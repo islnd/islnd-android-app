@@ -1,4 +1,8 @@
-package com.island.island;
+package com.island.island.Database;
+
+import com.island.island.Containers.Post;
+import com.island.island.Containers.Profile;
+import com.island.island.Containers.User;
 
 import java.util.ArrayList;
 import java.util.List;
