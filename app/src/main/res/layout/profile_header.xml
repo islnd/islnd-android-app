@@ -18,7 +18,8 @@
             android:layout_width="@dimen/profile_profile_picture"
             android:layout_height="@dimen/profile_profile_picture"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/profile_profile_picture_top_margin"/>
+            android:layout_marginTop="@dimen/profile_profile_picture_top_margin"
+            android:src="@drawable/ic_profile_picture"/>
     </FrameLayout>
 
     <!-- Name -->
@@ -28,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_header_frame"
         android:layout_centerHorizontal="true"
+        android:paddingTop="@dimen/profile_name_padding"
         android:text="David Thompson"
         style="@style/Base.TextAppearance.AppCompat.Title"/>
 
@@ -38,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_name"
         android:layout_centerHorizontal="true"
+        android:paddingBottom="@dimen/about_me_padding"
         android:text="About Me !!!"
         style="@style/Base.TextAppearance.AppCompat.Subhead"/>
 </RelativeLayout>

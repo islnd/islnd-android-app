@@ -1,10 +1,17 @@
 package com.island.island.Database;
 
+import android.util.JsonReader;
+
 import com.island.island.Containers.Post;
 import com.island.island.Containers.Profile;
 import com.island.island.Containers.User;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -14,6 +21,77 @@ import java.util.List;
  */
 public class IslandDB
 {
+    public static String mockData = "{\n" +
+            "  \"users\": [\n" +
+            "    \"Bill Gates\", \"Steve Jobs\", \"Fred Flintstone\", \"John Smith\", \"Thom Yorke\"\n" +
+            "  ],\n" +
+            "  \"Bill Gates\": {\n" +
+            "    \"posts\": {\n" +
+            "      \"0\": {\n" +
+            "        \"timestamp\": \"Jan 1st 2016 04:23 am\",\n" +
+            "        \"content\": \"I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.\",\n" +
+            "        \"comments\": {}\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"profile\":\n" +
+            "    {\n" +
+            "      \"about_me\": \"Founder of Microsoft.\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"Steve Jobs\": {\n" +
+            "    \"posts\": {\n" +
+            "      \"0\": {\n" +
+            "        \"timestamp\": \"Jan 10th 2016 04:20 pm\",\n" +
+            "        \"content\": \"*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.\",\n" +
+            "        \"comments\": {}\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"profile\":\n" +
+            "    {\n" +
+            "      \"about_me\": \"Founder of Apple.\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"Fred Flintstone\": {\n" +
+            "    \"posts\": {\n" +
+            "      \"0\": {\n" +
+            "        \"timestamp\": \"Jan 1st 2016 01:12 am\",\n" +
+            "        \"content\": \"I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.\",\n" +
+            "        \"comments\": {}\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"profile\":\n" +
+            "    {\n" +
+            "      \"about_me\": \"Citizen of Bedrock.\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"John Smith\": {\n" +
+            "    \"posts\": {\n" +
+            "      \"0\": {\n" +
+            "        \"timestamp\": \"Jan 1st 2016 12:17 am\",\n" +
+            "        \"content\": \"This post is boring just like my name :)\",\n" +
+            "        \"comments\": {}\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"profile\":\n" +
+            "    {\n" +
+            "      \"about_me\": \"I ain't nothin'.\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"Thom Yorke\": {\n" +
+            "    \"posts\": {\n" +
+            "      \"0\": {\n" +
+            "        \"timestamp\": \"Jan 1st 2016 07:31 pm\",\n" +
+            "        \"content\": \"I am radiohead lol. I have a high voice but it's cool because I'm nasty with a synth. Get at me Damon Albarn. Gorillaz suk lol ayyyyyyeeeee. ISLAND NEEDS TO SUPPORT EMOJIS AYYYYEEEEe.\",\n" +
+            "        \"comments\": {}\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"profile\":\n" +
+            "    {\n" +
+            "      \"about_me\": \"I'm in that one band.\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+
     public static List<User> getUsers()
     /**
      * Gets list of users that have allowed me to read their content.
@@ -21,10 +99,23 @@ public class IslandDB
      * @return The list of users.
      */
     {
-        // Return empty list for now
-        List<User> emptyList = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
 
-        return emptyList;
+        try
+        {
+            JSONObject obj = new JSONObject(mockData);
+            JSONArray users = obj.getJSONArray("users");
+
+            for(int i = 0; i < users.length(); ++i)
+            {
+                User newUser = new User(users.getString(i), "", "");
+                userList.add(newUser);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return userList;
     }
 
     public static void post(String content)
@@ -50,9 +141,29 @@ public class IslandDB
         // Return
 
         // Return empty list for now
-        List<Post> emptyList = new ArrayList<>();
+        List<Post> posts = new ArrayList<>();
 
-        return emptyList;
+        try
+        {
+            JSONObject obj = new JSONObject(mockData);
+            JSONObject userPosts = obj.getJSONObject(user.getUsername()).getJSONObject("posts");
+            Iterator<?> keys = userPosts.keys();
+
+            while(keys.hasNext())
+            {
+                String key = (String)keys.next();
+                JSONObject postObject = userPosts.getJSONObject(key);
+                String timestamp = postObject.getString("timestamp");
+                String content = postObject.getString("content");
+
+                posts.add(new Post("", user.getUsername(), timestamp, content));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return posts;
     }
 
     public static List<Post> getLastNPostsForUser(User user, int n)
@@ -69,9 +180,32 @@ public class IslandDB
         // Return
 
         // Return empty list for now
-        List<Post> emptyList = new ArrayList<>();
+        List<Post> posts = new ArrayList<>();
 
-        return emptyList;
+        try
+        {
+            JSONObject obj = new JSONObject(mockData);
+            JSONObject userPosts = obj.getJSONObject(user.getUsername()).getJSONObject("posts");
+            Iterator<?> keys = userPosts.keys();
+
+            int count = 0;
+
+            while(keys.hasNext() && count < n)
+            {
+                String key = (String)keys.next();
+                JSONObject postObject = userPosts.getJSONObject(key);
+                String timestamp = postObject.getString("timestamp");
+                String content = postObject.getString("content");
+
+                posts.add(new Post("", user.getUsername(), timestamp, content));
+                count++;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return posts;
     }
 
     public static void allowReader(String username)
@@ -123,9 +257,20 @@ public class IslandDB
      * @return Profile of designated user.
      */
     {
-        // Return empty profile for now.
-        //Profile profile = new Profile();
+        Profile profile = null;
 
-        return null;
+        try
+        {
+            JSONObject obj = new JSONObject(mockData);
+            JSONObject profileObj = obj.getJSONObject(user.getUsername()).getJSONObject("profile");
+
+            String aboutMe = profileObj.getString("about_me");
+            profile = new Profile("", "", user.getUsername(), aboutMe);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return profile;
     }
 }

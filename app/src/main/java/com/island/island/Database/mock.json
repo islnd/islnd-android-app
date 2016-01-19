@@ -1,0 +1,70 @@
+{
+  "users": [
+    "Bill Gates", "Steve Jobs", "Fred Flintstone", "John Smith", "Thom Yorke"
+  ],
+  "Bill Gates": {
+    "posts": {
+      "0": {
+        "timestamp": "Jan 1st 2016 04:23 am",
+        "content": "I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.",
+        "comments": {}
+      }
+    },
+    "profile":
+    {
+      "about_me": "Founder of Microsoft."
+    }
+  },
+  "Steve Jobs": {
+    "posts": {
+      "0": {
+        "timestamp": "Jan 10th 2016 04:20 pm",
+        "content": "*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.",
+        "comments": {}
+      }
+    },
+    "profile":
+    {
+      "about_me": "Founder of Apple."
+    }
+  },
+  "Fred Flintstone": {
+    "posts": {
+      "0": {
+        "timestamp": "Jan 1st 2016 01:12 am",
+        "content": "I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.",
+        "comments": {}
+      }
+    },
+    "profile":
+    {
+      "about_me": "Citizen of Bedrock."
+    }
+  },
+  "John Smith": {
+    "posts": {
+      "0": {
+        "timestamp": "Jan 1st 2016 12:17 am",
+        "content": "This post is boring just like my name :)",
+        "comments": {}
+      }
+    },
+    "profile":
+    {
+      "about_me": "I ain't nothin'."
+    }
+  },
+  "Thom Yorke": {
+    "posts": {
+      "0": {
+        "timestamp": "Jan 1st 2016 07:31 pm",
+        "content": "I am radiohead lol. I have a high voice but it's cool because I'm nasty with a synth. Get at me Damon Albarn. Gorillaz suk lol ayyyyyyeeeee. ISLAND NEEDS TO SUPPORT EMOJIS AYYYYEEEEe.",
+        "comments": {}
+      }
+    },
+    "profile":
+    {
+      "about_me": "I'm in that one band."
+    }
+  }
+}

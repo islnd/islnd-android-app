@@ -12,6 +12,8 @@ import android.widget.ListView;
 import com.island.island.Adapters.FeedAdapter;
 import com.island.island.Containers.Post;
 import com.island.island.Containers.Profile;
+import com.island.island.Containers.User;
+import com.island.island.Database.IslandDB;
 import com.island.island.R;
 
 import java.util.ArrayList;
@@ -29,8 +31,8 @@ public class FeedActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Feed posts
-        ArrayList<Post> arraryOfPosts = new ArrayList<>();
-        FeedAdapter feedAdapter = new FeedAdapter(this, arraryOfPosts);
+        ArrayList<Post> arrayOfPosts = new ArrayList<>();
+        FeedAdapter feedAdapter = new FeedAdapter(this, arrayOfPosts);
         ListView postsListView = (ListView) findViewById(R.id.feed_posts);
         postsListView.setAdapter(feedAdapter);
 
@@ -50,6 +52,18 @@ public class FeedActivity extends AppCompatActivity
         feedAdapter.add(testPost4);
         feedAdapter.add(testPost5);
         feedAdapter.add(testPost6);
+
+        List<User> userList = IslandDB.getUsers();
+        for(int i = 0; i < userList.size(); ++i)
+        {
+            User user = userList.get(i);
+
+            List<Post> userPosts = IslandDB.getPostsForUser(user);
+            for(int j = 0; j < userPosts.size(); ++j)
+            {
+                feedAdapter.add(userPosts.get(j));
+            }
+        }
 
         // Profile test
         final Intent profileIntent = new Intent(this, ProfileActivity.class);
