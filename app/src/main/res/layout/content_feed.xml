@@ -13,4 +13,9 @@
     tools:context=".Activities.FeedActivity"
     tools:showIn="@layout/activity_feed">
 
+    <ListView
+        android:id="@+id/feed_posts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
 </RelativeLayout>

@@ -7,8 +7,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ListView;
 
+import com.island.island.Adapters.FeedAdapter;
+import com.island.island.Containers.Post;
+import com.island.island.Containers.Profile;
 import com.island.island.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FeedActivity extends AppCompatActivity
 {
@@ -20,6 +27,29 @@ public class FeedActivity extends AppCompatActivity
         setContentView(R.layout.activity_feed);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Feed posts
+        ArrayList<Post> arraryOfPosts = new ArrayList<>();
+        FeedAdapter feedAdapter = new FeedAdapter(this, arraryOfPosts);
+        ListView postsListView = (ListView) findViewById(R.id.feed_posts);
+        postsListView.setAdapter(feedAdapter);
+
+        // Add test posts
+        Post testPost = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        Post testPost1 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        Post testPost2 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        Post testPost3 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        Post testPost4 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        Post testPost5 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        Post testPost6 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+
+        feedAdapter.add(testPost);
+        feedAdapter.add(testPost1);
+        feedAdapter.add(testPost2);
+        feedAdapter.add(testPost3);
+        feedAdapter.add(testPost4);
+        feedAdapter.add(testPost5);
+        feedAdapter.add(testPost6);
 
         // Profile test
         final Intent profileIntent = new Intent(this, ProfileActivity.class);
