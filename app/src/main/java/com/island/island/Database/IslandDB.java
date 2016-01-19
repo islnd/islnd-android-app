@@ -124,8 +124,8 @@ public class IslandDB
      */
     {
         // Return empty profile for now.
-        Profile profile = new Profile();
+        //Profile profile = new Profile();
 
-        return profile;
+        return null;
     }
 }

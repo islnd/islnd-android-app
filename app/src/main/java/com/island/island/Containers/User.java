@@ -13,7 +13,7 @@ public class User
 
     public void User(){}
 
-    public void User(String username, String pseudonym, String groupKey)
+    public User(String username, String pseudonym, String groupKey)
     {
         this.username = username;
         this.pseudonym = pseudonym;

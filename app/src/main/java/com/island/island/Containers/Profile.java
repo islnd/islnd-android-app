@@ -7,4 +7,17 @@ package com.island.island.Containers;
  */
 public class Profile
 {
+    public String headerPictureUri = "";
+    public String profilePictureUri = "";
+    public String userName = "";
+    public String aboutMe = "";
+
+    public Profile(String headerPictureUri, String profilePictureUri, String userName,
+                   String aboutMe)
+    {
+        this.headerPictureUri = headerPictureUri;
+        this.profilePictureUri = profilePictureUri;
+        this.userName = userName;
+        this.aboutMe = aboutMe;
+    }
 }

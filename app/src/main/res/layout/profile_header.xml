@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_header_frame">
+        <!-- Header -->
+        <ImageView
+            android:id="@+id/profile_header_image"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_header_height"/>
+
+        <!-- Profile Picture -->
+        <ImageView
+            android:id="@+id/profile_profile_picture"
+            android:layout_width="@dimen/profile_profile_picture"
+            android:layout_height="@dimen/profile_profile_picture"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/profile_profile_picture_top_margin"/>
+    </FrameLayout>
+
+    <!-- Name -->
+    <TextView
+        android:id="@+id/profile_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/profile_header_frame"
+        android:layout_centerHorizontal="true"
+        android:text="David Thompson"
+        style="@style/Base.TextAppearance.AppCompat.Title"/>
+
+    <!-- About me -->
+    <TextView
+        android:id="@+id/profile_about_me"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profile_name"
+        android:layout_centerHorizontal="true"
+        android:text="About Me !!!"
+        style="@style/Base.TextAppearance.AppCompat.Subhead"/>
+</RelativeLayout>

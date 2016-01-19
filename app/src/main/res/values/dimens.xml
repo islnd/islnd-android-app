@@ -7,4 +7,9 @@
     <!-- Post -->
     <dimen name="post_profile_picture">50dp</dimen>
     <dimen name="post_profile_picture_margin">8dp</dimen>
+
+    <!-- Profile -->
+    <dimen name="profile_header_height">200dp</dimen>
+    <dimen name="profile_profile_picture">100dp</dimen>
+    <dimen name="profile_profile_picture_top_margin">150dp</dimen>
 </resources>

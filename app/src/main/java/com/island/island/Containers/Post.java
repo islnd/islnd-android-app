@@ -7,5 +7,16 @@ package com.island.island.Containers;
  */
 public class Post
 {
+    public String profilePictureUri = "";
+    public String profileName = "";
+    public String timestamp = "";
+    public String content = "";
 
+    public Post(String profilePictureUri, String profileName, String timestamp, String content)
+    {
+        this.profilePictureUri = profilePictureUri;
+        this.profileName = profileName;
+        this.timestamp = timestamp;
+        this.content = content;
+    }
 }
