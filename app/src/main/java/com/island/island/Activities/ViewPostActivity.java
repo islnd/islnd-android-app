@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.island.island.Containers.Post;
 import com.island.island.R;
 
 
@@ -25,18 +26,16 @@ public class ViewPostActivity extends AppCompatActivity
 
         // Get intent with post info
         Intent intent = getIntent();
-        String postProfileName = intent.getStringExtra("POST_PROFILE_NAME");
-        String postTimestamp = intent.getStringExtra("POST_TIMESTAMP");
-        String postContent = intent.getStringExtra("POST_CONTENT");
+        Post post = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
 
         // Get layout views and set data
         TextView name = (TextView) findViewById(R.id.post_profile_name);
         TextView timestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView content = (TextView) findViewById(R.id.post_content);
 
-        name.setText(postProfileName);
-        timestamp.setText(postTimestamp);
-        content.setText(postContent);
+        name.setText(post.profileName);
+        timestamp.setText(post.timestamp);
+        content.setText(post.content);
 
         // Set FAB onclick
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

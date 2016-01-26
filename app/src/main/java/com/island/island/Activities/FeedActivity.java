@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.island.island.Adapters.FeedAdapter;
@@ -30,29 +31,13 @@ public class FeedActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Feed posts
+        // Feed posts setup
         ArrayList<Post> arrayOfPosts = new ArrayList<>();
         FeedAdapter feedAdapter = new FeedAdapter(this, arrayOfPosts);
         ListView postsListView = (ListView) findViewById(R.id.feed_posts);
         postsListView.setAdapter(feedAdapter);
 
-        // Add test posts
-        Post testPost = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost1 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost2 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost3 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost4 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost5 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost6 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-
-        feedAdapter.add(testPost);
-        feedAdapter.add(testPost1);
-        feedAdapter.add(testPost2);
-        feedAdapter.add(testPost3);
-        feedAdapter.add(testPost4);
-        feedAdapter.add(testPost5);
-        feedAdapter.add(testPost6);
-
+        // Populate feed
         List<User> userList = IslandDB.getUsers();
         for(int i = 0; i < userList.size(); ++i)
         {
@@ -64,6 +49,19 @@ public class FeedActivity extends AppCompatActivity
                 feedAdapter.add(userPosts.get(j));
             }
         }
+
+        // View post on post click
+        postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent viewPostIntent = new Intent(FeedActivity.this, ViewPostActivity.class);
+                Post post = (Post) parent.getItemAtPosition(position);
+                viewPostIntent.putExtra(Post.POST_EXTRA, post);
+                startActivity(viewPostIntent);
+            }
+        });
 
         // Profile test
         final Intent profileIntent = new Intent(this, ProfileActivity.class);
@@ -79,4 +77,8 @@ public class FeedActivity extends AppCompatActivity
         });
     }
 
+    public void postClick(View post)
+    {
+
+    }
 }

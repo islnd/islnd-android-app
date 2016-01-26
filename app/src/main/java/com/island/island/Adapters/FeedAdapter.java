@@ -1,12 +1,16 @@
 package com.island.island.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.island.island.Activities.FeedActivity;
+import com.island.island.Activities.ProfileActivity;
 import com.island.island.Containers.Post;
 import com.island.island.R;
 
@@ -17,13 +21,15 @@ import java.util.ArrayList;
  */
 public class FeedAdapter extends ArrayAdapter<Post>
 {
+    private Context mContext;
     public FeedAdapter(Context context, ArrayList posts)
     {
         super(context, 0, posts);
+        mContext = context;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getView(int position, View convertView, final ViewGroup parent)
     {
         if (convertView == null)
         {
@@ -33,9 +39,22 @@ public class FeedAdapter extends ArrayAdapter<Post>
         Post post = (Post) getItem(position);
 
         // Get layout views
+        ImageView postProfilePicture = (ImageView) convertView.findViewById(
+                R.id.post_profile_picture);
         TextView postName = (TextView) convertView.findViewById(R.id.post_profile_name);
         TextView postTimestamp = (TextView) convertView.findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) convertView.findViewById(R.id.post_content);
+
+        // Go to profile on picture click
+        postProfilePicture.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+                mContext.startActivity(profileIntent);
+            }
+        });
 
         // Set values
         postName.setText(post.profileName);

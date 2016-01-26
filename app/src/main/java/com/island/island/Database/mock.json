@@ -8,6 +8,16 @@
         "timestamp": "1453837198",
         "content": "I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.",
         "comments": {}
+      },
+      "1": {
+        "timestamp": "1253837198",
+        "content": "I made a bunch of money today!",
+        "comments": {}
+      },
+      "2": {
+        "timestamp": "1253937198",
+        "content": "I made even more money today!",
+        "comments": {}
       }
     },
     "profile":
@@ -21,6 +31,11 @@
         "timestamp": "1453837000",
         "content": "*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.",
         "comments": {}
+      },
+      "1": {
+        "timestamp": "1213857000",
+        "content": "I'm innovative lol :)",
+        "comments": {}
       }
     },
     "profile":
@@ -33,6 +48,11 @@
       "0": {
         "timestamp": "1453830198",
         "content": "I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.",
+        "comments": {}
+      },
+      "1": {
+        "timestamp": "1400830198",
+        "content": "Watch my show tonight!",
         "comments": {}
       }
     },

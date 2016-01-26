@@ -32,6 +32,16 @@ public class IslandDB
             "        \"timestamp\": \"1453837198\",\n" +
             "        \"content\": \"I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.\",\n" +
             "        \"comments\": {}\n" +
+            "      },\n" +
+            "      \"1\": {\n" +
+            "        \"timestamp\": \"1253837198\",\n" +
+            "        \"content\": \"I made a bunch of money today!\",\n" +
+            "        \"comments\": {}\n" +
+            "      },\n" +
+            "      \"2\": {\n" +
+            "        \"timestamp\": \"1253937198\",\n" +
+            "        \"content\": \"I made even more money today!\",\n" +
+            "        \"comments\": {}\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -45,6 +55,11 @@ public class IslandDB
             "        \"timestamp\": \"1453837000\",\n" +
             "        \"content\": \"*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.\",\n" +
             "        \"comments\": {}\n" +
+            "      },\n" +
+            "      \"1\": {\n" +
+            "        \"timestamp\": \"1213857000\",\n" +
+            "        \"content\": \"I'm innovative lol :)\",\n" +
+            "        \"comments\": {}\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -57,6 +72,11 @@ public class IslandDB
             "      \"0\": {\n" +
             "        \"timestamp\": \"1453830198\",\n" +
             "        \"content\": \"I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.\",\n" +
+            "        \"comments\": {}\n" +
+            "      },\n" +
+            "      \"1\": {\n" +
+            "        \"timestamp\": \"1400830198\",\n" +
+            "        \"content\": \"Watch my show tonight!\",\n" +
             "        \"comments\": {}\n" +
             "      }\n" +
             "    },\n" +
