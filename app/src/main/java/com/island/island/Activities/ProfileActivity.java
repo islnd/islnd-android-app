@@ -1,11 +1,13 @@
 package com.island.island.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.island.island.Adapters.ProfileAdapter;
@@ -50,6 +52,19 @@ public class ProfileActivity extends AppCompatActivity
         profileAdapter.add(testPost4);
         profileAdapter.add(testPost5);
         profileAdapter.add(testPost6);
+
+        // View post on post click
+        postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent viewPostIntent = new Intent(ProfileActivity.this, ViewPostActivity.class);
+                Post post = (Post) parent.getItemAtPosition(position);
+                viewPostIntent.putExtra(Post.POST_EXTRA, post);
+                startActivity(viewPostIntent);
+            }
+        });
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
