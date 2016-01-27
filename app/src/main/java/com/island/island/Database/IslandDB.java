@@ -272,7 +272,7 @@ public class IslandDB
 
     }
 
-    public static Profile getUserProfile(User user)
+    public static Profile getUserProfile(String username)
     /**
      * Gets a user's profile.
      *
@@ -285,10 +285,10 @@ public class IslandDB
         try
         {
             JSONObject obj = new JSONObject(mockData);
-            JSONObject profileObj = obj.getJSONObject(user.getUsername()).getJSONObject("profile");
+            JSONObject profileObj = obj.getJSONObject(username).getJSONObject("profile");
 
             String aboutMe = profileObj.getString("about_me");
-            profile = new Profile("", "", user.getUsername(), aboutMe);
+            profile = new Profile("", "", username, aboutMe);
 
         } catch (JSONException e) {
             e.printStackTrace();
