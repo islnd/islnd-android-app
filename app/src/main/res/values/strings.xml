@@ -13,4 +13,8 @@
     <string name="new_post_hint">Whatcha got?</string>
 
     <string name="empty_string_post">Cannot submit an empty post!</string>
+    <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
