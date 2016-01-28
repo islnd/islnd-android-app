@@ -30,6 +30,8 @@ Thumbs.db
 *.iml
 .idea/workspace.xml
 .idea/encodings.xml
+.idea/codeStyleSettings.xml
+.idea/misc.xml
 .idea/libraries
 .gradle
 build/
