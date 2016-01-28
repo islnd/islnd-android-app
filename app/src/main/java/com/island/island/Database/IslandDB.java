@@ -178,7 +178,7 @@ public class IslandDB
                 timestamp = Utils.smartTimestampFromUnixTime(Long.parseLong(timestamp));
                 String content = postObject.getString("content");
 
-                posts.add(new Post("", user.getUsername(), timestamp, content));
+                posts.add(new Post(user.getUsername(), timestamp, content, ""));
             }
 
         } catch (JSONException e) {
@@ -220,7 +220,7 @@ public class IslandDB
                 timestamp = Utils.smartTimestampFromUnixTime(Long.parseLong(timestamp));
                 String content = postObject.getString("content");
 
-                posts.add(new Post("", user.getUsername(), timestamp, content));
+                posts.add(new Post(user.getUsername(), timestamp, content, ""));
                 count++;
             }
 
@@ -272,7 +272,7 @@ public class IslandDB
 
     }
 
-    public static Profile getUserProfile(String username)
+    public static Profile getUserProfile(String userName)
     /**
      * Gets a user's profile.
      *
@@ -285,10 +285,10 @@ public class IslandDB
         try
         {
             JSONObject obj = new JSONObject(mockData);
-            JSONObject profileObj = obj.getJSONObject(username).getJSONObject("profile");
+            JSONObject profileObj = obj.getJSONObject(userName).getJSONObject("profile");
 
             String aboutMe = profileObj.getString("about_me");
-            profile = new Profile("", "", username, aboutMe);
+            profile = new Profile(userName, "", "", aboutMe);
 
         } catch (JSONException e) {
             e.printStackTrace();

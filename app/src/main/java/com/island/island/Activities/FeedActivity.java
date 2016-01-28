@@ -63,9 +63,6 @@ public class FeedActivity extends AppCompatActivity
             }
         });
 
-        // Profile test
-        final Intent profileIntent = new Intent(this, ProfileActivity.class);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()
         {

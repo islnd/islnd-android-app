@@ -45,9 +45,9 @@ public class FeedAdapter extends ArrayAdapter<Post>
         TextView postTimestamp = (TextView) convertView.findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) convertView.findViewById(R.id.post_content);
 
-        postName.setText(post.profileName);
-        postTimestamp.setText(post.timestamp);
-        postContent.setText(post.content);
+        postName.setText(post.getUserName());
+        postTimestamp.setText(post.getTimestamp());
+        postContent.setText(post.getContent());
 
         // Go to profile on picture click
         postProfilePicture.setOnClickListener(new View.OnClickListener()
@@ -56,7 +56,7 @@ public class FeedAdapter extends ArrayAdapter<Post>
             public void onClick(View v)
             {
                 Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.profileName);
+                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
                 mContext.startActivity(profileIntent);
             }
         });

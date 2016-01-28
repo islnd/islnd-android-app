@@ -1,11 +1,13 @@
 package com.island.island.Containers;
 
+import java.io.Serializable;
+
 /**
  * Created by David Thompson on 12/20/2015.
  *
  * This class represents a user.
  */
-public class User
+public class User implements Serializable
 {
     private String username = "";
     private String pseudonym = "";

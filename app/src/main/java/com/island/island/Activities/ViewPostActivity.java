@@ -35,9 +35,9 @@ public class ViewPostActivity extends AppCompatActivity
         TextView timestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView content = (TextView) findViewById(R.id.post_content);
 
-        name.setText(post.profileName);
-        timestamp.setText(post.timestamp);
-        content.setText(post.content);
+        name.setText(post.getUserName());
+        timestamp.setText(post.getTimestamp());
+        content.setText(post.getContent());
 
         // Go to profile on picture click
         postProfilePicture.setOnClickListener(new View.OnClickListener()
@@ -46,7 +46,7 @@ public class ViewPostActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 Intent profileIntent = new Intent(ViewPostActivity.this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.profileName);
+                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
                 startActivity(profileIntent);
             }
         });

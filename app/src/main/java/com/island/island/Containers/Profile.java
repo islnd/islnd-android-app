@@ -11,17 +11,56 @@ public class Profile implements Serializable
 {
     public static String PROFILE_EXTRA = "PROFILE_OBJECT";
 
-    public String headerPictureUri = "";
-    public String profilePictureUri = "";
-    public String userName = "";
-    public String aboutMe = "";
+    private String userName = "";
+    private String headerImageUri = "";
+    private String profileImageUri = "";
+    private String aboutMe = "";
 
-    public Profile(String headerPictureUri, String profilePictureUri, String userName,
-                   String aboutMe)
+    public Profile(String userName, String headerImageUri, String profileImageUri, String aboutMe)
     {
-        this.headerPictureUri = headerPictureUri;
-        this.profilePictureUri = profilePictureUri;
         this.userName = userName;
+        this.headerImageUri = headerImageUri;
+        this.profileImageUri = profileImageUri;
         this.aboutMe = aboutMe;
+    }
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
+
+    public String getAboutMe()
+    {
+        return aboutMe;
+    }
+
+    public void setAboutMe(String aboutMe)
+    {
+        this.aboutMe = aboutMe;
+    }
+
+    public String getProfileImageUri()
+    {
+        return profileImageUri;
+    }
+
+    public void setProfileImageUri(String profileImageUri)
+    {
+        this.profileImageUri = profileImageUri;
+    }
+
+    public String getHeaderImageUri()
+    {
+        return headerImageUri;
+    }
+
+    public void setHeaderImageUri(String headerImageUri)
+    {
+        this.headerImageUri = headerImageUri;
     }
 }

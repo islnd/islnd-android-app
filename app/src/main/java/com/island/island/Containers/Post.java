@@ -9,19 +9,58 @@ import java.io.Serializable;
  */
 public class Post implements Serializable
 {
-    // When passing post with intent
     public static String POST_EXTRA = "POST_OBJECT";
 
-    public String profilePictureUri = "";
-    public String profileName = "";
-    public String timestamp = "";
-    public String content = "";
+    private String userName = "";
+    private String timestamp = "";
+    private String content = "";
+    private String profileImageUri = "";
 
-    public Post(String profilePictureUri, String profileName, String timestamp, String content)
+    public Post(String userName, String timestamp, String content, String profileImageUri)
     {
-        this.profilePictureUri = profilePictureUri;
-        this.profileName = profileName;
+        this.userName = userName;
         this.timestamp = timestamp;
         this.content = content;
+        this.profileImageUri = profileImageUri;
+    }
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
+
+    public String getTimestamp()
+    {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp)
+    {
+        this.timestamp = timestamp;
+    }
+
+    public String getContent()
+    {
+        return content;
+    }
+
+    public void setContent(String content)
+    {
+        this.content = content;
+    }
+
+    public String getProfileImageUri()
+    {
+        return profileImageUri;
+    }
+
+    public void setProfileImageUri(String profileImageUri)
+    {
+        this.profileImageUri = profileImageUri;
     }
 }
