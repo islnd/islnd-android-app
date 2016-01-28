@@ -11,4 +11,6 @@
     <string name="title_activity_new_post">NewPostActivity</string>
 
     <string name="new_post_hint">Whatcha got?</string>
+
+    <string name="empty_string_post">Cannot submit an empty post!</string>
 </resources>
