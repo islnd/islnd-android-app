@@ -62,15 +62,11 @@ public class FeedActivity extends AppCompatActivity
                 startActivity(viewPostIntent);
             }
         });
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-
-            }
-        });
+    public void startNewPostActivity(View view)
+    {
+        Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
+        startActivity(newPostIntent);
     }
 }

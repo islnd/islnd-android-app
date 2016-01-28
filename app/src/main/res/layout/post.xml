@@ -27,16 +27,14 @@
                 android:id="@+id/post_profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Base.TextAppearance.AppCompat.Title"
-                android:text="@string/post_placeholder_name"/>
+                style="@style/Base.TextAppearance.AppCompat.Title"/>
 
             <TextView
                 android:id="@+id/post_timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_profile_name"
-                style="@style/Base.TextAppearance.AppCompat.Caption"
-                android:text="@string/post_placeholder_timestamp"/>
+                style="@style/Base.TextAppearance.AppCompat.Caption"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -45,7 +43,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/post_header_layout"
-        style="@style/Base.TextAppearance.AppCompat.Body1"
-        android:text="@string/post_placeholder_content"/>
+        style="@style/Base.TextAppearance.AppCompat.Body1"/>
 
 </RelativeLayout>

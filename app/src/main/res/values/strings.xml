@@ -6,16 +6,9 @@
 
     <string name="add_comment">Add Comment</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <!-- Post Placeholders-->
-    <string name="post_placeholder_name">Name</string>
-    <string name="post_placeholder_timestamp">Timestamp</string>
-    <string name="post_placeholder_content">This is tempory content! akldf lajkdhf alidu e amndbfi
-        kjadhf uieh akjdjha fkjahdf nme akjsdhfkjahdfjhadkjfna f kuajdhf kajhdfjkadf
-        kjahdfjkhakdfjhajkdfs aljkdhfahkdfkljasdf lkadjfkljadflkjadsf laidkjflkjflkejmn,adfnm
-    </string>
     <string name="title_activity_feed">FeedActivity</string>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_new_post">NewPostActivity</string>
+
+    <string name="new_post_hint">Whatcha got?</string>
 </resources>
