@@ -10,7 +10,8 @@
         <ImageView
             android:id="@+id/profile_header_image"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/profile_header_height"/>
+            android:layout_height="@dimen/profile_header_height"
+            android:src="@drawable/side_nav_bar"/>
 
         <!-- Profile Picture -->
         <ImageView
@@ -19,7 +20,8 @@
             android:layout_height="@dimen/profile_profile_picture"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/profile_profile_picture_top_margin"
-            android:src="@drawable/ic_profile_picture"/>
+            android:src="@drawable/ic_person_black_24dp"
+            android:background="@android:color/white"/>
     </FrameLayout>
 
     <!-- Name -->
