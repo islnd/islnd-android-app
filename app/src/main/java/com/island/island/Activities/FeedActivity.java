@@ -72,13 +72,8 @@ public class FeedActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                startActivity(profileIntent);
+
             }
         });
-    }
-
-    public void postClick(View post)
-    {
-
     }
 }

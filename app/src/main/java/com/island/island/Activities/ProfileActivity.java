@@ -13,12 +13,16 @@ import android.widget.ListView;
 import com.island.island.Adapters.ProfileAdapter;
 import com.island.island.Containers.Post;
 import com.island.island.Containers.Profile;
+import com.island.island.Containers.User;
+import com.island.island.Database.IslandDB;
 import com.island.island.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity
 {
+    public static String USER_NAME_EXTRA = "USER_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,24 +38,20 @@ public class ProfileActivity extends AppCompatActivity
         ListView postsListView = (ListView) findViewById(R.id.profile_posts);
         postsListView.setAdapter(profileAdapter);
 
-        // Add test posts
-        Profile profile = new Profile("", "", "David Thompson", "This is about me!");
-        Post testPost = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost1 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost2 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost3 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost4 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost5 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
-        Post testPost6 = new Post("", "David Thompson", "Jan 2015", "Hello, World!");
+        // Get intent with username
+        Intent profileIntent = getIntent();
+        String userName = profileIntent.getStringExtra(USER_NAME_EXTRA);
+        Profile profile = IslandDB.getUserProfile(userName);
 
+        // Add profile first then posts
         profileAdapter.add(profile);
-        profileAdapter.add(testPost);
-        profileAdapter.add(testPost1);
-        profileAdapter.add(testPost2);
-        profileAdapter.add(testPost3);
-        profileAdapter.add(testPost4);
-        profileAdapter.add(testPost5);
-        profileAdapter.add(testPost6);
+
+        // User posts
+        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
+        for(int i = 0; i < userPosts.size(); ++i)
+        {
+            profileAdapter.add(userPosts.get(i));
+        }
 
         // View post on post click
         postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -59,13 +59,18 @@ public class ProfileActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
+                // Ignore profile header
+                if(position == 0)
+                {
+                    return;
+                }
+
                 Intent viewPostIntent = new Intent(ProfileActivity.this, ViewPostActivity.class);
                 Post post = (Post) parent.getItemAtPosition(position);
                 viewPostIntent.putExtra(Post.POST_EXTRA, post);
                 startActivity(viewPostIntent);
             }
         });
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()

@@ -36,14 +36,18 @@ public class FeedAdapter extends ArrayAdapter<Post>
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.post, parent, false);
         }
 
-        Post post = (Post) getItem(position);
+        final Post post = (Post) getItem(position);
 
-        // Get layout views
+        // Get layout views and set data
         ImageView postProfilePicture = (ImageView) convertView.findViewById(
                 R.id.post_profile_picture);
         TextView postName = (TextView) convertView.findViewById(R.id.post_profile_name);
         TextView postTimestamp = (TextView) convertView.findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) convertView.findViewById(R.id.post_content);
+
+        postName.setText(post.profileName);
+        postTimestamp.setText(post.timestamp);
+        postContent.setText(post.content);
 
         // Go to profile on picture click
         postProfilePicture.setOnClickListener(new View.OnClickListener()
@@ -52,14 +56,10 @@ public class FeedAdapter extends ArrayAdapter<Post>
             public void onClick(View v)
             {
                 Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.profileName);
                 mContext.startActivity(profileIntent);
             }
         });
-
-        // Set values
-        postName.setText(post.profileName);
-        postTimestamp.setText(post.timestamp);
-        postContent.setText(post.content);
 
         return convertView;
     }
