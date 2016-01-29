@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Containers.Post;
 import com.island.island.R;
+import com.island.island.Utils.Utils;
 
 import java.util.ArrayList;
 
@@ -60,6 +61,10 @@ public class FeedAdapter extends ArrayAdapter<Post>
                 mContext.startActivity(profileIntent);
             }
         });
+
+        // Set number of comments
+        TextView postCommentCount = (TextView) convertView.findViewById(R.id.post_comment_count);
+        postCommentCount.setText(Utils.numberOfCommentsString(post.getComments().size()));
 
         return convertView;
     }

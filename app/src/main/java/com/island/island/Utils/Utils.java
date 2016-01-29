@@ -48,4 +48,9 @@ public class Utils
 
         return timestamp;
     }
+
+    public static String numberOfCommentsString(int numberOfComments)
+    {
+        return numberOfComments + " comments";
+    }
 }
