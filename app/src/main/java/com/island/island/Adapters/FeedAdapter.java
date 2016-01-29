@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.island.island.Activities.FeedActivity;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Containers.Post;
 import com.island.island.R;
@@ -40,8 +39,8 @@ public class FeedAdapter extends ArrayAdapter<Post>
 
         // Get layout views and set data
         ImageView postProfilePicture = (ImageView) convertView.findViewById(
-                R.id.post_profile_picture);
-        TextView postName = (TextView) convertView.findViewById(R.id.post_profile_name);
+                R.id.post_profile_image);
+        TextView postName = (TextView) convertView.findViewById(R.id.post_user_name);
         TextView postTimestamp = (TextView) convertView.findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) convertView.findViewById(R.id.post_content);
 

@@ -28,8 +28,8 @@ public class ViewPostActivity extends AppCompatActivity
         final Post post = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
 
         // Get layout views and set data
-        ImageView postProfilePicture = (ImageView) findViewById(R.id.post_profile_picture);
-        TextView name = (TextView) findViewById(R.id.post_profile_name);
+        ImageView postProfilePicture = (ImageView) findViewById(R.id.post_profile_image);
+        TextView name = (TextView) findViewById(R.id.post_user_name);
         TextView timestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView content = (TextView) findViewById(R.id.post_content);
 

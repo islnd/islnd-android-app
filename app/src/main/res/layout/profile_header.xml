@@ -16,10 +16,10 @@
         <!-- Profile Picture -->
         <ImageView
             android:id="@+id/profile_profile_picture"
-            android:layout_width="@dimen/profile_profile_picture"
-            android:layout_height="@dimen/profile_profile_picture"
+            android:layout_width="@dimen/profile_profile_image"
+            android:layout_height="@dimen/profile_profile_image"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/profile_profile_picture_top_margin"
+            android:layout_marginTop="@dimen/profile_profile_image_top_margin"
             android:src="@drawable/ic_person_black_24dp"
             android:background="@android:color/white"/>
     </FrameLayout>
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_header_frame"
         android:layout_centerHorizontal="true"
-        android:paddingTop="@dimen/profile_name_padding"
+        android:paddingTop="@dimen/profile_user_name_padding"
         android:text="David Thompson"
         style="@style/Base.TextAppearance.AppCompat.Title"/>
 

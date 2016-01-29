@@ -5,16 +5,21 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <!-- Post -->
-    <dimen name="post_profile_picture">50dp</dimen>
-    <dimen name="post_profile_picture_margin">8dp</dimen>
+    <dimen name="post_profile_image">50dp</dimen>
+    <dimen name="post_profile_image_margin">8dp</dimen>
     <dimen name="post_padding">16dp</dimen>
 
     <!-- Profile -->
-    <dimen name="profile_header_height">200dp</dimen>
-    <dimen name="profile_profile_picture">100dp</dimen>
-    <dimen name="profile_profile_picture_top_margin">150dp</dimen>
+    <dimen name="profile_header_height">160dp</dimen>
+    <dimen name="profile_profile_image">100dp</dimen>
+    <dimen name="profile_profile_image_top_margin">150dp</dimen>
     <dimen name="about_me_padding">16dp</dimen>
-    <dimen name="profile_name_padding">16dp</dimen>
+    <dimen name="profile_user_name_padding">16dp</dimen>
+
+    <!-- Comment -->
+    <dimen name="comment_profile_image">50dp</dimen>
+    <dimen name="comment_profile_image_margin">8dp</dimen>
+    <dimen name="comment_padding">16dp</dimen>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
