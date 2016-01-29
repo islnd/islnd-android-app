@@ -49,10 +49,4 @@ public class ViewPostActivity extends AppCompatActivity
             }
         });
     }
-
-    public void startNewPostActivity(View view)
-    {
-        Intent newPostIntent = new Intent(ViewPostActivity.this, NewPostActivity.class);
-        startActivity(newPostIntent);
-    }
 }
