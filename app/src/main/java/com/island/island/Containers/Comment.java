@@ -1,9 +1,11 @@
 package com.island.island.Containers;
 
+import java.io.Serializable;
+
 /**
  * Created by poo on 1/29/2016.
  */
-public class Comment
+public class Comment implements Serializable
 {
     private String userName = "";
     private String comment = "";

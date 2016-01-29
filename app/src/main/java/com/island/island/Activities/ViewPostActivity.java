@@ -16,6 +16,7 @@ import com.island.island.Database.IslandDB;
 import com.island.island.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ViewPostActivity extends AppCompatActivity
@@ -44,9 +45,10 @@ public class ViewPostActivity extends AppCompatActivity
 
         // Add comments to list
         // TEST for now
-        for(int i = 0; i < 20; ++i)
+        List<Comment> comments = post.getComments();
+        for(int i = 0; i < comments.size(); ++i)
         {
-            viewPostAdapter.add(new Comment("Thom Yorke", "Great post!!!"));
+            viewPostAdapter.add(comments.get(i));
         }
     }
 

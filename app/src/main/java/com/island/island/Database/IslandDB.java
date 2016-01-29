@@ -32,17 +32,26 @@ public class IslandDB
             "      \"0\": {\n" +
             "        \"timestamp\": \"1453837198\",\n" +
             "        \"content\": \"I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": [\n" +
+            "          {\n" +
+            "            \"user\": \"Steve Jobs\",\n" +
+            "            \"comment\": \"Microsoft suks!!!\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"user\": \"Thom Yorke\",\n" +
+            "            \"comment\": \"You inspired Okay Computer\"\n" +
+            "          }\n" +
+            "        ]\n" +
             "      },\n" +
             "      \"1\": {\n" +
             "        \"timestamp\": \"1253837198\",\n" +
             "        \"content\": \"I made a bunch of money today!\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      },\n" +
             "      \"2\": {\n" +
             "        \"timestamp\": \"1253937198\",\n" +
             "        \"content\": \"I made even more money today!\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -55,12 +64,12 @@ public class IslandDB
             "      \"0\": {\n" +
             "        \"timestamp\": \"1453837000\",\n" +
             "        \"content\": \"*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      },\n" +
             "      \"1\": {\n" +
             "        \"timestamp\": \"1213857000\",\n" +
             "        \"content\": \"I'm innovative lol :)\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -73,12 +82,12 @@ public class IslandDB
             "      \"0\": {\n" +
             "        \"timestamp\": \"1453830198\",\n" +
             "        \"content\": \"I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      },\n" +
             "      \"1\": {\n" +
             "        \"timestamp\": \"1400830198\",\n" +
             "        \"content\": \"Watch my show tonight!\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -91,7 +100,7 @@ public class IslandDB
             "      \"0\": {\n" +
             "        \"timestamp\": \"1453807198\",\n" +
             "        \"content\": \"This post is boring just like my name :)\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -104,7 +113,7 @@ public class IslandDB
             "      \"0\": {\n" +
             "        \"timestamp\": \"1450837198\",\n" +
             "        \"content\": \"I am radiohead lol. I have a high voice but it's cool because I'm nasty with a synth. Get at me Damon Albarn. Gorillaz suk lol ayyyyyyeeeee. ISLAND NEEDS TO SUPPORT EMOJIS AYYYYEEEEe.\",\n" +
-            "        \"comments\": {}\n" +
+            "        \"comments\": []\n" +
             "      }\n" +
             "    },\n" +
             "    \"profile\":\n" +
@@ -179,7 +188,18 @@ public class IslandDB
                 timestamp = Utils.smartTimestampFromUnixTime(Long.parseLong(timestamp));
                 String content = postObject.getString("content");
 
-                posts.add(new Post(user.getUsername(), timestamp, content, ""));
+                List<Comment> comments = new ArrayList<>();
+                JSONArray commentArray = postObject.getJSONArray("comments");
+
+                for(int i = 0; i < commentArray.length(); ++i)
+                {
+                    JSONObject commentObj = commentArray.getJSONObject(i);
+                    Comment comment = new Comment(commentObj.getString("user"),
+                            commentObj.getString("comment"));
+                    comments.add(comment);
+                }
+
+                posts.add(new Post(user.getUsername(), timestamp, content, "", comments));
             }
 
         } catch (JSONException e) {
@@ -221,7 +241,18 @@ public class IslandDB
                 timestamp = Utils.smartTimestampFromUnixTime(Long.parseLong(timestamp));
                 String content = postObject.getString("content");
 
-                posts.add(new Post(user.getUsername(), timestamp, content, ""));
+                List<Comment> comments = new ArrayList<>();
+                JSONArray commentArray = postObject.getJSONArray("comments");
+
+                for(int i = 0; i < commentArray.length(); ++i)
+                {
+                    JSONObject commentObj = commentArray.getJSONObject(i);
+                    Comment comment = new Comment(commentObj.getString("user"),
+                            commentObj.getString("comment"));
+                    comments.add(comment);
+                }
+
+                posts.add(new Post(user.getUsername(), timestamp, content, "", comments));
                 count++;
             }
 
