@@ -9,7 +9,8 @@
     <dimen name="post_profile_image_margin">8dp</dimen>
     <dimen name="post_padding">16dp</dimen>
     <dimen name="post_submit_comment_margin">8dp</dimen>
-    <dimen name="post_add_comment_margin">8dp</dimen>
+    <dimen name="post_add_comment_horizontal_padding">16dp</dimen>
+    <dimen name="post_add_comment_vertical_padding">8dp</dimen>
 
     <!-- Profile -->
     <dimen name="profile_header_height">160dp</dimen>

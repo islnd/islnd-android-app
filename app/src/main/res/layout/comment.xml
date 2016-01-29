@@ -9,7 +9,7 @@
         android:layout_width="@dimen/comment_profile_image"
         android:layout_height="@dimen/comment_profile_image"
         android:layout_marginRight="@dimen/comment_profile_image_margin"
-        android:background="@android:color/white"
+        android:background="?android:colorBackground"
         android:src="@drawable/ic_person_black_24dp"/>
 
     <LinearLayout
@@ -25,14 +25,12 @@
             android:id="@+id/comment_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test"
-            style="@style/Base.TextAppearance.AppCompat.Title"/>
+            style="@style/Base.TextAppearance.AppCompat.Body2"/>
 
         <TextView
             android:id="@+id/comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test comment! Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!Test comment!"
             style="@style/Base.TextAppearance.AppCompat.Body1"/>
     </LinearLayout>
 </RelativeLayout>

@@ -2,6 +2,7 @@ package com.island.island.Database;
 
 import android.util.JsonReader;
 
+import com.island.island.Containers.Comment;
 import com.island.island.Containers.Post;
 import com.island.island.Containers.Profile;
 import com.island.island.Containers.User;
@@ -295,5 +296,16 @@ public class IslandDB
         }
 
         return profile;
+    }
+
+    public static void addCommentToPost(Post post, Comment comment)
+    /**
+     * Adds comment to existing post
+     *
+     * @param post Post I am adding comment to.
+     * @param comment Comment that I'm adding.
+     */
+    {
+
     }
 }
