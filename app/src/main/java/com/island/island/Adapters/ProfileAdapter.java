@@ -62,8 +62,8 @@ public class ProfileAdapter extends ArrayAdapter
             // Post
             else
             {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.post, parent,
-                        false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.glance_post,
+                        parent, false);
                 buildPost(position, convertView);
             }
         }

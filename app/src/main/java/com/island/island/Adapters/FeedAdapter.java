@@ -32,7 +32,8 @@ public class FeedAdapter extends ArrayAdapter<Post>
     {
         if (convertView == null)
         {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.post, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.glance_post, parent,
+                    false);
         }
 
         final Post post = (Post) getItem(position);
