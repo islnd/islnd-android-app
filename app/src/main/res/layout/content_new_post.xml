@@ -16,8 +16,10 @@
     <EditText
         android:id="@+id/new_post_edit_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/new_post_edit_text_margin"
         android:background="@android:color/transparent"
-        android:hint="@string/new_post_hint"/>
+        android:hint="@string/new_post_hint"
+        android:gravity="top"/>
 
 </RelativeLayout>
