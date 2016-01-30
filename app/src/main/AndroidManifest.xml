@@ -29,7 +29,8 @@
         <activity
             android:name=".Activities.NewPostActivity"
             android:label="@string/title_activity_new_post"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
         </activity>
     </application>
 
