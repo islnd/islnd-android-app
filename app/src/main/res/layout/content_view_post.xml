@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/view_post_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".Activities.ViewPostActivity"
     tools:showIn="@layout/activity_view_post">
@@ -14,12 +15,11 @@
         android:id="@+id/view_post_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"/>
+        android:layout_weight="1.0"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/post_add_comment_horizontal_padding"
         android:paddingRight="@dimen/post_add_comment_horizontal_padding"
@@ -45,4 +45,4 @@
             android:onClick="addCommentToPost"/>
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
