@@ -23,7 +23,7 @@ import java.util.List;
 
 public class ViewPostActivity extends AppCompatActivity
 {
-    Post post = null;
+    private Post post = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -63,8 +63,7 @@ public class ViewPostActivity extends AppCompatActivity
 
         if(commentText.equals(""))
         {
-            Snackbar.make(view, getString(R.string.empty_comment_post),
-                    Snackbar.LENGTH_SHORT).setAction("Dismiss", null).show();
+            Snackbar.make(view, getString(R.string.empty_comment_post), Snackbar.LENGTH_SHORT).show();
         }
         else
         {
