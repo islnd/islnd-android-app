@@ -1,7 +1,5 @@
 package com.island.island.Database;
 
-import android.util.JsonReader;
-
 import com.island.island.Containers.Comment;
 import com.island.island.Containers.Post;
 import com.island.island.Containers.Profile;
@@ -80,7 +78,7 @@ public class IslandDB
         try
         {
             JSONObject obj = new JSONObject(mockData);
-            JSONObject userPosts = obj.getJSONObject(user.getUsername()).getJSONObject("posts");
+            JSONObject userPosts = obj.getJSONObject(user.getUserName()).getJSONObject("posts");
             Iterator<?> keys = userPosts.keys();
 
             while(keys.hasNext())
@@ -102,7 +100,7 @@ public class IslandDB
                     comments.add(comment);
                 }
 
-                posts.add(new Post(user.getUsername(), timestamp, content, "", comments));
+                posts.add(new Post(user.getUserName(), timestamp, content, "", comments));
             }
 
         } catch (JSONException e) {
@@ -131,7 +129,7 @@ public class IslandDB
         try
         {
             JSONObject obj = new JSONObject(mockData);
-            JSONObject userPosts = obj.getJSONObject(user.getUsername()).getJSONObject("posts");
+            JSONObject userPosts = obj.getJSONObject(user.getUserName()).getJSONObject("posts");
             Iterator<?> keys = userPosts.keys();
 
             int count = 0;
@@ -155,7 +153,7 @@ public class IslandDB
                     comments.add(comment);
                 }
 
-                posts.add(new Post(user.getUsername(), timestamp, content, "", comments));
+                posts.add(new Post(user.getUserName(), timestamp, content, "", comments));
                 count++;
             }
 

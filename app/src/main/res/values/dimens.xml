@@ -26,6 +26,11 @@
     <dimen name="comment_icon_count_margin">8dp</dimen>
     <dimen name="comment_icon_count_top_margin">8dp</dimen>
 
+    <!-- Friend Glance -->
+    <dimen name="friend_glance_padding">16dp</dimen>
+    <dimen name="friend_profile_image">50dp</dimen>
+    <dimen name="friend_profile_image_name_margin">16dp</dimen>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>

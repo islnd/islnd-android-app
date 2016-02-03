@@ -91,11 +91,16 @@ public class FeedActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_profile) {
-            // Handle the camera action
-        } else if (id == R.id.nav_friends) {
+        if (id == R.id.nav_profile)
+        {
 
-        } else if (id == R.id.nav_settings) {
+        }
+        else if (id == R.id.nav_friends)
+        {
+            startActivity(new Intent(this, ViewFriendsActivity.class));
+        }
+        else if (id == R.id.nav_settings)
+        {
 
         }
 

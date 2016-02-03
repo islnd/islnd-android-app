@@ -105,7 +105,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         final int mPosition = position;
 
         // View post on post click
-        holder.mItemView.setOnClickListener(new View.OnClickListener()
+        holder.itemView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

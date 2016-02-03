@@ -68,7 +68,7 @@ public class FeedAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
         final int mPosition = position;
 
         // View post on post click
-        holder.mItemView.setOnClickListener(new View.OnClickListener()
+        holder.itemView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

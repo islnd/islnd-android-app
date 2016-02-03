@@ -17,12 +17,10 @@ public class GlancePostViewHolder extends RecyclerView.ViewHolder
     public TextView postTimestamp;
     public TextView postContent;
     public TextView postCommentCount;
-    public View mItemView;
 
     public GlancePostViewHolder(View itemView)
     {
         super(itemView);
-        mItemView = itemView;
         postProfileImage = (ImageView) itemView.findViewById(R.id.post_profile_image);
         postUserName = (TextView) itemView.findViewById(R.id.post_user_name);
         postTimestamp = (TextView) itemView.findViewById(R.id.post_timestamp);

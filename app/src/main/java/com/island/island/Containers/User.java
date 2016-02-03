@@ -9,22 +9,22 @@ import java.io.Serializable;
  */
 public class User implements Serializable
 {
-    private String username = "";
+    private String userName = "";
     private String pseudonym = "";
     private String groupKey = "";
 
     public void User(){}
 
-    public User(String username, String pseudonym, String groupKey)
+    public User(String userName, String pseudonym, String groupKey)
     {
-        this.username = username;
+        this.userName = userName;
         this.pseudonym = pseudonym;
         this.groupKey = groupKey;
     }
 
-    public String getUsername()
+    public String getUserName()
     {
-        return username;
+        return userName;
     }
 
     public String getPseudonym()
@@ -37,9 +37,9 @@ public class User implements Serializable
         return groupKey;
     }
 
-    public void setUsername(String username)
+    public void setUserName(String username)
     {
-        this.username = username;
+        this.userName = username;
     }
 
     public void setPseudonym(String pseudonym)
