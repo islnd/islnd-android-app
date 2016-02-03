@@ -5,17 +5,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.island.island.Adapters.ViewPostAdapter;
 import com.island.island.Containers.Comment;
 import com.island.island.Containers.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
+import com.island.island.SimpleDividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,10 @@ import java.util.List;
 public class ViewPostActivity extends AppCompatActivity
 {
     private Post post = null;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -36,21 +42,23 @@ public class ViewPostActivity extends AppCompatActivity
 
         // List view stuff
         ArrayList viewPostList = new ArrayList<>();
-        ViewPostAdapter viewPostAdapter = new ViewPostAdapter(this, viewPostList);
-        ListView listView = (ListView) findViewById(R.id.view_post_list_view);
-        listView.setAdapter(viewPostAdapter);
+        mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ViewPostAdapter(viewPostList, this);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Get intent with post info
         Intent intent = getIntent();
         post = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
-        viewPostAdapter.add(post);
+        viewPostList.add(post);
 
         // Add comments to list
-        // TEST for now
         List<Comment> comments = post.getComments();
         for(int i = 0; i < comments.size(); ++i)
         {
-            viewPostAdapter.add(comments.get(i));
+            viewPostList.add(comments.get(i));
         }
     }
 
