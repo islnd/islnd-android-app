@@ -9,15 +9,8 @@
     tools:context=".Activities.FeedActivity"
     tools:showIn="@layout/activity_feed">
 
-    <!--<ListView-->
-        <!--android:id="@+id/feed_posts"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
-    <!--</ListView>-->
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/feed_recycler_view"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </android.support.v7.widget.RecyclerView>

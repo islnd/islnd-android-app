@@ -9,12 +9,10 @@
     tools:context="com.island.island.Activities.ProfileActivity"
     tools:showIn="@layout/activity_profile">
 
-    <!-- Profile ListView -->
-    <ListView
-        android:id="@+id/profile_posts"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/profile_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
-    </ListView>
+        android:layout_height="wrap_content">
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
