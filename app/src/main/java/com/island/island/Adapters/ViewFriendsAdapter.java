@@ -64,4 +64,68 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     {
         return mList.size();
     }
+
+    public User removeItem(int position)
+    {
+        final User user = mList.remove(position);
+        notifyItemRemoved(position);
+        return user;
+    }
+
+    public void addItem(int position, User user)
+    {
+        mList.add(position, user);
+        notifyItemInserted(position);
+    }
+
+    public void moveItem(int fromPosition, int toPosition)
+    {
+        final User user = mList.remove(fromPosition);
+        mList.add(toPosition, user);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    public void animateTo(List<User> users)
+    {
+        applyAndAnimateRemovals(users);
+        applyAndAnimateAdditions(users);
+        applyAndAnimateMovedItems(users);
+    }
+
+    private void applyAndAnimateRemovals(List<User> users)
+    {
+        for (int i = mList.size() - 1; i >= 0; i--)
+        {
+            final User user = mList.get(i);
+            if (!users.contains(user))
+            {
+                removeItem(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateAdditions(List<User> users)
+    {
+        for (int i = 0, count = users.size(); i < count; i++)
+        {
+            final User user = users.get(i);
+            if (!mList.contains(user))
+            {
+                addItem(i, user);
+            }
+        }
+    }
+
+    private void applyAndAnimateMovedItems(List<User> users)
+    {
+        for (int toPosition = users.size() - 1; toPosition >= 0; toPosition--)
+        {
+            final User user = users.get(toPosition);
+            final int fromPosition = users.indexOf(user);
+            if (fromPosition >= 0 && fromPosition != toPosition)
+            {
+                moveItem(fromPosition, toPosition);
+            }
+        }
+    }
 }

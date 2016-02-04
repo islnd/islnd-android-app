@@ -60,16 +60,10 @@ public class FeedActivity extends AppCompatActivity
 
         // Populate feed
         List<User> userList = IslandDB.getUsers();
-        for(int i = 0; i < userList.size(); ++i)
+        for(User user: userList)
         {
-            User user = userList.get(i);
-
             List<Post> userPosts = IslandDB.getPostsForUser(user);
-            for(int j = 0; j < userPosts.size(); ++j)
-            {
-                //feedAdapter.add(userPosts.get(j));
-                arrayOfPosts.add(userPosts.get(j));
-            }
+            arrayOfPosts.addAll(userPosts);
         }
     }
 

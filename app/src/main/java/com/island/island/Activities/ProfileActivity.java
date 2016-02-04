@@ -54,10 +54,7 @@ public class ProfileActivity extends AppCompatActivity
 
         // User posts
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
-        for(int i = 0; i < userPosts.size(); ++i)
-        {
-            profileList.add(userPosts.get(i));
-        }
+        profileList.addAll(userPosts);
     }
 
     public void startNewPostActivity(View view)

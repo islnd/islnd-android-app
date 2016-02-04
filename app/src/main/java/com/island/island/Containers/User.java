@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * This class represents a user.
  */
-public class User implements Serializable
+public class User implements Serializable, Comparable<User>
 {
     private String userName = "";
     private String pseudonym = "";
@@ -50,5 +50,11 @@ public class User implements Serializable
     public void setGroupKey(String groupKey)
     {
         this.groupKey = groupKey;
+    }
+
+    @Override
+    public int compareTo(User another)
+    {
+        return userName.compareTo(another.getUserName());
     }
 }

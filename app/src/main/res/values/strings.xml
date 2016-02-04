@@ -20,4 +20,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_user_name">UserName</string>
     <string name="title_activity_view_friends">ViewFriendsActivity</string>
+
+    <string name="search_friends_hint">Search friends</string>
+    <string name="search">Search</string>
 </resources>

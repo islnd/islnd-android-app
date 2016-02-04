@@ -56,10 +56,7 @@ public class ViewPostActivity extends AppCompatActivity
 
         // Add comments to list
         List<Comment> comments = post.getComments();
-        for(int i = 0; i < comments.size(); ++i)
-        {
-            viewPostList.add(comments.get(i));
-        }
+        viewPostList.addAll(comments);
     }
 
     public void addCommentToPost(View view)

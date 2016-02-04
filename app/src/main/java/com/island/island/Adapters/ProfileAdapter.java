@@ -23,8 +23,8 @@ import java.util.ArrayList;
  */
 public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
-    ArrayList mList = new ArrayList<>();
-    Context mContext = null;
+    private ArrayList mList = new ArrayList<>();
+    private Context mContext = null;
 
     private static final int PROFILE_HEADER = 0;
     private static final int POST = 1;

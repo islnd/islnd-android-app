@@ -23,10 +23,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="@dimen/post_add_comment_horizontal_padding"
-        android:paddingRight="@dimen/post_add_comment_horizontal_padding"
-        android:paddingTop="@dimen/post_add_comment_vertical_padding"
-        android:paddingBottom="@dimen/post_add_comment_vertical_padding"
+        android:paddingLeft="@dimen/edit_text_box_horizontal_padding"
+        android:paddingRight="@dimen/edit_text_box_horizontal_padding"
+        android:paddingTop="@dimen/edit_text_box_vertical_padding"
+        android:paddingBottom="@dimen/edit_text_box_vertical_padding"
         android:background="?android:colorBackground"
         android:elevation="8dp">
 

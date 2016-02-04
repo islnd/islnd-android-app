@@ -21,8 +21,8 @@ import java.util.ArrayList;
  */
 public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
-    ArrayList mList = new ArrayList<>();
-    Context mContext = null;
+    private ArrayList mList = new ArrayList<>();
+    private Context mContext = null;
 
     private static final int POST = 0;
     private static final int COMMENT = 1;

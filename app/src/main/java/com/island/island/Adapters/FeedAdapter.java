@@ -24,8 +24,8 @@ import java.util.List;
  */
 public class FeedAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
 {
-    List<Post> mPosts = new ArrayList<>();
-    Context mContext = null;
+    private List<Post> mPosts = new ArrayList<>();
+    private Context mContext = null;
 
     public FeedAdapter(List<Post> posts, Context context)
     {
