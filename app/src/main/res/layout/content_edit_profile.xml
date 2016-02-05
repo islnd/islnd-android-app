@@ -25,8 +25,12 @@
                 android:id="@+id/profile_header_image"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_header_height"
-                android:foreground="@color/transparent_black"
                 android:src="@drawable/side_nav_bar"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent_black"/>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -49,8 +53,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_person_black_24dp"
-                android:background="@android:color/white"
-                android:foreground="@color/transparent_black"/>
+                android:background="@android:color/white"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent_black"/>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -84,6 +92,4 @@
             android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/about_me"/>
     </android.support.design.widget.TextInputLayout>
-
-
 </RelativeLayout>
