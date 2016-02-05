@@ -15,7 +15,7 @@
 
         <!-- Profile Picture -->
         <ImageView
-            android:id="@+id/profile_profile_picture"
+            android:id="@+id/profile_profile_image"
             android:layout_width="@dimen/profile_profile_image"
             android:layout_height="@dimen/profile_profile_image"
             android:layout_gravity="center_horizontal"
@@ -26,13 +26,12 @@
 
     <!-- Name -->
     <TextView
-        android:id="@+id/profile_name"
+        android:id="@+id/profile_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_header_frame"
         android:layout_centerHorizontal="true"
         android:paddingTop="@dimen/profile_user_name_padding"
-        android:text="David Thompson"
         style="@style/Base.TextAppearance.AppCompat.Title"/>
 
     <!-- About me -->
@@ -40,9 +39,8 @@
         android:id="@+id/profile_about_me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profile_name"
+        android:layout_below="@id/profile_user_name"
         android:layout_centerHorizontal="true"
         android:paddingBottom="@dimen/about_me_padding"
-        android:text="About Me !!!"
         style="@style/Base.TextAppearance.AppCompat.Subhead"/>
 </RelativeLayout>

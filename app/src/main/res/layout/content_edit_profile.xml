@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.island.island.Activities.EditProfileActivity"
+    tools:showIn="@layout/activity_edit_profile">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_header_frame">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/profile_header_image"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/profile_header_height"
+                android:foreground="@color/transparent_black"
+                android:src="@drawable/side_nav_bar"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:paddingBottom="@dimen/edit_profile_header_image_icon_padding"
+                android:paddingRight="@dimen/edit_profile_header_image_icon_padding"
+                android:src="@drawable/ic_photo_camera_white_24dp"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="@dimen/profile_profile_image"
+            android:layout_height="@dimen/profile_profile_image"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/profile_profile_image_top_margin">
+
+            <ImageView
+                android:id="@+id/profile_profile_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_person_black_24dp"
+                android:background="@android:color/white"
+                android:foreground="@color/transparent_black"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_photo_camera_white_24dp"/>
+        </FrameLayout>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/profile_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/profile_header_frame"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="@dimen/profile_user_name_padding"
+        style="@style/Base.TextAppearance.AppCompat.Title"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profile_user_name">
+
+        <EditText
+            android:id="@+id/edit_profile_about_me"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/about_me_edit_text_padding"
+            android:layout_marginRight="@dimen/about_me_edit_text_padding"
+            android:layout_marginTop="@dimen/about_me_padding"
+            android:inputType="textMultiLine|textCapSentences"
+            android:hint="@string/about_me"/>
+    </android.support.design.widget.TextInputLayout>
+
+
+</RelativeLayout>

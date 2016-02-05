@@ -23,4 +23,9 @@
 
     <string name="search_friends_hint">Search friends</string>
     <string name="search">Search</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
+
+    <string name="about_me">About me</string>
+
+    <string name="profile_saved">Profile saved</string>
 </resources>

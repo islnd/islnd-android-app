@@ -13,9 +13,9 @@
     <dimen name="edit_text_box_vertical_padding">8dp</dimen>
 
     <!-- Profile -->
-    <dimen name="profile_header_height">160dp</dimen>
+    <dimen name="profile_header_height">216dp</dimen>
     <dimen name="profile_profile_image">80dp</dimen>
-    <dimen name="profile_profile_image_top_margin">120dp</dimen>
+    <dimen name="profile_profile_image_top_margin">176dp</dimen>
     <dimen name="about_me_padding">16dp</dimen>
     <dimen name="profile_user_name_padding">16dp</dimen>
 
@@ -36,4 +36,7 @@
     <dimen name="nav_header_height">160dp</dimen>
 
     <dimen name="new_post_edit_text_margin">72dp</dimen>
+
+    <dimen name="about_me_edit_text_padding">16dp</dimen>
+    <dimen name="edit_profile_header_image_icon_padding">16dp</dimen>
 </resources>

@@ -11,4 +11,5 @@
     <color name="divider">#B6B6B6</color>
 
     <!-- Other Colors -->
+    <color name="transparent_black">#a3000000</color>
 </resources>

@@ -17,7 +17,7 @@ public class ProfileViewHolder extends RecyclerView.ViewHolder
     public ProfileViewHolder(View itemView)
     {
         super(itemView);
-        userName = (TextView) itemView.findViewById(R.id.profile_name);
+        userName = (TextView) itemView.findViewById(R.id.profile_user_name);
         aboutMe = (TextView) itemView.findViewById(R.id.profile_about_me);
     }
 }
