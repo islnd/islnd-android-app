@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Activities.ViewPostActivity;
-import com.island.island.Containers.Post;
-import com.island.island.Containers.Profile;
+import com.island.island.Models.Post;
+import com.island.island.Models.Profile;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.GlancePostViewHolder;

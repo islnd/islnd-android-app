@@ -21,7 +21,8 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/profile_profile_image_top_margin"
             android:src="@drawable/ic_person_black_24dp"
-            android:background="@android:color/white"/>
+            android:background="@android:color/white"
+            android:onClick="viewProfileImage"/>
     </FrameLayout>
 
     <!-- Name -->

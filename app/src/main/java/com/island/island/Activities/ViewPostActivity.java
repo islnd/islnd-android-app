@@ -13,8 +13,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
-import com.island.island.Containers.Comment;
-import com.island.island.Containers.Post;
+import com.island.island.Models.Comment;
+import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;

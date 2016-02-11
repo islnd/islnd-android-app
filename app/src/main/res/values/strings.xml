@@ -30,4 +30,5 @@
     <string name="profile_saved">Profile saved</string>
 
     <string name="select_image">Select Image</string>
+    <string name="title_activity_image_viewer">ImageViewerActivity</string>
 </resources>

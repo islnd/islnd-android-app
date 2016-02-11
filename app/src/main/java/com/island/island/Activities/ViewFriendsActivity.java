@@ -10,14 +10,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
-import com.island.island.Containers.User;
+import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class ViewFriendsActivity extends AppCompatActivity implements SearchView.OnQueryTextListener

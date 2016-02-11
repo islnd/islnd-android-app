@@ -1,9 +1,9 @@
 package com.island.island.Database;
 
-import com.island.island.Containers.Comment;
-import com.island.island.Containers.Post;
-import com.island.island.Containers.Profile;
-import com.island.island.Containers.User;
+import com.island.island.Models.Comment;
+import com.island.island.Models.Post;
+import com.island.island.Models.Profile;
+import com.island.island.Models.User;
 import com.island.island.Utils.Utils;
 
 import org.json.JSONArray;
@@ -102,7 +102,7 @@ public class IslandDB
                     comments.add(comment);
                 }
 
-                posts.add(new Post(user.getUserName(), timestamp, content, "", comments));
+                posts.add(new Post(user.getUserName(), timestamp, content, comments));
             }
 
         } catch (JSONException e) {
@@ -155,7 +155,7 @@ public class IslandDB
                     comments.add(comment);
                 }
 
-                posts.add(new Post(user.getUserName(), timestamp, content, "", comments));
+                posts.add(new Post(user.getUserName(), timestamp, content, comments));
                 count++;
             }
 
@@ -223,7 +223,7 @@ public class IslandDB
             JSONObject profileObj = obj.getJSONObject(userName).getJSONObject("profile");
 
             String aboutMe = profileObj.getString("about_me");
-            profile = new Profile(userName, "", "", aboutMe);
+            profile = new Profile(userName, aboutMe);
 
         } catch (JSONException e) {
             e.printStackTrace();

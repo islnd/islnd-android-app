@@ -14,8 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.island.island.Adapters.FeedAdapter;
-import com.island.island.Containers.Post;
-import com.island.island.Containers.User;
+import com.island.island.Models.Post;
+import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
@@ -71,9 +71,12 @@ public class FeedActivity extends AppCompatActivity
     public void onBackPressed()
     {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START))
+        {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else
+        {
             super.onBackPressed();
         }
     }

@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.island.island.Activities.ProfileActivity;
-import com.island.island.Containers.Comment;
-import com.island.island.Containers.Post;
+import com.island.island.Models.Comment;
+import com.island.island.Models.Post;
 import com.island.island.R;
 import com.island.island.ViewHolders.CommentViewHolder;
 import com.island.island.ViewHolders.PostViewHolder;

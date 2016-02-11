@@ -1,4 +1,4 @@
-package com.island.island.Containers;
+package com.island.island.Models;
 
 import java.io.Serializable;
 

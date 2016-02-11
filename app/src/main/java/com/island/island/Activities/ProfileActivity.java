@@ -9,9 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.island.island.Adapters.ProfileAdapter;
-import com.island.island.Containers.Post;
-import com.island.island.Containers.Profile;
-import com.island.island.Containers.User;
+import com.island.island.Models.Post;
+import com.island.island.Models.Profile;
+import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
@@ -61,5 +61,14 @@ public class ProfileActivity extends AppCompatActivity
     {
         Intent newPostIntent = new Intent(ProfileActivity.this, NewPostActivity.class);
         startActivity(newPostIntent);
+    }
+
+    public void viewProfileImage(View view)
+    {
+        Intent intent = new Intent(this, ImageViewerActivity.class);
+
+        // TODO: Get profile image uri from database and send string with intent
+        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, "");
+        startActivity(intent);
     }
 }

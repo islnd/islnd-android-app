@@ -1,4 +1,4 @@
-package com.island.island.Containers;
+package com.island.island.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,16 +16,14 @@ public class Post implements Serializable
     private String userName = "";
     private String timestamp = "";
     private String content = "";
-    private String profileImageUri = "";
     private List<Comment> comments = new ArrayList<>();
 
-    public Post(String userName, String timestamp, String content, String profileImageUri,
+    public Post(String userName, String timestamp, String content,
                 List<Comment> comments)
     {
         this.userName = userName;
         this.timestamp = timestamp;
         this.content = content;
-        this.profileImageUri = profileImageUri;
         this.comments = comments;
     }
 
@@ -57,16 +55,6 @@ public class Post implements Serializable
     public void setContent(String content)
     {
         this.content = content;
-    }
-
-    public String getProfileImageUri()
-    {
-        return profileImageUri;
-    }
-
-    public void setProfileImageUri(String profileImageUri)
-    {
-        this.profileImageUri = profileImageUri;
     }
 
     public List<Comment> getComments()
