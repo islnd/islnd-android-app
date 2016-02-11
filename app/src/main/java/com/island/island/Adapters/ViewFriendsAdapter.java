@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.island.island.Activities.ProfileActivity;
+import com.island.island.Dialogs;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.ViewHolders.FriendGlanceViewHolder;
@@ -40,7 +41,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     }
 
     @Override
-    public void onBindViewHolder(FriendGlanceViewHolder holder, int position)
+    public void onBindViewHolder(FriendGlanceViewHolder holder, final int position)
     {
         final User user = mList.get(position);
 
@@ -55,6 +56,17 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
                 Intent profileIntent = new Intent(mContext, ProfileActivity.class);
                 profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, user.getUserName());
                 mContext.startActivity(profileIntent);
+            }
+        });
+
+        // Remove friend
+        holder.removeFriend.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Dialogs.removeFriendDialog(mContext, user.getUserName());
+                // TODO: Remove friend from list?
             }
         });
     }

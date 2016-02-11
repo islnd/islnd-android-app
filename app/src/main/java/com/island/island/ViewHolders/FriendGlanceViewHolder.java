@@ -13,6 +13,7 @@ import com.island.island.R;
 public class FriendGlanceViewHolder extends RecyclerView.ViewHolder
 {
     public ImageView profileImage;
+    public ImageView removeFriend;
     public TextView userName;
 
     public FriendGlanceViewHolder(View itemView)
@@ -20,5 +21,6 @@ public class FriendGlanceViewHolder extends RecyclerView.ViewHolder
         super(itemView);
         profileImage = (ImageView) itemView.findViewById(R.id.friend_profile_image);
         userName = (TextView) itemView.findViewById(R.id.friend_user_name);
+        removeFriend = (ImageView) itemView.findViewById(R.id.remove_friend);
     }
 }
