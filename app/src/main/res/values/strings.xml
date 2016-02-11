@@ -31,4 +31,6 @@
 
     <string name="select_image">Select Image</string>
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
+
+    <string name="remove_friend">Remove Friend</string>
 </resources>

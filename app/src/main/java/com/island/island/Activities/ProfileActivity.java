@@ -6,9 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.island.island.Adapters.ProfileAdapter;
+import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
@@ -26,6 +30,8 @@ public class ProfileActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private Profile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,7 +53,7 @@ public class ProfileActivity extends AppCompatActivity
         // Get intent with username
         Intent profileIntent = getIntent();
         String userName = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        Profile profile = IslandDB.getUserProfile(userName);
+        profile = IslandDB.getUserProfile(userName);
 
         // Add profile first then posts
         profileList.add(profile);
@@ -55,6 +61,30 @@ public class ProfileActivity extends AppCompatActivity
         // User posts
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
         profileList.addAll(userPosts);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.profile_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId();
+
+        if (id == R.id.remove_friend)
+        {
+            Dialogs.removeFriendDialog(this, profile.getUserName());
+            // TODO: What behavior do we want after removing friend?
+            // Probably go back to feed.
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void startNewPostActivity(View view)
