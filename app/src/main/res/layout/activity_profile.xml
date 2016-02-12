@@ -14,7 +14,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent"
+            android:background="@drawable/profile_toolbar_gradient"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             android:theme="@style/AppTheme.AppBarOverlay"/>
 
