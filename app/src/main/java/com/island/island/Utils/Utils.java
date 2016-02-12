@@ -1,5 +1,11 @@
 package com.island.island.Utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.island.island.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -52,5 +58,27 @@ public class Utils
     public static String numberOfCommentsString(int numberOfComments)
     {
         return numberOfComments + " comments";
+    }
+
+    public static boolean isUser(Context context, String userName)
+    {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String setUser = sharedPref.getString(context.getString(R.string.user_name), "");
+
+        return userName.equals(setUser);
+    }
+
+    public static String getUser(Context context)
+    {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.user_name), "");
+    }
+
+    public static void setUser(Context context, String userName)
+    {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.user_name), userName);
+        editor.commit();
     }
 }
