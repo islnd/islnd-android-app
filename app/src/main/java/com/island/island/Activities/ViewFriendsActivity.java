@@ -44,7 +44,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
-        List<User> friends = IslandDB.getUsers();
+        List<User> friends = IslandDB.getUsers(this);
         friendsList.addAll(friends);
         adapterList.addAll(friends);
     }

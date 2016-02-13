@@ -60,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity
         profileList.add(profile);
 
         // User posts
-        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
+        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName));
         profileList.addAll(userPosts);
     }
 

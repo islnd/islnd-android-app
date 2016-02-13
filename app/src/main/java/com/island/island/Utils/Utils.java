@@ -3,9 +3,16 @@ package com.island.island.Utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 
+import com.island.island.Database.IdentityDatabase;
 import com.island.island.R;
 
+import org.apache.commons.lang3.SerializationUtils;
+import org.island.messaging.Crypto;
+
+import java.security.Key;
+import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -80,5 +87,15 @@ public class Utils
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(context.getString(R.string.user_name), userName);
         editor.commit();
+    }
+
+    public static String convertToString(Key key) {
+        byte[] data = SerializationUtils.serialize(key);
+        return Base64.encodeToString(data, Base64.DEFAULT);
+    }
+
+    public static Key convertFromString(String s) {
+        byte[] data = Base64.decode(s, Base64.DEFAULT);
+        return (Key) SerializationUtils.deserialize(data);
     }
 }

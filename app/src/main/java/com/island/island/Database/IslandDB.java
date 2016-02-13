@@ -1,17 +1,23 @@
 package com.island.island.Database;
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.Utils.Utils;
 
+import org.island.messaging.Crypto;
+import org.island.messaging.MessageLayer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.KeyPair;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,32 +30,39 @@ public class IslandDB
 {
     // Used json minifier online
     public static String mockData = "{\"users\":[\"Bill Gates\",\"Steve Jobs\",\"Fred Flintstone\",\"John Smith\",\"Thom Yorke\"],\"Bill Gates\":{\"posts\":{\"0\":{\"timestamp\":\"1453837198\",\"content\":\"I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"1\":{\"timestamp\":\"1253837198\",\"content\":\"I made a bunch of money today!\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"2\":{\"timestamp\":\"1253937198\",\"content\":\"I made even more money today!\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"Founder of Microsoft.\"}},\"Steve Jobs\":{\"posts\":{\"0\":{\"timestamp\":\"1453837000\",\"content\":\"*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"1\":{\"timestamp\":\"1213857000\",\"content\":\"I'm innovative lol :)\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"Founder of Apple.\"}},\"Fred Flintstone\":{\"posts\":{\"0\":{\"timestamp\":\"1453830198\",\"content\":\"I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"1\":{\"timestamp\":\"1400830198\",\"content\":\"Watch my show tonight!\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"Citizen of Bedrock.\"}},\"John Smith\":{\"posts\":{\"0\":{\"timestamp\":\"1453807198\",\"content\":\"This post is boring just like my name :)\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"I ain't nothin'.\"}},\"Thom Yorke\":{\"posts\":{\"0\":{\"timestamp\":\"1450837198\",\"content\":\"I am radiohead lol. I have a high voice but it's cool because I'm nasty with a synth. Get at me Damon Albarn. Gorillaz suk lol ayyyyyyeeeee. ISLAND NEEDS TO SUPPORT EMOJIS AYYYYEEEEe.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"I'm in that one band.\"}}}";
+    private static IdentityDatabase IDENTITY_DB;
 
-    public static List<User> getUsers()
-    /**
-     * Gets list of users that have allowed me to read their content.
-     *
-     * @return The list of users.
-     */
+    public static List<User> getUsers(Context context)
     {
-        List<User> userList = new ArrayList<>();
+        return MessageLayer.getReaders(getIdentityDatabase(context).getUsername());
+    }
 
-        try
-        {
-            JSONObject obj = new JSONObject(mockData);
-            JSONArray users = obj.getJSONArray("users");
-
-            for(int i = 0; i < users.length(); ++i)
-            {
-                User newUser = new User(users.getString(i), "", "");
-                userList.add(newUser);
+    public static void postPublicKey(Context context)
+    {
+        IdentityDatabase identityDatabase = getIdentityDatabase(context);
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                MessageLayer.postPublicKey(identityDatabase.getUsername(), identityDatabase.getPublicKey());
+                return new Object();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        }.execute();
+    }
+
+    @NonNull
+    private static IdentityDatabase getIdentityDatabase(Context context) {
+        if (IDENTITY_DB == null) {
+            IDENTITY_DB = new IdentityDatabase(context);
         }
 
-        Collections.sort(userList);
-        return userList;
+        return IDENTITY_DB;
+    }
+
+    public static void createIdentity(Context context, String username)
+    {
+        KeyPair keyPair = Crypto.getKeyPair();
+        IdentityDatabase identityDatabase = getIdentityDatabase(context);
+        identityDatabase.setIdentity(keyPair.getPublic(), keyPair.getPrivate(), username);
     }
 
     public static void post(String content)
