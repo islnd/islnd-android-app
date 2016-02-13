@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.island.island.Adapters.ProfileAdapter;
 import com.island.island.Dialogs;
@@ -56,8 +58,15 @@ public class ProfileActivity extends AppCompatActivity
         String userName = profileIntent.getStringExtra(USER_NAME_EXTRA);
         profile = IslandDB.getUserProfile(userName);
 
-        // Add profile first then posts
-        profileList.add(profile);
+        // Setup profile header
+        ImageView profileHeader = (ImageView) findViewById(R.id.profile_header_image);
+        ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
+        TextView userNameView = (TextView) findViewById(R.id.profile_user_name);
+        TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
+
+        userNameView.setText(userName);
+        aboutMe.setText(profile.getAboutMe());
+        getSupportActionBar().setTitle(userName);
 
         // User posts
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));

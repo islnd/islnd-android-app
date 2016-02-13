@@ -32,9 +32,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private ArrayList mList = new ArrayList<>();
     private Context mContext = null;
 
-    private static final int PROFILE_HEADER = 0;
-    private static final int POST = 1;
-
     public ProfileAdapter(ArrayList list, Context context)
     {
         mList = list;
@@ -44,20 +41,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        RecyclerView.ViewHolder viewHolder = null;
-
-        if(viewType == POST)
-        {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.glance_post, parent, false);
-            viewHolder = new GlancePostViewHolder(v);
-        }
-        else if(viewType == PROFILE_HEADER)
-        {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.profile_header, parent, false);
-            viewHolder = new ProfileViewHolder(v);
-        }
+        View v = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.glance_post, parent, false);
+        RecyclerView.ViewHolder viewHolder = new GlancePostViewHolder(v);
 
         return viewHolder;
     }
@@ -65,26 +51,13 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
-        if(position != 0)
-        {
-            bindPost((GlancePostViewHolder)holder, position);
-        }
-        else
-        {
-            bindProfile((ProfileViewHolder) holder);
-        }
+        bindPost((GlancePostViewHolder)holder, position);
     }
 
     @Override
     public int getItemCount()
     {
         return mList.size();
-    }
-
-    @Override
-    public int getItemViewType(int position)
-    {
-        return position == 0 ? PROFILE_HEADER : POST;
     }
 
     private void bindPost(GlancePostViewHolder holder, int position)
