@@ -6,7 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.island.island.Activities.EditProfileActivity;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Activities.ViewPostActivity;
 import com.island.island.Models.Post;
@@ -123,5 +125,19 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         holder.userName.setText(profile.getUserName());
         holder.aboutMe.setText(profile.getAboutMe());
+
+        // Client user's profile
+        if(Utils.isUser(mContext, profile.getUserName()))
+        {
+            holder.editProfile.setVisibility(View.VISIBLE);
+            holder.editProfile.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    mContext.startActivity(new Intent(mContext, EditProfileActivity.class));
+                }
+            });
+        }
     }
 }

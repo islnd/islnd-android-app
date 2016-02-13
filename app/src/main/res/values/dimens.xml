@@ -16,8 +16,9 @@
     <dimen name="profile_header_height">216dp</dimen>
     <dimen name="profile_profile_image">80dp</dimen>
     <dimen name="profile_profile_image_top_margin">176dp</dimen>
-    <dimen name="about_me_padding">16dp</dimen>
+    <dimen name="about_me_padding">8dp</dimen>
     <dimen name="profile_user_name_padding">16dp</dimen>
+    <dimen name="edit_profile_button_margin">16dp</dimen>
 
     <!-- Comment -->
     <dimen name="comment_profile_image">50dp</dimen>

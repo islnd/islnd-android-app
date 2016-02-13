@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.island.island.Adapters.ProfileAdapter;
 import com.island.island.Dialogs;
@@ -19,6 +20,7 @@ import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+import com.island.island.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +71,8 @@ public class ProfileActivity extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile_menu, menu);
 
-        return true;
+        // If this is the client user's profile, don't show menu
+        return !Utils.isUser(this, profile.getUserName());
     }
 
     @Override

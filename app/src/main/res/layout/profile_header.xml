@@ -23,6 +23,7 @@
             android:src="@drawable/ic_person_black_24dp"
             android:background="@android:color/white"
             android:onClick="viewProfileImage"/>
+
     </FrameLayout>
 
     <!-- Name -->
@@ -44,4 +45,14 @@
         android:layout_centerHorizontal="true"
         android:paddingBottom="@dimen/about_me_padding"
         style="@style/Base.TextAppearance.AppCompat.Subhead"/>
+
+    <Button
+        android:id="@+id/edit_profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile"
+        android:layout_marginBottom="@dimen/edit_profile_button_margin"
+        android:layout_below="@+id/profile_about_me"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
 </RelativeLayout>

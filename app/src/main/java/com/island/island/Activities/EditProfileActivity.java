@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.island.island.Models.Profile;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
+import com.island.island.Utils.Utils;
 
 public class EditProfileActivity extends AppCompatActivity
 {
@@ -30,9 +31,7 @@ public class EditProfileActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //TODO: Load profile from database (local/or external)
-        // Using a fake one for now
-        profile = new Profile("David Thompson", "Pizza is the reason I wake up everyday.");
+        profile = IslandDB.getUserProfile(Utils.getUser(this));
 
         TextView userName = (TextView) findViewById(R.id.profile_user_name);
         aboutMe = (EditText) findViewById(R.id.edit_profile_about_me);
@@ -48,7 +47,7 @@ public class EditProfileActivity extends AppCompatActivity
         {
             if (requestCode == SELECT_PROFILE_IMAGE)
             {
-                // TODO: set profile image
+                // TODO: set profile image and save uri to database
                 Uri selectedImageUri = data.getData();
             }
             else if(requestCode == SELECT_HEADER_IMAGE)

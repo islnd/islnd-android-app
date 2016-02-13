@@ -2,6 +2,7 @@ package com.island.island.ViewHolders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ public class ProfileViewHolder extends RecyclerView.ViewHolder
     public ImageView headerImage;
     public TextView userName;
     public TextView aboutMe;
+    public Button editProfile;
 
     public ProfileViewHolder(View itemView)
     {
@@ -24,5 +26,6 @@ public class ProfileViewHolder extends RecyclerView.ViewHolder
         headerImage = (ImageView) itemView.findViewById(R.id.profile_header_image);
         userName = (TextView) itemView.findViewById(R.id.profile_user_name);
         aboutMe = (TextView) itemView.findViewById(R.id.profile_about_me);
+        editProfile = (Button) itemView.findViewById(R.id.edit_profile_button);
     }
 }

@@ -98,8 +98,9 @@ public class FeedActivity extends AppCompatActivity
 
         if (id == R.id.nav_profile)
         {
-            // TODO: this is temporary until we handle loading client profile.
-            startActivity(new Intent(this, EditProfileActivity.class));
+            Intent profileIntent = new Intent(this, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Utils.getUser(this));
+            startActivity(profileIntent);
         }
         else if (id == R.id.nav_friends)
         {

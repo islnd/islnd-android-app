@@ -35,4 +35,6 @@
     <string name="remove_friend">Remove Friend</string>
 
     <string name="user_name">USER_NAME</string>
+
+    <string name="edit_profile">Edit profile</string>
 </resources>
