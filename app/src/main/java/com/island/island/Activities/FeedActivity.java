@@ -82,7 +82,7 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
-        //List<User> userList = IslandDB.getUsers(this);
+        List<User> userList = IslandDB.getUsers(this);
 //        for(User user: userList)
 //        {
 //            //List<Post> userPosts = IslandDB.getPostsForUser(user);

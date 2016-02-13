@@ -16,7 +16,7 @@ import java.security.Key;
 public class IdentityDatabase extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Identity";
+    public static final String DATABASE_NAME = "Identity2";
 
     public IdentityDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,6 +67,9 @@ public class IdentityDatabase extends SQLiteOpenHelper {
         SQLiteDatabase readableDatabase = getReadableDatabase();
         String[] columns = {"PUBLIC_KEY"};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, "", null, "", "", "");
+        if (results.getCount() == 0) {
+            return null;
+        }
 
         results.moveToLast();
         return Utils.convertFromString(results.getString(0));

@@ -20,6 +20,7 @@ import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by David Thompson on 12/20/2015.
@@ -34,7 +35,22 @@ public class IslandDB
 
     public static List<User> getUsers(Context context)
     {
-        return MessageLayer.getReaders(getIdentityDatabase(context).getUsername());
+//        AsyncTask<Void, Void, List<User>> task = new AsyncTask<Void, Void, List<User>>() {
+//            @Override
+//            protected List<User> doInBackground(Void... params) {
+//                return MessageLayer.getReaders(getIdentityDatabase(context).getUsername());
+//            }
+//        };
+
+//        try {
+//            return task.get();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+
+        return null;
     }
 
     public static void postPublicKey(Context context)
@@ -60,6 +76,9 @@ public class IslandDB
 
     public static void createIdentity(Context context, String username)
     {
+        if(getIdentityDatabase(context).getPublicKey() != null) {
+            return;
+        }
         KeyPair keyPair = Crypto.getKeyPair();
         IdentityDatabase identityDatabase = getIdentityDatabase(context);
         identityDatabase.setIdentity(keyPair.getPublic(), keyPair.getPrivate(), username);

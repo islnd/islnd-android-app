@@ -16,12 +16,12 @@ public class ObjectEncrypter {
     public static String encryptSymmetric(Serializable o, Key key) {
         byte[] bytes = SerializationUtils.serialize(o);
         byte[] encryptedBytes = Crypto.encryptSymmetric(bytes, key);
-        return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+        return Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
     }
 
     public static Object decryptSymmetric(String string, Key key) {
         //byte[] encryptedBytes = decoder.decode(string);
-        byte[] encryptedBytes = Base64.decode(string, Base64.DEFAULT);
+        byte[] encryptedBytes = Base64.decode(string, Base64.NO_WRAP);
         byte[] bytes = Crypto.decryptSymmetric(encryptedBytes, key);
         return SerializationUtils.deserialize(bytes);
     }
@@ -65,7 +65,7 @@ public class ObjectEncrypter {
     private static String combineChunksIntoString(byte[][] encryptedChunks) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < encryptedChunks.length; i++) {
-            sb.append(Base64.encodeToString(encryptedChunks[i], Base64.DEFAULT));
+            sb.append(Base64.encodeToString(encryptedChunks[i], Base64.NO_WRAP));
             if (i != encryptedChunks.length - 1) {
                 sb.append(DELIMITER);
             }
@@ -79,7 +79,7 @@ public class ObjectEncrypter {
 
         byte[][] chunks = new byte[tokens.length][];
         for (int i = 0; i < chunks.length; i++) {
-            chunks[i] = Base64.decode(tokens[i], Base64.DEFAULT);
+            chunks[i] = Base64.decode(tokens[i], Base64.NO_WRAP);
         }
 
         return chunks;

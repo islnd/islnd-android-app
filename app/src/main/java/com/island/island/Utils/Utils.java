@@ -91,11 +91,11 @@ public class Utils
 
     public static String convertToString(Key key) {
         byte[] data = SerializationUtils.serialize(key);
-        return Base64.encodeToString(data, Base64.DEFAULT);
+        return Base64.encodeToString(data, Base64.NO_WRAP);
     }
 
     public static Key convertFromString(String s) {
-        byte[] data = Base64.decode(s, Base64.DEFAULT);
+        byte[] data = Base64.decode(s, Base64.NO_WRAP);
         return (Key) SerializationUtils.deserialize(data);
     }
 }
