@@ -2,15 +2,20 @@ package com.island.island.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
+import com.island.island.Dialogs;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.R;
+import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.CommentViewHolder;
 import com.island.island.ViewHolders.PostViewHolder;
 
@@ -82,6 +87,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void bindPost(PostViewHolder holder)
     {
         final Post post = (Post) mList.get(0);
+        final ImageView postOverflow = holder.postOverflow;
 
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(post.getTimestamp());
@@ -98,11 +104,50 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 mContext.startActivity(profileIntent);
             }
         });
+
+        if(Utils.isUser(mContext, post.getUserName()))
+        {
+            holder.postOverflow.setVisibility(View.VISIBLE);
+
+            holder.postOverflow.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    PopupMenu popup = new PopupMenu(mContext, postOverflow);
+                    popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
+
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                    {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item)
+                        {
+                            switch (item.getItemId())
+                            {
+                                case R.id.delete_post:
+                                    Dialogs.deletePostDialog(mContext, "");
+                                    // TODO: Behavior after removal?
+                                    // TODO: Don't have postIds yet
+                            }
+
+                            return false;
+                        }
+                    });
+
+                    popup.show();
+                }
+            });
+        }
+        else
+        {
+            holder.postOverflow.setVisibility(View.GONE);
+        }
     }
 
     public void bindComment(CommentViewHolder holder, int position)
     {
         final Comment comment = (Comment) mList.get(position);
+        final ImageView overflow = holder.overflow;
 
         holder.userName.setText(comment.getUserName());
         holder.comment.setText(comment.getComment());
@@ -118,5 +163,43 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 mContext.startActivity(profileIntent);
             }
         });
+
+        if(Utils.isUser(mContext, comment.getUserName()))
+        {
+            holder.overflow.setVisibility(View.VISIBLE);
+
+            holder.overflow.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    PopupMenu popup = new PopupMenu(mContext, overflow);
+                    popup.getMenuInflater().inflate(R.menu.comment_menu, popup.getMenu());
+
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                    {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item)
+                        {
+                            switch (item.getItemId())
+                            {
+                                case R.id.delete_post:
+                                    Dialogs.deleteCommentDialog(mContext);
+                                    // TODO: Behavior after removal?
+                                    // TODO: Don't have postIds yet
+                            }
+
+                            return false;
+                        }
+                    });
+
+                    popup.show();
+                }
+            });
+        }
+        else
+        {
+            holder.overflow.setVisibility(View.GONE);
+        }
     }
 }

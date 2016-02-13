@@ -16,6 +16,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder
     public TextView postUserName;
     public TextView postTimestamp;
     public TextView postContent;
+    public ImageView postOverflow;
     public View mItemView;
 
     public PostViewHolder(View itemView)
@@ -26,5 +27,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder
         postUserName = (TextView) itemView.findViewById(R.id.post_user_name);
         postTimestamp = (TextView) itemView.findViewById(R.id.post_timestamp);
         postContent = (TextView) itemView.findViewById(R.id.post_content);
+        postOverflow  = (ImageView) itemView.findViewById(R.id.post_overflow);
     }
 }
