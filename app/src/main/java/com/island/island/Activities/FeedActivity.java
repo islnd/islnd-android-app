@@ -15,6 +15,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.island.island.Adapters.FeedAdapter;
 import com.island.island.Models.Post;
@@ -56,6 +58,24 @@ public class FeedActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Set user in nav drawer
+        View header = navigationView.getHeaderView(0);
+        ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
+        TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
+        final String userName = Utils.getUser(FeedActivity.this);
+
+        navProfileImage.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent profileIntent = new Intent(FeedActivity.this, ProfileActivity.class);
+                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
+                startActivity(profileIntent);
+            }
+        });
+        navUserName.setText(userName);
 
         // Feed posts setup
         ArrayList<Post> arrayOfPosts = new ArrayList<>();
