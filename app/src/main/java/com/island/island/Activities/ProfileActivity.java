@@ -79,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity
     {
         int id = item.getItemId();
 
-        if (id == R.id.view_friend_overflow)
+        if (id == R.id.remove_friend)
         {
             Dialogs.removeFriendDialog(this, profile.getUserName());
             // TODO: What behavior do we want after removing friend?
