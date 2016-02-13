@@ -2,10 +2,13 @@ package com.island.island.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Dialogs;
@@ -44,6 +47,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     public void onBindViewHolder(FriendGlanceViewHolder holder, final int position)
     {
         final User user = mList.get(position);
+        final ImageView removeFriend = holder.removeFriend;
 
         holder.userName.setText(user.getUserName());
 
@@ -59,14 +63,31 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
             }
         });
 
-        // Remove friend
         holder.removeFriend.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Dialogs.removeFriendDialog(mContext, user.getUserName());
-                // TODO: Remove friend from list?
+                PopupMenu popup = new PopupMenu(mContext, removeFriend);
+                popup.getMenuInflater().inflate(R.menu.view_friends_item_menu, popup.getMenu());
+
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item)
+                    {
+                        switch (item.getItemId())
+                        {
+                            case R.id.remove_friend:
+                                Dialogs.removeFriendDialog(mContext, user.getUserName());
+                                // TODO: Remove friend from list?
+                        }
+
+                        return false;
+                    }
+                });
+
+                popup.show();
             }
         });
     }
