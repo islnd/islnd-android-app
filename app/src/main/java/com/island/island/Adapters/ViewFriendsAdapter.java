@@ -47,7 +47,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     public void onBindViewHolder(FriendGlanceViewHolder holder, final int position)
     {
         final User user = mList.get(position);
-        final ImageView removeFriend = holder.removeFriend;
+        final ImageView removeFriend = holder.overflow;
 
         holder.userName.setText(user.getUserName());
 
@@ -63,7 +63,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
             }
         });
 
-        holder.removeFriend.setOnClickListener(new View.OnClickListener()
+        holder.overflow.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -76,8 +76,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
                     @Override
                     public boolean onMenuItemClick(MenuItem item)
                     {
-                        switch (item.getItemId())
-                        {
+                        switch (item.getItemId()) {
                             case R.id.remove_friend:
                                 Dialogs.removeFriendDialog(mContext, user.getUserName());
                                 // TODO: Remove friend from list?

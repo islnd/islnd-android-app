@@ -37,4 +37,9 @@
     <string name="user_name">USER_NAME</string>
 
     <string name="edit_profile">Edit profile</string>
+
+    <string name="delete_post">Delete post</string>
+    <string name="delete_post_dialog">Delete post?</string>
+    <string name="delete_comment">Delete comment</string>
+    <string name="delete_comment_dialog">Delete comment?</string>
 </resources>

@@ -45,4 +45,14 @@
         android:layout_below="@id/post_header_layout"
         style="@style/Base.TextAppearance.AppCompat.Body1"/>
 
+    <ImageView
+        android:id="@+id/post_overflow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_more_vert_black_24dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>

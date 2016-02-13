@@ -27,7 +27,7 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/remove_friend"
+        android:id="@+id/view_friend_overflow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_more_vert_black_24dp"

@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
 import com.island.island.Adapters.ProfileAdapter;
 import com.island.island.Dialogs;
@@ -80,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity
     {
         int id = item.getItemId();
 
-        if (id == R.id.remove_friend)
+        if (id == R.id.view_friend_overflow)
         {
             Dialogs.removeFriendDialog(this, profile.getUserName());
             // TODO: What behavior do we want after removing friend?

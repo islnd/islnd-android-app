@@ -32,4 +32,46 @@ public class Dialogs
                 })
                 .show();
     }
+
+    public static void deletePostDialog(Context context, String postId)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(context.getString(R.string.delete_post_dialog))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        // TODO: Add remove post!
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        // User cancelled the dialog
+                    }
+                })
+                .show();
+    }
+
+    public static void deleteCommentDialog(Context context)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(context.getString(R.string.delete_comment_dialog))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        // TODO: Add remove comment!
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        // User cancelled the dialog
+                    }
+                })
+                .show();
+    }
 }
