@@ -65,15 +65,11 @@ public class FeedActivity extends AppCompatActivity
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
         final String userName = Utils.getUser(FeedActivity.this);
 
-        navProfileImage.setOnClickListener(new View.OnClickListener()
+        navProfileImage.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent profileIntent = new Intent(FeedActivity.this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
-                startActivity(profileIntent);
-            }
+            Intent profileIntent = new Intent(FeedActivity.this, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
+            startActivity(profileIntent);
         });
         navUserName.setText(userName);
 

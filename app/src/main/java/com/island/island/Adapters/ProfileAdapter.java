@@ -89,8 +89,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void bindPost(GlancePostViewHolder holder, int position)
     {
-        final Post post = (Post) mList.get(position);
-        final ImageView postOverflow = holder.postOverflow;
+        Post post = (Post) mList.get(position);
 
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(post.getTimestamp());
@@ -98,62 +97,43 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.postCommentCount.setText(Utils.numberOfCommentsString(post.getComments().size()));
 
         // Go to profile on picture click
-        holder.postProfileImage.setOnClickListener(new View.OnClickListener()
+        holder.postProfileImage.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
-                mContext.startActivity(profileIntent);
-            }
+            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
+            mContext.startActivity(profileIntent);
         });
 
-        final int mPosition = position;
-
         // View post on post click
-        holder.itemView.setOnClickListener(new View.OnClickListener()
+        holder.itemView.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent viewPostIntent = new Intent(mContext, ViewPostActivity.class);
-                viewPostIntent.putExtra(Post.POST_EXTRA, post);
-                mContext.startActivity(viewPostIntent);
-            }
+            Intent viewPostIntent = new Intent(mContext, ViewPostActivity.class);
+            viewPostIntent.putExtra(Post.POST_EXTRA, post);
+            mContext.startActivity(viewPostIntent);
         });
 
         if(Utils.isUser(mContext, post.getUserName()))
         {
             holder.postOverflow.setVisibility(View.VISIBLE);
 
-            holder.postOverflow.setOnClickListener(new View.OnClickListener()
+            holder.postOverflow.setOnClickListener((View v) ->
             {
-                @Override
-                public void onClick(View v)
+                PopupMenu popup = new PopupMenu(mContext, holder.postOverflow);
+                popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener((MenuItem item) ->
                 {
-                    PopupMenu popup = new PopupMenu(mContext, postOverflow);
-                    popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                    switch (item.getItemId())
                     {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item)
-                        {
-                            switch (item.getItemId())
-                            {
-                                case R.id.delete_post:
-                                    Dialogs.deletePostDialog(mContext, "");
-                                    // TODO: Behavior after removal?
-                                    // TODO: Don't have postIds yet
-                            }
+                        case R.id.delete_post:
+                            Dialogs.deletePostDialog(mContext, "");
+                            // TODO: Behavior after removal?
+                            // TODO: Don't have postIds yet
+                    }
 
-                            return false;
-                        }
-                    });
+                    return true;
+                });
 
-                    popup.show();
-                }
+                popup.show();
             });
         }
         else
@@ -173,13 +153,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(Utils.isUser(mContext, profile.getUserName()))
         {
             holder.editProfile.setVisibility(View.VISIBLE);
-            holder.editProfile.setOnClickListener(new View.OnClickListener()
+            holder.editProfile.setOnClickListener((View v) ->
             {
-                @Override
-                public void onClick(View v)
-                {
-                    mContext.startActivity(new Intent(mContext, EditProfileActivity.class));
-                }
+                mContext.startActivity(new Intent(mContext, EditProfileActivity.class));
             });
         }
     }

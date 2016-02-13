@@ -46,48 +46,36 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     @Override
     public void onBindViewHolder(FriendGlanceViewHolder holder, final int position)
     {
-        final User user = mList.get(position);
-        final ImageView removeFriend = holder.overflow;
+        User user = mList.get(position);
 
         holder.userName.setText(user.getUserName());
 
         // Go to profile on view click
-        holder.itemView.setOnClickListener(new View.OnClickListener()
+        holder.itemView.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, user.getUserName());
-                mContext.startActivity(profileIntent);
-            }
+            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, user.getUserName());
+            mContext.startActivity(profileIntent);
         });
 
-        holder.overflow.setOnClickListener(new View.OnClickListener()
+        holder.overflow.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
+            PopupMenu popup = new PopupMenu(mContext, holder.overflow);
+            popup.getMenuInflater().inflate(R.menu.view_friends_item_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener((MenuItem item) ->
             {
-                PopupMenu popup = new PopupMenu(mContext, removeFriend);
-                popup.getMenuInflater().inflate(R.menu.view_friends_item_menu, popup.getMenu());
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                switch (item.getItemId())
                 {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item)
-                    {
-                        switch (item.getItemId()) {
-                            case R.id.remove_friend:
-                                Dialogs.removeFriendDialog(mContext, user.getUserName());
-                                // TODO: Remove friend from list?
-                        }
+                    case R.id.remove_friend:
+                        Dialogs.removeFriendDialog(mContext, user.getUserName());
+                        // TODO: Remove friend from list?
+                }
 
-                        return false;
-                    }
-                });
+                return true;
+            });
 
-                popup.show();
-            }
+            popup.show();
         });
     }
 

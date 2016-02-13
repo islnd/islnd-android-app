@@ -86,56 +86,42 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void bindPost(PostViewHolder holder)
     {
-        final Post post = (Post) mList.get(0);
-        final ImageView postOverflow = holder.postOverflow;
+        Post post = (Post) mList.get(0);
 
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(post.getTimestamp());
         holder.postContent.setText(post.getContent());
 
         // Go to profile on picture click
-        holder.postProfileImage.setOnClickListener(new View.OnClickListener()
+        holder.postProfileImage.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
-                mContext.startActivity(profileIntent);
-            }
+            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
+            mContext.startActivity(profileIntent);
         });
 
         if(Utils.isUser(mContext, post.getUserName()))
         {
             holder.postOverflow.setVisibility(View.VISIBLE);
 
-            holder.postOverflow.setOnClickListener(new View.OnClickListener()
+            holder.postOverflow.setOnClickListener((View v) ->
             {
-                @Override
-                public void onClick(View v)
+                PopupMenu popup = new PopupMenu(mContext, holder.postOverflow);
+                popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener((MenuItem item) ->
                 {
-                    PopupMenu popup = new PopupMenu(mContext, postOverflow);
-                    popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                    switch (item.getItemId())
                     {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item)
-                        {
-                            switch (item.getItemId())
-                            {
-                                case R.id.delete_post:
-                                    Dialogs.deletePostDialog(mContext, "");
-                                    // TODO: Behavior after removal?
-                                    // TODO: Don't have postIds yet
-                            }
+                        case R.id.delete_post:
+                            Dialogs.deletePostDialog(mContext, "");
+                            // TODO: Behavior after removal?
+                            // TODO: Don't have postIds yet
+                    }
 
-                            return false;
-                        }
-                    });
+                    return true;
+                });
 
-                    popup.show();
-                }
+                popup.show();
             });
         }
         else
@@ -153,48 +139,35 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.comment.setText(comment.getComment());
 
         // Go to profile on picture click
-        holder.profileImage.setOnClickListener(new View.OnClickListener()
+        holder.profileImage.setOnClickListener((View v) ->
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUserName());
-                mContext.startActivity(profileIntent);
-            }
+            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUserName());
+            mContext.startActivity(profileIntent);
         });
 
         if(Utils.isUser(mContext, comment.getUserName()))
         {
             holder.overflow.setVisibility(View.VISIBLE);
 
-            holder.overflow.setOnClickListener(new View.OnClickListener()
+            holder.overflow.setOnClickListener((View v) ->
             {
-                @Override
-                public void onClick(View v)
+                PopupMenu popup = new PopupMenu(mContext, overflow);
+                popup.getMenuInflater().inflate(R.menu.comment_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener((MenuItem item) ->
                 {
-                    PopupMenu popup = new PopupMenu(mContext, overflow);
-                    popup.getMenuInflater().inflate(R.menu.comment_menu, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                    switch (item.getItemId())
                     {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item)
-                        {
-                            switch (item.getItemId())
-                            {
-                                case R.id.delete_post:
-                                    Dialogs.deleteCommentDialog(mContext);
-                                    // TODO: Behavior after removal?
-                                    // TODO: Don't have postIds yet
-                            }
+                        case R.id.delete_post:
+                            Dialogs.deleteCommentDialog(mContext);
+                            // TODO: Behavior after removal?
+                            // TODO: Don't have postIds yet
+                    }
 
-                            return false;
-                        }
-                    });
+                    return true;
+                });
 
-                    popup.show();
-                }
+                popup.show();
             });
         }
         else
