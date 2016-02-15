@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.island.island.Adapters.ProfileAdapter;
+import com.island.island.Adapters.PostAdapter;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
@@ -45,11 +45,11 @@ public class ProfileActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Post list stuff
-        ArrayList profileList = new ArrayList<>();
+        List<Post> arrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ProfileAdapter(profileList, this);
+        mAdapter = new PostAdapter(this, arrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
@@ -61,16 +61,24 @@ public class ProfileActivity extends AppCompatActivity
         // Setup profile header
         ImageView profileHeader = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
-        TextView userNameView = (TextView) findViewById(R.id.profile_user_name);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
+        ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        userNameView.setText(userName);
+        if(Utils.isUser(this, profile.getUserName()))
+        {
+            editProfile.setVisibility(View.VISIBLE);
+            editProfile.setOnClickListener((View v) ->
+            {
+                startActivity(new Intent(this, EditProfileActivity.class));
+            });
+        }
+
         aboutMe.setText(profile.getAboutMe());
         getSupportActionBar().setTitle(userName);
 
         // User posts
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
-        profileList.addAll(userPosts);
+        arrayOfPosts.addAll(userPosts);
     }
 
     @Override

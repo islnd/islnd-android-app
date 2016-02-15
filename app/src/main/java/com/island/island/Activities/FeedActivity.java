@@ -2,9 +2,7 @@ package com.island.island.Activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,7 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.island.island.Adapters.FeedAdapter;
+import com.island.island.Adapters.PostAdapter;
 import com.island.island.Models.Post;
 import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
@@ -74,11 +72,11 @@ public class FeedActivity extends AppCompatActivity
         navUserName.setText(userName);
 
         // Feed posts setup
-        ArrayList<Post> arrayOfPosts = new ArrayList<>();
+        List<Post> arrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new FeedAdapter(arrayOfPosts, this);
+        mAdapter = new PostAdapter(this, arrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
