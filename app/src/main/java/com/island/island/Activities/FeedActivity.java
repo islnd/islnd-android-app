@@ -1,6 +1,8 @@
 package com.island.island.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,9 +21,13 @@ import android.widget.TextView;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
+import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
+
+import org.island.messaging.Crypto;
+import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +38,7 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private List<Post> arrayOfPosts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,7 +51,7 @@ public class FeedActivity extends AppCompatActivity
 
         // TODO: Remove after login implemented
         // Set user hack
-        String USER = "Rocky";
+        String USER = "Jam";
         Utils.setUser(this, USER);
         IslandDB.createIdentity(this, USER);
         IslandDB.postPublicKey(this);
@@ -73,7 +81,7 @@ public class FeedActivity extends AppCompatActivity
         navUserName.setText(userName);
 
         // Feed posts setup
-        List<Post> arrayOfPosts = new ArrayList<>();
+        arrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -87,6 +95,7 @@ public class FeedActivity extends AppCompatActivity
 //            //List<Post> userPosts = IslandDB.getPostsForUser(user);
 //            arrayOfPosts.addAll(userPosts);
 //        }
+        new GetPostsTask().execute();
     }
 
     @Override
@@ -135,5 +144,26 @@ public class FeedActivity extends AppCompatActivity
     {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
         startActivity(newPostIntent);
+    }
+
+    private class GetPostsTask extends AsyncTask<Void, Void, List<Post>> {
+
+        private final String TAG = GetPostsTask.class.getSimpleName();
+
+        @Override
+        protected List<Post> doInBackground(Void... params) {
+            return MessageLayer.getPosts(getApplicationContext());
+        }
+
+        @Override
+        protected void onPostExecute(List<Post> posts) {
+            if (posts != null) {
+                arrayOfPosts.addAll(posts);
+                mAdapter.notifyDataSetChanged();
+                for (Post p : posts) {
+                    Log.v(TAG, "added post " + p.getUserName());
+                }
+            }
+        }
     }
 }

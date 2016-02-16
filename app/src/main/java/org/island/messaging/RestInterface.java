@@ -18,6 +18,10 @@ public interface RestInterface
     Call<List<EncryptedPseudonymKey>> readers(
             @Path("username") String username);
 
+    @GET("/posts/{pseudonym}")
+    Call<List<EncryptedPost>> posts(
+            @Path("pseudonym") String pseudonym);
+
     @POST("/publicKey/{username}")
     Call<String> postPublicKey(@Path("username") String username, @Body String publicKey);
 }

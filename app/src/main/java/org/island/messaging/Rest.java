@@ -41,7 +41,24 @@ public class Rest {
 
         try {
             service.postPublicKey(username, publicKey).execute().body();
-            return "For a fuck's sake";
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static List<EncryptedPost> getPosts(String pseudonym) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            return service.posts(pseudonym).execute().body();
         } catch (IOException e) {
             e.printStackTrace();
         }

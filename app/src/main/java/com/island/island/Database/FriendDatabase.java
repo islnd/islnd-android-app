@@ -10,6 +10,9 @@ import android.util.Log;
 import org.island.messaging.Crypto;
 import org.island.messaging.PseudonymKey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FriendDatabase extends SQLiteOpenHelper {
 
     private static final String TAG = FriendDatabase.class.getSimpleName();
@@ -20,6 +23,7 @@ public class FriendDatabase extends SQLiteOpenHelper {
 
     private static final String USER_NAME = "USER_NAME";
     private static final String PSEUDONYM = "PSEUDONYM";
+    private static final String GROUP_KEY = "GROUP_KEY";
 
     private FriendDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -34,13 +38,13 @@ public class FriendDatabase extends SQLiteOpenHelper {
     }
 
     public void addFriend(PseudonymKey pseudonymKey) {
-        SQLiteDatabase writeableDatabase = getWritableDatabase();
+        SQLiteDatabase writableDatabase = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(USER_NAME, pseudonymKey.getUsername());
         values.put(PSEUDONYM, pseudonymKey.getPseudonym());
-        values.put("GROUP_KEY", Crypto.encodeKey(pseudonymKey.getKey()));
+        values.put(GROUP_KEY, Crypto.encodeKey(pseudonymKey.getKey()));
 
-        writeableDatabase.insert(DATABASE_NAME, null, values);
+        writableDatabase.insert(DATABASE_NAME, null, values);
     }
 
     @Override
@@ -75,5 +79,19 @@ public class FriendDatabase extends SQLiteOpenHelper {
         String[] args = {pseudonymKey.getUsername(), pseudonymKey.getPseudonym()};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
+    }
+
+    public ArrayList<PseudonymKey> getKeys() {
+        ArrayList<PseudonymKey> keys = new ArrayList<>();
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {USER_NAME, PSEUDONYM, GROUP_KEY};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, null, null, "", "", "");
+        while(results.moveToNext()) {
+            keys.add(new PseudonymKey(1, results.getString(0), results.getString(1),
+                    Crypto.decodeSymmetricKey(results.getString(2))));
+        }
+
+        return keys;
     }
 }
