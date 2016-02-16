@@ -1,6 +1,7 @@
 package com.island.island.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -44,8 +45,9 @@ public class FeedActivity extends AppCompatActivity
 
         // TODO: Remove after login implemented
         // Set user hack
-        Utils.setUser(this, "David");
-        IslandDB.createIdentity(this, "David");
+        String USER = "Rocky";
+        Utils.setUser(this, USER);
+        IslandDB.createIdentity(this, USER);
         IslandDB.postPublicKey(this);
 
         // Nav drawer
@@ -82,7 +84,7 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
-        List<User> userList = IslandDB.getUsers(this);
+        IslandDB.getUsers(this);
 //        for(User user: userList)
 //        {
 //            //List<Post> userPosts = IslandDB.getPostsForUser(user);

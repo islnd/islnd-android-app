@@ -1,5 +1,6 @@
 package org.island.messaging;
 
+import com.island.client.PseudonymKey;
 import com.island.island.Models.User;
 import com.island.island.Utils.Utils;
 
@@ -11,14 +12,14 @@ import java.util.List;
  * Created by poo on 2/13/16.
  */
 public class MessageLayer {
-    public static List<User> getReaders(String username) {
+    public static List<User> getReaders(String username, Key privateKey) {
         //call the REST service
         List<EncryptedPseudonymKey> keys = Rest.getReaders(username);
 
         //decrypt the friends
         List<User> friends = new ArrayList<>();
         for (EncryptedPseudonymKey encryptedPseudonymKey : keys) {
-            PseudonymKey pseudonymKey = (PseudonymKey) ObjectEncrypter.decryptAsymmetric(encryptedPseudonymKey.blob, null);
+            PseudonymKey pseudonymKey = (PseudonymKey) ObjectEncrypter.decryptAsymmetric(encryptedPseudonymKey.blob, privateKey);
             friends.add(new User(pseudonymKey.getUsername()));
         }
 
@@ -26,6 +27,6 @@ public class MessageLayer {
     }
 
     public static void postPublicKey(String username, Key publicKey){
-        Rest.postPublicKey(username, Utils.convertToString(publicKey));
+        Rest.postPublicKey(username, Utils.encodeKey(publicKey));
     }
 }

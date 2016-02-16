@@ -1,9 +1,10 @@
-package org.island.messaging;
+package com.island.client;
 
 import java.io.Serializable;
 import java.security.Key;
 
 public class PseudonymKey implements Serializable {
+    static final long serialVersionUID =-3255306082042971311L;
     private long uniqueID;
     private String username;
     private String pseudonym;

@@ -4,8 +4,12 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+
 import java.io.Serializable;
 import java.security.*;
+import java.security.spec.MGF1ParameterSpec;
 import java.util.Arrays;
 
 public class Crypto {
@@ -55,21 +59,9 @@ public class Crypto {
 
     public static byte[] encryptAsymmetricWithOAEP(byte[] bytes, Key key) {
         try {
-            asymmetricCipherWithOAEP.init(Cipher.ENCRYPT_MODE, key);
+            asymmetricCipherWithOAEP.init(Cipher.ENCRYPT_MODE, key,
+                    new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT));
             return asymmetricCipherWithOAEP.doFinal(bytes);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static byte[] decryptAsymmetric(byte[] cipherText, Key key) throws DecryptionErrorException {
-        try {
-            asymmetricCipher.init(Cipher.DECRYPT_MODE, key);
-            return asymmetricCipher.doFinal(cipherText);
-        } catch (BadPaddingException e) {
-            throw new DecryptionErrorException();
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
@@ -79,25 +71,10 @@ public class Crypto {
 
     public static byte[] decryptAsymmetricWithOAEP(byte[] cipherText, Key key) {
         try {
-            asymmetricCipherWithOAEP.init(Cipher.DECRYPT_MODE, key);
+            asymmetricCipherWithOAEP.init(Cipher.DECRYPT_MODE, key,
+                    new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT));
+
             return asymmetricCipherWithOAEP.doFinal(cipherText);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static byte[] encryptSymmetric(byte[] bytes, Key key) {
-        try {
-            symmetricCipher.init(Cipher.ENCRYPT_MODE, key);
-            byte[] IV = symmetricCipher.getIV();
-            byte[] encryptedBytes = symmetricCipher.doFinal(bytes);
-
-            byte[] cipherText = new byte[IV.length + encryptedBytes.length];
-            System.arraycopy(IV, 0, cipherText, 0, IV.length);
-            System.arraycopy(encryptedBytes, 0, cipherText, IV.length, encryptedBytes.length);
-            return cipherText;
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }

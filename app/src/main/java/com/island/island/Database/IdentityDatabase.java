@@ -15,7 +15,7 @@ import java.security.Key;
  */
 public class IdentityDatabase extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "Identity2";
 
     public IdentityDatabase(Context context) {
@@ -37,8 +37,8 @@ public class IdentityDatabase extends SQLiteOpenHelper {
     public void setIdentity(Key publicKey, Key privateKey, String username)
     {
         ContentValues values = new ContentValues();
-        values.put("PUBLIC_KEY", Utils.convertToString(publicKey));
-        values.put("PRIVATE_KEY", Utils.convertToString(privateKey));
+        values.put("PUBLIC_KEY", Utils.encodeKey(publicKey));
+        values.put("PRIVATE_KEY", Utils.encodeKey(privateKey));
         values.put("USER_NAME", username);
 
         SQLiteDatabase writableDatabase = getWritableDatabase();
@@ -60,7 +60,7 @@ public class IdentityDatabase extends SQLiteOpenHelper {
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, "", null, "", "", "");
 
         results.moveToLast();
-        return Utils.convertFromString(results.getString(0));
+        return Utils.decodePrivateKey(results.getString(0));
     }
 
     public Key getPublicKey() {
@@ -72,6 +72,6 @@ public class IdentityDatabase extends SQLiteOpenHelper {
         }
 
         results.moveToLast();
-        return Utils.convertFromString(results.getString(0));
+        return Utils.decodePublicKey(results.getString(0));
     }
 }

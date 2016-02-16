@@ -12,7 +12,12 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.island.messaging.Crypto;
 
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -89,13 +94,34 @@ public class Utils
         editor.commit();
     }
 
-    public static String convertToString(Key key) {
-        byte[] data = SerializationUtils.serialize(key);
-        return Base64.encodeToString(data, Base64.NO_WRAP);
+    public static String encodeKey(Key key) {
+        byte[] encodedKey = key.getEncoded();
+        return Base64.encodeToString(encodedKey, Base64.NO_WRAP);
     }
 
-    public static Key convertFromString(String s) {
-        byte[] data = Base64.decode(s, Base64.NO_WRAP);
-        return (Key) SerializationUtils.deserialize(data);
+    public static Key decodePrivateKey(String string) {
+        byte[] encodedKey = Base64.decode(string, Base64.NO_WRAP);
+        try {
+            return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Key decodePublicKey(String string) {
+        byte[] encodedKey = Base64.decode(string, Base64.NO_WRAP);
+        try {
+            return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(encodedKey));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

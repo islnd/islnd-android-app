@@ -13,19 +13,6 @@ public class ObjectEncrypter {
     private static final int CHUNK_SIZE = 190;
     private static final String DELIMITER = "_";
 
-    public static String encryptSymmetric(Serializable o, Key key) {
-        byte[] bytes = SerializationUtils.serialize(o);
-        byte[] encryptedBytes = Crypto.encryptSymmetric(bytes, key);
-        return Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
-    }
-
-    public static Object decryptSymmetric(String string, Key key) {
-        //byte[] encryptedBytes = decoder.decode(string);
-        byte[] encryptedBytes = Base64.decode(string, Base64.NO_WRAP);
-        byte[] bytes = Crypto.decryptSymmetric(encryptedBytes, key);
-        return SerializationUtils.deserialize(bytes);
-    }
-
     public static String encryptAsymmetric(Serializable o, Key key) {
         byte[][] chunks = getChunksFromObject(o);
 

@@ -40,8 +40,7 @@ public class Rest {
         RestInterface service = retrofit.create(RestInterface.class);
 
         try {
-            String lol = service.postPublicKey(username, publicKey).execute().body();
-            System.out.println(lol + "I fucking hate you guys");
+            service.postPublicKey(username, publicKey).execute().body();
             return "For a fuck's sake";
         } catch (IOException e) {
             e.printStackTrace();
