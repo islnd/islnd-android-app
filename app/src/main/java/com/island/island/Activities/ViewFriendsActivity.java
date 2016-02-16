@@ -1,11 +1,14 @@
 package com.island.island.Activities;
 
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -14,6 +17,9 @@ import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+
+import org.island.messaging.Crypto;
+import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +50,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
-        IslandDB.getUsers(this);
-        //--todo update the friend UI
+        new GetFriendsTask().execute();
     }
 
     @Override
@@ -92,5 +97,33 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         mAdapter.animateTo(filteredModelList);
         mRecyclerView.scrollToPosition(0);
         return true;
+    }
+
+    private class GetFriendsTask extends AsyncTask<Void, Void, List<User>> {
+
+        private final String TAG = GetFriendsTask.class.getSimpleName();
+
+        SharedPreferences preferences = getSharedPreferences("DEFAULT", 0);
+        String username = preferences.getString("USER_NAME", "");
+        String privateKey = preferences.getString("PRIVATE_KEY", "");
+
+        @Override
+        protected List<User> doInBackground(Void... params) {
+            Log.v(TAG, "starting to get friends");
+            Log.v(TAG, "username " + username);
+            Log.v(TAG, "private key " + privateKey);
+            return MessageLayer.getReaders(username, Crypto.decodePrivateKey(privateKey));
+        }
+
+        @Override
+        protected void onPostExecute(List<User> users) {
+            if (users != null) {
+                adapterList.addAll(users);
+                mAdapter.notifyDataSetChanged();
+                for (User u : users) {
+                    Log.v(TAG, "added user " + u.getUserName());
+                }
+            }
+        }
     }
 }

@@ -11,9 +11,9 @@ public final class IslandProto {
   public interface PseudonymKeyOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
-    // required int32 unique_id = 1;
+    // required int64 unique_id = 1;
     boolean hasUniqueId();
-    int getUniqueId();
+    long getUniqueId();
     
     // required string username = 2;
     boolean hasUsername();
@@ -56,13 +56,13 @@ public final class IslandProto {
     }
     
     private int bitField0_;
-    // required int32 unique_id = 1;
+    // required int64 unique_id = 1;
     public static final int UNIQUE_ID_FIELD_NUMBER = 1;
-    private int uniqueId_;
+    private long uniqueId_;
     public boolean hasUniqueId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-    public int getUniqueId() {
+    public long getUniqueId() {
       return uniqueId_;
     }
     
@@ -163,7 +163,7 @@ public final class IslandProto {
     }
     
     private void initFields() {
-      uniqueId_ = 0;
+      uniqueId_ = 0L;
       username_ = "";
       pseudonym_ = "";
       key_ = "";
@@ -197,7 +197,7 @@ public final class IslandProto {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, uniqueId_);
+        output.writeInt64(1, uniqueId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, getUsernameBytes());
@@ -219,7 +219,7 @@ public final class IslandProto {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, uniqueId_);
+          .computeInt64Size(1, uniqueId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -357,7 +357,7 @@ public final class IslandProto {
       
       public Builder clear() {
         super.clear();
-        uniqueId_ = 0;
+        uniqueId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         username_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -496,7 +496,7 @@ public final class IslandProto {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              uniqueId_ = input.readInt32();
+              uniqueId_ = input.readInt64();
               break;
             }
             case 18: {
@@ -520,15 +520,15 @@ public final class IslandProto {
       
       private int bitField0_;
       
-      // required int32 unique_id = 1;
-      private int uniqueId_ ;
+      // required int64 unique_id = 1;
+      private long uniqueId_ ;
       public boolean hasUniqueId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public int getUniqueId() {
+      public long getUniqueId() {
         return uniqueId_;
       }
-      public Builder setUniqueId(int value) {
+      public Builder setUniqueId(long value) {
         bitField0_ |= 0x00000001;
         uniqueId_ = value;
         onChanged();
@@ -536,7 +536,7 @@ public final class IslandProto {
       }
       public Builder clearUniqueId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        uniqueId_ = 0;
+        uniqueId_ = 0L;
         onChanged();
         return this;
       }
@@ -2507,7 +2507,7 @@ public final class IslandProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\030proto/island_proto.proto\022\005proto\"S\n\014Pse" +
-      "udonymKey\022\021\n\tunique_id\030\001 \002(\005\022\020\n\010username" +
+      "udonymKey\022\021\n\tunique_id\030\001 \002(\003\022\020\n\010username" +
       "\030\002 \002(\t\022\021\n\tpseudonym\030\003 \002(\t\022\013\n\003key\030\004 \002(\t\"1" +
       "\n\014SignedObject\022\016\n\006object\030\001 \002(\t\022\021\n\tsignat" +
       "ure\030\002 \002(\t\"O\n\nPostUpdate\022\021\n\tis_delete\030\001 \002" +

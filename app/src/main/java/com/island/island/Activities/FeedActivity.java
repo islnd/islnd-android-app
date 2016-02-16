@@ -1,7 +1,6 @@
 package com.island.island.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,14 +17,12 @@ import android.widget.TextView;
 
 import com.island.island.Adapters.FeedAdapter;
 import com.island.island.Models.Post;
-import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -84,7 +81,6 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
-        IslandDB.getUsers(this);
 //        for(User user: userList)
 //        {
 //            //List<Post> userPosts = IslandDB.getPostsForUser(user);

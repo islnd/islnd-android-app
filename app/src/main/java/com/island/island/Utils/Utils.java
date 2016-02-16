@@ -93,35 +93,4 @@ public class Utils
         editor.putString(context.getString(R.string.user_name), userName);
         editor.commit();
     }
-
-    public static String encodeKey(Key key) {
-        byte[] encodedKey = key.getEncoded();
-        return Base64.encodeToString(encodedKey, Base64.NO_WRAP);
-    }
-
-    public static Key decodePrivateKey(String string) {
-        byte[] encodedKey = Base64.decode(string, Base64.NO_WRAP);
-        try {
-            return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static Key decodePublicKey(String string) {
-        byte[] encodedKey = Base64.decode(string, Base64.NO_WRAP);
-        try {
-            return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(encodedKey));
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
 }

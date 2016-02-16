@@ -1,8 +1,6 @@
 package org.island.messaging;
 
-import com.island.client.PseudonymKey;
 import com.island.island.Models.User;
-import com.island.island.Utils.Utils;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -19,7 +17,7 @@ public class MessageLayer {
         //decrypt the friends
         List<User> friends = new ArrayList<>();
         for (EncryptedPseudonymKey encryptedPseudonymKey : keys) {
-            PseudonymKey pseudonymKey = (PseudonymKey) ObjectEncrypter.decryptAsymmetric(encryptedPseudonymKey.blob, privateKey);
+            PseudonymKey pseudonymKey = ObjectEncrypter.decryptPseudonymKey(encryptedPseudonymKey.blob, privateKey);
             friends.add(new User(pseudonymKey.getUsername()));
         }
 
@@ -27,6 +25,6 @@ public class MessageLayer {
     }
 
     public static void postPublicKey(String username, Key publicKey){
-        Rest.postPublicKey(username, Utils.encodeKey(publicKey));
+        Rest.postPublicKey(username, Crypto.encodeKey(publicKey));
     }
 }

@@ -3,7 +3,7 @@ package proto;
 option java_package = "org.island.messaging.proto";
 
 message PseudonymKey {
-  required int32 unique_id = 1;
+  required int64 unique_id = 1;
   required string username = 2;
   required string pseudonym = 3;
   required string key = 4;

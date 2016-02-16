@@ -1,19 +1,40 @@
 package org.island.messaging;
 
-import android.util.Base64;
 
-import org.apache.commons.lang3.SerializationUtils;
+import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.io.Serializable;
+import org.island.messaging.proto.IslandProto;
+
 import java.security.Key;
 import java.util.Arrays;
 
 public class ObjectEncrypter {
     private static final int CHUNK_SIZE = 190;
     private static final String DELIMITER = "_";
+    private static Encoder encoder = new Encoder();
+    private static Decoder decoder = new Decoder();
 
-    public static String encryptAsymmetric(Serializable o, Key key) {
-        byte[][] chunks = getChunksFromObject(o);
+
+    public static String encryptSymmetric(ProtoSerializable o, Key key) {
+        byte[] bytes = o.toByteArray();
+        byte[] encryptedBytes = Crypto.encryptSymmetric(bytes, key);
+        return encoder.encodeToString(encryptedBytes);
+    }
+
+    public static byte[] decryptSymmetric(String string, Key key) {
+        byte[] encryptedBytes = decoder.decode(string);
+        return Crypto.decryptSymmetric(encryptedBytes, key);
+    }
+
+    public static String encryptAsymmetric(PseudonymKey o, Key key) {
+        IslandProto.PseudonymKey message = IslandProto.PseudonymKey.newBuilder()
+                .setKey(Crypto.encodeKey(o.getKey()))
+                .setPseudonym(o.getPseudonym())
+                .setUniqueId(o.getUniqueID())
+                .setUsername(o.getPseudonym())
+                .build();
+
+        byte[][] chunks = getChunksFromObject(message.toByteArray());
 
         byte[][] encryptedChunks = new byte[chunks.length][];
         for (int i = 0; i < chunks.length; i++) {
@@ -23,7 +44,31 @@ public class ObjectEncrypter {
         return combineChunksIntoString(encryptedChunks);
     }
 
-    public static Object decryptAsymmetric(String string, Key key) {
+    public static PseudonymKey decryptPseudonymKey(String string, Key key) {
+        byte[][] encryptedChunks = getChunksFromString(string);
+
+        byte[][] chunks = new byte[encryptedChunks.length][];
+        for (int i = 0; i < chunks.length; i++) {
+            chunks[i] = Crypto.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
+        }
+
+        byte[] bytes = combineChunksIntoObject(chunks);
+        try {
+            IslandProto.PseudonymKey protoKey = IslandProto.PseudonymKey.parseFrom(bytes);
+            PseudonymKey pseudonymKey = new PseudonymKey(
+                    protoKey.getUniqueId(),
+                    protoKey.getUsername(),
+                    protoKey.getPseudonym(),
+                    Crypto.decodeSymmetricKey(protoKey.getKey()));
+            return pseudonymKey;
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static byte[] decryptAsymmetric(String string, Key key) {
         byte[][] encryptedChunks = getChunksFromString(string);
 
         byte[][] chunks = new byte[encryptedChunks.length][];
@@ -34,9 +79,7 @@ public class ObjectEncrypter {
         return combineChunksIntoObject(chunks);
     }
 
-    private static byte[][] getChunksFromObject(Serializable o) {
-        byte[] serializedO = SerializationUtils.serialize(o);
-
+    private static byte[][] getChunksFromObject(byte[] serializedO) {
         int numberOfChunks = (int) Math.ceil((double)serializedO.length / CHUNK_SIZE);
         byte[][] chunks = new byte[numberOfChunks][];
         for (int i = 0; i < numberOfChunks; i++) {
@@ -51,7 +94,7 @@ public class ObjectEncrypter {
     private static String combineChunksIntoString(byte[][] encryptedChunks) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < encryptedChunks.length; i++) {
-            sb.append(Base64.encodeToString(encryptedChunks[i], Base64.NO_WRAP));
+            sb.append(encoder.encodeToString(encryptedChunks[i]));
             if (i != encryptedChunks.length - 1) {
                 sb.append(DELIMITER);
             }
@@ -65,13 +108,13 @@ public class ObjectEncrypter {
 
         byte[][] chunks = new byte[tokens.length][];
         for (int i = 0; i < chunks.length; i++) {
-            chunks[i] = Base64.decode(tokens[i], Base64.NO_WRAP);
+            chunks[i] = decoder.decode(tokens[i]);
         }
 
         return chunks;
     }
 
-    private static Object combineChunksIntoObject(byte[][] chunks) {
+    private static byte[] combineChunksIntoObject(byte[][] chunks) {
         int totalLength = 0;
         for (int i = 0; i < chunks.length; i++) {
             totalLength += chunks[i].length;
@@ -84,6 +127,6 @@ public class ObjectEncrypter {
             }
         }
 
-        return SerializationUtils.deserialize(object);
+        return object;
     }
 }
