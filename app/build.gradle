@@ -40,4 +40,5 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
+    compile 'com.google.protobuf:protobuf-java:2.4.1'
 }

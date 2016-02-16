@@ -3,7 +3,6 @@ package org.island.messaging;
 import android.util.Base64;
 
 import org.apache.commons.lang3.SerializationUtils;
-import org.island.messaging.Crypto;
 
 import java.io.Serializable;
 import java.security.Key;
