@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
+import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -112,7 +113,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
             Log.v(TAG, "starting to get friends");
             Log.v(TAG, "username " + username);
             Log.v(TAG, "private key " + privateKey);
-            return MessageLayer.getReaders(username, Crypto.decodePrivateKey(privateKey));
+            return MessageLayer.getReaders(getApplicationContext(), username, Crypto.decodePrivateKey(privateKey));
         }
 
         @Override
