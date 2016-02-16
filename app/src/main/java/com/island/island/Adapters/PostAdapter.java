@@ -8,88 +8,47 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 
-import com.island.island.Activities.EditProfileActivity;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Activities.ViewPostActivity;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
-import com.island.island.Models.Profile;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.GlancePostViewHolder;
-import com.island.island.ViewHolders.ProfileViewHolder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by poo on 2/3/2016.
+ * Created by root on 2/2/16.
  */
-public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
 {
-    private ArrayList mList = new ArrayList<>();
+    private List<Post> mPosts = new ArrayList<>();
     private Context mContext = null;
 
-    private static final int PROFILE_HEADER = 0;
-    private static final int POST = 1;
-
-    public ProfileAdapter(ArrayList list, Context context)
+    public PostAdapter(Context context, List<Post> posts)
     {
-        mList = list;
+        mPosts = posts;
         mContext = context;
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    public GlancePostViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        RecyclerView.ViewHolder viewHolder = null;
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.glance_post, parent, false);
 
-        if(viewType == POST)
-        {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.glance_post, parent, false);
-            viewHolder = new GlancePostViewHolder(v);
-        }
-        else if(viewType == PROFILE_HEADER)
-        {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.profile_header, parent, false);
-            viewHolder = new ProfileViewHolder(v);
-        }
-
+        GlancePostViewHolder viewHolder = new GlancePostViewHolder(v);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
+    public void onBindViewHolder(GlancePostViewHolder holder, int position)
     {
-        if(position != 0)
-        {
-            bindPost((GlancePostViewHolder)holder, position);
-        }
-        else
-        {
-            bindProfile((ProfileViewHolder) holder);
-        }
-    }
-
-    @Override
-    public int getItemCount()
-    {
-        return mList.size();
-    }
-
-    @Override
-    public int getItemViewType(int position)
-    {
-        return position == 0 ? PROFILE_HEADER : POST;
-    }
-
-    private void bindPost(GlancePostViewHolder holder, int position)
-    {
-        Post post = (Post) mList.get(position);
+        Post post = mPosts.get(position);
 
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(post.getTimestamp());
@@ -142,21 +101,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    private void bindProfile(ProfileViewHolder holder)
+    @Override
+    public int getItemCount()
     {
-        Profile profile = (Profile) mList.get(0);
-
-        holder.userName.setText(profile.getUserName());
-        holder.aboutMe.setText(profile.getAboutMe());
-
-        // Client user's profile
-        if(Utils.isUser(mContext, profile.getUserName()))
-        {
-            holder.editProfile.setVisibility(View.VISIBLE);
-            holder.editProfile.setOnClickListener((View v) ->
-            {
-                mContext.startActivity(new Intent(mContext, EditProfileActivity.class));
-            });
-        }
+        return mPosts.size();
     }
 }

@@ -77,8 +77,13 @@ public class ProfileActivity extends AppCompatActivity
         getSupportActionBar().setTitle(userName);
 
         // User posts
+<<<<<<< HEAD
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName));
+        profileList.addAll(userPosts);
+=======
+        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
         arrayOfPosts.addAll(userPosts);
+>>>>>>> master
     }
 
     @Override

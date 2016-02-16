@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.island.island.Adapters.FeedAdapter;
+import com.island.island.Adapters.PostAdapter;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -23,6 +23,7 @@ import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -72,11 +73,11 @@ public class FeedActivity extends AppCompatActivity
         navUserName.setText(userName);
 
         // Feed posts setup
-        ArrayList<Post> arrayOfPosts = new ArrayList<>();
+        List<Post> arrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new FeedAdapter(arrayOfPosts, this);
+        mAdapter = new PostAdapter(this, arrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
