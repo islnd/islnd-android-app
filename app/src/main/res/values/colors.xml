@@ -17,4 +17,7 @@
     <color name="translucent_scrim_top_center">#0C000000</color>
     <color name="translucent_scrim_bottom">#2A000000</color>
     <color name="translucent_scrim_bottom_center">#0D000000</color>
+
+    <color name="black_active">#8a000000</color>
+    <color name="black_inactive">#42000000</color>
 </resources>

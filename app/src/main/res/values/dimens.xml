@@ -42,4 +42,6 @@
     <dimen name="edit_profile_header_image_icon_padding">16dp</dimen>
 
     <dimen name="expanded_title_name_margin">38dp</dimen>
+
+    <dimen name="view_friend_status_padding">8dp</dimen>
 </resources>

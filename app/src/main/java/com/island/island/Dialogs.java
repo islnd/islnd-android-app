@@ -16,20 +16,11 @@ public class Dialogs
         final String removeFriend = userName;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("Remove " + userName + " as a friend?")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        IslandDB.removeReader(removeFriend);
-                    }
+                    IslandDB.removeReader(removeFriend);
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        // User cancelled the dialog
-                    }
-                })
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -37,20 +28,11 @@ public class Dialogs
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(context.getString(R.string.delete_post_dialog))
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        // TODO: Add remove post!
-                    }
+                    // TODO: Add remove post!
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        // User cancelled the dialog
-                    }
-                })
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -58,20 +40,23 @@ public class Dialogs
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(context.getString(R.string.delete_comment_dialog))
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
                         // TODO: Add remove comment!
-                    }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    public static void allowUserDialog(Context context)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(context.getString(R.string.allow_user_dialog))
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        // User cancelled the dialog
-                    }
+                    // TODO: Allow user!
                 })
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 }

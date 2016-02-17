@@ -33,6 +33,7 @@
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
 
     <string name="remove_friend">Remove Friend</string>
+    <string name="allow_user">Allow User</string>
 
     <string name="user_name">USER_NAME</string>
 
@@ -42,4 +43,8 @@
     <string name="delete_post_dialog">Delete post?</string>
     <string name="delete_comment">Delete comment</string>
     <string name="delete_comment_dialog">Delete comment?</string>
+
+    <string name="view_friend_status">Not Allowed</string>
+
+    <string name="allow_user_dialog">Allow user?</string>
 </resources>

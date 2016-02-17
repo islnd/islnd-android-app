@@ -60,16 +60,27 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
 
         holder.overflow.setOnClickListener((View v) ->
         {
+            final int REMOVE_FRIEND = 0;
+            final int ALLOW_USER = 1;
+
             PopupMenu popup = new PopupMenu(mContext, holder.overflow);
-            popup.getMenuInflater().inflate(R.menu.view_friends_item_menu, popup.getMenu());
+
+            // TODO: if(user is allowed)
+            popup.getMenu().add(0, REMOVE_FRIEND, 0, mContext.getString(R.string.remove_friend));
+
+            // TODO: if(user is not allowed)
+            popup.getMenu().add(0, ALLOW_USER, 1, mContext.getString(R.string.allow_user));
 
             popup.setOnMenuItemClickListener((MenuItem item) ->
             {
                 switch (item.getItemId())
                 {
-                    case R.id.remove_friend:
+                    case REMOVE_FRIEND:
                         Dialogs.removeFriendDialog(mContext, user.getUserName());
-                        // TODO: Remove friend from list?
+                        // TODO: Update UI to show user was removed
+                    case ALLOW_USER:
+                        Dialogs.allowUserDialog(mContext);
+                        // TODO: Update UI to show that user was allowed
                 }
 
                 return true;
