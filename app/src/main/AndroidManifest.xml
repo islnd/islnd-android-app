@@ -55,6 +55,13 @@
             android:label="@string/title_activity_show_qr"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".Activities.VerticalCaptureActivity"
+                  android:screenOrientation="fullSensor"
+                  android:stateNotNeeded="true"
+                  android:theme="@style/zxing_CaptureTheme"
+                  android:windowSoftInputMode="stateAlwaysHidden">
+
+        </activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.island.island.Activities;
 
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -12,13 +13,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
-import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
@@ -36,6 +39,8 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
+
+    private static String TAG = "FeedActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -138,7 +143,7 @@ public class FeedActivity extends AppCompatActivity
         }
         else if (id == R.id.qr_code)
         {
-            Dialogs.qrCodeActionDialog(this);
+            qrCodeActionDialog();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -146,10 +151,54 @@ public class FeedActivity extends AppCompatActivity
         return true;
     }
 
-    // On clicks
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO: Do something with qr results
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null)
+        {
+            if(result.getContents() == null)
+            {
+                Log.d(TAG, "Cancelled scan");
+            }
+            else
+            {
+                Log.d(TAG, "Contents: " + result.getContents());
+                // TODO: If contents are valid, open a dialog to allow use
+            }
+        }
+        else
+        {
+            // This is important, otherwise the result will not be passed to the fragment
+            //super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     public void startNewPostActivity(View view)
     {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
         startActivity(newPostIntent);
+    }
+
+    public  void qrCodeActionDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.qr_action_dialog)
+                .setItems(R.array.qr_actions, (DialogInterface dialog, int which) ->
+                {
+                    switch (which)
+                    {
+                        case 0: // Show QR
+                            startActivity(new Intent(this, ShowQRActivity.class));
+                            break;
+                        case 1: // Get QR
+                            IntentIntegrator integrator = new IntentIntegrator(this);
+                            integrator.setCaptureActivity(VerticalCaptureActivity.class);
+                            integrator.setOrientationLocked(false);
+                            integrator.initiateScan();
+                            break;
+                    }
+                })
+                .show();
     }
 }
