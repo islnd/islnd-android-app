@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,6 +34,7 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -87,6 +89,15 @@ public class FeedActivity extends AppCompatActivity
             List<Post> userPosts = IslandDB.getPostsForUser(user);
             arrayOfPosts.addAll(userPosts);
         }
+
+        // Swipe to refresh
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+
+        refreshLayout.setOnRefreshListener(() ->
+        {
+            // TODO: Run async task again
+            refreshLayout.setRefreshing(false);
+        });
     }
 
     @Override

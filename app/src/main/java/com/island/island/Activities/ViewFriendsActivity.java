@@ -1,6 +1,7 @@
 package com.island.island.Activities;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
     private RecyclerView.LayoutManager mLayoutManager;
     private List<User> friendsList;
     private List<User> adapterList;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +49,15 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         List<User> friends = IslandDB.getUsers();
         friendsList.addAll(friends);
         adapterList.addAll(friends);
+
+        // Swipe to refresh
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+
+        refreshLayout.setOnRefreshListener(() ->
+        {
+            // TODO: Run async task again
+            refreshLayout.setRefreshing(false);
+        });
     }
 
     @Override
