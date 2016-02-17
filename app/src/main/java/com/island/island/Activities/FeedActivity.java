@@ -29,7 +29,6 @@ import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
-import org.island.messaging.Crypto;
 import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private List<Post> arrayOfPosts;
+    private List<Post> mArrayOfPosts;
     private SwipeRefreshLayout refreshLayout;
 
     @Override
@@ -85,11 +84,11 @@ public class FeedActivity extends AppCompatActivity
         navUserName.setText(userName);
 
         // Feed posts setup
-        arrayOfPosts = new ArrayList<>();
+        mArrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PostAdapter(this, arrayOfPosts);
+        mAdapter = new PostAdapter(this, mArrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
@@ -193,7 +192,7 @@ public class FeedActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(List<Post> posts) {
             if (posts != null) {
-                arrayOfPosts.addAll(posts);
+                mArrayOfPosts.addAll(posts);
                 mAdapter.notifyDataSetChanged();
                 for (Post p : posts) {
                     Log.v(TAG, "added post " + p.getUserName());

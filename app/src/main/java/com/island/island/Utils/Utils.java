@@ -3,21 +3,9 @@ package com.island.island.Utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Base64;
 
-import com.island.island.Database.IdentityDatabase;
 import com.island.island.R;
 
-import org.apache.commons.lang3.SerializationUtils;
-import org.island.messaging.Crypto;
-
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
