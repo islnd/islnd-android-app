@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,7 @@ public class ViewPostActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,6 +59,15 @@ public class ViewPostActivity extends AppCompatActivity
         // Add comments to list
         List<Comment> comments = post.getComments();
         viewPostList.addAll(comments);
+
+        // Swipe to refresh
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+
+        refreshLayout.setOnRefreshListener(() ->
+        {
+            // TODO: Run async task again
+            refreshLayout.setRefreshing(false);
+        });
     }
 
     public void addCommentToPost(View view)

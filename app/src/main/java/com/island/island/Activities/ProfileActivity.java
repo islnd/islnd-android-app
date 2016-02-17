@@ -2,6 +2,7 @@ package com.island.island.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +34,7 @@ public class ProfileActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout refreshLayout;
 
     private Profile profile;
 
@@ -79,6 +81,15 @@ public class ProfileActivity extends AppCompatActivity
         // User posts
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName));
         arrayOfPosts.addAll(userPosts);
+
+        // Swipe to refresh
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+
+        refreshLayout.setOnRefreshListener(() ->
+        {
+            // TODO: Run async task again
+            refreshLayout.setRefreshing(false);
+        });
     }
 
     @Override

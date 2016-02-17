@@ -3,36 +3,35 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_view_post">ViewPostActivity</string>
     <string name="title_activity_main">MainActivity</string>
-
-    <string name="add_comment">Add Comment</string>
-
     <string name="title_activity_feed">FeedActivity</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_new_post">NewPostActivity</string>
+    <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
+    <string name="title_activity_view_friends">ViewFriendsActivity</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
+    <string name="title_activity_image_viewer">ImageViewerActivity</string>
 
+    <string name="add_comment">Add Comment</string>
     <string name="new_post_hint">Whatcha got?</string>
 
     <string name="empty_string_post">Cannot submit empty post!</string>
     <string name="empty_comment_post">Cannot submit empty comment!</string>
-    <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_user_name">UserName</string>
-    <string name="title_activity_view_friends">ViewFriendsActivity</string>
 
     <string name="search_friends_hint">Search friends</string>
     <string name="search">Search</string>
-    <string name="title_activity_edit_profile">EditProfileActivity</string>
 
     <string name="about_me">About me</string>
 
     <string name="profile_saved">Profile saved</string>
 
     <string name="select_image">Select Image</string>
-    <string name="title_activity_image_viewer">ImageViewerActivity</string>
 
     <string name="remove_friend">Remove Friend</string>
+    <string name="allow_user">Allow User</string>
 
     <string name="user_name">USER_NAME</string>
 
@@ -49,4 +48,16 @@
     <string name="group_key">group_key</string>
     <string name="pseudonym_seed">pseudonym_seed</string>
     <string name="pseudonym">pseudonym</string>
+
+    <string name="view_friend_status">Not Allowed</string>
+
+    <string name="allow_user_dialog">Allow user?</string>
+
+    <string-array name="qr_actions">
+        <item>Show QR Code</item>
+        <item>Get QR Code</item>
+    </string-array>
+
+    <string name="qr_action_dialog">Pick QR Action</string>
+    <string name="title_activity_show_qr">ShowQRActivity</string>
 </resources>

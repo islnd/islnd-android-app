@@ -1,10 +1,10 @@
 package com.island.island.Activities;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,9 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
-import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.User;
-import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 
@@ -34,6 +32,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
     private RecyclerView.LayoutManager mLayoutManager;
     private List<User> friendsList;
     private List<User> adapterList;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,6 +53,15 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         new GetFriendsTask().execute();
+
+        // Swipe to refresh
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+
+        refreshLayout.setOnRefreshListener(() ->
+        {
+            // TODO: Run async task again
+            refreshLayout.setRefreshing(false);
+        });
     }
 
     @Override

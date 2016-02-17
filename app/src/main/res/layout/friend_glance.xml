@@ -23,7 +23,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Base.TextAppearance.AppCompat.Subhead"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical"
+            android:text="Test Name"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/black_inactive"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="@dimen/view_friend_status_padding"
+            android:paddingLeft="@dimen/view_friend_status_padding"
+            android:layout_marginLeft="@dimen/view_friend_status_padding"
+            android:text="@string/view_friend_status"/>
     </LinearLayout>
 
     <ImageView
