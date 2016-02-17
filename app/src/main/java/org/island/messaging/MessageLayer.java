@@ -23,6 +23,10 @@ public class MessageLayer {
         //call the REST service
         //FriendDatabase.getInstance(context).deleteAll();
         List<EncryptedPseudonymKey> keys = Rest.getReaders(username);
+        if (keys == null) {
+            Log.d(TAG, "get readers returned null");
+            return new ArrayList<>();
+        }
 
         //decrypt the friends and add to DB
         List<User> friends = new ArrayList<>();
@@ -56,6 +60,10 @@ public class MessageLayer {
 
         for (PseudonymKey key: keys) {
             List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
+            if (encryptedPosts == null) {
+                Log.d(TAG, "get posts return null");
+                continue;
+            }
 
             for (EncryptedPost post: encryptedPosts) {
                 SignedObject signedPost = SignedObject.
