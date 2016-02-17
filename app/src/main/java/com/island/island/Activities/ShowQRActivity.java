@@ -13,6 +13,8 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.island.island.R;
 
+import org.island.messaging.MessageLayer;
+
 // https://github.com/zxing/zxing/blob/master/android/src/com/google/zxing/client/android/encode/QRCodeEncoder.java
 
 public class ShowQRActivity extends AppCompatActivity
@@ -26,8 +28,7 @@ public class ShowQRActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String test = "this is a test!";
-        buildQrCode(test);
+        buildQrCode(MessageLayer.getQrCode(getApplicationContext()));
     }
 
     private void buildQrCode(String content)

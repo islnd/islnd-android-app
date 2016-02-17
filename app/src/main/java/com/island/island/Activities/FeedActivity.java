@@ -56,7 +56,7 @@ public class FeedActivity extends AppCompatActivity
 
         // TODO: Remove after login implemented
         // Set user hack
-        String USER = "newUser10";
+        String USER = "newUser11";
         IslandDB.createIdentity(this, USER);
 
         // Nav drawer
@@ -162,8 +162,10 @@ public class FeedActivity extends AppCompatActivity
             }
             else
             {
-                Log.d(TAG, "Contents: " + result.getContents());
+                String contents = result.getContents();
+                Log.d(TAG, "Contents: " + contents);
                 // TODO: If contents are valid, open a dialog to allow use
+                MessageLayer.addFriendFromQRCode(getApplicationContext(), contents);
             }
         }
         else
