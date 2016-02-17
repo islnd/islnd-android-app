@@ -12,6 +12,8 @@ import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 
+import org.island.messaging.proto.IslandProto;
+
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,5 +105,26 @@ public class MessageLayer {
 
     public static String getPseudonym(String seed) {
         return Rest.getPseudonym(seed);
+    }
+
+    public static void addFriendFromQRCode(Context context, String qrCode) {
+        Log.v(TAG, "adding friend from QR code: " + qrCode);
+        byte[] bytes = new Decoder().decode(qrCode);
+        PseudonymKey pk = PseudonymKey.fromProto(bytes);
+        FriendDatabase.getInstance(context).addFriend(pk);
+    }
+
+    public static String getQrCode(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
+        String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
+        String pseudonym = sharedPreferences.getString(context.getString(R.string.pseudonym), "");
+        Key groupKey = Crypto.decodeSymmetricKey(
+                sharedPreferences.getString(context.getString(R.string.group_key), ""));
+
+        PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);
+        String qrCode = new Encoder().encodeToString(pk.toByteArray());
+        Log.v(TAG, "generated QR code: " + qrCode);
+        return qrCode;
     }
 }

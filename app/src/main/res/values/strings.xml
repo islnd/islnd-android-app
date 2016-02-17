@@ -60,4 +60,5 @@
 
     <string name="qr_action_dialog">Pick QR Action</string>
     <string name="title_activity_show_qr">ShowQRActivity</string>
+    <string name="pseudonym_key_id">pseudonym_key_id</string>
 </resources>
