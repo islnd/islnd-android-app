@@ -65,4 +65,37 @@ public class Rest {
 
         return null;
     }
+
+    public static void post(String pseudonym, String encryptedPost) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            service.post(pseudonym, encryptedPost).execute().body();
+            //--TODO check that post was successful
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static String getPseudonym(String seed) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+        try {
+            return service.pseduonym(seed).execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

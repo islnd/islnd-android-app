@@ -1,21 +1,21 @@
 package org.island.messaging;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.User;
+import com.island.island.R;
 import com.island.island.Utils.Utils;
 
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by poo on 2/13/16.
- */
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
@@ -51,7 +51,9 @@ public class MessageLayer {
     }
 
     public static List<Post> getPosts(Context context) {
-        ArrayList<PseudonymKey> keys = FriendDatabase.getInstance(context).getKeys();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+
+        ArrayList<PseudonymKey> keys = friendDatabase.getKeys();
         for (PseudonymKey pk : keys) {
             Log.v(TAG, "pk: " + pk.getUsername());
         }
@@ -83,5 +85,23 @@ public class MessageLayer {
         }
 
         return posts;
+    }
+
+    public static void post(Context context, String content) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String lastId = preferences.getString(context.getString(R.string.post_id_key), "");
+        String newId = String.valueOf(Integer.parseInt(lastId) + 1);
+        PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
+
+        String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
+        Key key = Crypto.decodeSymmetricKey(myGroupKey);
+        String encryptedPost = ObjectEncrypter.encryptSymmetric(postUpdate, key);
+
+        String myPseudonym = preferences.getString(context.getString(R.string.pseudonym_key), "");
+        Rest.post(myPseudonym, encryptedPost);
+    }
+
+    public static String getPseudonym(String seed) {
+        return Rest.getPseudonym(seed);
     }
 }

@@ -3,6 +3,7 @@ package com.island.island.Database;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
+import com.island.island.R;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.Crypto;
@@ -18,7 +20,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.Key;
 import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,9 +42,9 @@ public class IslandDB
 
     public static void postPublicKey(Context context)
     {
-        SharedPreferences preferences = context.getSharedPreferences("DEFAULT", 0);
-        String username = preferences.getString("USER_NAME", "");
-        String publicKey = preferences.getString("PUBLIC_KEY", "");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = preferences.getString(context.getString(R.string.user_name), "");
+        String publicKey = preferences.getString(context.getString(R.string.public_key), "");
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
@@ -65,42 +69,100 @@ public class IslandDB
 
     public static void createIdentity(Context context, String username)
     {
-//        if(getIdentityDatabase(context).getPublicKey() != null) {
-//            return;
-//        }
-//
-//        KeyPair keyPair = Crypto.getKeyPair();
-//        IdentityDatabase identityDatabase = getIdentityDatabase(context);
-//        identityDatabase.setIdentity(keyPair.getPublic(), keyPair.getPrivate(), username);
-
-        KeyPair keyPair = Crypto.getKeyPair();
-        SharedPreferences settings = context.getSharedPreferences("DEFAULT", 0);
-        if (settings.getString("USER_NAME", "").equals(username)) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        String currentUsername = settings.getString(context.getString(R.string.user_name), "");
+        Log.v(TAG, String.format("previous user %s, current user %s", currentUsername, username));
+        if (currentUsername.equals(username)) {
+            //--The app is already using this user
             return;
         }
 
-        SharedPreferences.Editor editor = settings.edit();
-        String privateKey = Crypto.encodeKey(keyPair.getPrivate());
-        String publicKey = Crypto.encodeKey(keyPair.getPublic());
+        setUsername(context, username);
+        setKeyPairAndPostPublicKey(context);
+        setGroupKey(context);
+        setPseudonym(context);
+    }
 
-        editor.putString("PRIVATE_KEY", privateKey);
-        editor.putString("PUBLIC_KEY", publicKey);
-        editor.putString("USER_NAME", username);
+    private static void setPseudonym(Context context) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        String seed = String.valueOf(new SecureRandom().nextLong());
+        editor.putString(context.getString(R.string.pseudonym_seed), seed);
+
+        new AsyncTask<String, Void, String>() {
+            @Override
+            protected String doInBackground(String... params) {
+                return MessageLayer.getPseudonym(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(String pseudonym) {
+                editor.putString(context.getString(R.string.pseudonym), pseudonym);
+                editor.commit();
+
+                Log.v(TAG, "pseudonym " + pseudonym);
+                Log.v(TAG, "pseudonym seed " + seed);
+            }
+        }.execute(seed);
+    }
+
+    private static void setGroupKey(Context context) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+        String groupKey = Crypto.encodeKey(Crypto.getKey());
+        editor.putString(context.getString(R.string.group_key), groupKey);
+        editor.commit();
+
+        Log.v(TAG, "group key " + groupKey);
+    }
+
+    private static void setUsername(Context context, String username) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putString(context.getString(R.string.user_name), username);
         editor.commit();
 
         Log.v(TAG, "username " + username);
-        Log.v(TAG, "private key " + privateKey);
-        Log.v(TAG, "public key " + publicKey);
     }
 
-    public static void post(String content)
+    private static void setKeyPairAndPostPublicKey(Context context) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = settings.edit();
+
+                KeyPair keyPair = Crypto.getKeyPair();
+                String privateKey = Crypto.encodeKey(keyPair.getPrivate());
+                String publicKey = Crypto.encodeKey(keyPair.getPublic());
+                editor.putString(context.getString(R.string.private_key), privateKey);
+                editor.putString(context.getString(R.string.public_key), publicKey);
+                editor.commit();
+
+                Log.v(TAG, "private key " + privateKey);
+                Log.v(TAG, "public key " + publicKey);
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                IslandDB.postPublicKey(context);
+            }
+        }.execute();
+    }
+
+    public static void post(Context context, String content)
     /**
      * Encrypts content and posts to database.
      *
      * @param content Plaintext content to be posted.
      */
     {
-
+        MessageLayer.post(context, content);
     }
 
     public static List<Post> getPostsForUser(User user)

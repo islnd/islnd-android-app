@@ -35,6 +35,8 @@ import java.util.List;
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
 {
+    private static final String TAG = FeedActivity.class.getSimpleName();
+
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -51,10 +53,8 @@ public class FeedActivity extends AppCompatActivity
 
         // TODO: Remove after login implemented
         // Set user hack
-        String USER = "Jam";
-        Utils.setUser(this, USER);
+        String USER = "newUser10";
         IslandDB.createIdentity(this, USER);
-        IslandDB.postPublicKey(this);
 
         // Nav drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

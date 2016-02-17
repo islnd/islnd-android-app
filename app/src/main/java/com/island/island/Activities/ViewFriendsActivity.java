@@ -1,8 +1,10 @@
 package com.island.island.Activities;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -104,9 +106,10 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
 
         private final String TAG = GetFriendsTask.class.getSimpleName();
 
-        SharedPreferences preferences = getSharedPreferences("DEFAULT", 0);
-        String username = preferences.getString("USER_NAME", "");
-        String privateKey = preferences.getString("PRIVATE_KEY", "");
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String username = preferences.getString(getApplicationContext().getString(R.string.user_name), "");
+        String privateKey = preferences.getString(getApplicationContext().getString(R.string.private_key), "");
 
         @Override
         protected List<User> doInBackground(Void... params) {

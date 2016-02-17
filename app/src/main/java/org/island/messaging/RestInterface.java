@@ -2,16 +2,14 @@ package org.island.messaging;
 
 import java.util.List;
 
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
-/**
- * Created by poo on 2/13/16.
- */
 public interface RestInterface
 {
     @GET("/readers/{username}")
@@ -22,6 +20,14 @@ public interface RestInterface
     Call<List<EncryptedPost>> posts(
             @Path("pseudonym") String pseudonym);
 
+    @GET("/pseudonym/{seed}")
+    Call<String> pseduonym(
+            @Path("seed") String seed);
+
     @POST("/publicKey/{username}")
     Call<String> postPublicKey(@Path("username") String username, @Body String publicKey);
+
+    @FormUrlEncoded
+    @POST("/post/{pseudonym}")
+    Call post(@Path("pseduonym") String pseudonym, @Field("blob") String blob);
 }
