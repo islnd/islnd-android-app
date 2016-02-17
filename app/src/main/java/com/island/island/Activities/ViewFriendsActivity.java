@@ -1,20 +1,26 @@
 package com.island.island.Activities;
 
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
 import com.island.island.Models.User;
-import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+
+import org.island.messaging.Crypto;
+import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +52,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
-        List<User> friends = IslandDB.getUsers();
-        friendsList.addAll(friends);
-        adapterList.addAll(friends);
+        new GetFriendsTask().execute();
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -104,5 +108,34 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         mAdapter.animateTo(filteredModelList);
         mRecyclerView.scrollToPosition(0);
         return true;
+    }
+
+    private class GetFriendsTask extends AsyncTask<Void, Void, List<User>> {
+
+        private final String TAG = GetFriendsTask.class.getSimpleName();
+
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String username = preferences.getString(getApplicationContext().getString(R.string.user_name), "");
+        String privateKey = preferences.getString(getApplicationContext().getString(R.string.private_key), "");
+
+        @Override
+        protected List<User> doInBackground(Void... params) {
+            Log.v(TAG, "starting to get friends");
+            Log.v(TAG, "username " + username);
+            Log.v(TAG, "private key " + privateKey);
+            return MessageLayer.getReaders(getApplicationContext(), username, Crypto.decodePrivateKey(privateKey));
+        }
+
+        @Override
+        protected void onPostExecute(List<User> users) {
+            if (users != null) {
+                adapterList.addAll(users);
+                mAdapter.notifyDataSetChanged();
+                for (User u : users) {
+                    Log.v(TAG, "added user " + u.getUserName());
+                }
+            }
+        }
     }
 }

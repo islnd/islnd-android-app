@@ -10,16 +10,12 @@ import java.io.Serializable;
 public class User implements Serializable, Comparable<User>
 {
     private String userName = "";
-    private String pseudonym = "";
-    private String groupKey = "";
 
     public void User(){}
 
-    public User(String userName, String pseudonym, String groupKey)
+    public User(String userName)
     {
         this.userName = userName;
-        this.pseudonym = pseudonym;
-        this.groupKey = groupKey;
     }
 
     public String getUserName()
@@ -27,29 +23,9 @@ public class User implements Serializable, Comparable<User>
         return userName;
     }
 
-    public String getPseudonym()
-    {
-        return pseudonym;
-    }
-
-    public String getGroupKey()
-    {
-        return groupKey;
-    }
-
     public void setUserName(String username)
     {
         this.userName = username;
-    }
-
-    public void setPseudonym(String pseudonym)
-    {
-        this.pseudonym = pseudonym;
-    }
-
-    public void setGroupKey(String groupKey)
-    {
-        this.groupKey = groupKey;
     }
 
     @Override

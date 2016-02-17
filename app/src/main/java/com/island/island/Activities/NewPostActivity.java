@@ -32,7 +32,7 @@ public class NewPostActivity extends AppCompatActivity
         }
         else
         {
-            IslandDB.post(postText);
+            IslandDB.post(getApplicationContext(), postText);
             finish();
         }
     }

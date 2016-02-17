@@ -1,0 +1,30 @@
+package proto;
+
+option java_package = "org.island.messaging.proto";
+
+message PseudonymKey {
+  required int64 unique_id = 1;
+  required string username = 2;
+  required string pseudonym = 3;
+  required string key = 4;
+}
+
+message SignedObject {
+  required string object = 1;
+  required string signature = 2;
+}
+
+message PostUpdate {
+  required bool is_delete = 1;
+  required string id = 2;
+  required string content = 3;
+  required int64 timestamp = 4;
+}
+
+message CommentUpdate {
+  required bool is_delete = 1;
+  required string id = 2;
+  required string author = 3;
+  required string content = 4;
+  required int64 timestamp = 5;
+}

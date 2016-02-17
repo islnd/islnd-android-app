@@ -79,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity
         getSupportActionBar().setTitle(userName);
 
         // User posts
-        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName, "", ""));
+        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName));
         arrayOfPosts.addAll(userPosts);
 
         // Swipe to refresh
