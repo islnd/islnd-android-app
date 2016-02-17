@@ -47,4 +47,12 @@
     <string name="view_friend_status">Not Allowed</string>
 
     <string name="allow_user_dialog">Allow user?</string>
+
+    <string-array name="qr_actions">
+        <item>Show QR Code</item>
+        <item>Get QR Code</item>
+    </string-array>
+
+    <string name="qr_action_dialog">Pick QR Action</string>
+    <string name="title_activity_show_qr">ShowQRActivity</string>
 </resources>

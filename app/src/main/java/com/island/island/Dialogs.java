@@ -3,7 +3,9 @@ package com.island.island;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 
+import com.island.island.Activities.ShowQRActivity;
 import com.island.island.Database.IslandDB;
 
 /**
@@ -57,6 +59,23 @@ public class Dialogs
                     // TODO: Allow user!
                 })
                 .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    public static void qrCodeActionDialog(Context context)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.qr_action_dialog)
+                .setItems(R.array.qr_actions, (DialogInterface dialog, int which) ->
+                {
+                    switch (which) {
+                        case 0: // Show QR
+                            context.startActivity(new Intent(context, ShowQRActivity.class));
+                            break;
+                        case 1: // Get QR
+                            break;
+                    }
+                })
                 .show();
     }
 }

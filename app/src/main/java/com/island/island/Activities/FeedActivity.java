@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.island.island.Adapters.PostAdapter;
+import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
@@ -134,6 +135,10 @@ public class FeedActivity extends AppCompatActivity
         else if (id == R.id.nav_settings)
         {
 
+        }
+        else if (id == R.id.qr_code)
+        {
+            Dialogs.qrCodeActionDialog(this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
