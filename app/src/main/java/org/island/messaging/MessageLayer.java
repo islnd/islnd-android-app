@@ -56,19 +56,18 @@ public class MessageLayer {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
 
         ArrayList<PseudonymKey> keys = friendDatabase.getKeys();
-        for (PseudonymKey pk : keys) {
-            Log.v(TAG, "pk: " + pk.getUsername());
-        }
-
         List<Post> posts = new ArrayList<>();
 
         for (PseudonymKey key: keys) {
             List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
+            Log.v(TAG, "posts from " + key.getUsername());
+            Log.v(TAG, "posts from " + key.getPseudonym());
             if (encryptedPosts == null) {
                 Log.d(TAG, "get posts return null");
                 continue;
             }
 
+            Log.v(TAG, encryptedPosts.size() + " posts from " + key.getUsername());
             for (EncryptedPost post: encryptedPosts) {
                 SignedObject signedPost = SignedObject.
                         fromProto(ObjectEncrypter.decryptSymmetric(post.blob, key.getKey()));
@@ -111,6 +110,7 @@ public class MessageLayer {
         Log.v(TAG, "adding friend from QR code: " + qrCode);
         byte[] bytes = new Decoder().decode(qrCode);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
+        Log.v(TAG, String.format("pseudonym is %s", pk.getPseudonym()));
         FriendDatabase.getInstance(context).addFriend(pk);
     }
 
@@ -119,6 +119,7 @@ public class MessageLayer {
         long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
         String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
         String pseudonym = sharedPreferences.getString(context.getString(R.string.pseudonym), "");
+        Log.v(TAG, String.format("pseudonym is %s", pseudonym));
         Key groupKey = Crypto.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
 

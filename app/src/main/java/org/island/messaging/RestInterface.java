@@ -1,5 +1,7 @@
 package org.island.messaging;
 
+import org.island.messaging.server.PseudonymResponse;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -21,7 +23,7 @@ public interface RestInterface
             @Path("pseudonym") String pseudonym);
 
     @GET("/pseudonym/{seed}")
-    Call<String> pseduonym(
+    Call<PseudonymResponse> pseduonym(
             @Path("seed") String seed);
 
     @POST("/publicKey/{username}")

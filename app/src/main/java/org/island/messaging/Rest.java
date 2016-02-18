@@ -2,6 +2,8 @@ package org.island.messaging;
 
 import android.util.Log;
 
+import org.island.messaging.server.PseudonymResponse;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -94,12 +96,18 @@ public class Rest {
     public static String getPseudonym(String seed) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
-                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         RestInterface service = retrofit.create(RestInterface.class);
         try {
-            return service.pseduonym(seed).execute().body();
+            Response<PseudonymResponse> result = service.pseduonym(seed).execute();
+            if (result.code() == 200) {
+                return result.body().getPseudonym();
+            }
+            else {
+                Log.d(TAG, "/pseudonym GET returned code " + result.code());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
