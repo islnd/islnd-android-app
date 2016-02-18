@@ -1,12 +1,14 @@
 package com.island.island.Activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.island.island.Adapters.PostAdapter;
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
@@ -23,6 +26,8 @@ import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
+
+import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +42,7 @@ public class ProfileActivity extends AppCompatActivity
     private SwipeRefreshLayout refreshLayout;
 
     private Profile profile;
+    private List<Post> mArrayOfPosts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,18 +53,22 @@ public class ProfileActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Post list stuff
-        List<Post> arrayOfPosts = new ArrayList<>();
+        mArrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PostAdapter(this, arrayOfPosts);
+        mAdapter = new PostAdapter(this, mArrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
-        // Get intent with username
         Intent profileIntent = getIntent();
         String userName = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        profile = IslandDB.getUserProfile(userName);
+        new GetProfileTask().execute(userName);
+    }
+
+    private void showProfile(String userName) {
+        // Get intent with username
+        profile = ProfileDatabase.getInstance(getApplicationContext()).get(userName);
 
         // Setup profile header
         ImageView profileHeader = (ImageView) findViewById(R.id.profile_header_image);
@@ -66,7 +76,7 @@ public class ProfileActivity extends AppCompatActivity
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        if(Utils.isUser(this, profile.getUserName()))
+        if(Utils.isUser(this, profile.getUsername()))
         {
             editProfile.setVisibility(View.VISIBLE);
             editProfile.setOnClickListener((View v) ->
@@ -80,16 +90,17 @@ public class ProfileActivity extends AppCompatActivity
 
         // User posts
         List<Post> userPosts = IslandDB.getPostsForUser(new User(userName));
-        arrayOfPosts.addAll(userPosts);
+        mArrayOfPosts.addAll(userPosts);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
-        refreshLayout.setOnRefreshListener(() ->
-        {
-            // TODO: Run async task again
-            refreshLayout.setRefreshing(false);
-        });
+        refreshLayout.setOnRefreshListener(
+                () ->
+                {
+                    // TODO: Run async task again
+                    refreshLayout.setRefreshing(false);
+                });
     }
 
     @Override
@@ -98,8 +109,14 @@ public class ProfileActivity extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile_menu, menu);
 
+        //--TODO check the username from the intent instead of the profile
+        //  or just set a member variable
+        if (profile == null) {
+            return true;
+        }
+
         // If this is the client user's profile, don't show menu
-        return !Utils.isUser(this, profile.getUserName());
+        return !Utils.isUser(this, profile.getUsername());
     }
 
     @Override
@@ -109,7 +126,7 @@ public class ProfileActivity extends AppCompatActivity
 
         if (id == R.id.remove_friend)
         {
-            Dialogs.removeFriendDialog(this, profile.getUserName());
+            Dialogs.removeFriendDialog(this, profile.getUsername());
             // TODO: What behavior do we want after removing friend?
             // Probably go back to feed.
         }
@@ -130,5 +147,26 @@ public class ProfileActivity extends AppCompatActivity
         // TODO: Get profile image uri from database and send string with intent
         intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, "");
         startActivity(intent);
+    }
+
+    private class GetProfileTask extends AsyncTask<String, Void, String> {
+        private final String TAG = GetProfileTask.class.getSimpleName();
+
+        protected String doInBackground(String... params) {
+            String username = params[0];
+            if (!username.equals(Utils.getUser(getApplicationContext()))) {
+                Profile profile = MessageLayer.getProfile(getApplicationContext(), username);
+                ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
+                profileDatabase.insert(profile);
+                Log.v(TAG, String.format("Adding %s's profile to DB", profile.getUsername()));
+            }
+
+            return username;
+        }
+
+        @Override
+        protected void onPostExecute(String username) {
+            showProfile(username);
+        }
     }
 }

@@ -8,9 +8,13 @@ import android.widget.Toast;
 
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.Post;
+import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+
+import org.island.messaging.server.ProfilePost;
+import org.island.messaging.server.ProfileResponse;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -102,6 +106,24 @@ public class MessageLayer {
         Rest.post(pseudonymSeed, encryptedPost);
     }
 
+    public static void postProfile(Context context, Profile profile) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
+        SignedObject signedProfile = ObjectSigner.sign(
+                profile,
+                Crypto.decodePrivateKey(privateKey)
+        );
+
+        String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
+        Key key = Crypto.decodeSymmetricKey(myGroupKey);
+        String blob = ObjectEncrypter.encryptSymmetric(signedProfile, key);
+
+        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
+
+        ProfilePost profilePost = new ProfilePost(blob);
+        Rest.postProfile(pseudonymSeed, profilePost);
+    }
+
     public static String getPseudonym(String seed) {
         return Rest.getPseudonym(seed);
     }
@@ -113,6 +135,7 @@ public class MessageLayer {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (friendDatabase.contains(pk)) {
             // TODO: Possibly switch to snackbar...
+            // TODO: Remove UI behavior from this package
             Toast.makeText(
                     context,
                     String.format("%s is already your friend!", pk.getUsername()),
@@ -140,5 +163,22 @@ public class MessageLayer {
         String qrCode = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated QR code: " + qrCode);
         return qrCode;
+    }
+
+    public static Profile getProfile(Context context, String username) {
+        PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
+        ProfileResponse profileResponse = Rest.getProfile(friendPK.getPseudonym());
+        Log.v(TAG, "got profile from network");
+        if (profileResponse == null) {
+            Log.d(TAG, "profile response was null");
+            return null;
+        }
+
+        Log.v(TAG, String.format("blob is %s", profileResponse.getBlob()));
+
+        SignedObject signedProfile = SignedObject.fromProto(
+                ObjectEncrypter.decryptSymmetric(profileResponse.getBlob(), friendPK.getKey()));
+        //--TODO check signature
+        return Profile.fromProto(signedProfile.getObject());
     }
 }

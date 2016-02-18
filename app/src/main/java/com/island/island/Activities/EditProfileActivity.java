@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Profile;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -31,12 +32,12 @@ public class EditProfileActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        profile = IslandDB.getUserProfile(Utils.getUser(this));
+        profile = ProfileDatabase.getInstance(getApplicationContext()).get(Utils.getUser(this));
 
         TextView userName = (TextView) findViewById(R.id.profile_user_name);
         aboutMe = (EditText) findViewById(R.id.edit_profile_about_me);
 
-        userName.setText(profile.getUserName());
+        userName.setText(profile.getUsername());
         aboutMe.setText(profile.getAboutMe());
     }
 
@@ -62,7 +63,8 @@ public class EditProfileActivity extends AppCompatActivity
     {
         // TODO: handle image stuff for saving
         profile.setAboutMe(aboutMe.getText().toString());
-        IslandDB.updateProfile(profile);
+        ProfileDatabase.getInstance(getApplicationContext()).update(profile);
+        IslandDB.postProfile(getApplicationContext(), profile);
 
         Snackbar.make(view, getString(R.string.profile_saved), Snackbar.LENGTH_SHORT).show();
     }

@@ -95,4 +95,23 @@ public class FriendDatabase extends SQLiteOpenHelper {
 
         return keys;
     }
+
+    public PseudonymKey getKey(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {USER_NAME, PSEUDONYM, GROUP_KEY};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return null;
+        }
+
+        results.moveToNext();
+        return new PseudonymKey(
+                1, //--TODO PK ID
+                results.getString(0),
+                results.getString(1),
+                Crypto.decodeSymmetricKey(results.getString(2)));
+    }
 }

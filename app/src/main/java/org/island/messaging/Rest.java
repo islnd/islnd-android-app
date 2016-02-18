@@ -2,6 +2,10 @@ package org.island.messaging;
 
 import android.util.Log;
 
+import com.island.island.Models.Profile;
+
+import org.island.messaging.server.ProfilePost;
+import org.island.messaging.server.ProfileResponse;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
@@ -18,7 +22,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class Rest {
     private static final String TAG = Rest.class.getSimpleName();
 
-    private final static String HOST = "http://ec2-54-152-254-52.compute-1.amazonaws.com:1935";
+    private final static String HOST = "http://ec2-54-152-104-67.compute-1.amazonaws.com:1935";
 
     public static List<EncryptedPseudonymKey> getReaders(String username) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -90,7 +94,26 @@ public class Rest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public static void postProfile(String pseudonymSeed, ProfilePost profilePost) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Response<Object> result = service.postProfile(
+                    pseudonymSeed,
+                    profilePost).execute();
+            Log.v(TAG, "posted profile");
+            Log.v(TAG, "response code " + result.code());
+            //--TODO check that post was successful
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static String getPseudonym(String seed) {
@@ -107,6 +130,28 @@ public class Rest {
             }
             else {
                 Log.d(TAG, "/pseudonym GET returned code " + result.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static ProfileResponse getProfile(String pseudonym) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+        try {
+            Response<ProfileResponse> result = service.getProfile(pseudonym).execute();
+            if (result.code() == 200) {
+                return result.body();
+            }
+            else {
+                Log.d(TAG, "/profile GET returned code " + result.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

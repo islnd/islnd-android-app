@@ -81,6 +81,10 @@ public class IslandDB
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
         setPseudonym(context);
+
+        //--Add a default profile
+        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
+        profileDatabase.insert(new Profile(username, "I'm a newb"));
     }
 
     private static void setPseudonym(Context context) {
@@ -308,41 +312,6 @@ public class IslandDB
 
     }
 
-    public static void updateProfile(Profile profile)
-    /**
-     * Encrypts new profile data and sends to database.
-     *
-     * @param profile Profile object with new profile data.
-     */
-    {
-
-    }
-
-    public static Profile getUserProfile(String userName)
-    /**
-     * Gets a user's profile.
-     *
-     * @param user User whose profile I'm getting.
-     * @return Profile of designated user.
-     */
-    {
-        Profile profile = null;
-
-        try
-        {
-            JSONObject obj = new JSONObject(mockData);
-            JSONObject profileObj = obj.getJSONObject(userName).getJSONObject("profile");
-
-            String aboutMe = profileObj.getString("about_me");
-            profile = new Profile(userName, aboutMe);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return profile;
-    }
-
     public static void addCommentToPost(Post post, Comment comment)
     /**
      * Adds comment to existing post
@@ -352,5 +321,16 @@ public class IslandDB
      */
     {
 
+    }
+
+    public static void postProfile(Context context, Profile profile) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                MessageLayer.postProfile(context, profile);
+                return null;
+            }
+        }.execute();
     }
 }
