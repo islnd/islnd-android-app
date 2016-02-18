@@ -18,7 +18,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class Rest {
     private static final String TAG = Rest.class.getSimpleName();
 
-    private final static String HOST = "http://ec2-54-152-254-52.compute-1.amazonaws.com:1935";
+    private final static String HOST = "http://ec2-54-152-104-67.compute-1.amazonaws.com:1935";
 
     public static List<EncryptedPseudonymKey> getReaders(String username) {
         Retrofit retrofit = new Retrofit.Builder()
