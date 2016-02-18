@@ -145,6 +145,8 @@ public class FeedActivity extends AppCompatActivity
             case R.id.delete_database:
                 FriendDatabase.getInstance(this).deleteAll();
                 break;
+            case R.id.sms_allow_user:
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
