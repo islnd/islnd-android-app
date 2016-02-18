@@ -6,13 +6,10 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
-import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
-
-import org.island.messaging.proto.IslandProto;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -93,10 +90,12 @@ public class MessageLayer {
         String lastId = preferences.getString(context.getString(R.string.post_id_key), "0");
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
         PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
+        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
+        SignedObject signedPost = ObjectSigner.sign(postUpdate, Crypto.decodePrivateKey(privateKey));
 
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
         Key key = Crypto.decodeSymmetricKey(myGroupKey);
-        String encryptedPost = ObjectEncrypter.encryptSymmetric(postUpdate, key);
+        String encryptedPost = ObjectEncrypter.encryptSymmetric(signedPost, key);
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
         Rest.post(pseudonymSeed, encryptedPost);
