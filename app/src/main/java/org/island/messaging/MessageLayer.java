@@ -77,11 +77,11 @@ public class MessageLayer {
 
                 if (postUpdate != null
                         && !postUpdate.isDeletion()) {
-                    posts.add(new Post(key.getUsername(),
-                            Utils.smartTimestampFromUnixTime(postUpdate.getTimestamp()),
-                            postUpdate.getContent(),
-                            new ArrayList<Comment>()));
-                    Log.v(TAG, "timestamp: " + postUpdate.getTimestamp());
+                    posts.add(new Post(
+                                    key.getUsername(),
+                                    Utils.smartTimestampFromUnixTime(postUpdate.getTimestamp()),
+                                    postUpdate.getContent(),
+                                    new ArrayList<>()));
                 }
             }
         }
@@ -91,7 +91,7 @@ public class MessageLayer {
 
     public static void post(Context context, String content) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String lastId = preferences.getString(context.getString(R.string.post_id_key), "");
+        String lastId = preferences.getString(context.getString(R.string.post_id_key), "0");
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
         PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
 
@@ -99,8 +99,8 @@ public class MessageLayer {
         Key key = Crypto.decodeSymmetricKey(myGroupKey);
         String encryptedPost = ObjectEncrypter.encryptSymmetric(postUpdate, key);
 
-        String myPseudonym = preferences.getString(context.getString(R.string.pseudonym_key), "");
-        Rest.post(myPseudonym, encryptedPost);
+        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
+        Rest.post(pseudonymSeed, encryptedPost);
     }
 
     public static String getPseudonym(String seed) {

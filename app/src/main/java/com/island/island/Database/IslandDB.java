@@ -162,7 +162,15 @@ public class IslandDB
      * @param content Plaintext content to be posted.
      */
     {
-        MessageLayer.post(context, content);
+        new AsyncTask<String, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(String... params) {
+                MessageLayer.post(context, params[0]);
+                return null;
+            }
+
+        }.execute(content);
     }
 
     public static List<Post> getPostsForUser(User user)
