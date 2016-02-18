@@ -8,4 +8,8 @@ public class EncryptedPost {
     public String author;
     public String timestamp;
     public String blob;
+
+    public EncryptedPost(String blob) {
+        this.blob = blob;
+    }
 }
