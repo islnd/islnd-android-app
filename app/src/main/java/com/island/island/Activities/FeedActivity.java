@@ -100,8 +100,8 @@ public class FeedActivity extends AppCompatActivity
 
         refreshLayout.setOnRefreshListener(() ->
         {
-            // TODO: Run async task again
-            refreshLayout.setRefreshing(false);
+            // TODO: This will add duplicates, okay for now
+            new GetPostsTask().execute();
         });
     }
 
@@ -200,6 +200,7 @@ public class FeedActivity extends AppCompatActivity
                     Log.v(TAG, "added post " + p.getUserName());
                 }
             }
+            refreshLayout.setRefreshing(false);
         }
     }
 

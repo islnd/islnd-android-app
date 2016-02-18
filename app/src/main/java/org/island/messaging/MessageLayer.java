@@ -112,6 +112,7 @@ public class MessageLayer {
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (friendDatabase.contains(pk)) {
+            // TODO: Possibly switch to snackbar...
             Toast.makeText(
                     context,
                     String.format("%s is already your friend!", pk.getUsername()),

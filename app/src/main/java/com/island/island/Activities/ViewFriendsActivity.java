@@ -61,8 +61,8 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
 
         refreshLayout.setOnRefreshListener(() ->
         {
-            // TODO: Run async task again
-            refreshLayout.setRefreshing(false);
+            // TODO: This will add duplicates, okay for now
+            new GetFriendsTask().execute();
         });
     }
 
@@ -139,6 +139,8 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
                 adapterList.addAll(allFriends);
                 mAdapter.notifyDataSetChanged();
             }
+
+            refreshLayout.setRefreshing(false);
         }
     }
 }
