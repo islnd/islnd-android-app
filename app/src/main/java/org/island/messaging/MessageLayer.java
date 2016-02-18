@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.Comment;
@@ -112,7 +113,17 @@ public class MessageLayer {
         byte[] bytes = new Decoder().decode(qrCode);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        if (!friendDatabase.contains(pk)) {
+        if (friendDatabase.contains(pk)) {
+            Toast.makeText(
+                    context,
+                    String.format("%s is already your friend!", pk.getUsername()),
+                    Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(
+                    context,
+                    String.format("%s is now your friend!", pk.getUsername()),
+                    Toast.LENGTH_LONG).show();
             friendDatabase.addFriend(pk);
         }
     }
