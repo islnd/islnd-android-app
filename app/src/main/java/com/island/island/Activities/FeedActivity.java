@@ -203,7 +203,7 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
-    public  void qrCodeActionDialog()
+    public void qrCodeActionDialog()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.qr_action_dialog)

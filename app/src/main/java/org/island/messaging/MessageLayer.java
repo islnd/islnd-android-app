@@ -111,7 +111,10 @@ public class MessageLayer {
         Log.v(TAG, "adding friend from QR code: " + qrCode);
         byte[] bytes = new Decoder().decode(qrCode);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
-        FriendDatabase.getInstance(context).addFriend(pk);
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        if (!friendDatabase.contains(pk)) {
+            friendDatabase.addFriend(pk);
+        }
     }
 
     public static String getQrCode(Context context) {

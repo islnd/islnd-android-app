@@ -15,12 +15,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
+import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 
 import org.island.messaging.Crypto;
 import org.island.messaging.MessageLayer;
+import org.island.messaging.PseudonymKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +112,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         return true;
     }
 
-    private class GetFriendsTask extends AsyncTask<Void, Void, List<User>> {
+    private class GetFriendsTask extends AsyncTask<Void, Void, Void> {
 
         private final String TAG = GetFriendsTask.class.getSimpleName();
 
@@ -120,21 +122,22 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         String privateKey = preferences.getString(getApplicationContext().getString(R.string.private_key), "");
 
         @Override
-        protected List<User> doInBackground(Void... params) {
-            Log.v(TAG, "starting to get friends");
-            Log.v(TAG, "username " + username);
-            Log.v(TAG, "private key " + privateKey);
-            return MessageLayer.getReaders(getApplicationContext(), username, Crypto.decodePrivateKey(privateKey));
+        protected Void doInBackground(Void... params) {
+            MessageLayer.getReaders(getApplicationContext(), username, Crypto.decodePrivateKey(privateKey));
+            return null;
         }
 
         @Override
-        protected void onPostExecute(List<User> users) {
-            if (users != null) {
-                adapterList.addAll(users);
+        protected void onPostExecute(Void aVoid) {
+            List<PseudonymKey> pks = FriendDatabase.getInstance(getApplicationContext()).getKeys();
+            List<User> allFriends = new ArrayList<>();
+            for (PseudonymKey pk : pks) {
+                allFriends.add(new User(pk.getUsername()));
+            }
+
+            if (allFriends.size() > 0) {
+                adapterList.addAll(allFriends);
                 mAdapter.notifyDataSetChanged();
-                for (User u : users) {
-                    Log.v(TAG, "added user " + u.getUserName());
-                }
             }
         }
     }
