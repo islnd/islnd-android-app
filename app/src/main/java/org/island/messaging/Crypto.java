@@ -175,5 +175,18 @@ public class Crypto {
     public static byte[] getDigest(String object) {
         return messageDigest.digest(decoder.decode(object));
     }
+
+    public static byte[] decryptAsymmetric(byte[] cipherText, Key key) throws DecryptionErrorException {
+        try {
+            asymmetricCipher.init(Cipher.DECRYPT_MODE, key);
+            return asymmetricCipher.doFinal(cipherText);
+        } catch (BadPaddingException e) {
+            throw new DecryptionErrorException();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
 
