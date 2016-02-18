@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.Comment;
@@ -11,6 +12,8 @@ import com.island.island.Models.Post;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+
+import org.island.messaging.proto.IslandProto;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -103,5 +106,39 @@ public class MessageLayer {
 
     public static String getPseudonym(String seed) {
         return Rest.getPseudonym(seed);
+    }
+
+    public static void addFriendFromQRCode(Context context, String qrCode) {
+        Log.v(TAG, "adding friend from QR code: " + qrCode);
+        byte[] bytes = new Decoder().decode(qrCode);
+        PseudonymKey pk = PseudonymKey.fromProto(bytes);
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        if (friendDatabase.contains(pk)) {
+            Toast.makeText(
+                    context,
+                    String.format("%s is already your friend!", pk.getUsername()),
+                    Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(
+                    context,
+                    String.format("%s is now your friend!", pk.getUsername()),
+                    Toast.LENGTH_LONG).show();
+            friendDatabase.addFriend(pk);
+        }
+    }
+
+    public static String getQrCode(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
+        String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
+        String pseudonym = sharedPreferences.getString(context.getString(R.string.pseudonym), "");
+        Key groupKey = Crypto.decodeSymmetricKey(
+                sharedPreferences.getString(context.getString(R.string.group_key), ""));
+
+        PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);
+        String qrCode = new Encoder().encodeToString(pk.toByteArray());
+        Log.v(TAG, "generated QR code: " + qrCode);
+        return qrCode;
     }
 }
