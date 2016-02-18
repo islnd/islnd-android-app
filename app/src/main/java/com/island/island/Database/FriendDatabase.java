@@ -43,6 +43,7 @@ public class FriendDatabase extends SQLiteOpenHelper {
         values.put(USER_NAME, pseudonymKey.getUsername());
         values.put(PSEUDONYM, pseudonymKey.getPseudonym());
         values.put(GROUP_KEY, Crypto.encodeKey(pseudonymKey.getKey()));
+        Log.v(TAG, "adding friend w username " + pseudonymKey.getUsername());
 
         writableDatabase.insert(DATABASE_NAME, null, values);
     }
