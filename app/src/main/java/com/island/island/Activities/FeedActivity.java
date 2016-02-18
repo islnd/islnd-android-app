@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
+import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -126,23 +127,24 @@ public class FeedActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_profile)
+        switch (id)
         {
-            Intent profileIntent = new Intent(this, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Utils.getUser(this));
-            startActivity(profileIntent);
-        }
-        else if (id == R.id.nav_friends)
-        {
-            startActivity(new Intent(this, ViewFriendsActivity.class));
-        }
-        else if (id == R.id.nav_settings)
-        {
-
-        }
-        else if (id == R.id.qr_code)
-        {
-            qrCodeActionDialog();
+            case R.id.nav_profile:
+                Intent profileIntent = new Intent(this, ProfileActivity.class);
+                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Utils.getUser(this));
+                startActivity(profileIntent);
+                break;
+            case R.id.nav_friends:
+                startActivity(new Intent(this, ViewFriendsActivity.class));
+                break;
+            case R.id.nav_settings:
+                break;
+            case R.id.qr_code:
+                qrCodeActionDialog();
+                break;
+            case R.id.delete_database:
+                FriendDatabase.getInstance(this).deleteAll();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -151,7 +153,8 @@ public class FeedActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         // TODO: Do something with qr results
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null)
@@ -181,8 +184,8 @@ public class FeedActivity extends AppCompatActivity
         startActivity(newPostIntent);
     }
 
-    private class GetPostsTask extends AsyncTask<Void, Void, List<Post>> {
-
+    private class GetPostsTask extends AsyncTask<Void, Void, List<Post>>
+    {
         private final String TAG = GetPostsTask.class.getSimpleName();
 
         @Override
