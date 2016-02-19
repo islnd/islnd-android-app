@@ -66,4 +66,5 @@
     <string name="sms_disclaimer">Disclaimer: Standard text messaging rates may apply based on the subscriber’s plan with their mobile phone carrier</string>
     <string name="send">send</string>
     <string name="phone_number">Phone Number</string>
+    <string name="new_friend_notification">New Friend</string>
 </resources>

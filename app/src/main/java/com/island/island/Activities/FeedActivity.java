@@ -64,7 +64,7 @@ public class FeedActivity extends AppCompatActivity
 
         // TODO: Remove after login implemented
         // Set user hack
-        String USER = "newUser16";
+        String USER = "newUser18";
         IslandDB.createIdentity(this, USER);
 
         // Nav drawer
