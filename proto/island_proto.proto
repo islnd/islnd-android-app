@@ -28,3 +28,9 @@ message CommentUpdate {
   required string content = 4;
   required int64 timestamp = 5;
 }
+
+message Profile {
+  required string username = 1;
+  required string about_me = 2;
+  required int32 version = 3;
+}

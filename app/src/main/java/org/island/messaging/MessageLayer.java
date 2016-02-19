@@ -4,13 +4,20 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
+import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+
+import org.island.messaging.crypto.CryptoUtil;
+import org.island.messaging.crypto.EncryptedData;
+import org.island.messaging.crypto.EncryptedPost;
+import org.island.messaging.crypto.EncryptedProfile;
+import org.island.messaging.crypto.ObjectEncrypter;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -22,7 +29,7 @@ public class MessageLayer {
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
         //FriendDatabase.getInstance(context).deleteAll();
-        List<EncryptedPseudonymKey> keys = Rest.getReaders(username);
+        List<EncryptedData> keys = Rest.getReaders(username);
         if (keys == null) {
             Log.d(TAG, "get readers returned null");
             return new ArrayList<>();
@@ -30,16 +37,11 @@ public class MessageLayer {
 
         //decrypt the friends and add to DB
         List<User> friends = new ArrayList<>();
-        for (EncryptedPseudonymKey encryptedPseudonymKey : keys) {
+        for (EncryptedData encryptedPseudonymKey : keys) {
             PseudonymKey pseudonymKey = ObjectEncrypter.decryptPseudonymKey(
-                    encryptedPseudonymKey.blob,
+                    encryptedPseudonymKey.getBlob(),
                     privateKey);
-
-            FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-            if (!friendDatabase.contains(pseudonymKey)) {
-                friendDatabase.addFriend(pseudonymKey);
-            }
-
+            addFriendToDatabaseAndCreateDefaultProfile(context, pseudonymKey);
             friends.add(new User(pseudonymKey.getUsername()));
         }
 
@@ -47,7 +49,7 @@ public class MessageLayer {
     }
 
     public static void postPublicKey(String username, Key publicKey){
-        Rest.postPublicKey(username, Crypto.encodeKey(publicKey));
+        Rest.postPublicKey(username, CryptoUtil.encodeKey(publicKey));
     }
 
     public static List<Post> getPosts(Context context) {
@@ -67,10 +69,8 @@ public class MessageLayer {
 
             Log.v(TAG, encryptedPosts.size() + " posts from " + key.getUsername());
             for (EncryptedPost post: encryptedPosts) {
-                SignedObject signedPost = SignedObject.
-                        fromProto(ObjectEncrypter.decryptSymmetric(post.blob, key.getKey()));
                 //--TODO check that post is signed
-                PostUpdate postUpdate = PostUpdate.fromProto(signedPost.getObject());
+                PostUpdate postUpdate = post.decrypt(key.getKey());
 
                 if (postUpdate != null
                         && !postUpdate.isDeletion()) {
@@ -92,14 +92,29 @@ public class MessageLayer {
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
         PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        SignedObject signedPost = ObjectSigner.sign(postUpdate, Crypto.decodePrivateKey(privateKey));
-
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-        Key key = Crypto.decodeSymmetricKey(myGroupKey);
-        String encryptedPost = ObjectEncrypter.encryptSymmetric(signedPost, key);
+
+        EncryptedPost encryptedPost = new EncryptedPost(
+                postUpdate,
+                CryptoUtil.decodePrivateKey(privateKey),
+                CryptoUtil.decodeSymmetricKey(myGroupKey));
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
         Rest.post(pseudonymSeed, encryptedPost);
+    }
+
+    public static void postProfile(Context context, Profile profile) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
+        String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
+
+        EncryptedProfile profilePost = new EncryptedProfile(
+                profile,
+                CryptoUtil.decodePrivateKey(privateKey),
+                CryptoUtil.decodeSymmetricKey(myGroupKey));
+
+        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
+        Rest.postProfile(pseudonymSeed, profilePost);
     }
 
     public static String getPseudonym(String seed) {
@@ -110,20 +125,15 @@ public class MessageLayer {
         Log.v(TAG, "adding friend from encoded string: " + encodedString);
         byte[] bytes = new Decoder().decode(encodedString);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
+        addFriendToDatabaseAndCreateDefaultProfile(context, pk);
+    }
+
+    private static void addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        if (friendDatabase.contains(pk)) {
-            // TODO: Possibly switch to snackbar...
-            Toast.makeText(
-                    context,
-                    String.format("%s is already your friend!", pk.getUsername()),
-                    Toast.LENGTH_LONG).show();
-        }
-        else {
-            Toast.makeText(
-                    context,
-                    String.format("%s is now your friend!", pk.getUsername()),
-                    Toast.LENGTH_LONG).show();
+        if (!friendDatabase.contains(pk)) {
             friendDatabase.addFriend(pk);
+            Profile defaultProfile = Util.buildDefaultProfile(context, pk.getUsername());
+            ProfileDatabase.getInstance(context).insert(defaultProfile);
         }
     }
 
@@ -133,12 +143,29 @@ public class MessageLayer {
         String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
         String pseudonym = sharedPreferences.getString(context.getString(R.string.pseudonym), "");
         Log.v(TAG, String.format("pseudonym is %s", pseudonym));
-        Key groupKey = Crypto.decodeSymmetricKey(
+        Key groupKey = CryptoUtil.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
 
         PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);
         String encodeString = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated encoded string: " + encodeString);
         return encodeString;
+    }
+
+    public static Profile getMostRecentProfile(Context context, String username) {
+        PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
+        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym());
+        if (encryptedProfiles == null) {
+            Log.d(TAG, "profile response was null");
+            return null;
+        }
+
+        List<Profile> profiles = new ArrayList<>();
+        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
+            //--TODO check signature
+            profiles.add(encryptedProfile.decrypt(friendPK.getKey()));
+        }
+
+        return Util.getNewest(profiles);
     }
 }

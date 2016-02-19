@@ -36,6 +36,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -166,6 +167,7 @@ public class FeedActivity extends AppCompatActivity
                 break;
             case R.id.delete_database:
                 FriendDatabase.getInstance(this).deleteAll();
+                ProfileDatabase.getInstance(this).deleteAll();
                 break;
             case R.id.sms_allow_user:
                 smsAllowDialog();
@@ -251,7 +253,6 @@ public class FeedActivity extends AppCompatActivity
 
         @Override
         protected List<Post> doInBackground(Void... params) {
-            Log.v(TAG, "getting posts...");
             return MessageLayer.getPosts(getApplicationContext());
         }
 
@@ -260,9 +261,6 @@ public class FeedActivity extends AppCompatActivity
             if (posts != null) {
                 mArrayOfPosts.addAll(posts);
                 mAdapter.notifyDataSetChanged();
-                for (Post p : posts) {
-                    Log.v(TAG, "added post " + p.getUserName());
-                }
             }
             refreshLayout.setRefreshing(false);
         }

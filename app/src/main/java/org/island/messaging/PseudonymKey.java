@@ -2,6 +2,7 @@ package org.island.messaging;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.proto.IslandProto;
 
 import java.io.Serializable;
@@ -67,13 +68,13 @@ public class PseudonymKey implements Serializable, ProtoSerializable<PseudonymKe
         return new PseudonymKey(pseudonymKey.getUniqueId(),
                 pseudonymKey.getUsername(),
                 pseudonymKey.getPseudonym(),
-                Crypto.decodeSymmetricKey(pseudonymKey.getKey()));
+                CryptoUtil.decodeSymmetricKey(pseudonymKey.getKey()));
     }
 
     @Override
     public byte[] toByteArray() {
         return IslandProto.PseudonymKey.newBuilder()
-                .setKey(Crypto.encodeKey(this.getKey()))
+                .setKey(CryptoUtil.encodeKey(this.getKey()))
                 .setPseudonym(this.getPseudonym())
                 .setUniqueId(this.getUniqueID())
                 .setUsername(this.getUsername())

@@ -7,11 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import org.island.messaging.Crypto;
+import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.PseudonymKey;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FriendDatabase extends SQLiteOpenHelper {
 
@@ -42,7 +41,7 @@ public class FriendDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(USER_NAME, pseudonymKey.getUsername());
         values.put(PSEUDONYM, pseudonymKey.getPseudonym());
-        values.put(GROUP_KEY, Crypto.encodeKey(pseudonymKey.getKey()));
+        values.put(GROUP_KEY, CryptoUtil.encodeKey(pseudonymKey.getKey()));
         Log.v(TAG, "adding friend w username " + pseudonymKey.getUsername());
 
         writableDatabase.insert(DATABASE_NAME, null, values);
@@ -90,9 +89,28 @@ public class FriendDatabase extends SQLiteOpenHelper {
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, null, null, "", "", "");
         while(results.moveToNext()) {
             keys.add(new PseudonymKey(1, results.getString(0), results.getString(1),
-                    Crypto.decodeSymmetricKey(results.getString(2))));
+                    CryptoUtil.decodeSymmetricKey(results.getString(2))));
         }
 
         return keys;
+    }
+
+    public PseudonymKey getKey(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {USER_NAME, PSEUDONYM, GROUP_KEY};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return null;
+        }
+
+        results.moveToNext();
+        return new PseudonymKey(
+                1, //--TODO PK ID
+                results.getString(0),
+                results.getString(1),
+                CryptoUtil.decodeSymmetricKey(results.getString(2)));
     }
 }

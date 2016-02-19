@@ -1,4 +1,4 @@
-package org.island.messaging;
+package org.island.messaging.crypto;
 
 /**
  * Created by poo on 2/13/16.

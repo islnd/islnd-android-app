@@ -1,6 +1,8 @@
-package org.island.messaging;
+package org.island.messaging.crypto;
 
-import android.util.Base64;
+import org.island.messaging.Decoder;
+import org.island.messaging.Encoder;
+import org.island.messaging.ProtoSerializable;
 
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -22,7 +24,7 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Crypto {
+public class CryptoUtil {
 
     // encryption configurations
     private static final String SYMMETRIC_GENERATOR_ALGO = "AES";

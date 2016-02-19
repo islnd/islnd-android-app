@@ -69,4 +69,6 @@
     <string name="new_friend_notification">New Friend</string>
     <string name="request_sms_send_explanation">SMS permissions are needed to allow user with SMS</string>
     <string name="request_contact_explanation">Contact permissions are needed to get contact number</string>
+    <string name="profile_default_about_me"></string>
+    <string name="previous_profile_version_key">previous_profile_version</string>
 </resources>
