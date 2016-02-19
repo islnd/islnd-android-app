@@ -236,7 +236,8 @@ public class FeedActivity extends AppCompatActivity
     private void sendSms()
     {
         String phoneNo = "";
-        String sms = MessageLayer.getEncodedString(getApplicationContext());
+        String sms = getString(R.string.sms_prefix) +
+                MessageLayer.getEncodedString(getApplicationContext());
 
         try
         {

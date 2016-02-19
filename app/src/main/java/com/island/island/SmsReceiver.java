@@ -10,6 +10,8 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.island.messaging.MessageLayer;
+
 /**
  * Created by poo on 2/18/2016.
  */
@@ -21,8 +23,7 @@ public class SmsReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        System.out.println("MADE IT");
-        String smsMessageStr = "";
+        String smsBody = "";
         SmsMessage[] messages;
 
         if (Build.VERSION.SDK_INT >= 19)
@@ -43,15 +44,19 @@ public class SmsReceiver extends BroadcastReceiver
 
         for (int i = 0; i < messages.length; ++i)
         {
-            String smsBody = messages[i].getMessageBody();
-            String address = messages[i].getOriginatingAddress();
-
-            smsMessageStr += "SMS From: " + address + "\n";
-            smsMessageStr += smsBody + "\n";
+            smsBody += messages[i].getMessageBody();
         }
 
-        Log.v(TAG, smsMessageStr);
+        Log.d(TAG, smsBody);
+        if (isRelevant(context, smsBody))
+        {
+            MessageLayer.addFriendFromEncodedString(context,
+                    smsBody.replace(context.getString(R.string.sms_prefix), ""));
+        }
+    }
 
-        // Start add friend intent
+    private boolean isRelevant(Context context, String smsBody)
+    {
+        return smsBody.startsWith(context.getString(R.string.sms_prefix));
     }
 }

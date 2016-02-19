@@ -106,9 +106,9 @@ public class MessageLayer {
         return Rest.getPseudonym(seed);
     }
 
-    public static void addFriendFromEncodedString(Context context, String qrCode) {
-        Log.v(TAG, "adding friend from QR code: " + qrCode);
-        byte[] bytes = new Decoder().decode(qrCode);
+    public static void addFriendFromEncodedString(Context context, String encodedString) {
+        Log.v(TAG, "adding friend from encoded string: " + encodedString);
+        byte[] bytes = new Decoder().decode(encodedString);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (friendDatabase.contains(pk)) {
@@ -137,8 +137,8 @@ public class MessageLayer {
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
 
         PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);
-        String qrCode = new Encoder().encodeToString(pk.toByteArray());
-        Log.v(TAG, "generated QR code: " + qrCode);
-        return qrCode;
+        String encodeString = new Encoder().encodeToString(pk.toByteArray());
+        Log.v(TAG, "generated encoded string: " + encodeString);
+        return encodeString;
     }
 }

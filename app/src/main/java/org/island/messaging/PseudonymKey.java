@@ -60,6 +60,7 @@ public class PseudonymKey implements Serializable, ProtoSerializable<PseudonymKe
         try {
             pseudonymKey = IslandProto.PseudonymKey.parseFrom(bytes);
         } catch (InvalidProtocolBufferException e) {
+            // TODO: Might want to handle for things like sms
             e.printStackTrace();
         }
 
