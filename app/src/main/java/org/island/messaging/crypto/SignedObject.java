@@ -1,7 +1,8 @@
-package org.island.messaging;
+package org.island.messaging.crypto;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import org.island.messaging.ProtoSerializable;
 import org.island.messaging.proto.IslandProto;
 
 public class SignedObject implements ProtoSerializable<SignedObject> {

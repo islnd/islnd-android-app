@@ -6,9 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.island.island.Utils.Utils;
-
-import org.island.messaging.Crypto;
+import org.island.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
 
@@ -39,8 +37,8 @@ public class IdentityDatabase extends SQLiteOpenHelper {
     public void setIdentity(Key publicKey, Key privateKey, String username)
     {
         ContentValues values = new ContentValues();
-        values.put("PUBLIC_KEY", Crypto.encodeKey(publicKey));
-        values.put("PRIVATE_KEY", Crypto.encodeKey(privateKey));
+        values.put("PUBLIC_KEY", CryptoUtil.encodeKey(publicKey));
+        values.put("PRIVATE_KEY", CryptoUtil.encodeKey(privateKey));
         values.put("USER_NAME", username);
 
         SQLiteDatabase writableDatabase = getWritableDatabase();
@@ -62,7 +60,7 @@ public class IdentityDatabase extends SQLiteOpenHelper {
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, "", null, "", "", "");
 
         results.moveToLast();
-        return Crypto.decodePrivateKey(results.getString(0));
+        return CryptoUtil.decodePrivateKey(results.getString(0));
     }
 
     public Key getPublicKey() {
@@ -74,6 +72,6 @@ public class IdentityDatabase extends SQLiteOpenHelper {
         }
 
         results.moveToLast();
-        return Crypto.decodePublicKey(results.getString(0));
+        return CryptoUtil.decodePublicKey(results.getString(0));
     }
 }

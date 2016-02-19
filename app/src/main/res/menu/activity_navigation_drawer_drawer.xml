@@ -20,7 +20,7 @@
             android:icon="@drawable/ic_settings_black_24dp"/>
         <item
             android:id="@+id/delete_database"
-            android:title="Delete Database"
+            android:title="Clear all databases"
             android:icon="@drawable/ic_delete_black_24dp"/>
     </group>
 

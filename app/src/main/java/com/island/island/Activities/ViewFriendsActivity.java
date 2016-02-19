@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -20,7 +19,7 @@ import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 
-import org.island.messaging.Crypto;
+import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
 import org.island.messaging.PseudonymKey;
 
@@ -123,7 +122,8 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
 
         @Override
         protected Void doInBackground(Void... params) {
-            MessageLayer.getReaders(getApplicationContext(), username, Crypto.decodePrivateKey(privateKey));
+            MessageLayer.getReaders(getApplicationContext(), username, CryptoUtil.decodePrivateKey(
+                            privateKey));
             return null;
         }
 

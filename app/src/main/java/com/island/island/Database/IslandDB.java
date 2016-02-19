@@ -13,14 +13,15 @@ import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+import com.island.island.VersionedContentBuilder;
 
-import org.island.messaging.Crypto;
+import org.island.messaging.Util;
+import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -48,10 +49,7 @@ public class IslandDB
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-                Log.v(TAG, "starting post key");
-                Log.v(TAG, "username: " + username);
-                Log.v(TAG, "public key: " + publicKey);
-                MessageLayer.postPublicKey(username, Crypto.decodePublicKey(publicKey));
+                MessageLayer.postPublicKey(username, CryptoUtil.decodePublicKey(publicKey));
                 Log.v(TAG, "post key completed");
                 return new Object();
             }
@@ -67,8 +65,7 @@ public class IslandDB
         return IDENTITY_DB;
     }
 
-    public static void createIdentity(Context context, String username)
-    {
+    public static void createIdentity(Context context, String username) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String currentUsername = settings.getString(context.getString(R.string.user_name), "");
         Log.v(TAG, String.format("previous user %s, current user %s", currentUsername, username));
@@ -81,6 +78,10 @@ public class IslandDB
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
         setPseudonym(context);
+
+        //--Add a default profile
+        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
+        profileDatabase.insert(Util.buildDefaultProfile(context, username));
     }
 
     private static void setPseudonym(Context context) {
@@ -110,7 +111,7 @@ public class IslandDB
     private static void setGroupKey(Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
-        String groupKey = Crypto.encodeKey(Crypto.getKey());
+        String groupKey = CryptoUtil.encodeKey(CryptoUtil.getKey());
         editor.putString(context.getString(R.string.group_key), groupKey);
         editor.commit();
 
@@ -123,8 +124,6 @@ public class IslandDB
 
         editor.putString(context.getString(R.string.user_name), username);
         editor.commit();
-
-        Log.v(TAG, "username " + username);
     }
 
     private static void setKeyPairAndPostPublicKey(Context context) {
@@ -135,9 +134,9 @@ public class IslandDB
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
                 SharedPreferences.Editor editor = settings.edit();
 
-                KeyPair keyPair = Crypto.getKeyPair();
-                String privateKey = Crypto.encodeKey(keyPair.getPrivate());
-                String publicKey = Crypto.encodeKey(keyPair.getPublic());
+                KeyPair keyPair = CryptoUtil.getKeyPair();
+                String privateKey = CryptoUtil.encodeKey(keyPair.getPrivate());
+                String publicKey = CryptoUtil.encodeKey(keyPair.getPublic());
                 editor.putString(context.getString(R.string.private_key), privateKey);
                 editor.putString(context.getString(R.string.public_key), publicKey);
                 editor.commit();
@@ -308,41 +307,6 @@ public class IslandDB
 
     }
 
-    public static void updateProfile(Profile profile)
-    /**
-     * Encrypts new profile data and sends to database.
-     *
-     * @param profile Profile object with new profile data.
-     */
-    {
-
-    }
-
-    public static Profile getUserProfile(String userName)
-    /**
-     * Gets a user's profile.
-     *
-     * @param user User whose profile I'm getting.
-     * @return Profile of designated user.
-     */
-    {
-        Profile profile = null;
-
-        try
-        {
-            JSONObject obj = new JSONObject(mockData);
-            JSONObject profileObj = obj.getJSONObject(userName).getJSONObject("profile");
-
-            String aboutMe = profileObj.getString("about_me");
-            profile = new Profile(userName, aboutMe);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return profile;
-    }
-
     public static void addCommentToPost(Post post, Comment comment)
     /**
      * Adds comment to existing post
@@ -352,5 +316,16 @@ public class IslandDB
      */
     {
 
+    }
+
+    public static void postProfile(Context context, Profile profile) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                MessageLayer.postProfile(context, profile);
+                return null;
+            }
+        }.execute();
     }
 }

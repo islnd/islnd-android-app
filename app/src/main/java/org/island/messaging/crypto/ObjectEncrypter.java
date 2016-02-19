@@ -1,8 +1,13 @@
-package org.island.messaging;
+package org.island.messaging.crypto;
 
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import org.island.messaging.Decoder;
+import org.island.messaging.Encoder;
+import org.island.messaging.ProtoSerializable;
+import org.island.messaging.PseudonymKey;
+import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.proto.IslandProto;
 
 import java.security.Key;
@@ -17,18 +22,18 @@ public class ObjectEncrypter {
 
     public static String encryptSymmetric(ProtoSerializable o, Key key) {
         byte[] bytes = o.toByteArray();
-        byte[] encryptedBytes = Crypto.encryptSymmetric(bytes, key);
+        byte[] encryptedBytes = CryptoUtil.encryptSymmetric(bytes, key);
         return encoder.encodeToString(encryptedBytes);
     }
 
     public static byte[] decryptSymmetric(String string, Key key) {
         byte[] encryptedBytes = decoder.decode(string);
-        return Crypto.decryptSymmetric(encryptedBytes, key);
+        return CryptoUtil.decryptSymmetric(encryptedBytes, key);
     }
 
     public static String encryptAsymmetric(PseudonymKey o, Key key) {
         IslandProto.PseudonymKey message = IslandProto.PseudonymKey.newBuilder()
-                .setKey(Crypto.encodeKey(o.getKey()))
+                .setKey(CryptoUtil.encodeKey(o.getKey()))
                 .setPseudonym(o.getPseudonym())
                 .setUniqueId(o.getUniqueID())
                 .setUsername(o.getPseudonym())
@@ -38,7 +43,7 @@ public class ObjectEncrypter {
 
         byte[][] encryptedChunks = new byte[chunks.length][];
         for (int i = 0; i < chunks.length; i++) {
-            encryptedChunks[i] = Crypto.encryptAsymmetricWithOAEP(chunks[i], key);
+            encryptedChunks[i] = CryptoUtil.encryptAsymmetricWithOAEP(chunks[i], key);
         }
 
         return combineChunksIntoString(encryptedChunks);
@@ -49,7 +54,7 @@ public class ObjectEncrypter {
 
         byte[][] chunks = new byte[encryptedChunks.length][];
         for (int i = 0; i < chunks.length; i++) {
-            chunks[i] = Crypto.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
+            chunks[i] = CryptoUtil.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
         }
 
         byte[] bytes = combineChunksIntoObject(chunks);
@@ -59,7 +64,7 @@ public class ObjectEncrypter {
                     protoKey.getUniqueId(),
                     protoKey.getUsername(),
                     protoKey.getPseudonym(),
-                    Crypto.decodeSymmetricKey(protoKey.getKey()));
+                    CryptoUtil.decodeSymmetricKey(protoKey.getKey()));
             return pseudonymKey;
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -73,7 +78,7 @@ public class ObjectEncrypter {
 
         byte[][] chunks = new byte[encryptedChunks.length][];
         for (int i = 0; i < chunks.length; i++) {
-            chunks[i] = Crypto.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
+            chunks[i] = CryptoUtil.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
         }
 
         return combineChunksIntoObject(chunks);
