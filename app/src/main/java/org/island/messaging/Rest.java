@@ -2,10 +2,7 @@ package org.island.messaging;
 
 import android.util.Log;
 
-import com.island.island.Models.Profile;
-
-import org.island.messaging.server.ProfilePost;
-import org.island.messaging.server.ProfileResponse;
+import org.island.messaging.server.EncryptedData;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
@@ -16,15 +13,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-/**
- * Created by poo on 2/13/16.
- */
 public class Rest {
     private static final String TAG = Rest.class.getSimpleName();
 
     private final static String HOST = "http://ec2-54-152-104-67.compute-1.amazonaws.com:1935";
 
-    public static List<EncryptedPseudonymKey> getReaders(String username) {
+    public static List<EncryptedData> getReaders(String username) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -59,7 +53,7 @@ public class Rest {
         return null;
     }
 
-    public static List<EncryptedPost> getPosts(String pseudonym) {
+    public static List<EncryptedData> getPosts(String pseudonym) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -87,7 +81,7 @@ public class Rest {
         try {
             Response<Object> result = service.post(
                     pseudonymSeed,
-                    new EncryptedPost(encryptedPost)).execute();
+                    new EncryptedData(encryptedPost)).execute();
             Log.v(TAG, "made a post");
             Log.v(TAG, "response code " + result.code());
             //--TODO check that post was successful
@@ -96,7 +90,7 @@ public class Rest {
         }
     }
 
-    public static void postProfile(String pseudonymSeed, ProfilePost profilePost) {
+    public static void postProfile(String pseudonymSeed, EncryptedData profilePost) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -138,7 +132,7 @@ public class Rest {
         return null;
     }
 
-    public static ProfileResponse getProfile(String pseudonym) {
+    public static EncryptedData getProfile(String pseudonym) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -146,7 +140,7 @@ public class Rest {
 
         RestInterface service = retrofit.create(RestInterface.class);
         try {
-            Response<ProfileResponse> result = service.getProfile(pseudonym).execute();
+            Response<EncryptedData> result = service.getProfile(pseudonym).execute();
             if (result.code() == 200) {
                 return result.body();
             }

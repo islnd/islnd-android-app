@@ -1,15 +1,12 @@
 package org.island.messaging;
 
-import org.island.messaging.server.ProfilePost;
-import org.island.messaging.server.ProfileResponse;
+import org.island.messaging.server.EncryptedData;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -17,15 +14,15 @@ import retrofit2.http.Path;
 public interface RestInterface
 {
     @GET("/readers/{username}")
-    Call<List<EncryptedPseudonymKey>> readers(
+    Call<List<EncryptedData>> readers(
             @Path("username") String username);
 
 
     @GET("/posts/{pseudonym}")
-    Call<List<EncryptedPost>> posts(@Path("pseudonym") String pseudonym);
+    Call<List<EncryptedData>> posts(@Path("pseudonym") String pseudonym);
 
     @POST("/post/{pseudonymSeed}")
-    Call<Object> post(@Path("pseudonymSeed") String pseudonymSeed, @Body EncryptedPost encryptedPost);
+    Call<Object> post(@Path("pseudonymSeed") String pseudonymSeed, @Body EncryptedData encryptedPost);
 
 
     @GET("/pseudonym/{seed}")
@@ -36,10 +33,10 @@ public interface RestInterface
 
 
     @GET("/profile/{pseudonym}")
-    Call<ProfileResponse> getProfile(@Path("pseudonym") String pseudonym);
+    Call<EncryptedData> getProfile(@Path("pseudonym") String pseudonym);
 
     @POST("/profile/{pseudonymSeed}")
     Call<Object> postProfile(
             @Path("pseudonymSeed") String pseudonymSeed,
-            @Body ProfilePost profilePost);
+            @Body EncryptedData profilePost);
 }

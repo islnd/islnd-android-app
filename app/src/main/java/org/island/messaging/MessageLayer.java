@@ -13,8 +13,7 @@ import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 
-import org.island.messaging.server.ProfilePost;
-import org.island.messaging.server.ProfileResponse;
+import org.island.messaging.server.EncryptedData;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class MessageLayer {
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
         //FriendDatabase.getInstance(context).deleteAll();
-        List<EncryptedPseudonymKey> keys = Rest.getReaders(username);
+        List<EncryptedData> keys = Rest.getReaders(username);
         if (keys == null) {
             Log.d(TAG, "get readers returned null");
             return new ArrayList<>();
@@ -34,9 +33,9 @@ public class MessageLayer {
 
         //decrypt the friends and add to DB
         List<User> friends = new ArrayList<>();
-        for (EncryptedPseudonymKey encryptedPseudonymKey : keys) {
+        for (EncryptedData encryptedPseudonymKey : keys) {
             PseudonymKey pseudonymKey = ObjectEncrypter.decryptPseudonymKey(
-                    encryptedPseudonymKey.blob,
+                    encryptedPseudonymKey.getBlob(),
                     privateKey);
 
             FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
@@ -61,7 +60,7 @@ public class MessageLayer {
         List<Post> posts = new ArrayList<>();
 
         for (PseudonymKey key: keys) {
-            List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
+            List<EncryptedData> encryptedPosts = Rest.getPosts(key.getPseudonym());
             Log.v(TAG, "posts from " + key.getUsername());
             Log.v(TAG, "posts from " + key.getPseudonym());
             if (encryptedPosts == null) {
@@ -70,9 +69,9 @@ public class MessageLayer {
             }
 
             Log.v(TAG, encryptedPosts.size() + " posts from " + key.getUsername());
-            for (EncryptedPost post: encryptedPosts) {
+            for (EncryptedData post: encryptedPosts) {
                 SignedObject signedPost = SignedObject.
-                        fromProto(ObjectEncrypter.decryptSymmetric(post.blob, key.getKey()));
+                        fromProto(ObjectEncrypter.decryptSymmetric(post.getBlob(), key.getKey()));
                 //--TODO check that post is signed
                 PostUpdate postUpdate = PostUpdate.fromProto(signedPost.getObject());
 
@@ -120,7 +119,7 @@ public class MessageLayer {
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
 
-        ProfilePost profilePost = new ProfilePost(blob);
+        EncryptedData profilePost = new EncryptedData(blob);
         Rest.postProfile(pseudonymSeed, profilePost);
     }
 
@@ -167,7 +166,7 @@ public class MessageLayer {
 
     public static Profile getProfile(Context context, String username) {
         PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
-        ProfileResponse profileResponse = Rest.getProfile(friendPK.getPseudonym());
+        EncryptedData profileResponse = Rest.getProfile(friendPK.getPseudonym());
         Log.v(TAG, "got profile from network");
         if (profileResponse == null) {
             Log.d(TAG, "profile response was null");
