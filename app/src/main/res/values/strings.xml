@@ -67,4 +67,5 @@
     <string name="send">send</string>
     <string name="phone_number">Phone Number</string>
     <string name="new_friend_notification">New Friend</string>
+    <string name="request_sms_send_explanation">SMS permissions are needed to allow user with SMS</string>
 </resources>

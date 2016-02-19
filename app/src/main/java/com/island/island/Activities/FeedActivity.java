@@ -1,13 +1,17 @@
 package com.island.island.Activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -50,7 +53,9 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Post> mArrayOfPosts;
     private SwipeRefreshLayout refreshLayout;
-    private FloatingActionButton fab;
+    private CoordinatorLayout mainLayout;
+
+    private final static int REQUEST_SMS = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,7 +65,7 @@ public class FeedActivity extends AppCompatActivity
         setContentView(R.layout.activity_feed);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        mainLayout = (CoordinatorLayout) findViewById(R.id.feed_main_layout);
 
         // TODO: Remove after login implemented
         // Set user hack
@@ -188,6 +193,25 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults)
+    {
+        switch (requestCode)
+        {
+            case REQUEST_SMS:
+            {
+                // Permission granted
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    smsAllowDialog();
+                }
+                return;
+            }
+        }
+    }
+
     public void startNewPostActivity(View view)
     {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
@@ -223,8 +247,7 @@ public class FeedActivity extends AppCompatActivity
         builder.setTitle(R.string.qr_action_dialog)
                 .setItems(R.array.qr_actions, (DialogInterface dialog, int which) ->
                 {
-                    switch (which)
-                    {
+                    switch (which) {
                         case 0: // Show QR
                             startActivity(new Intent(this, ShowQRActivity.class));
                             break;
@@ -241,6 +264,14 @@ public class FeedActivity extends AppCompatActivity
 
     private void smsAllowDialog()
     {
+        // Check permission if we have to.
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            requestSmsPermissions();
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
         builder.setView(dialogView);
@@ -264,14 +295,37 @@ public class FeedActivity extends AppCompatActivity
         {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(number, null, sms, null, null);
-            Snackbar.make(fab, "SMS sent!", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mainLayout, "SMS sent!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS sent!");
         }
         catch (Exception e)
         {
-            Snackbar.make(fab, "SMS failed!", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mainLayout, "SMS failed!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS failed!");
             e.printStackTrace();
+        }
+    }
+
+    private void requestSmsPermissions()
+    {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.SEND_SMS))
+        {
+            // Show an explanation to the user
+            Snackbar.make(mainLayout, R.string.request_sms_send_explanation,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, (View view) ->
+                    {
+                            ActivityCompat.requestPermissions(FeedActivity.this,
+                                    new String[]{Manifest.permission.SEND_SMS},
+                                    REQUEST_SMS);
+                    })
+                    .show();
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    REQUEST_SMS);
         }
     }
 }
