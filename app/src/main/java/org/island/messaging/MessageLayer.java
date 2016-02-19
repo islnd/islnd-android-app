@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
@@ -41,12 +41,7 @@ public class MessageLayer {
             PseudonymKey pseudonymKey = ObjectEncrypter.decryptPseudonymKey(
                     encryptedPseudonymKey.getBlob(),
                     privateKey);
-
-            FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-            if (!friendDatabase.contains(pseudonymKey)) {
-                friendDatabase.addFriend(pseudonymKey);
-            }
-
+            addFriendToDatabaseAndCreateDefaultProfile(context, pseudonymKey);
             friends.add(new User(pseudonymKey.getUsername()));
         }
 
@@ -130,21 +125,15 @@ public class MessageLayer {
         Log.v(TAG, "adding friend from QR code: " + qrCode);
         byte[] bytes = new Decoder().decode(qrCode);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
+        addFriendToDatabaseAndCreateDefaultProfile(context, pk);
+    }
+
+    private static void addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        if (friendDatabase.contains(pk)) {
-            // TODO: Possibly switch to snackbar...
-            // TODO: Remove UI behavior from this package
-            Toast.makeText(
-                    context,
-                    String.format("%s is already your friend!", pk.getUsername()),
-                    Toast.LENGTH_LONG).show();
-        }
-        else {
-            Toast.makeText(
-                    context,
-                    String.format("%s is now your friend!", pk.getUsername()),
-                    Toast.LENGTH_LONG).show();
+        if (!friendDatabase.contains(pk)) {
             friendDatabase.addFriend(pk);
+            Profile defaultProfile = Util.buildDefaultProfile(context, pk.getUsername());
+            ProfileDatabase.getInstance(context).insert(defaultProfile);
         }
     }
 
@@ -163,7 +152,7 @@ public class MessageLayer {
         return qrCode;
     }
 
-    public static Profile getMostRecent(Context context, String username) {
+    public static Profile getMostRecentProfile(Context context, String username) {
         PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
         List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym());
         if (encryptedProfiles == null) {

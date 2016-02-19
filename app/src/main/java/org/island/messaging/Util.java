@@ -1,8 +1,11 @@
 package org.island.messaging;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.island.island.Models.Profile;
 import com.island.island.Models.VersionedContent;
+import com.island.island.R;
 
 import java.util.List;
 
@@ -25,5 +28,12 @@ public class Util {
         }
 
         return newestItem;
+    }
+
+    public static Profile buildDefaultProfile(Context context, String username) {
+        return new Profile(
+                username,
+                context.getString(R.string.profile_default_about_me),
+                Integer.MIN_VALUE);
     }
 }

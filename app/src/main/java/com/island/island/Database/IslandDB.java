@@ -15,6 +15,7 @@ import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
+import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
 import org.json.JSONArray;
@@ -80,11 +81,7 @@ public class IslandDB
 
         //--Add a default profile
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
-        profileDatabase.insert(
-                VersionedContentBuilder.buildProfile(
-                        context,
-                        username,
-                        context.getString(R.string.profile_default_about_me)));
+        profileDatabase.insert(Util.buildDefaultProfile(context, username));
     }
 
     private static void setPseudonym(Context context) {

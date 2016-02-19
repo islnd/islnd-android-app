@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity
 {
+    private static final String TAG = ProfileActivity.class.getSimpleName();
     public static String USER_NAME_EXTRA = "USER_NAME";
 
     private RecyclerView mRecyclerView;
@@ -40,8 +42,8 @@ public class ProfileActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
 
-    private Profile profile;
     private List<Post> mArrayOfPosts;
+    private String mProfileUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,21 +63,21 @@ public class ProfileActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         Intent profileIntent = getIntent();
-        String userName = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        new GetProfileTask().execute(userName);
+        mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
+        new GetProfileTask().execute();
     }
 
-    private void showProfile(String userName) {
-        // Get intent with username
-        profile = ProfileDatabase.getInstance(getApplicationContext()).get(userName);
-
+    private void showProfile() {
         // Setup profile header
         ImageView profileHeader = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        if(Utils.isUser(this, profile.getUsername()))
+        Profile profile = ProfileDatabase.getInstance(this)
+                .get(mProfileUsername);
+
+        if(Utils.isUser(this, mProfileUsername))
         {
             editProfile.setVisibility(View.VISIBLE);
             editProfile.setOnClickListener((View v) ->
@@ -85,10 +87,11 @@ public class ProfileActivity extends AppCompatActivity
         }
 
         aboutMe.setText(profile.getAboutMe());
-        getSupportActionBar().setTitle(userName);
+        getSupportActionBar().setTitle(mProfileUsername);
 
         // User posts
-        List<Post> userPosts = IslandDB.getPostsForUser(new User(userName));
+        // TODO get the real posts
+        List<Post> userPosts = IslandDB.getPostsForUser(new User(mProfileUsername));
         mArrayOfPosts.addAll(userPosts);
 
         // Swipe to refresh
@@ -108,14 +111,8 @@ public class ProfileActivity extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile_menu, menu);
 
-        //--TODO check the username from the intent instead of the profile
-        //  or just set a member variable
-        if (profile == null) {
-            return true;
-        }
-
         // If this is the client user's profile, don't show menu
-        return !Utils.isUser(this, profile.getUsername());
+        return !Utils.isUser(this, mProfileUsername);
     }
 
     @Override
@@ -125,7 +122,7 @@ public class ProfileActivity extends AppCompatActivity
 
         if (id == R.id.remove_friend)
         {
-            Dialogs.removeFriendDialog(this, profile.getUsername());
+            Dialogs.removeFriendDialog(this, mProfileUsername);
             // TODO: What behavior do we want after removing friend?
             // Probably go back to feed.
         }
@@ -148,28 +145,31 @@ public class ProfileActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private class GetProfileTask extends AsyncTask<String, Void, String> {
-        private final String TAG = GetProfileTask.class.getSimpleName();
+    private class GetProfileTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            if (!Utils.isUser(getApplicationContext(), mProfileUsername)) {
+                Profile profile = MessageLayer.getMostRecentProfile(
+                        getApplicationContext(),
+                        mProfileUsername);
+                if (profile == null) {
+                    Log.v(TAG, "no profile on network for " + mProfileUsername);
+                    return null;
+                }
 
-        protected String doInBackground(String... params) {
-            String username = params[0];
-            if (!username.equals(Utils.getUser(getApplicationContext()))) {
-                Profile profile = MessageLayer.getMostRecent(getApplicationContext(), username);
                 ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
                 if (profileDatabase.hasProfile(profile)) {
                     profileDatabase.update(profile);
-                }
-                else {
+                } else {
                     profileDatabase.insert(profile);
                 }
             }
 
-            return username;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(String username) {
-            showProfile(username);
+        protected void onPostExecute(Void aVoid) {
+            showProfile();
         }
     }
 }
