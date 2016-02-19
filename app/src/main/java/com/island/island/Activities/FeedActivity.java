@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -146,6 +147,7 @@ public class FeedActivity extends AppCompatActivity
                 FriendDatabase.getInstance(this).deleteAll();
                 break;
             case R.id.sms_allow_user:
+                sendSms();
                 break;
         }
 
@@ -170,7 +172,7 @@ public class FeedActivity extends AppCompatActivity
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
                 // TODO: If contents are valid, open a dialog to allow use
-                MessageLayer.addFriendFromQRCode(getApplicationContext(), contents);
+                MessageLayer.addFriendFromEncodedString(getApplicationContext(), contents);
             }
         }
         else
@@ -229,5 +231,23 @@ public class FeedActivity extends AppCompatActivity
                     }
                 })
                 .show();
+    }
+
+    private void sendSms()
+    {
+        String phoneNo = "";
+        String sms = MessageLayer.getEncodedString(getApplicationContext());
+
+        try
+        {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, sms, null, null);
+            Log.d(TAG, "SMS sent!");
+        }
+        catch (Exception e)
+        {
+            Log.d(TAG, "SMS failed!");
+            e.printStackTrace();
+        }
     }
 }
