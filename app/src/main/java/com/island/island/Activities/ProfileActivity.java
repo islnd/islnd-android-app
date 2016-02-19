@@ -3,6 +3,7 @@ package com.island.island.Activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -87,7 +88,9 @@ public class ProfileActivity extends AppCompatActivity
         }
 
         aboutMe.setText(profile.getAboutMe());
-        getSupportActionBar().setTitle(mProfileUsername);
+        CollapsingToolbarLayout collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(mProfileUsername);
 
         // User posts
         // TODO get the real posts
