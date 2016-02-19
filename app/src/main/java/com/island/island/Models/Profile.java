@@ -13,23 +13,23 @@ import java.io.Serializable;
  *
  * This class represents a user profile.
  */
-public class Profile implements Serializable, ProtoSerializable {
+public class Profile implements Serializable, ProtoSerializable, VersionedContent {
 
     private String username = "";
     private String aboutMe = "";
+    private int version;
 
-    public Profile(String username, String aboutMe)
+    public Profile(String username, String aboutMe, int version)
     {
         this.username = username;
         this.aboutMe = aboutMe;
+        this.version = version;
     }
 
     public String getUsername()
     {
         return username;
     }
-
-    public void setUsername(String username)
     {
         this.username = username;
     }
@@ -39,9 +39,8 @@ public class Profile implements Serializable, ProtoSerializable {
         return aboutMe;
     }
 
-    public void setAboutMe(String aboutMe)
-    {
-        this.aboutMe = aboutMe;
+    public int getVersion() {
+        return version;
     }
 
     @Override
@@ -49,6 +48,7 @@ public class Profile implements Serializable, ProtoSerializable {
         return IslandProto.Profile.newBuilder()
                 .setUsername(this.username)
                 .setAboutMe(this.aboutMe)
+                .setVersion(this.version)
                 .build()
                 .toByteArray();
     }
@@ -65,6 +65,7 @@ public class Profile implements Serializable, ProtoSerializable {
             e.printStackTrace();
         }
 
-        return new Profile(profile.getUsername(), profile.getAboutMe());
+        return new Profile(
+                profile.getUsername(), profile.getAboutMe(), profile.getVersion());
     }
 }

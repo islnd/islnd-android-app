@@ -2487,6 +2487,10 @@ public final class IslandProto {
     // required string about_me = 2;
     boolean hasAboutMe();
     String getAboutMe();
+    
+    // required int32 version = 3;
+    boolean hasVersion();
+    int getVersion();
   }
   public static final class Profile extends
       com.google.protobuf.GeneratedMessage
@@ -2581,9 +2585,20 @@ public final class IslandProto {
       }
     }
     
+    // required int32 version = 3;
+    public static final int VERSION_FIELD_NUMBER = 3;
+    private int version_;
+    public boolean hasVersion() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public int getVersion() {
+      return version_;
+    }
+    
     private void initFields() {
       username_ = "";
       aboutMe_ = "";
+      version_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2595,6 +2610,10 @@ public final class IslandProto {
         return false;
       }
       if (!hasAboutMe()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasVersion()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -2610,6 +2629,9 @@ public final class IslandProto {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, getAboutMeBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt32(3, version_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2627,6 +2649,10 @@ public final class IslandProto {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, getAboutMeBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, version_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2756,6 +2782,8 @@ public final class IslandProto {
         bitField0_ = (bitField0_ & ~0x00000001);
         aboutMe_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        version_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       
@@ -2802,6 +2830,10 @@ public final class IslandProto {
           to_bitField0_ |= 0x00000002;
         }
         result.aboutMe_ = aboutMe_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.version_ = version_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2824,6 +2856,9 @@ public final class IslandProto {
         if (other.hasAboutMe()) {
           setAboutMe(other.getAboutMe());
         }
+        if (other.hasVersion()) {
+          setVersion(other.getVersion());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -2834,6 +2869,10 @@ public final class IslandProto {
           return false;
         }
         if (!hasAboutMe()) {
+          
+          return false;
+        }
+        if (!hasVersion()) {
           
           return false;
         }
@@ -2871,6 +2910,11 @@ public final class IslandProto {
             case 18: {
               bitField0_ |= 0x00000002;
               aboutMe_ = input.readBytes();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              version_ = input.readInt32();
               break;
             }
           }
@@ -2951,6 +2995,27 @@ public final class IslandProto {
         onChanged();
       }
       
+      // required int32 version = 3;
+      private int version_ ;
+      public boolean hasVersion() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public int getVersion() {
+        return version_;
+      }
+      public Builder setVersion(int value) {
+        bitField0_ |= 0x00000004;
+        version_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearVersion() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        version_ = 0;
+        onChanged();
+        return this;
+      }
+      
       // @@protoc_insertion_point(builder_scope:proto.Profile)
     }
     
@@ -3004,9 +3069,10 @@ public final class IslandProto {
       "(\010\022\n\n\002id\030\002 \002(\t\022\017\n\007content\030\003 \002(\t\022\021\n\ttimes" +
       "tamp\030\004 \002(\003\"b\n\rCommentUpdate\022\021\n\tis_delete" +
       "\030\001 \002(\010\022\n\n\002id\030\002 \002(\t\022\016\n\006author\030\003 \002(\t\022\017\n\007co" +
-      "ntent\030\004 \002(\t\022\021\n\ttimestamp\030\005 \002(\003\"-\n\007Profil" +
-      "e\022\020\n\010username\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\tB\034\n",
-      "\032org.island.messaging.proto"
+      "ntent\030\004 \002(\t\022\021\n\ttimestamp\030\005 \002(\003\">\n\007Profil" +
+      "e\022\020\n\010username\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\t\022\017\n",
+      "\007version\030\003 \002(\005B\034\n\032org.island.messaging.p" +
+      "roto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3050,7 +3116,7 @@ public final class IslandProto {
           internal_static_proto_Profile_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_Profile_descriptor,
-              new java.lang.String[] { "Username", "AboutMe", },
+              new java.lang.String[] { "Username", "AboutMe", "Version", },
               org.island.messaging.proto.IslandProto.Profile.class,
               org.island.messaging.proto.IslandProto.Profile.Builder.class);
           return null;

@@ -58,7 +58,7 @@ public class FeedActivity extends AppCompatActivity
 
         // TODO: Remove after login implemented
         // Set user hack
-        String USER = "bigAndroid";
+        String USER = "kylewalker";
         IslandDB.createIdentity(this, USER);
 
         // Nav drawer
@@ -192,7 +192,6 @@ public class FeedActivity extends AppCompatActivity
 
         @Override
         protected List<Post> doInBackground(Void... params) {
-            Log.v(TAG, "getting posts...");
             return MessageLayer.getPosts(getApplicationContext());
         }
 
@@ -201,9 +200,6 @@ public class FeedActivity extends AppCompatActivity
             if (posts != null) {
                 mArrayOfPosts.addAll(posts);
                 mAdapter.notifyDataSetChanged();
-                for (Post p : posts) {
-                    Log.v(TAG, "added post " + p.getUserName());
-                }
             }
             refreshLayout.setRefreshing(false);
         }

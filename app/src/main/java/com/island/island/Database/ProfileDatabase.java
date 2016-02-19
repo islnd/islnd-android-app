@@ -71,7 +71,7 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         }
 
         results.moveToNext();
-        return new Profile(results.getString(0), results.getString(1));
+        return new Profile(results.getString(0), results.getString(1), Integer.MIN_VALUE);
     }
 
     public void update(Profile profile) {
@@ -82,6 +82,15 @@ public class ProfileDatabase extends SQLiteOpenHelper {
                 new String[]{profile.getUsername()});
 
         insert(profile);
+    }
+
+    public boolean hasProfile(Profile profile) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {USER_NAME};
+        String selection = USER_NAME + " = ?";
+        String[] args = { profile.getUsername() };
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        return results.getCount() > 0;
     }
 }
 

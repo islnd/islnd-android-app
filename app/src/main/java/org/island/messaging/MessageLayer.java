@@ -163,18 +163,20 @@ public class MessageLayer {
         return qrCode;
     }
 
-    public static Profile getProfile(Context context, String username) {
+    public static Profile getMostRecent(Context context, String username) {
         PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
-        EncryptedProfile encryptedProfile = Rest.getProfile(friendPK.getPseudonym());
-        Log.v(TAG, "got profile from network");
-        if (encryptedProfile == null) {
+        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym());
+        if (encryptedProfiles == null) {
             Log.d(TAG, "profile response was null");
             return null;
         }
 
-        Log.v(TAG, String.format("blob is %s", encryptedProfile.getBlob()));
+        List<Profile> profiles = new ArrayList<>();
+        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
+            //--TODO check signature
+            profiles.add(encryptedProfile.decrypt(friendPK.getKey()));
+        }
 
-        //--TODO check signature
-        return encryptedProfile.decrypt(friendPK.getKey());
+        return Util.getNewest(profiles);
     }
 }

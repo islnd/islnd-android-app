@@ -5,11 +5,13 @@ import android.util.Log;
 import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.crypto.EncryptedPost;
 import org.island.messaging.crypto.EncryptedProfile;
+import org.island.messaging.server.ProfileResponse;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
 import java.util.List;
 
+import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -81,12 +83,8 @@ public class Rest {
         RestInterface service = retrofit.create(RestInterface.class);
 
         try {
-            Response<Object> result = service.post(
-                    pseudonymSeed,
-                    encryptedPost).execute();
-            Log.v(TAG, "made a post");
-            Log.v(TAG, "response code " + result.code());
             //--TODO check that post was successful
+            service.post(pseudonymSeed, encryptedPost).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,12 +99,8 @@ public class Rest {
         RestInterface service = retrofit.create(RestInterface.class);
 
         try {
-            Response<Object> result = service.postProfile(
-                    pseudonymSeed,
-                    profilePost).execute();
-            Log.v(TAG, "posted profile");
-            Log.v(TAG, "response code " + result.code());
             //--TODO check that post was successful
+            service.postProfile(pseudonymSeed, profilePost).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -134,7 +128,7 @@ public class Rest {
         return null;
     }
 
-    public static EncryptedProfile getProfile(String pseudonym) {
+    public static List<EncryptedProfile> getProfiles(String pseudonym) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -142,12 +136,12 @@ public class Rest {
 
         RestInterface service = retrofit.create(RestInterface.class);
         try {
-            Response<EncryptedProfile> result = service.getProfile(pseudonym).execute();
-            if (result.code() == 200) {
-                return result.body();
+            Response<ProfileResponse> response = service.getProfiles(pseudonym).execute();
+            if (response.code() == 200) {
+                return response.body().getProfiles();
             }
             else {
-                Log.d(TAG, "/profile GET returned code " + result.code());
+                Log.d(TAG, "/profile GET returned code " + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

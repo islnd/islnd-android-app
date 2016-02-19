@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -155,10 +154,14 @@ public class ProfileActivity extends AppCompatActivity
         protected String doInBackground(String... params) {
             String username = params[0];
             if (!username.equals(Utils.getUser(getApplicationContext()))) {
-                Profile profile = MessageLayer.getProfile(getApplicationContext(), username);
+                Profile profile = MessageLayer.getMostRecent(getApplicationContext(), username);
                 ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
-                profileDatabase.insert(profile);
-                Log.v(TAG, String.format("Adding %s's profile to DB", profile.getUsername()));
+                if (profileDatabase.hasProfile(profile)) {
+                    profileDatabase.update(profile);
+                }
+                else {
+                    profileDatabase.insert(profile);
+                }
             }
 
             return username;

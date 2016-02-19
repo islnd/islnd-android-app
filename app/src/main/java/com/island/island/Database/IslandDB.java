@@ -13,6 +13,7 @@ import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
@@ -47,9 +48,6 @@ public class IslandDB
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-                Log.v(TAG, "starting post key");
-                Log.v(TAG, "username: " + username);
-                Log.v(TAG, "public key: " + publicKey);
                 MessageLayer.postPublicKey(username, CryptoUtil.decodePublicKey(publicKey));
                 Log.v(TAG, "post key completed");
                 return new Object();
@@ -66,8 +64,7 @@ public class IslandDB
         return IDENTITY_DB;
     }
 
-    public static void createIdentity(Context context, String username)
-    {
+    public static void createIdentity(Context context, String username) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String currentUsername = settings.getString(context.getString(R.string.user_name), "");
         Log.v(TAG, String.format("previous user %s, current user %s", currentUsername, username));
@@ -83,7 +80,11 @@ public class IslandDB
 
         //--Add a default profile
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
-        profileDatabase.insert(new Profile(username, "I'm a newb"));
+        profileDatabase.insert(
+                VersionedContentBuilder.buildProfile(
+                        context,
+                        username,
+                        context.getString(R.string.profile_default_about_me)));
     }
 
     private static void setPseudonym(Context context) {
@@ -126,8 +127,6 @@ public class IslandDB
 
         editor.putString(context.getString(R.string.user_name), username);
         editor.commit();
-
-        Log.v(TAG, "username " + username);
     }
 
     private static void setKeyPairAndPostPublicKey(Context context) {
