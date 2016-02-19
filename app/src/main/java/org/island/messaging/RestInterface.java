@@ -1,6 +1,8 @@
 package org.island.messaging;
 
 import org.island.messaging.crypto.EncryptedData;
+import org.island.messaging.crypto.EncryptedPost;
+import org.island.messaging.crypto.EncryptedProfile;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.util.List;
@@ -19,10 +21,10 @@ public interface RestInterface
 
 
     @GET("/posts/{pseudonym}")
-    Call<List<EncryptedData>> posts(@Path("pseudonym") String pseudonym);
+    Call<List<EncryptedPost>> posts(@Path("pseudonym") String pseudonym);
 
     @POST("/post/{pseudonymSeed}")
-    Call<Object> post(@Path("pseudonymSeed") String pseudonymSeed, @Body EncryptedData encryptedPost);
+    Call<Object> post(@Path("pseudonymSeed") String pseudonymSeed, @Body EncryptedPost encryptedPost);
 
 
     @GET("/pseudonym/{seed}")
@@ -33,10 +35,10 @@ public interface RestInterface
 
 
     @GET("/profile/{pseudonym}")
-    Call<EncryptedData> getProfile(@Path("pseudonym") String pseudonym);
+    Call<EncryptedProfile> getProfile(@Path("pseudonym") String pseudonym);
 
     @POST("/profile/{pseudonymSeed}")
     Call<Object> postProfile(
             @Path("pseudonymSeed") String pseudonymSeed,
-            @Body EncryptedData profilePost);
+            @Body EncryptedProfile encryptedProfile);
 }

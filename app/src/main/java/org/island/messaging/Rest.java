@@ -3,6 +3,8 @@ package org.island.messaging;
 import android.util.Log;
 
 import org.island.messaging.crypto.EncryptedData;
+import org.island.messaging.crypto.EncryptedPost;
+import org.island.messaging.crypto.EncryptedProfile;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
@@ -53,7 +55,7 @@ public class Rest {
         return null;
     }
 
-    public static List<EncryptedData> getPosts(String pseudonym) {
+    public static List<EncryptedPost> getPosts(String pseudonym) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -70,7 +72,7 @@ public class Rest {
         return null;
     }
 
-    public static void post(String pseudonymSeed, String encryptedPost) {
+    public static void post(String pseudonymSeed, EncryptedPost encryptedPost) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -81,7 +83,7 @@ public class Rest {
         try {
             Response<Object> result = service.post(
                     pseudonymSeed,
-                    new EncryptedData(encryptedPost)).execute();
+                    encryptedPost).execute();
             Log.v(TAG, "made a post");
             Log.v(TAG, "response code " + result.code());
             //--TODO check that post was successful
@@ -90,7 +92,7 @@ public class Rest {
         }
     }
 
-    public static void postProfile(String pseudonymSeed, EncryptedData profilePost) {
+    public static void postProfile(String pseudonymSeed, EncryptedProfile profilePost) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -132,7 +134,7 @@ public class Rest {
         return null;
     }
 
-    public static EncryptedData getProfile(String pseudonym) {
+    public static EncryptedProfile getProfile(String pseudonym) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -140,7 +142,7 @@ public class Rest {
 
         RestInterface service = retrofit.create(RestInterface.class);
         try {
-            Response<EncryptedData> result = service.getProfile(pseudonym).execute();
+            Response<EncryptedProfile> result = service.getProfile(pseudonym).execute();
             if (result.code() == 200) {
                 return result.body();
             }

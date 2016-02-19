@@ -15,9 +15,9 @@ import com.island.island.Utils.Utils;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedData;
+import org.island.messaging.crypto.EncryptedPost;
+import org.island.messaging.crypto.EncryptedProfile;
 import org.island.messaging.crypto.ObjectEncrypter;
-import org.island.messaging.crypto.ObjectSigner;
-import org.island.messaging.crypto.SignedObject;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class MessageLayer {
         List<Post> posts = new ArrayList<>();
 
         for (PseudonymKey key: keys) {
-            List<EncryptedData> encryptedPosts = Rest.getPosts(key.getPseudonym());
+            List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
             Log.v(TAG, "posts from " + key.getUsername());
             Log.v(TAG, "posts from " + key.getPseudonym());
             if (encryptedPosts == null) {
@@ -73,11 +73,9 @@ public class MessageLayer {
             }
 
             Log.v(TAG, encryptedPosts.size() + " posts from " + key.getUsername());
-            for (EncryptedData post: encryptedPosts) {
-                SignedObject signedPost = SignedObject.
-                        fromProto(ObjectEncrypter.decryptSymmetric(post.getBlob(), key.getKey()));
+            for (EncryptedPost post: encryptedPosts) {
                 //--TODO check that post is signed
-                PostUpdate postUpdate = PostUpdate.fromProto(signedPost.getObject());
+                PostUpdate postUpdate = post.decrypt(key.getKey());
 
                 if (postUpdate != null
                         && !postUpdate.isDeletion()) {
@@ -99,13 +97,12 @@ public class MessageLayer {
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
         PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        SignedObject signedPost = ObjectSigner.sign(
-                postUpdate, CryptoUtil.decodePrivateKey(
-                        privateKey));
-
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-        Key key = CryptoUtil.decodeSymmetricKey(myGroupKey);
-        String encryptedPost = ObjectEncrypter.encryptSymmetric(signedPost, key);
+
+        EncryptedPost encryptedPost = new EncryptedPost(
+                postUpdate,
+                CryptoUtil.decodePrivateKey(privateKey),
+                CryptoUtil.decodeSymmetricKey(myGroupKey));
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
         Rest.post(pseudonymSeed, encryptedPost);
@@ -114,18 +111,14 @@ public class MessageLayer {
     public static void postProfile(Context context, Profile profile) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        SignedObject signedProfile = ObjectSigner.sign(
-                profile,
-                CryptoUtil.decodePrivateKey(privateKey)
-        );
-
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-        Key key = CryptoUtil.decodeSymmetricKey(myGroupKey);
-        String blob = ObjectEncrypter.encryptSymmetric(signedProfile, key);
+
+        EncryptedProfile profilePost = new EncryptedProfile(
+                profile,
+                CryptoUtil.decodePrivateKey(privateKey),
+                CryptoUtil.decodeSymmetricKey(myGroupKey));
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-
-        EncryptedData profilePost = new EncryptedData(blob);
         Rest.postProfile(pseudonymSeed, profilePost);
     }
 
@@ -172,18 +165,16 @@ public class MessageLayer {
 
     public static Profile getProfile(Context context, String username) {
         PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
-        EncryptedData profileResponse = Rest.getProfile(friendPK.getPseudonym());
+        EncryptedProfile encryptedProfile = Rest.getProfile(friendPK.getPseudonym());
         Log.v(TAG, "got profile from network");
-        if (profileResponse == null) {
+        if (encryptedProfile == null) {
             Log.d(TAG, "profile response was null");
             return null;
         }
 
-        Log.v(TAG, String.format("blob is %s", profileResponse.getBlob()));
+        Log.v(TAG, String.format("blob is %s", encryptedProfile.getBlob()));
 
-        SignedObject signedProfile = SignedObject.fromProto(
-                ObjectEncrypter.decryptSymmetric(profileResponse.getBlob(), friendPK.getKey()));
         //--TODO check signature
-        return Profile.fromProto(signedProfile.getObject());
+        return encryptedProfile.decrypt(friendPK.getKey());
     }
 }

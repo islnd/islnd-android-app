@@ -1,11 +1,10 @@
 package org.island.messaging.crypto;
 
 public class EncryptedData {
-    public EncryptedData(String blob) {
-        this.blob = blob;
+    protected EncryptedData() {
     }
 
-    private String blob;
+    protected String blob;
 
     public String getBlob() {
         return blob;
