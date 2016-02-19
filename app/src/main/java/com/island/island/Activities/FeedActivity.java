@@ -58,9 +58,12 @@ public class FeedActivity extends AppCompatActivity
     private List<Post> mArrayOfPosts;
     private SwipeRefreshLayout refreshLayout;
     private CoordinatorLayout mainLayout;
-    EditText smsEditText = null;
+
+    private EditText smsEditText = null;
+    private View dialogView = null;
 
     private final static int REQUEST_SMS = 0;
+    private final static int REQUEST_CONTACT = 1;
 
     private final static int CONTACT_RESULT = 0;
 
@@ -223,6 +226,16 @@ public class FeedActivity extends AppCompatActivity
                 }
                 return;
             }
+            case REQUEST_CONTACT:
+            {
+                // Permission granted
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    importContact(null);
+                }
+                return;
+            }
         }
     }
 
@@ -287,15 +300,15 @@ public class FeedActivity extends AppCompatActivity
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
+        dialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
         builder.setView(dialogView);
 
         smsEditText = (EditText) dialogView.findViewById(R.id.sms_number_edit_text);
 
         builder.setPositiveButton(getString(R.string.send), (DialogInterface dialog, int id) ->
-                {
-                    sendSms(smsEditText.getText().toString());
-                })
+        {
+            sendSms(smsEditText.getText().toString());
+        })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
@@ -343,8 +356,39 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
+    private void requestContactPermissions()
+    {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_CONTACTS))
+        {
+            // Show an explanation to the user
+            Snackbar.make(dialogView, R.string.request_contact_explanation,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, (View view) ->
+                    {
+                        ActivityCompat.requestPermissions(FeedActivity.this,
+                                new String[]{Manifest.permission.READ_CONTACTS},
+                                REQUEST_CONTACT);
+                    })
+                    .show();
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    REQUEST_CONTACT);
+        }
+    }
+
     public void importContact(View view)
     {
+        // Check permission if we have to.
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            requestContactPermissions();
+            return;
+        }
+
         startActivityForResult(new Intent(
                         Intent.ACTION_PICK,
                         ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
