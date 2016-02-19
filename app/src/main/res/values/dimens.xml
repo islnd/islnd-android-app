@@ -44,4 +44,6 @@
     <dimen name="expanded_title_name_margin">38dp</dimen>
 
     <dimen name="view_friend_status_padding">8dp</dimen>
+
+    <dimen name="sms_allow_dialog_margin">8dp</dimen>
 </resources>

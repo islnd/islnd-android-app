@@ -5,7 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,8 +18,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,6 +50,7 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Post> mArrayOfPosts;
     private SwipeRefreshLayout refreshLayout;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,6 +60,7 @@ public class FeedActivity extends AppCompatActivity
         setContentView(R.layout.activity_feed);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         // TODO: Remove after login implemented
         // Set user hack
@@ -147,7 +153,7 @@ public class FeedActivity extends AppCompatActivity
                 FriendDatabase.getInstance(this).deleteAll();
                 break;
             case R.id.sms_allow_user:
-                sendSms();
+                smsAllowDialog();
                 break;
         }
 
@@ -211,7 +217,7 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
-    public void qrCodeActionDialog()
+    private void qrCodeActionDialog()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.qr_action_dialog)
@@ -233,20 +239,37 @@ public class FeedActivity extends AppCompatActivity
                 .show();
     }
 
-    private void sendSms()
+    private void smsAllowDialog()
     {
-        String phoneNo = "";
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
+        builder.setView(dialogView);
+
+        EditText editText = (EditText) dialogView.findViewById(R.id.sms_number_edit_text);
+
+        builder.setPositiveButton(getString(R.string.send), (DialogInterface dialog, int id) ->
+                {
+                    sendSms(editText.getText().toString());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void sendSms(String number)
+    {
         String sms = getString(R.string.sms_prefix) +
                 MessageLayer.getEncodedString(getApplicationContext());
 
         try
         {
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNo, null, sms, null, null);
+            smsManager.sendTextMessage(number, null, sms, null, null);
+            Snackbar.make(fab, "SMS sent!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS sent!");
         }
         catch (Exception e)
         {
+            Snackbar.make(fab, "SMS failed!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS failed!");
             e.printStackTrace();
         }

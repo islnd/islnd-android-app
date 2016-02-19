@@ -47,9 +47,9 @@ public class SmsReceiver extends BroadcastReceiver
             smsBody += messages[i].getMessageBody();
         }
 
-        Log.d(TAG, smsBody);
         if (isRelevant(context, smsBody))
         {
+            Log.d(TAG, smsBody);
             MessageLayer.addFriendFromEncodedString(context,
                     smsBody.replace(context.getString(R.string.sms_prefix), ""));
         }
