@@ -1,4 +1,4 @@
-package org.island.messaging.server;
+package org.island.messaging.crypto;
 
 public class EncryptedData {
     public EncryptedData(String blob) {

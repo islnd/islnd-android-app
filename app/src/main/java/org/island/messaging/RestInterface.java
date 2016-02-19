@@ -1,6 +1,6 @@
 package org.island.messaging;
 
-import org.island.messaging.server.EncryptedData;
+import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.util.List;

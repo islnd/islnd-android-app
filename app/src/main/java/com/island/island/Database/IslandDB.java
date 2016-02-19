@@ -14,13 +14,12 @@ import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 
-import org.island.messaging.Crypto;
+import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class IslandDB
                 Log.v(TAG, "starting post key");
                 Log.v(TAG, "username: " + username);
                 Log.v(TAG, "public key: " + publicKey);
-                MessageLayer.postPublicKey(username, Crypto.decodePublicKey(publicKey));
+                MessageLayer.postPublicKey(username, CryptoUtil.decodePublicKey(publicKey));
                 Log.v(TAG, "post key completed");
                 return new Object();
             }
@@ -114,7 +113,7 @@ public class IslandDB
     private static void setGroupKey(Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
-        String groupKey = Crypto.encodeKey(Crypto.getKey());
+        String groupKey = CryptoUtil.encodeKey(CryptoUtil.getKey());
         editor.putString(context.getString(R.string.group_key), groupKey);
         editor.commit();
 
@@ -139,9 +138,9 @@ public class IslandDB
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
                 SharedPreferences.Editor editor = settings.edit();
 
-                KeyPair keyPair = Crypto.getKeyPair();
-                String privateKey = Crypto.encodeKey(keyPair.getPrivate());
-                String publicKey = Crypto.encodeKey(keyPair.getPublic());
+                KeyPair keyPair = CryptoUtil.getKeyPair();
+                String privateKey = CryptoUtil.encodeKey(keyPair.getPrivate());
+                String publicKey = CryptoUtil.encodeKey(keyPair.getPublic());
                 editor.putString(context.getString(R.string.private_key), privateKey);
                 editor.putString(context.getString(R.string.public_key), publicKey);
                 editor.commit();

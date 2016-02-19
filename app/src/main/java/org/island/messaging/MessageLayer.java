@@ -13,7 +13,11 @@ import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 
-import org.island.messaging.server.EncryptedData;
+import org.island.messaging.crypto.CryptoUtil;
+import org.island.messaging.crypto.EncryptedData;
+import org.island.messaging.crypto.ObjectEncrypter;
+import org.island.messaging.crypto.ObjectSigner;
+import org.island.messaging.crypto.SignedObject;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -50,7 +54,7 @@ public class MessageLayer {
     }
 
     public static void postPublicKey(String username, Key publicKey){
-        Rest.postPublicKey(username, Crypto.encodeKey(publicKey));
+        Rest.postPublicKey(username, CryptoUtil.encodeKey(publicKey));
     }
 
     public static List<Post> getPosts(Context context) {
@@ -95,10 +99,12 @@ public class MessageLayer {
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
         PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        SignedObject signedPost = ObjectSigner.sign(postUpdate, Crypto.decodePrivateKey(privateKey));
+        SignedObject signedPost = ObjectSigner.sign(
+                postUpdate, CryptoUtil.decodePrivateKey(
+                        privateKey));
 
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-        Key key = Crypto.decodeSymmetricKey(myGroupKey);
+        Key key = CryptoUtil.decodeSymmetricKey(myGroupKey);
         String encryptedPost = ObjectEncrypter.encryptSymmetric(signedPost, key);
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
@@ -110,11 +116,11 @@ public class MessageLayer {
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
         SignedObject signedProfile = ObjectSigner.sign(
                 profile,
-                Crypto.decodePrivateKey(privateKey)
+                CryptoUtil.decodePrivateKey(privateKey)
         );
 
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-        Key key = Crypto.decodeSymmetricKey(myGroupKey);
+        Key key = CryptoUtil.decodeSymmetricKey(myGroupKey);
         String blob = ObjectEncrypter.encryptSymmetric(signedProfile, key);
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
@@ -155,7 +161,7 @@ public class MessageLayer {
         String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
         String pseudonym = sharedPreferences.getString(context.getString(R.string.pseudonym), "");
         Log.v(TAG, String.format("pseudonym is %s", pseudonym));
-        Key groupKey = Crypto.decodeSymmetricKey(
+        Key groupKey = CryptoUtil.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
 
         PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);

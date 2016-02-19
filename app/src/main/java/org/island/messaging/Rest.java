@@ -2,7 +2,7 @@ package org.island.messaging;
 
 import android.util.Log;
 
-import org.island.messaging.server.EncryptedData;
+import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
