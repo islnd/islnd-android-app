@@ -17,8 +17,6 @@ import com.island.island.Activities.ViewFriendsActivity;
 
 import org.island.messaging.MessageLayer;
 
-import java.util.UUID;
-
 /**
  * Created by poo on 2/18/2016.
  */
@@ -59,7 +57,7 @@ public class SmsReceiver extends BroadcastReceiver
         {
             Log.d(TAG, smsBody);
             // TODO: Don't notify if user is already friend.
-            boolean friendAdded = MessageLayer.addFriendFromEncodedString(context,
+            boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(context,
                     smsBody.replace(context.getString(R.string.sms_prefix), ""));
 
             if (friendAdded)

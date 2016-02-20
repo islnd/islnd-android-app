@@ -28,7 +28,7 @@ public class ShowQRActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        buildQrCode(MessageLayer.getEncodedString(getApplicationContext()));
+        buildQrCode(MessageLayer.getEncodedIdentityString(getApplicationContext()));
     }
 
     private void buildQrCode(String content)

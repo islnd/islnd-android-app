@@ -121,7 +121,8 @@ public class MessageLayer {
         return Rest.getPseudonym(seed);
     }
 
-    public static boolean addFriendFromEncodedString(Context context, String encodedString) {
+    public static boolean addFriendFromEncodedIdentityString(Context context,
+                                                             String encodedString) {
         Log.v(TAG, "adding friend from encoded string: " + encodedString);
         byte[] bytes = new Decoder().decode(encodedString);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
@@ -139,7 +140,7 @@ public class MessageLayer {
         return false;
     }
 
-    public static String getEncodedString(Context context) {
+    public static String getEncodedIdentityString(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
         String username = sharedPreferences.getString(context.getString(R.string.user_name), "");

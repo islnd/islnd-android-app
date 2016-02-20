@@ -193,7 +193,7 @@ public class FeedActivity extends AppCompatActivity
             {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                MessageLayer.addFriendFromEncodedString(getApplicationContext(), contents);
+                MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
             }
         }
         // Not QR result
@@ -314,7 +314,7 @@ public class FeedActivity extends AppCompatActivity
     private void sendSms(String number)
     {
         String sms = getString(R.string.sms_prefix) +
-                MessageLayer.getEncodedString(getApplicationContext());
+                MessageLayer.getEncodedIdentityString(getApplicationContext());
 
         try
         {
