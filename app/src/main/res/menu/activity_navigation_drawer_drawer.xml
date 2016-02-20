@@ -26,6 +26,9 @@
             android:id="@+id/delete_database"
             android:title="Clear all databases"
             android:icon="@drawable/ic_delete_black_24dp"/>
+        <item
+            android:id="@+id/edit_username"
+            android:title="Edit Username"/>
     </group>
 
 </menu>
