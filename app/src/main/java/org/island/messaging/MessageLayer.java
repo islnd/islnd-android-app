@@ -11,7 +11,6 @@ import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
-import com.island.island.Utils.Utils;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedData;
@@ -76,7 +75,7 @@ public class MessageLayer {
                         && !postUpdate.isDeletion()) {
                     posts.add(new Post(
                                     key.getUsername(),
-                                    Utils.smartTimestampFromUnixTime(postUpdate.getTimestamp()),
+                                    postUpdate.getTimestamp(),
                                     postUpdate.getContent(),
                                     new ArrayList<>()));
                 }

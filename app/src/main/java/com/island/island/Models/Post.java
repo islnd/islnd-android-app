@@ -14,11 +14,11 @@ public class Post implements Serializable
     public static String POST_EXTRA = "POST_OBJECT";
 
     private String userName = "";
-    private String timestamp = "";
+    private long timestamp;
     private String content = "";
     private List<Comment> comments = new ArrayList<>();
 
-    public Post(String userName, String timestamp, String content,
+    public Post(String userName, long timestamp, String content,
                 List<Comment> comments)
     {
         this.userName = userName;
@@ -37,14 +37,9 @@ public class Post implements Serializable
         this.userName = userName;
     }
 
-    public String getTimestamp()
+    public long getTimestamp()
     {
         return timestamp;
-    }
-
-    public void setTimestamp(String timestamp)
-    {
-        this.timestamp = timestamp;
     }
 
     public String getContent()
@@ -65,5 +60,9 @@ public class Post implements Serializable
     public void setComments(List<Comment> comments)
     {
         this.comments = comments;
+    }
+
+    public String getKey() {
+        return getUserName() + getTimestamp();
     }
 }

@@ -89,7 +89,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         Post post = (Post) mList.get(0);
 
         holder.postUserName.setText(post.getUserName());
-        holder.postTimestamp.setText(post.getTimestamp());
+        holder.postTimestamp.setText(Utils.smartTimestampFromUnixTime(post.getTimestamp()));
         holder.postContent.setText(post.getContent());
 
         // Go to profile on picture click

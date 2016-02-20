@@ -47,7 +47,9 @@ import com.island.island.Utils.Utils;
 import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -58,6 +60,7 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Post> mArrayOfPosts;
+    private Set<String> mPostMap;
     private SwipeRefreshLayout refreshLayout;
     private CoordinatorLayout mainLayout;
 
@@ -95,16 +98,18 @@ public class FeedActivity extends AppCompatActivity
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
         final String userName = Utils.getUser(FeedActivity.this);
 
-        navProfileImage.setOnClickListener((View v) ->
-        {
-            Intent profileIntent = new Intent(FeedActivity.this, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
-            startActivity(profileIntent);
-        });
+        navProfileImage.setOnClickListener(
+                (View v) ->
+                {
+                    Intent profileIntent = new Intent(FeedActivity.this, ProfileActivity.class);
+                    profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
+                    startActivity(profileIntent);
+                });
         navUserName.setText(userName);
 
         // Feed posts setup
         mArrayOfPosts = new ArrayList<>();
+        mPostMap = new HashSet<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -257,10 +262,32 @@ public class FeedActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<Post> posts) {
+            boolean adapterChanged = false;
+
             if (posts != null) {
-                mArrayOfPosts.addAll(posts);
+                for (Post p : posts) {
+                    Log.v(TAG, "looking at post with key " + p.getKey());
+                    if (!mPostMap.contains(p.getKey())) {
+                        mPostMap.add(p.getKey());
+
+                        //--TODO extract and use binary search
+                        int insertionPoint = 0;
+                        while (insertionPoint < mArrayOfPosts.size()
+                                && p.getTimestamp() < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
+                            Log.v(TAG, "" + insertionPoint);
+                            insertionPoint++;
+                        }
+
+                        mArrayOfPosts.add(insertionPoint, p);
+                        adapterChanged = true;
+                    }
+                }
+            }
+
+            if (adapterChanged) {
                 mAdapter.notifyDataSetChanged();
             }
+
             refreshLayout.setRefreshing(false);
         }
     }
