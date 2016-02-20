@@ -121,23 +121,26 @@ public class MessageLayer {
         return Rest.getPseudonym(seed);
     }
 
-    public static void addFriendFromQRCode(Context context, String qrCode) {
-        Log.v(TAG, "adding friend from QR code: " + qrCode);
-        byte[] bytes = new Decoder().decode(qrCode);
+    public static boolean addFriendFromEncodedIdentityString(Context context,
+                                                             String encodedString) {
+        Log.v(TAG, "adding friend from encoded string: " + encodedString);
+        byte[] bytes = new Decoder().decode(encodedString);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
-        addFriendToDatabaseAndCreateDefaultProfile(context, pk);
+        return addFriendToDatabaseAndCreateDefaultProfile(context, pk);
     }
 
-    private static void addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
+    private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (!friendDatabase.contains(pk)) {
             friendDatabase.addFriend(pk);
             Profile defaultProfile = Util.buildDefaultProfile(context, pk.getUsername());
             ProfileDatabase.getInstance(context).insert(defaultProfile);
+            return true;
         }
+        return false;
     }
 
-    public static String getQrCode(Context context) {
+    public static String getEncodedIdentityString(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
         String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
@@ -147,9 +150,9 @@ public class MessageLayer {
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
 
         PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);
-        String qrCode = new Encoder().encodeToString(pk.toByteArray());
-        Log.v(TAG, "generated QR code: " + qrCode);
-        return qrCode;
+        String encodeString = new Encoder().encodeToString(pk.toByteArray());
+        Log.v(TAG, "generated encoded string: " + encodeString);
+        return encodeString;
     }
 
     public static Profile getMostRecentProfile(Context context, String username) {

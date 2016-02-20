@@ -1,11 +1,21 @@
 package com.island.island.Activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,9 +24,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,6 +58,15 @@ public class FeedActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Post> mArrayOfPosts;
     private SwipeRefreshLayout refreshLayout;
+    private CoordinatorLayout mainLayout;
+
+    private EditText smsEditText = null;
+    private View dialogView = null;
+
+    private final static int REQUEST_SMS = 0;
+    private final static int REQUEST_CONTACT = 1;
+
+    private final static int CONTACT_RESULT = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,10 +76,11 @@ public class FeedActivity extends AppCompatActivity
         setContentView(R.layout.activity_feed);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mainLayout = (CoordinatorLayout) findViewById(R.id.feed_main_layout);
 
         // TODO: Remove after login implemented
         // Set user hack
-        String USER = "curry";
+        String USER = "newUser18";
         IslandDB.createIdentity(this, USER);
 
         // Nav drawer
@@ -147,6 +169,9 @@ public class FeedActivity extends AppCompatActivity
                 FriendDatabase.getInstance(this).deleteAll();
                 ProfileDatabase.getInstance(this).deleteAll();
                 break;
+            case R.id.sms_allow_user:
+                smsAllowDialog();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -157,7 +182,6 @@ public class FeedActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        // TODO: Do something with qr results
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null)
         {
@@ -169,14 +193,51 @@ public class FeedActivity extends AppCompatActivity
             {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                // TODO: If contents are valid, open a dialog to allow use
-                MessageLayer.addFriendFromQRCode(getApplicationContext(), contents);
+                MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
             }
         }
+        // Not QR result
         else
         {
-            // This is important, otherwise the result will not be passed to the fragment
-            //super.onActivityResult(requestCode, resultCode, data);
+            if (requestCode == CONTACT_RESULT && resultCode == RESULT_OK)
+            {
+                Uri uriContact = data.getData();
+
+                String number = retrieveContactNumber(uriContact);
+                if (smsEditText != null)
+                {
+                    smsEditText.setText(number);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults)
+    {
+        switch (requestCode)
+        {
+            case REQUEST_SMS:
+            {
+                // Permission granted
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    smsAllowDialog();
+                }
+                return;
+            }
+            case REQUEST_CONTACT:
+            {
+                // Permission granted
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    importContact(null);
+                }
+                return;
+            }
         }
     }
 
@@ -205,14 +266,13 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
-    public void qrCodeActionDialog()
+    private void qrCodeActionDialog()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.qr_action_dialog)
                 .setItems(R.array.qr_actions, (DialogInterface dialog, int which) ->
                 {
-                    switch (which)
-                    {
+                    switch (which) {
                         case 0: // Show QR
                             startActivity(new Intent(this, ShowQRActivity.class));
                             break;
@@ -225,5 +285,149 @@ public class FeedActivity extends AppCompatActivity
                     }
                 })
                 .show();
+    }
+
+    private void smsAllowDialog()
+    {
+        // Check permission if we have to.
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            requestSmsPermissions();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        dialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
+        builder.setView(dialogView);
+
+        smsEditText = (EditText) dialogView.findViewById(R.id.sms_number_edit_text);
+
+        builder.setPositiveButton(getString(R.string.send), (DialogInterface dialog, int id) ->
+        {
+            sendSms(smsEditText.getText().toString());
+        })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void sendSms(String number)
+    {
+        String sms = getString(R.string.sms_prefix) +
+                MessageLayer.getEncodedIdentityString(getApplicationContext());
+
+        try
+        {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(number, null, sms, null, null);
+            Snackbar.make(mainLayout, "SMS sent!", Snackbar.LENGTH_LONG).show();
+            Log.d(TAG, "SMS sent!");
+        }
+        catch (Exception e)
+        {
+            Snackbar.make(mainLayout, "SMS failed!", Snackbar.LENGTH_LONG).show();
+            Log.d(TAG, "SMS failed!");
+            e.printStackTrace();
+        }
+    }
+
+    private void requestSmsPermissions()
+    {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.SEND_SMS))
+        {
+            // Show an explanation to the user
+            Snackbar.make(mainLayout, R.string.request_sms_send_explanation,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, (View view) ->
+                    {
+                            ActivityCompat.requestPermissions(FeedActivity.this,
+                                    new String[]{Manifest.permission.SEND_SMS},
+                                    REQUEST_SMS);
+                    })
+                    .show();
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    REQUEST_SMS);
+        }
+    }
+
+    private void requestContactPermissions()
+    {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_CONTACTS))
+        {
+            // Show an explanation to the user
+            Snackbar.make(dialogView, R.string.request_contact_explanation,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, (View view) ->
+                    {
+                        ActivityCompat.requestPermissions(FeedActivity.this,
+                                new String[]{Manifest.permission.READ_CONTACTS},
+                                REQUEST_CONTACT);
+                    })
+                    .show();
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    REQUEST_CONTACT);
+        }
+    }
+
+    public void importContact(View view)
+    {
+        // Check permission if we have to.
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            requestContactPermissions();
+            return;
+        }
+
+        startActivityForResult(new Intent(
+                        Intent.ACTION_PICK,
+                        ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
+    }
+
+    private String retrieveContactNumber(Uri uriContact)
+    {
+        String contactNumber = null;
+
+        // getting contacts ID
+        ContentResolver cr = getContentResolver();
+        Cursor cursorID = cr.query(uriContact,
+                new String[]{ContactsContract.Contacts._ID},
+                null, null, null);
+
+        if (cursorID.moveToFirst())
+        {
+            String contactId =
+                    cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
+
+            Cursor cursorPhone = getContentResolver().query(
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
+
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
+                            ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
+                            ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+
+                    new String[]{contactId},
+                    null);
+
+            if (cursorPhone.moveToFirst())
+            {
+                contactNumber =
+                        cursorPhone.getString(
+                                cursorPhone.getColumnIndex(
+                                        ContactsContract.CommonDataKinds.Phone.NUMBER));
+            }
+            cursorPhone.close();
+        }
+        cursorID.close();
+        return contactNumber;
     }
 }
