@@ -79,11 +79,6 @@ public class FeedActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         mainLayout = (CoordinatorLayout) findViewById(R.id.feed_main_layout);
 
-        // TODO: Remove after login implemented
-        // Set user hack
-        String USER = "newUser18";
-        IslandDB.createIdentity(this, USER);
-
         // Nav drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
