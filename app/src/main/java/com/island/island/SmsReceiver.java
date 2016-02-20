@@ -17,6 +17,8 @@ import com.island.island.Activities.ViewFriendsActivity;
 
 import org.island.messaging.MessageLayer;
 
+import java.util.UUID;
+
 /**
  * Created by poo on 2/18/2016.
  */
@@ -24,6 +26,7 @@ public class SmsReceiver extends BroadcastReceiver
 {
     private static String TAG = SmsReceiver.class.getSimpleName();
     private static final String SMS_BUNDLE = "pdus";
+    private static int notificationCount = 0;
 
     @Override
     public void onReceive(Context context, Intent intent)
@@ -56,9 +59,13 @@ public class SmsReceiver extends BroadcastReceiver
         {
             Log.d(TAG, smsBody);
             // TODO: Don't notify if user is already friend.
-            MessageLayer.addFriendFromEncodedString(context,
+            boolean friendAdded = MessageLayer.addFriendFromEncodedString(context,
                     smsBody.replace(context.getString(R.string.sms_prefix), ""));
-            newFriendNotification(context);
+
+            if (friendAdded)
+            {
+                newFriendNotification(context);
+            }
         }
     }
 
@@ -74,7 +81,8 @@ public class SmsReceiver extends BroadcastReceiver
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(context.getString(R.string.new_friend_notification))
-                        .setContentText("A friend allowed you via SMS!");
+                        .setContentText("A friend allowed you via SMS!")
+                        .setAutoCancel(true);
 
         Intent resultIntent = new Intent(context, ViewFriendsActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -90,7 +98,6 @@ public class SmsReceiver extends BroadcastReceiver
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        mNotificationManager.notify(context.getResources().
-                getInteger(R.integer.notif_sms_friend_added), mBuilder.build());
+        mNotificationManager.notify(notificationCount++, mBuilder.build());
     }
 }

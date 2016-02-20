@@ -121,20 +121,22 @@ public class MessageLayer {
         return Rest.getPseudonym(seed);
     }
 
-    public static void addFriendFromEncodedString(Context context, String encodedString) {
+    public static boolean addFriendFromEncodedString(Context context, String encodedString) {
         Log.v(TAG, "adding friend from encoded string: " + encodedString);
         byte[] bytes = new Decoder().decode(encodedString);
         PseudonymKey pk = PseudonymKey.fromProto(bytes);
-        addFriendToDatabaseAndCreateDefaultProfile(context, pk);
+        return addFriendToDatabaseAndCreateDefaultProfile(context, pk);
     }
 
-    private static void addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
+    private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (!friendDatabase.contains(pk)) {
             friendDatabase.addFriend(pk);
             Profile defaultProfile = Util.buildDefaultProfile(context, pk.getUsername());
             ProfileDatabase.getInstance(context).insert(defaultProfile);
+            return true;
         }
+        return false;
     }
 
     public static String getEncodedString(Context context) {
