@@ -36,6 +36,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.IdentityDatabase;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
@@ -171,6 +172,9 @@ public class FeedActivity extends AppCompatActivity
                 break;
             case R.id.sms_allow_user:
                 smsAllowDialog();
+                break;
+            case R.id.edit_username:
+                editUsernameDialog();
                 break;
         }
 
@@ -429,5 +433,25 @@ public class FeedActivity extends AppCompatActivity
         }
         cursorID.close();
         return contactNumber;
+    }
+
+    private void editUsernameDialog()
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        dialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
+        builder.setView(dialogView);
+
+        EditText editText = (EditText) dialogView.findViewById(R.id.edit_username_edit_text);
+
+        builder.setPositiveButton(getString(android.R.string.ok),
+                (DialogInterface dialog, int id) ->
+                {
+                    FriendDatabase.getInstance(getApplicationContext()).deleteAll();
+                    ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
+                    IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 }
