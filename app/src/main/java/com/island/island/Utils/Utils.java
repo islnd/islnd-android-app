@@ -15,11 +15,11 @@ import java.util.TimeZone;
  */
 public class Utils
 {
-    public static String smartTimestampFromUnixTime(long unixTime)
+    public static String smartTimestampFromUnixTime(long unixTimeMillis)
     {
         // currentTimeMillis is already in UTC!
         long currentTime = System.currentTimeMillis() / 1000;
-        long timeDiff = currentTime - unixTime;
+        long timeDiff = currentTime - unixTimeMillis / 1000;
 
         String timestamp = "";
 
@@ -49,7 +49,7 @@ public class Utils
             dateFormat.setTimeZone(timeZone);
 
             dateFormat.applyPattern("MMM d, yyyy");
-            timestamp = dateFormat.format(new Date(unixTime * 1000));
+            timestamp = dateFormat.format(new Date(unixTimeMillis));
         }
 
         return timestamp;

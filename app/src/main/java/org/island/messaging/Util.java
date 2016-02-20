@@ -13,7 +13,7 @@ public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
     public static long getPostTimestamp() {
-        return System.currentTimeMillis() / 1000;
+        return System.currentTimeMillis();
     }
 
     public static <T extends VersionedContent> T getNewest(List<T> versionedContent) {

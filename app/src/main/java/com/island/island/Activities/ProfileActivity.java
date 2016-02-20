@@ -94,8 +94,8 @@ public class ProfileActivity extends AppCompatActivity
 
         // User posts
         // TODO get the real posts
-        List<Post> userPosts = IslandDB.getPostsForUser(new User(mProfileUsername));
-        mArrayOfPosts.addAll(userPosts);
+//        List<Post> userPosts = IslandDB.getPostsForUser(new User(mProfileUsername));
+//        mArrayOfPosts.addAll(userPosts);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);

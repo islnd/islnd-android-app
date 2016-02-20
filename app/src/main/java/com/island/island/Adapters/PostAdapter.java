@@ -51,7 +51,7 @@ public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
         Post post = mPosts.get(position);
 
         holder.postUserName.setText(post.getUserName());
-        holder.postTimestamp.setText(post.getTimestamp());
+        holder.postTimestamp.setText(Utils.smartTimestampFromUnixTime(post.getTimestamp()));
         holder.postContent.setText(post.getContent());
         holder.postCommentCount.setText(Utils.numberOfCommentsString(post.getComments().size()));
 
