@@ -73,7 +73,10 @@ public class MessageLayer {
                 PostUpdate postUpdate = post.decrypt(key.getKey());
                 if (postUpdate != null
                         && !postUpdate.isDeletion()) {
-                    postDatabase.insert(userId, postUpdate);
+                    if (!postDatabase.contains(userId, postUpdate)) {
+                        postDatabase.insert(userId, postUpdate);
+                    }
+
                     posts.add(new Post(
                                     key.getUsername(),
                                     postUpdate.getTimestamp(),

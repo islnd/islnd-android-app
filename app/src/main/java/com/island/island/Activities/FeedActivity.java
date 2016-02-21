@@ -72,6 +72,7 @@ public class FeedActivity extends AppCompatActivity
     private final static int REQUEST_CONTACT = 1;
 
     private final static int CONTACT_RESULT = 0;
+    private final static int NEW_POST_RESULT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -121,28 +122,13 @@ public class FeedActivity extends AppCompatActivity
         // Populate feed
         List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
         FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
+        boolean listChanged = false;
         for (RawPost p : localPosts) {
-            int userId = p.getUserId();
-            Log.v(TAG, "post from userId " + userId);
-            String postAuthor = userId == 0
-                    ? Utils.getUser(this)
-                    : friendDatabase.getUsername(userId);
+            listChanged = addPostToFeed(friendDatabase, listChanged, p);
+        }
 
-            String key = postAuthor + p.getTimestamp();
-            if (mPostMap.contains(key)) {
-                continue;
-            }
-
-            mPostMap.add(key);
-            int insertionPoint = getInsertionPoint(p.getTimestamp());
-            mArrayOfPosts.add(
-                    insertionPoint,
-                    new Post(
-                            postAuthor,
-                            p.getTimestamp(),
-                            p.getContent(),
-                            new ArrayList<>()
-                    ));
+        if (listChanged) {
+            mAdapter.notifyDataSetChanged();
         }
 
         new GetPostsTask().execute();
@@ -154,6 +140,33 @@ public class FeedActivity extends AppCompatActivity
         {
             new GetPostsTask().execute();
         });
+    }
+
+    private boolean addPostToFeed(FriendDatabase friendDatabase, boolean listChanged, RawPost p) {
+        int userId = p.getUserId();
+        Log.v(TAG, "post from userId " + userId);
+        String postAuthor = userId == 0
+                ? Utils.getUser(this)
+                : friendDatabase.getUsername(userId);
+
+        String key = postAuthor + p.getTimestamp();
+        if (mPostMap.contains(key)) {
+            return listChanged;
+        }
+
+        listChanged = true;
+        mPostMap.add(key);
+        int insertionPoint = getInsertionPoint(p.getTimestamp());
+        mArrayOfPosts.add(
+                insertionPoint,
+                new Post(
+                        postAuthor,
+                        p.getTimestamp(),
+                        p.getContent(),
+                        new ArrayList<>()
+                ));
+
+        return listChanged;
     }
 
     @Override
@@ -239,6 +252,12 @@ public class FeedActivity extends AppCompatActivity
                     smsEditText.setText(number);
                 }
             }
+            else if (requestCode == NEW_POST_RESULT) {
+                Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
+                Log.v(TAG, "post return text: " + post.getContent());
+                mArrayOfPosts.add(0, post);
+                mAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -274,7 +293,7 @@ public class FeedActivity extends AppCompatActivity
     public void startNewPostActivity(View view)
     {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
-        startActivity(newPostIntent);
+        startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
     private class GetPostsTask extends AsyncTask<Void, Void, List<Post>>
@@ -296,6 +315,7 @@ public class FeedActivity extends AppCompatActivity
             }
 
             refreshLayout.setRefreshing(false);
+            Utils.printAvailableMemory(getApplicationContext(), TAG);
         }
 
         private boolean addPostsToFeed(List<Post> posts) {
@@ -485,6 +505,7 @@ public class FeedActivity extends AppCompatActivity
             }
             cursorPhone.close();
         }
+
         cursorID.close();
         return contactNumber;
     }

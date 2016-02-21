@@ -88,4 +88,13 @@ public class PostDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(DATABASE_NAME, null, null);
     }
+
+    public boolean contains(int userId, PostUpdate postUpdate) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {USER_ID, TIMESTAMP};
+        String selection = USER_ID + " = ? AND " + TIMESTAMP + " = ?";
+        String[] args = {String.valueOf(userId), String.valueOf(postUpdate.getTimestamp())};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        return results.getCount() > 0;
+    }
 }

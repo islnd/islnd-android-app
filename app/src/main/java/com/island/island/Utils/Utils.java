@@ -1,8 +1,10 @@
 package com.island.island.Utils;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.island.island.R;
 
@@ -80,5 +82,11 @@ public class Utils
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(context.getString(R.string.user_name), userName);
         editor.commit();
+    }
+
+    public static void printAvailableMemory(Context context, String tag) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        int memoryClass = am.getMemoryClass();
+        Log.v(tag, memoryClass + "mb available");
     }
 }
