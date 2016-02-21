@@ -10,19 +10,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
 import com.island.island.Database.PostDatabase;
-import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.PostUpdate;
-import org.island.messaging.Util;
 
-import java.security.Identity;
 import java.util.ArrayList;
 
 public class NewPostActivity extends AppCompatActivity
