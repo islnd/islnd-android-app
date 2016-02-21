@@ -92,8 +92,6 @@ public class MessageLayer {
 
     public static void post(Context context, String content) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String lastId = preferences.getString(context.getString(R.string.post_id_key), "0");
-        String newId = String.valueOf(Integer.parseInt(lastId) + 1);
         PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
@@ -102,6 +100,20 @@ public class MessageLayer {
                 postUpdate,
                 CryptoUtil.decodePrivateKey(privateKey),
                 CryptoUtil.decodeSymmetricKey(myGroupKey));
+
+        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
+        Rest.post(pseudonymSeed, encryptedPost);
+    }
+
+    public static void comment(Context context, CommentUpdate commentUpdate) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
+        String postAuthorGroupKey = FriendDatabase.getInstance(context).getKey()
+
+        EncryptedComment encryptedComment = new EncryptedComment(
+                commentUpdate,
+                CryptoUtil.decodePrivateKey(privateKey),
+                CryptoUtil.decodeSymmetricKey(postAuthorGroupKey));
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
         Rest.post(pseudonymSeed, encryptedPost);

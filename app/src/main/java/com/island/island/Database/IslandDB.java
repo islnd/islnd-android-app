@@ -227,11 +227,14 @@ public class IslandDB
         int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
         String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
         String postId = post.getPostId();
+        //--TODO comment update should be built in message layer
         CommentUpdate commentUpdate = CommentUpdate.buildComment(
                 postAuthorPseudonym,
                 postId,
                 comment.getComment());
         CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
+
+        MessageLayer.comment(postAuthorPseudonym, postId, comment.getComment());
     }
 
     public static void postProfile(Context context, Profile profile) {
