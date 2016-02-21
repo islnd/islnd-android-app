@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.island.island.Models.RawPost;
+
 import org.island.messaging.PostUpdate;
 
 import java.util.ArrayList;
@@ -64,18 +66,18 @@ public class PostDatabase extends SQLiteOpenHelper {
         writableDatabase.insert(DATABASE_NAME, null, values);
     }
 
-    public List<PostUpdate> getAll() {
-        List<PostUpdate> posts = new ArrayList<>();
+    public List<RawPost> getAll() {
+        List<RawPost> posts = new ArrayList<>();
         SQLiteDatabase readableDatabase = getReadableDatabase();
 
-        String[] columns = {POST_ID, CONTENT, TIMESTAMP};
+        String[] columns = {USER_ID, POST_ID, CONTENT, TIMESTAMP};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, null, null, "", "", "");
         while(results.moveToNext()) {
-            posts.add(new PostUpdate(
-                            results.getString(0),
+            posts.add(new RawPost(
+                            results.getInt(0),
                             results.getString(1),
-                            false,
-                            results.getLong(2)
+                            results.getString(2),
+                            results.getLong(3)
                     ));
         }
 

@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
@@ -59,21 +60,20 @@ public class MessageLayer {
         List<Post> posts = new ArrayList<>();
 
         for (PseudonymKey key: keys) {
+            int userId = friendDatabase.getUserId(key.getUsername());
             List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
-            Log.v(TAG, "posts from " + key.getUsername());
-            Log.v(TAG, "posts from " + key.getPseudonym());
             if (encryptedPosts == null) {
                 Log.d(TAG, "get posts return null");
                 continue;
             }
 
-            Log.v(TAG, encryptedPosts.size() + " posts from " + key.getUsername());
+            PostDatabase postDatabase = PostDatabase.getInstance(context);
             for (EncryptedPost post: encryptedPosts) {
                 //--TODO check that post is signed
                 PostUpdate postUpdate = post.decrypt(key.getKey());
-
                 if (postUpdate != null
                         && !postUpdate.isDeletion()) {
+                    postDatabase.insert(userId, postUpdate);
                     posts.add(new Post(
                                     key.getUsername(),
                                     postUpdate.getTimestamp(),

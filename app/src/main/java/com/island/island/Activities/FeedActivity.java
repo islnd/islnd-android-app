@@ -38,16 +38,14 @@ import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
-import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
+import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
-import org.island.messaging.PostUpdate;
-import org.island.messaging.Util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -121,11 +119,26 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
-        List<PostUpdate> localPosts = PostDatabase.getInstance(this).getAll();
-        for (PostUpdate p : localPosts) {
-            //--TODO get current display name for userId
-            mArrayOfPosts.add(new Post(
-                            Utils.getUser(this),
+        List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
+        for (RawPost p : localPosts) {
+            int userId = p.getUserId();
+            Log.v(TAG, "post from userId " + userId);
+            String postAuthor = userId == 0
+                    ? Utils.getUser(this)
+                    : friendDatabase.getUsername(userId);
+
+            String key = postAuthor + p.getTimestamp();
+            if (mPostMap.contains(key)) {
+                continue;
+            }
+
+            mPostMap.add(key);
+            int insertionPoint = getInsertionPoint(p.getTimestamp());
+            mArrayOfPosts.add(
+                    insertionPoint,
+                    new Post(
+                            postAuthor,
                             p.getTimestamp(),
                             p.getContent(),
                             new ArrayList<>()
@@ -275,34 +288,40 @@ public class FeedActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<Post> posts) {
-            boolean adapterChanged = false;
-
             if (posts != null) {
-                for (Post p : posts) {
-                    Log.v(TAG, "looking at post with key " + p.getKey());
-                    if (!mPostMap.contains(p.getKey())) {
-                        mPostMap.add(p.getKey());
-
-                        //--TODO extract and use binary search
-                        int insertionPoint = 0;
-                        while (insertionPoint < mArrayOfPosts.size()
-                                && p.getTimestamp() < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
-                            Log.v(TAG, "" + insertionPoint);
-                            insertionPoint++;
-                        }
-
-                        mArrayOfPosts.add(insertionPoint, p);
-                        adapterChanged = true;
-                    }
+                boolean adapterChanged = addPostsToFeed(posts);
+                if (adapterChanged) {
+                    mAdapter.notifyDataSetChanged();
                 }
-            }
-
-            if (adapterChanged) {
-                mAdapter.notifyDataSetChanged();
             }
 
             refreshLayout.setRefreshing(false);
         }
+
+        private boolean addPostsToFeed(List<Post> posts) {
+            boolean postAdded = false;
+            for (Post p : posts) {
+                if (!mPostMap.contains(p.getKey())) {
+                    mPostMap.add(p.getKey());
+
+                    int insertionPoint = getInsertionPoint(p.getTimestamp());
+                    mArrayOfPosts.add(insertionPoint, p);
+                    postAdded = true;
+                }
+            }
+            return postAdded;
+        }
+    }
+
+    private int getInsertionPoint(long postTimestamp) {
+        int insertionPoint = 0;
+        while (insertionPoint < mArrayOfPosts.size()
+                && postTimestamp < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
+            Log.v(TAG, "" + insertionPoint);
+            insertionPoint++;
+        }
+
+        return insertionPoint;
     }
 
     private void qrCodeActionDialog()
