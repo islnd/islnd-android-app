@@ -36,8 +36,9 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.FriendDatabase;
-import com.island.island.Database.IdentityDatabase;
+import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -45,6 +46,8 @@ import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
+import org.island.messaging.PostUpdate;
+import org.island.messaging.Util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -118,6 +121,17 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
+        List<PostUpdate> localPosts = PostDatabase.getInstance(this).getAll();
+        for (PostUpdate p : localPosts) {
+            //--TODO get current display name for userId
+            mArrayOfPosts.add(new Post(
+                            Utils.getUser(this),
+                            p.getTimestamp(),
+                            p.getContent(),
+                            new ArrayList<>()
+                    ));
+        }
+
         new GetPostsTask().execute();
 
         // Swipe to refresh
@@ -125,7 +139,6 @@ public class FeedActivity extends AppCompatActivity
 
         refreshLayout.setOnRefreshListener(() ->
         {
-            // TODO: This will add duplicates, okay for now
             new GetPostsTask().execute();
         });
     }
@@ -471,6 +484,7 @@ public class FeedActivity extends AppCompatActivity
                 {
                     FriendDatabase.getInstance(getApplicationContext()).deleteAll();
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
+                    PostDatabase.getInstance(getApplicationContext()).deleteAll();
                     IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)

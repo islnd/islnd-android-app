@@ -7,8 +7,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
+import com.island.island.Database.PostDatabase;
 import com.island.island.R;
+import com.island.island.VersionedContentBuilder;
+
+import java.security.Identity;
 
 public class NewPostActivity extends AppCompatActivity
 {
@@ -33,6 +38,9 @@ public class NewPostActivity extends AppCompatActivity
         else
         {
             IslandDB.post(getApplicationContext(), postText);
+            PostDatabase.getInstance(this).insert(
+                    0, // my id is 0
+                    VersionedContentBuilder.buildPost(this, postText));
             finish();
         }
     }

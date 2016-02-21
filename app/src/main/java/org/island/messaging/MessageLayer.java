@@ -11,6 +11,7 @@ import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
+import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedData;
@@ -89,7 +90,7 @@ public class MessageLayer {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String lastId = preferences.getString(context.getString(R.string.post_id_key), "0");
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
-        PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
+        PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
 
@@ -132,6 +133,10 @@ public class MessageLayer {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (!friendDatabase.contains(pk)) {
             friendDatabase.addFriend(pk);
+            Log.v(TAG, String.format(
+                            "friend %s has id %d",
+                            pk.getUsername(),
+                            friendDatabase.getUserId(pk.getUsername())));
             Profile defaultProfile = Util.buildDefaultProfile(context, pk.getUsername());
             ProfileDatabase.getInstance(context).insert(defaultProfile);
             return true;
