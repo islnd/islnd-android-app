@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Models.Post;
@@ -45,7 +46,8 @@ public class NewPostActivity extends AppCompatActivity
             //--TODO activity is doing too much here
             IslandDB.post(getApplicationContext(), postText);
             PostUpdate post = VersionedContentBuilder.buildPost(this, postText);
-            PostDatabase.getInstance(this).insert(0, post); // 0 is my id
+            int myUserId = FriendDatabase.getInstance(this).getUserId(Utils.getUser(this));
+            PostDatabase.getInstance(this).insert(myUserId, post);
 
             setResult(Activity.RESULT_OK, buildReturnIntent(post));
             finish();
@@ -59,6 +61,7 @@ public class NewPostActivity extends AppCompatActivity
                 Post.POST_EXTRA,
                 new Post(
                         Utils.getUser(this),
+                        post.getId(),
                         post.getTimestamp(),
                         post.getContent(),
                         new ArrayList<>()));

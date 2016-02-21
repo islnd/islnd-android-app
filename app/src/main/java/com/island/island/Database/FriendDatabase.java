@@ -153,4 +153,19 @@ public class FriendDatabase extends SQLiteOpenHelper {
         results.moveToNext();
         return results.getString(1);
     }
+
+    public String getPseudonym(int userId) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {ID, PSEUDONYM};
+        String selection = ID + " = ?";
+        String[] args = {String.valueOf(userId)};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return "";
+        }
+
+        results.moveToNext();
+        return results.getString(1);
+    }
 }

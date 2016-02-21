@@ -1767,13 +1767,13 @@ public final class IslandProto {
     boolean hasIsDelete();
     boolean getIsDelete();
     
-    // required string id = 2;
-    boolean hasId();
-    String getId();
+    // required string post_author = 3;
+    boolean hasPostAuthor();
+    String getPostAuthor();
     
-    // required string author = 3;
-    boolean hasAuthor();
-    String getAuthor();
+    // required string post_id = 2;
+    boolean hasPostId();
+    String getPostId();
     
     // required string content = 4;
     boolean hasContent();
@@ -1822,14 +1822,14 @@ public final class IslandProto {
       return isDelete_;
     }
     
-    // required string id = 2;
-    public static final int ID_FIELD_NUMBER = 2;
-    private java.lang.Object id_;
-    public boolean hasId() {
+    // required string post_author = 3;
+    public static final int POST_AUTHOR_FIELD_NUMBER = 3;
+    private java.lang.Object postAuthor_;
+    public boolean hasPostAuthor() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-    public String getId() {
-      java.lang.Object ref = id_;
+    public String getPostAuthor() {
+      java.lang.Object ref = postAuthor_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -1837,31 +1837,31 @@ public final class IslandProto {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          id_ = s;
+          postAuthor_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getIdBytes() {
-      java.lang.Object ref = id_;
+    private com.google.protobuf.ByteString getPostAuthorBytes() {
+      java.lang.Object ref = postAuthor_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        id_ = b;
+        postAuthor_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     
-    // required string author = 3;
-    public static final int AUTHOR_FIELD_NUMBER = 3;
-    private java.lang.Object author_;
-    public boolean hasAuthor() {
+    // required string post_id = 2;
+    public static final int POST_ID_FIELD_NUMBER = 2;
+    private java.lang.Object postId_;
+    public boolean hasPostId() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-    public String getAuthor() {
-      java.lang.Object ref = author_;
+    public String getPostId() {
+      java.lang.Object ref = postId_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -1869,17 +1869,17 @@ public final class IslandProto {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          author_ = s;
+          postId_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getAuthorBytes() {
-      java.lang.Object ref = author_;
+    private com.google.protobuf.ByteString getPostIdBytes() {
+      java.lang.Object ref = postId_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        author_ = b;
+        postId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1930,8 +1930,8 @@ public final class IslandProto {
     
     private void initFields() {
       isDelete_ = false;
-      id_ = "";
-      author_ = "";
+      postAuthor_ = "";
+      postId_ = "";
       content_ = "";
       timestamp_ = 0L;
     }
@@ -1944,11 +1944,11 @@ public final class IslandProto {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasId()) {
+      if (!hasPostAuthor()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasAuthor()) {
+      if (!hasPostId()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1970,11 +1970,11 @@ public final class IslandProto {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBool(1, isDelete_);
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getIdBytes());
-      }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getAuthorBytes());
+        output.writeBytes(2, getPostIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(3, getPostAuthorBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBytes(4, getContentBytes());
@@ -1995,13 +1995,13 @@ public final class IslandProto {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(1, isDelete_);
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getIdBytes());
-      }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getAuthorBytes());
+          .computeBytesSize(2, getPostIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getPostAuthorBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2137,9 +2137,9 @@ public final class IslandProto {
         super.clear();
         isDelete_ = false;
         bitField0_ = (bitField0_ & ~0x00000001);
-        id_ = "";
+        postAuthor_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        author_ = "";
+        postId_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
         content_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -2190,11 +2190,11 @@ public final class IslandProto {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.id_ = id_;
+        result.postAuthor_ = postAuthor_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.author_ = author_;
+        result.postId_ = postId_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
@@ -2222,11 +2222,11 @@ public final class IslandProto {
         if (other.hasIsDelete()) {
           setIsDelete(other.getIsDelete());
         }
-        if (other.hasId()) {
-          setId(other.getId());
+        if (other.hasPostAuthor()) {
+          setPostAuthor(other.getPostAuthor());
         }
-        if (other.hasAuthor()) {
-          setAuthor(other.getAuthor());
+        if (other.hasPostId()) {
+          setPostId(other.getPostId());
         }
         if (other.hasContent()) {
           setContent(other.getContent());
@@ -2243,11 +2243,11 @@ public final class IslandProto {
           
           return false;
         }
-        if (!hasId()) {
+        if (!hasPostAuthor()) {
           
           return false;
         }
-        if (!hasAuthor()) {
+        if (!hasPostId()) {
           
           return false;
         }
@@ -2291,13 +2291,13 @@ public final class IslandProto {
               break;
             }
             case 18: {
-              bitField0_ |= 0x00000002;
-              id_ = input.readBytes();
+              bitField0_ |= 0x00000004;
+              postId_ = input.readBytes();
               break;
             }
             case 26: {
-              bitField0_ |= 0x00000004;
-              author_ = input.readBytes();
+              bitField0_ |= 0x00000002;
+              postAuthor_ = input.readBytes();
               break;
             }
             case 34: {
@@ -2337,75 +2337,75 @@ public final class IslandProto {
         return this;
       }
       
-      // required string id = 2;
-      private java.lang.Object id_ = "";
-      public boolean hasId() {
+      // required string post_author = 3;
+      private java.lang.Object postAuthor_ = "";
+      public boolean hasPostAuthor() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public String getId() {
-        java.lang.Object ref = id_;
+      public String getPostAuthor() {
+        java.lang.Object ref = postAuthor_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          id_ = s;
+          postAuthor_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setId(String value) {
+      public Builder setPostAuthor(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        id_ = value;
+        postAuthor_ = value;
         onChanged();
         return this;
       }
-      public Builder clearId() {
+      public Builder clearPostAuthor() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        id_ = getDefaultInstance().getId();
+        postAuthor_ = getDefaultInstance().getPostAuthor();
         onChanged();
         return this;
       }
-      void setId(com.google.protobuf.ByteString value) {
+      void setPostAuthor(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000002;
-        id_ = value;
+        postAuthor_ = value;
         onChanged();
       }
       
-      // required string author = 3;
-      private java.lang.Object author_ = "";
-      public boolean hasAuthor() {
+      // required string post_id = 2;
+      private java.lang.Object postId_ = "";
+      public boolean hasPostId() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public String getAuthor() {
-        java.lang.Object ref = author_;
+      public String getPostId() {
+        java.lang.Object ref = postId_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          author_ = s;
+          postId_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setAuthor(String value) {
+      public Builder setPostId(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000004;
-        author_ = value;
+        postId_ = value;
         onChanged();
         return this;
       }
-      public Builder clearAuthor() {
+      public Builder clearPostId() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        author_ = getDefaultInstance().getAuthor();
+        postId_ = getDefaultInstance().getPostId();
         onChanged();
         return this;
       }
-      void setAuthor(com.google.protobuf.ByteString value) {
+      void setPostId(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000004;
-        author_ = value;
+        postId_ = value;
         onChanged();
       }
       
@@ -3067,12 +3067,12 @@ public final class IslandProto {
       "\n\014SignedObject\022\016\n\006object\030\001 \002(\t\022\021\n\tsignat" +
       "ure\030\002 \002(\t\"O\n\nPostUpdate\022\021\n\tis_delete\030\001 \002" +
       "(\010\022\n\n\002id\030\002 \002(\t\022\017\n\007content\030\003 \002(\t\022\021\n\ttimes" +
-      "tamp\030\004 \002(\003\"b\n\rCommentUpdate\022\021\n\tis_delete" +
-      "\030\001 \002(\010\022\n\n\002id\030\002 \002(\t\022\016\n\006author\030\003 \002(\t\022\017\n\007co" +
-      "ntent\030\004 \002(\t\022\021\n\ttimestamp\030\005 \002(\003\">\n\007Profil" +
-      "e\022\020\n\010username\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\t\022\017\n",
-      "\007version\030\003 \002(\005B\034\n\032org.island.messaging.p" +
-      "roto"
+      "tamp\030\004 \002(\003\"l\n\rCommentUpdate\022\021\n\tis_delete" +
+      "\030\001 \002(\010\022\023\n\013post_author\030\003 \002(\t\022\017\n\007post_id\030\002" +
+      " \002(\t\022\017\n\007content\030\004 \002(\t\022\021\n\ttimestamp\030\005 \002(\003" +
+      "\">\n\007Profile\022\020\n\010username\030\001 \002(\t\022\020\n\010about_m",
+      "e\030\002 \002(\t\022\017\n\007version\030\003 \002(\005B\034\n\032org.island.m" +
+      "essaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3108,7 +3108,7 @@ public final class IslandProto {
           internal_static_proto_CommentUpdate_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_CommentUpdate_descriptor,
-              new java.lang.String[] { "IsDelete", "Id", "Author", "Content", "Timestamp", },
+              new java.lang.String[] { "IsDelete", "PostAuthor", "PostId", "Content", "Timestamp", },
               org.island.messaging.proto.IslandProto.CommentUpdate.class,
               org.island.messaging.proto.IslandProto.CommentUpdate.Builder.class);
           internal_static_proto_Profile_descriptor =

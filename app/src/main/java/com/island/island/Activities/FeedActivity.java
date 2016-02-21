@@ -35,11 +35,14 @@ import android.widget.TextView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
+import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
+import com.island.island.Models.RawComment;
 import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
@@ -135,9 +138,10 @@ public class FeedActivity extends AppCompatActivity
     private void getPostsFromDatabase() {
         List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
         FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
+        CommentDatabase commentDatabase = CommentDatabase.getInstance(this);
         boolean listChanged = false;
         for (RawPost p : localPosts) {
-            if (addPostToFeed(friendDatabase, p)) {
+            if (addPostToFeed(friendDatabase, commentDatabase, p)) {
                 listChanged = true;
             }
         }
@@ -147,7 +151,7 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
-    private boolean addPostToFeed(FriendDatabase friendDatabase, RawPost p) {
+    private boolean addPostToFeed(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
         int userId = p.getUserId();
         String postAuthor = userId == 0
                 ? Utils.getUser(this)
@@ -164,12 +168,24 @@ public class FeedActivity extends AppCompatActivity
                 insertionPoint,
                 new Post(
                         postAuthor,
+                        p.getPostId(),
                         p.getTimestamp(),
                         p.getContent(),
-                        new ArrayList<>()
+                        getCommentsForPost(friendDatabase, commentDatabase, p)
                 ));
 
         return true;
+    }
+
+    private List<Comment> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
+        List<RawComment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
+        List<Comment> comments = new ArrayList<>();
+        for (RawComment rc : rawComments) {
+            String commentUsername = friendDatabase.getUsername(rc.getCommentUserId());
+            comments.add(new Comment(commentUsername, rc.getContent(), rc.getTimestamp()));
+        }
+
+        return comments;
     }
 
     @Override

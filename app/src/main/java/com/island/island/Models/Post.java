@@ -16,12 +16,14 @@ public class Post implements Serializable
     private String userName = "";
     private long timestamp;
     private String content = "";
+    private String postId = "";
     private List<Comment> comments = new ArrayList<>();
 
-    public Post(String userName, long timestamp, String content,
+    public Post(String userName, String postId, long timestamp, String content,
                 List<Comment> comments)
     {
         this.userName = userName;
+        this.postId = postId;
         this.timestamp = timestamp;
         this.content = content;
         this.comments = comments;
@@ -64,5 +66,9 @@ public class Post implements Serializable
 
     public String getKey() {
         return getUserName() + getTimestamp();
+    }
+
+    public String getPostId() {
+        return postId;
     }
 }

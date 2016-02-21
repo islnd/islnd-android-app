@@ -24,4 +24,8 @@ public class RawPost {
     public int getUserId() {
         return userId;
     }
+
+    public String getPostId() {
+        return postId;
+    }
 }

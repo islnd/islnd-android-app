@@ -23,8 +23,8 @@ message PostUpdate {
 
 message CommentUpdate {
   required bool is_delete = 1;
-  required string id = 2;
-  required string author = 3;
+  required string post_author = 3;
+  required string post_id = 2;
   required string content = 4;
   required int64 timestamp = 5;
 }

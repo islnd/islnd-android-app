@@ -19,6 +19,9 @@ import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+import com.island.island.Utils.Utils;
+
+import org.island.messaging.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +86,7 @@ public class ViewPostActivity extends AppCompatActivity
         }
         else
         {
-            IslandDB.addCommentToPost(post, new Comment("", commentText));
+            IslandDB.addCommentToPost(this, post, new Comment(Utils.getUser(this), commentText));
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }

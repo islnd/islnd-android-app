@@ -12,7 +12,7 @@ import java.util.List;
 public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
-    public static long getPostTimestamp() {
+    public static long getContentTimestamp() {
         return System.currentTimeMillis();
     }
 
