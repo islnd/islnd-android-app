@@ -14,7 +14,7 @@ public class PostUpdate implements ProtoSerializable<PostUpdate> {
         this(id, content, isDelete, Util.getPostTimestamp());
     }
 
-    public PostUpdate(String id, String content, boolean isDelete, long timestamp) {
+    private PostUpdate(String id, String content, boolean isDelete, long timestamp) {
         this.id = id;
         this.content = content;
         this.timestamp = timestamp;

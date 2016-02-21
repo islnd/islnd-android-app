@@ -136,10 +136,6 @@ public class MessageLayer {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         if (!friendDatabase.contains(pk)) {
             friendDatabase.addFriend(pk);
-            Log.v(TAG, String.format(
-                            "friend %s has id %d",
-                            pk.getUsername(),
-                            friendDatabase.getUserId(pk.getUsername())));
             Profile defaultProfile = Util.buildDefaultProfile(context, pk.getUsername());
             ProfileDatabase.getInstance(context).insert(defaultProfile);
             return true;

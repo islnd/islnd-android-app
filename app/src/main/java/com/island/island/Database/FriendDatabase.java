@@ -15,8 +15,8 @@ import java.util.ArrayList;
 /*
     When we add support for unfriending and changing pseudonyms,
     this table will become two tables. The two tables will allow
-    a constant user id and public key, which the pseudonym and group
-    key can change.
+    a constant user id and public key, while the pseudonym and group
+    key change.
  */
 public class FriendDatabase extends SQLiteOpenHelper {
 

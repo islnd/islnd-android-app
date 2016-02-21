@@ -120,43 +120,46 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
-        List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
-        boolean listChanged = false;
-        for (RawPost p : localPosts) {
-            listChanged = addPostToFeed(friendDatabase, listChanged, p);
-        }
-
-        if (listChanged) {
-            mAdapter.notifyDataSetChanged();
-        }
-
-        new GetPostsTask().execute();
+        getPostsFromDatabase();
+        new GetPostsFromServerTask().execute();
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
         refreshLayout.setOnRefreshListener(() ->
         {
-            new GetPostsTask().execute();
+            new GetPostsFromServerTask().execute();
         });
     }
 
-    private boolean addPostToFeed(FriendDatabase friendDatabase, boolean listChanged, RawPost p) {
+    private void getPostsFromDatabase() {
+        List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
+        boolean listChanged = false;
+        for (RawPost p : localPosts) {
+            if (addPostToFeed(friendDatabase, p)) {
+                listChanged = true;
+            }
+        }
+
+        if (listChanged) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private boolean addPostToFeed(FriendDatabase friendDatabase, RawPost p) {
         int userId = p.getUserId();
-        Log.v(TAG, "post from userId " + userId);
         String postAuthor = userId == 0
                 ? Utils.getUser(this)
                 : friendDatabase.getUsername(userId);
 
         String key = postAuthor + p.getTimestamp();
         if (mPostMap.contains(key)) {
-            return listChanged;
+            return false;
         }
 
-        listChanged = true;
         mPostMap.add(key);
-        int insertionPoint = getInsertionPoint(p.getTimestamp());
+        int insertionPoint = getIndexToInsertPost(p.getTimestamp());
         mArrayOfPosts.add(
                 insertionPoint,
                 new Post(
@@ -166,7 +169,7 @@ public class FeedActivity extends AppCompatActivity
                         new ArrayList<>()
                 ));
 
-        return listChanged;
+        return true;
     }
 
     @Override
@@ -254,7 +257,6 @@ public class FeedActivity extends AppCompatActivity
             }
             else if (requestCode == NEW_POST_RESULT) {
                 Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
-                Log.v(TAG, "post return text: " + post.getContent());
                 mArrayOfPosts.add(0, post);
                 mAdapter.notifyDataSetChanged();
             }
@@ -296,9 +298,9 @@ public class FeedActivity extends AppCompatActivity
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
-    private class GetPostsTask extends AsyncTask<Void, Void, List<Post>>
+    private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>>
     {
-        private final String TAG = GetPostsTask.class.getSimpleName();
+        private final String TAG = GetPostsFromServerTask.class.getSimpleName();
 
         @Override
         protected List<Post> doInBackground(Void... params) {
@@ -324,16 +326,17 @@ public class FeedActivity extends AppCompatActivity
                 if (!mPostMap.contains(p.getKey())) {
                     mPostMap.add(p.getKey());
 
-                    int insertionPoint = getInsertionPoint(p.getTimestamp());
+                    int insertionPoint = getIndexToInsertPost(p.getTimestamp());
                     mArrayOfPosts.add(insertionPoint, p);
                     postAdded = true;
                 }
             }
+
             return postAdded;
         }
     }
 
-    private int getInsertionPoint(long postTimestamp) {
+    private int getIndexToInsertPost(long postTimestamp) {
         int insertionPoint = 0;
         while (insertionPoint < mArrayOfPosts.size()
                 && postTimestamp < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
