@@ -29,6 +29,9 @@
         <item
             android:id="@+id/edit_username"
             android:title="Edit Username"/>
+        <item
+            android:id="@+id/set_keystore_password"
+            android:title="Set Keystore Password"/>
     </group>
 
 </menu>

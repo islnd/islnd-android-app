@@ -5,11 +5,13 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -176,6 +178,9 @@ public class FeedActivity extends AppCompatActivity
             case R.id.edit_username:
                 editUsernameDialog();
                 break;
+            case R.id.set_keystore_password:
+                setKeystorePassword();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -329,10 +334,11 @@ public class FeedActivity extends AppCompatActivity
 
         smsEditText = (EditText) dialogView.findViewById(R.id.sms_number_edit_text);
 
-        builder.setPositiveButton(getString(R.string.send), (DialogInterface dialog, int id) ->
-        {
-            sendSms(smsEditText.getText().toString());
-        })
+        builder.setPositiveButton(
+                getString(R.string.send), (DialogInterface dialog, int id) ->
+                {
+                    sendSms(smsEditText.getText().toString());
+                })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
@@ -459,7 +465,6 @@ public class FeedActivity extends AppCompatActivity
 
     private void editUsernameDialog()
     {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         dialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
         builder.setView(dialogView);
@@ -472,6 +477,26 @@ public class FeedActivity extends AppCompatActivity
                     FriendDatabase.getInstance(getApplicationContext()).deleteAll();
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
                     IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void setKeystorePassword()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        dialogView = getLayoutInflater().inflate(R.layout.set_keystore_password_dialog, null);
+        builder.setView(dialogView);
+
+        EditText editText = (EditText) dialogView.findViewById(R.id.set_keystore_password_text);
+
+        builder.setPositiveButton(getString(android.R.string.ok),
+                (DialogInterface dialog, int id) ->
+                {
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(getString(R.string.keystore_password_key), editText.getText().toString());
+                    editor.commit();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
