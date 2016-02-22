@@ -29,6 +29,9 @@
         <item
             android:id="@+id/edit_username"
             android:title="Edit Username"/>
+        <item
+            android:id="@+id/edit_api_key"
+            android:title="Edit API Key"/>
     </group>
 
 </menu>
