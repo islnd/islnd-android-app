@@ -116,8 +116,8 @@ public class MessageLayer {
         Rest.postProfile(pseudonymSeed, profilePost);
     }
 
-    public static String getPseudonym(String seed) {
-        return Rest.getPseudonym(seed);
+    public static String getPseudonym(Context context, String seed) {
+        return Rest.getPseudonym(context, seed);
     }
 
     public static boolean addFriendFromEncodedIdentityString(Context context,

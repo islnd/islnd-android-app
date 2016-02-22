@@ -1,5 +1,6 @@
 package org.island.messaging;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.island.messaging.crypto.EncryptedData;
@@ -106,15 +107,16 @@ public class Rest {
         }
     }
 
-    public static String getPseudonym(String seed) {
+    public static String getPseudonym(Context context, String seed) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         RestInterface service = retrofit.create(RestInterface.class);
+        String key = "secret";
         try {
-            Response<PseudonymResponse> result = service.pseduonym(seed).execute();
+            Response<PseudonymResponse> result = service.pseduonym(seed, key).execute();
             if (result.code() == 200) {
                 return result.body().getPseudonym();
             }

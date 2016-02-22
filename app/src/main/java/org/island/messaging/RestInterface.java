@@ -13,6 +13,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface RestInterface
 {
@@ -27,9 +28,8 @@ public interface RestInterface
     @POST("/post/{pseudonymSeed}")
     Call<Object> post(@Path("pseudonymSeed") String pseudonymSeed, @Body EncryptedPost encryptedPost);
 
-
     @GET("/pseudonym/{seed}")
-    Call<PseudonymResponse> pseduonym(@Path("seed") String seed);
+    Call<PseudonymResponse> pseduonym(@Path("seed") String seed, @Query("key") String key);
 
     @POST("/publicKey/{username}")
     Call<String> postPublicKey(@Path("username") String username, @Body String publicKey);

@@ -94,7 +94,7 @@ public class IslandDB
         new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... params) {
-                return MessageLayer.getPseudonym(params[0]);
+                return MessageLayer.getPseudonym(context, params[0]);
             }
 
             @Override
