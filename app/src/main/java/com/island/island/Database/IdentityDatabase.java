@@ -14,9 +14,9 @@ import java.security.Key;
  * Created by poo on 2/13/16.
  */
 public class IdentityDatabase extends SQLiteOpenHelper {
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
-    public static final String DATABASE_NAME = "Identity2";
+
+    public static final String DATABASE_NAME = "IDENTITY_DATABASE";
+    public static final int DATABASE_VERSION = 1;
 
     public IdentityDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

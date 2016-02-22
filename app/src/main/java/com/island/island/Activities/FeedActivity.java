@@ -36,10 +36,11 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.FriendDatabase;
-import com.island.island.Database.IdentityDatabase;
+import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
+import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
@@ -71,6 +72,7 @@ public class FeedActivity extends AppCompatActivity
     private final static int REQUEST_CONTACT = 1;
 
     private final static int CONTACT_RESULT = 0;
+    private final static int NEW_POST_RESULT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -118,16 +120,56 @@ public class FeedActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Populate feed
-        new GetPostsTask().execute();
+        getPostsFromDatabase();
+        new GetPostsFromServerTask().execute();
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
         refreshLayout.setOnRefreshListener(() ->
         {
-            // TODO: This will add duplicates, okay for now
-            new GetPostsTask().execute();
+            new GetPostsFromServerTask().execute();
         });
+    }
+
+    private void getPostsFromDatabase() {
+        List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
+        boolean listChanged = false;
+        for (RawPost p : localPosts) {
+            if (addPostToFeed(friendDatabase, p)) {
+                listChanged = true;
+            }
+        }
+
+        if (listChanged) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private boolean addPostToFeed(FriendDatabase friendDatabase, RawPost p) {
+        int userId = p.getUserId();
+        String postAuthor = userId == 0
+                ? Utils.getUser(this)
+                : friendDatabase.getUsername(userId);
+
+        String key = postAuthor + p.getTimestamp();
+        if (mPostMap.contains(key)) {
+            return false;
+        }
+
+        mPostMap.add(key);
+        int insertionPoint = getIndexToInsertPost(p.getTimestamp());
+        mArrayOfPosts.add(
+                insertionPoint,
+                new Post(
+                        postAuthor,
+                        p.getTimestamp(),
+                        p.getContent(),
+                        new ArrayList<>()
+                ));
+
+        return true;
     }
 
     @Override
@@ -213,6 +255,11 @@ public class FeedActivity extends AppCompatActivity
                     smsEditText.setText(number);
                 }
             }
+            else if (requestCode == NEW_POST_RESULT) {
+                Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
+                mArrayOfPosts.add(0, post);
+                mAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -248,12 +295,12 @@ public class FeedActivity extends AppCompatActivity
     public void startNewPostActivity(View view)
     {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
-        startActivity(newPostIntent);
+        startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
-    private class GetPostsTask extends AsyncTask<Void, Void, List<Post>>
+    private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>>
     {
-        private final String TAG = GetPostsTask.class.getSimpleName();
+        private final String TAG = GetPostsFromServerTask.class.getSimpleName();
 
         @Override
         protected List<Post> doInBackground(Void... params) {
@@ -262,34 +309,42 @@ public class FeedActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<Post> posts) {
-            boolean adapterChanged = false;
-
             if (posts != null) {
-                for (Post p : posts) {
-                    Log.v(TAG, "looking at post with key " + p.getKey());
-                    if (!mPostMap.contains(p.getKey())) {
-                        mPostMap.add(p.getKey());
-
-                        //--TODO extract and use binary search
-                        int insertionPoint = 0;
-                        while (insertionPoint < mArrayOfPosts.size()
-                                && p.getTimestamp() < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
-                            Log.v(TAG, "" + insertionPoint);
-                            insertionPoint++;
-                        }
-
-                        mArrayOfPosts.add(insertionPoint, p);
-                        adapterChanged = true;
-                    }
+                boolean adapterChanged = addPostsToFeed(posts);
+                if (adapterChanged) {
+                    mAdapter.notifyDataSetChanged();
                 }
             }
 
-            if (adapterChanged) {
-                mAdapter.notifyDataSetChanged();
+            refreshLayout.setRefreshing(false);
+            Utils.printAvailableMemory(getApplicationContext(), TAG);
+        }
+
+        private boolean addPostsToFeed(List<Post> posts) {
+            boolean postAdded = false;
+            for (Post p : posts) {
+                if (!mPostMap.contains(p.getKey())) {
+                    mPostMap.add(p.getKey());
+
+                    int insertionPoint = getIndexToInsertPost(p.getTimestamp());
+                    mArrayOfPosts.add(insertionPoint, p);
+                    postAdded = true;
+                }
             }
 
-            refreshLayout.setRefreshing(false);
+            return postAdded;
         }
+    }
+
+    private int getIndexToInsertPost(long postTimestamp) {
+        int insertionPoint = 0;
+        while (insertionPoint < mArrayOfPosts.size()
+                && postTimestamp < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
+            Log.v(TAG, "" + insertionPoint);
+            insertionPoint++;
+        }
+
+        return insertionPoint;
     }
 
     private void qrCodeActionDialog()
@@ -453,6 +508,7 @@ public class FeedActivity extends AppCompatActivity
             }
             cursorPhone.close();
         }
+
         cursorID.close();
         return contactNumber;
     }
@@ -471,6 +527,7 @@ public class FeedActivity extends AppCompatActivity
                 {
                     FriendDatabase.getInstance(getApplicationContext()).deleteAll();
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
+                    PostDatabase.getInstance(getApplicationContext()).deleteAll();
                     IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)

@@ -12,6 +12,12 @@ import org.island.messaging.PseudonymKey;
 
 import java.util.ArrayList;
 
+/*
+    When we add support for unfriending and changing pseudonyms,
+    this table will become two tables. The two tables will allow
+    a constant user id and public key, while the pseudonym and group
+    key change.
+ */
 public class FriendDatabase extends SQLiteOpenHelper {
 
     private static final String TAG = FriendDatabase.class.getSimpleName();
@@ -20,12 +26,29 @@ public class FriendDatabase extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static FriendDatabase SINGLE = null;
 
+    private static final String ID = "ID";
     private static final String USER_NAME = "USER_NAME";
     private static final String PSEUDONYM = "PSEUDONYM";
     private static final String GROUP_KEY = "GROUP_KEY";
 
     private FriendDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String sql = "CREATE TABLE " + DATABASE_NAME + " ("
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_NAME + " TEXT, "
+                + PSEUDONYM + " TEXT, "
+                + GROUP_KEY + " TEXT)";
+        Log.v(TAG, String.format("Creating database %s", DATABASE_NAME));
+        db.execSQL(sql);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
     }
 
     public static FriendDatabase getInstance(Context context) {
@@ -47,22 +70,9 @@ public class FriendDatabase extends SQLiteOpenHelper {
         writableDatabase.insert(DATABASE_NAME, null, values);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE " + DATABASE_NAME
-                + " (" + USER_NAME + " TEXT, " + PSEUDONYM + " TEXT, GROUP_KEY TEXT)";
-        Log.v(TAG, String.format("Creating database %s", DATABASE_NAME));
-        db.execSQL(sql);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
     public void deleteAll() {
-        SQLiteDatabase delete = getWritableDatabase();
-        delete.delete(DATABASE_NAME, null, null);
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(DATABASE_NAME, null, null);
     }
 
     public int getRows() {
@@ -112,5 +122,35 @@ public class FriendDatabase extends SQLiteOpenHelper {
                 results.getString(0),
                 results.getString(1),
                 CryptoUtil.decodeSymmetricKey(results.getString(2)));
+    }
+
+    public int getUserId(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {ID, USER_NAME};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return -1;
+        }
+
+        results.moveToNext();
+        return results.getInt(0);
+    }
+
+    public String getUsername(int userId) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {ID, USER_NAME};
+        String selection = ID + " = ?";
+        String[] args = {String.valueOf(userId)};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return "";
+        }
+
+        results.moveToNext();
+        return results.getString(1);
     }
 }

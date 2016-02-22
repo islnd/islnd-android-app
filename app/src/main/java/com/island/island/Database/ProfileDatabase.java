@@ -24,6 +24,19 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         super(context, name, factory, version);
     }
 
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String sql = "CREATE TABLE " + DATABASE_NAME
+                + " (" + USER_NAME + " TEXT, " + ABOUT_ME + " TEXT)";
+        Log.v(TAG, String.format("Creating database %s", DATABASE_NAME));
+        db.execSQL(sql);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
     public static ProfileDatabase getInstance(Context context) {
         if (SINGLE == null) {
             SINGLE = new ProfileDatabase(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,22 +55,9 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         writableDatabase.insert(DATABASE_NAME, null, values);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE " + DATABASE_NAME
-                + " (" + USER_NAME + " TEXT, " + ABOUT_ME + " TEXT)";
-        Log.v(TAG, String.format("Creating database %s", DATABASE_NAME));
-        db.execSQL(sql);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
     public void deleteAll() {
-        SQLiteDatabase delete = getWritableDatabase();
-        delete.delete(DATABASE_NAME, null, null);
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(DATABASE_NAME, null, null);
     }
 
     public Profile get(String username) {
