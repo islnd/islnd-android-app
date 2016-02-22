@@ -17,12 +17,17 @@ public class Profile implements Serializable, ProtoSerializable, VersionedConten
 
     private String username = "";
     private String aboutMe = "";
+    private String profileImageUri = "";
+    private String headerImageUri = "";
     private int version;
 
-    public Profile(String username, String aboutMe, int version)
+    public Profile(String username, String aboutMe, String profileImageUri, String headerImageUri,
+                   int version)
     {
         this.username = username;
         this.aboutMe = aboutMe;
+        this.profileImageUri = profileImageUri;
+        this.headerImageUri = headerImageUri;
         this.version = version;
     }
 
@@ -30,13 +35,18 @@ public class Profile implements Serializable, ProtoSerializable, VersionedConten
     {
         return username;
     }
-    {
-        this.username = username;
-    }
 
     public String getAboutMe()
     {
         return aboutMe;
+    }
+
+    public String getProfileImageUri() {
+        return profileImageUri;
+    }
+
+    public String getHeaderImageUri() {
+        return headerImageUri;
     }
 
     public int getVersion() {
@@ -66,6 +76,10 @@ public class Profile implements Serializable, ProtoSerializable, VersionedConten
         }
 
         return new Profile(
-                profile.getUsername(), profile.getAboutMe(), profile.getVersion());
+                profile.getUsername(),
+                profile.getAboutMe(),
+                "",
+                "",
+                profile.getVersion());
     }
 }
