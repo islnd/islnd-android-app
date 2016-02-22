@@ -6,11 +6,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
 import com.island.island.R;
+import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedData;
@@ -58,21 +60,23 @@ public class MessageLayer {
         List<Post> posts = new ArrayList<>();
 
         for (PseudonymKey key: keys) {
+            int userId = friendDatabase.getUserId(key.getUsername());
             List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
-            Log.v(TAG, "posts from " + key.getUsername());
-            Log.v(TAG, "posts from " + key.getPseudonym());
             if (encryptedPosts == null) {
                 Log.d(TAG, "get posts return null");
                 continue;
             }
 
-            Log.v(TAG, encryptedPosts.size() + " posts from " + key.getUsername());
+            PostDatabase postDatabase = PostDatabase.getInstance(context);
             for (EncryptedPost post: encryptedPosts) {
                 //--TODO check that post is signed
                 PostUpdate postUpdate = post.decrypt(key.getKey());
-
                 if (postUpdate != null
                         && !postUpdate.isDeletion()) {
+                    if (!postDatabase.contains(userId, postUpdate)) {
+                        postDatabase.insert(userId, postUpdate);
+                    }
+
                     posts.add(new Post(
                                     key.getUsername(),
                                     postUpdate.getTimestamp(),
@@ -89,7 +93,7 @@ public class MessageLayer {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String lastId = preferences.getString(context.getString(R.string.post_id_key), "0");
         String newId = String.valueOf(Integer.parseInt(lastId) + 1);
-        PostUpdate postUpdate = PostUpdate.buildPost(content, newId);
+        PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
 
