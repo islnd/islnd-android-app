@@ -10,6 +10,7 @@ import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.VersionedContentBuilder;
@@ -106,7 +107,7 @@ public class MessageLayer {
         Rest.post(pseudonymSeed, encryptedPost);
     }
 
-    public static void postProfile(Context context, Profile profile) {
+    public static void postProfile(Context context, ProfileWithImageData profile) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
         String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
@@ -158,7 +159,7 @@ public class MessageLayer {
         return encodeString;
     }
 
-    public static Profile getMostRecentProfile(Context context, String username) {
+    public static ProfileWithImageData getMostRecentProfile(Context context, String username) {
         PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
         List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym());
         if (encryptedProfiles == null) {
@@ -166,7 +167,7 @@ public class MessageLayer {
             return null;
         }
 
-        List<Profile> profiles = new ArrayList<>();
+        List<ProfileWithImageData> profiles = new ArrayList<>();
         for (EncryptedProfile encryptedProfile : encryptedProfiles) {
             //--TODO check signature
             profiles.add(encryptedProfile.decrypt(friendPK.getKey()));

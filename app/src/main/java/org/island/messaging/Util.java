@@ -31,9 +31,12 @@ public class Util {
     }
 
     public static Profile buildDefaultProfile(Context context, String username) {
+        // TODO: default image Uris will probably be assets...
         return new Profile(
                 username,
                 context.getString(R.string.profile_default_about_me),
+                "",
+                "",
                 Integer.MIN_VALUE);
     }
 }

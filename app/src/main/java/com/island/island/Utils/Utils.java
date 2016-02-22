@@ -3,9 +3,12 @@ package com.island.island.Utils;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 import com.island.island.R;
 
 import java.text.SimpleDateFormat;
@@ -88,5 +91,20 @@ public class Utils
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         int memoryClass = am.getMemoryClass();
         Log.v(tag, memoryClass + "mb available");
+    }
+
+    public static Profile saveProfileWithImageData(Context context, ProfileWithImageData profile) {
+        Uri savedProfileImageUri = ImageUtils.saveBitmapToInternalFromByteArray(context,
+                profile.getProfileImageByteArray());
+        Uri savedHeaderImageUri = ImageUtils.saveBitmapToInternalFromByteArray(context,
+                profile.getHeaderImageByteArray());
+
+        return new Profile(
+                profile.getUsername(),
+                profile.getAboutMe(),
+                savedProfileImageUri.toString(),
+                savedHeaderImageUri.toString(),
+                profile.getVersion()
+        );
     }
 }

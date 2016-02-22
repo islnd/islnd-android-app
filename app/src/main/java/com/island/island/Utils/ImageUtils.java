@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,7 +20,9 @@ import java.io.InputStream;
  */
 public class ImageUtils
 {
+    private static String TAG = ImageUtils.class.getSimpleName();
     private static String IMAGE_DIR = "images";
+    private static String PNG_EXT = ".png";
 
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath)
     {
@@ -29,7 +34,6 @@ public class ImageUtils
         {
             outputStream = new FileOutputStream(bitmapPath);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-
             try
             {
                 outputStream.close();
@@ -43,6 +47,33 @@ public class ImageUtils
         {
             e.printStackTrace();
         }
+    }
+
+    public static Uri saveBitmapToInternalStorage(Context context, Bitmap bitmap)
+    {
+        File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
+        File bitmapPath = new File (directory, getCurrentTimeJpgString());
+        FileOutputStream outputStream = null;
+
+        try
+        {
+            outputStream = new FileOutputStream(bitmapPath);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            try
+            {
+                outputStream.close();
+                return Uri.fromFile(bitmapPath);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static Bitmap getBitmapFromInternalStorage(Context context, String filePath)
@@ -61,6 +92,38 @@ public class ImageUtils
         }
 
         return bitmap;
+    }
+
+    public static Uri saveBitmapToInternalFromUri(Context context, Uri uri) {
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Failed to get bitmap from uri.");
+        }
+
+        Uri newUri = null;
+        if (bitmap != null) {
+            newUri = saveBitmapToInternalStorage(context, bitmap);
+            Log.v(TAG, "Failed to get bitmap from uri.");
+        }
+        return newUri;
+    }
+
+    public static Bitmap getBitmapFromUri(Context context, Uri uri) {
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    private static String getCurrentTimeJpgString() {
+        return System.currentTimeMillis() + PNG_EXT;
     }
 
     public static Bitmap getBitmapFromAssets(Context context, String filePath)
@@ -90,5 +153,9 @@ public class ImageUtils
 
     public static Bitmap getBitmapFromByteArray(byte[] image) {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
+    }
+
+    public static Uri saveBitmapToInternalFromByteArray(Context context, byte[] byteArray) {
+        return saveBitmapToInternalStorage(context, getBitmapFromByteArray(byteArray));
     }
 }

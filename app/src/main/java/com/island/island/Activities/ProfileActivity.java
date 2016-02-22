@@ -22,6 +22,7 @@ import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -151,16 +152,21 @@ public class ProfileActivity extends AppCompatActivity
     private class GetProfileTask extends AsyncTask<Void, Void, Void> {
         protected Void doInBackground(Void... params) {
             if (!Utils.isUser(getApplicationContext(), mProfileUsername)) {
-                Profile profile = MessageLayer.getMostRecentProfile(
+                ProfileWithImageData profileWithImageData = MessageLayer.getMostRecentProfile(
                         getApplicationContext(),
                         mProfileUsername);
-                if (profile == null) {
+                if (profileWithImageData == null) {
                     Log.v(TAG, "no profile on network for " + mProfileUsername);
                     return null;
                 }
 
-                ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
-                if (profileDatabase.hasProfile(profile)) {
+                ProfileDatabase profileDatabase =
+                        ProfileDatabase.getInstance(getApplicationContext());
+                Profile profile = Utils.saveProfileWithImageData(getApplicationContext(),
+                        profileWithImageData);
+                String username = profileWithImageData.getUsername();
+
+                if (profileDatabase.hasProfile(username)) {
                     profileDatabase.update(profile);
                 } else {
                     profileDatabase.insert(profile);

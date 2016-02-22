@@ -13,7 +13,7 @@ import java.io.Serializable;
  *
  * This class represents a user profile.
  */
-public class Profile implements Serializable, ProtoSerializable, VersionedContent {
+public class Profile implements Serializable, VersionedContent {
 
     private String username = "";
     private String aboutMe = "";

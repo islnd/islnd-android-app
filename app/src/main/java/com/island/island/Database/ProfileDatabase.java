@@ -95,11 +95,11 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         insert(profile);
     }
 
-    public boolean hasProfile(Profile profile) {
+    public boolean hasProfile(String username) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
         String[] columns = {USER_NAME};
         String selection = USER_NAME + " = ?";
-        String[] args = { profile.getUsername() };
+        String[] args = { username };
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
     }

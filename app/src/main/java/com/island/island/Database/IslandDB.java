@@ -10,6 +10,7 @@ import android.util.Log;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
@@ -214,7 +215,7 @@ public class IslandDB
 
     }
 
-    public static void postProfile(Context context, Profile profile) {
+    public static void postProfile(Context context, ProfileWithImageData profile) {
         new AsyncTask<Void, Void, Void>() {
 
             @Override
