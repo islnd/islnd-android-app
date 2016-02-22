@@ -218,6 +218,9 @@ public class FeedActivity extends AppCompatActivity
             case R.id.edit_username:
                 editUsernameDialog();
                 break;
+            case R.id.edit_api_key:
+                editApiKey();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -529,6 +532,23 @@ public class FeedActivity extends AppCompatActivity
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
                     PostDatabase.getInstance(getApplicationContext()).deleteAll();
                     IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void editApiKey()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        dialogView = getLayoutInflater().inflate(R.layout.edit_api_key_dialog, null);
+        builder.setView(dialogView);
+
+        EditText editText = (EditText) dialogView.findViewById(R.id.edit_api_key_edit_text);
+
+        builder.setPositiveButton(getString(android.R.string.ok),
+                (DialogInterface dialog, int id) ->
+                {
+                    Utils.setApiKey(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
