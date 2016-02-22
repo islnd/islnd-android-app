@@ -52,34 +52,4 @@ public class Profile implements Serializable, ProtoSerializable, VersionedConten
     public int getVersion() {
         return version;
     }
-
-    @Override
-    public byte[] toByteArray() {
-        return IslandProto.Profile.newBuilder()
-                .setUsername(this.username)
-                .setAboutMe(this.aboutMe)
-                .setVersion(this.version)
-                .build()
-                .toByteArray();
-    }
-
-    public static Profile fromProto(String string) {
-        return fromProto(new Decoder().decode(string));
-    }
-
-    public static Profile fromProto(byte[] bytes) {
-        IslandProto.Profile profile = null;
-        try {
-            profile = IslandProto.Profile.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-
-        return new Profile(
-                profile.getUsername(),
-                profile.getAboutMe(),
-                "",
-                "",
-                profile.getVersion());
-    }
 }
