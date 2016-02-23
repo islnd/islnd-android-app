@@ -69,17 +69,21 @@ public class ProfileActivity extends AppCompatActivity
 
         Intent profileIntent = getIntent();
         mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
+        showProfile();
         new GetProfileTask().execute();
     }
 
     private void showProfile() {
-        // Setup profile header
+        mProfile = ProfileDatabase.getInstance(this).get(mProfileUsername);
+
+        if (mProfile == null) {
+            return;
+        }
+
         ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
-
-        mProfile = ProfileDatabase.getInstance(this).get(mProfileUsername);
 
         if(Utils.isUser(this, mProfileUsername))
         {

@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,13 +23,15 @@ public class ImageUtils
 {
     private static String TAG = ImageUtils.class.getSimpleName();
     private static String IMAGE_DIR = "images";
-    private static String PNG_EXT = ".png";
+    private static String JPG_EXT = ".jpg";
 
-    private static String ASSETS_DIR = "file:///android_asset";
     private static String DEFAULT_HEADER_ASSET = "default_header.jpg";
     private static String DEFAULT_PROFILE_ASSET = "default_profile.jpg";
 
     private static String SLASH = "/";
+
+    private static int COMPRESSION = 100;
+    private static int SAMPLE_SIZE = 2;
 
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath)
     {
@@ -39,7 +42,7 @@ public class ImageUtils
         try
         {
             outputStream = new FileOutputStream(bitmapPath);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, outputStream);
             try
             {
                 outputStream.close();
@@ -58,13 +61,13 @@ public class ImageUtils
     public static Uri saveBitmapToInternalStorage(Context context, Bitmap bitmap)
     {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File bitmapPath = new File (directory, getCurrentTimePngString());
+        File bitmapPath = new File (directory, getCurrentTimeJpgString());
         FileOutputStream outputStream = null;
 
         try
         {
             outputStream = new FileOutputStream(bitmapPath);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, outputStream);
             try
             {
                 outputStream.close();
@@ -127,8 +130,26 @@ public class ImageUtils
         return bitmap;
     }
 
-    private static String getCurrentTimePngString() {
-        return System.currentTimeMillis() + PNG_EXT;
+    public static Bitmap getSampledBitmapFromUri(Context context, Uri uri) {
+        InputStream input = null;
+        Bitmap bitmap = null;
+        try {
+            input = context.getContentResolver().openInputStream(uri);
+            BitmapFactory.Options bitmapOptions  = new BitmapFactory.Options();
+            bitmapOptions.inSampleSize = SAMPLE_SIZE;
+            bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+            input.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    private static String getCurrentTimeJpgString() {
+        return System.currentTimeMillis() + JPG_EXT;
     }
 
     public static Bitmap getBitmapFromAssets(Context context, String filePath)
@@ -141,6 +162,7 @@ public class ImageUtils
         {
             inputStream = assetManager.open(filePath);
             bitmap = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
         }
         catch (IOException e)
         {
@@ -178,7 +200,7 @@ public class ImageUtils
 
     public static byte[] getByteArrayFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, stream);
         return stream.toByteArray();
     }
 
