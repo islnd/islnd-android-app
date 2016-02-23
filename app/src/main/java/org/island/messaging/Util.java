@@ -6,6 +6,7 @@ import android.util.Log;
 import com.island.island.Models.Profile;
 import com.island.island.Models.VersionedContent;
 import com.island.island.R;
+import com.island.island.Utils.ImageUtils;
 
 import java.util.List;
 
@@ -35,8 +36,8 @@ public class Util {
         return new Profile(
                 username,
                 context.getString(R.string.profile_default_about_me),
-                "",
-                "",
+                ImageUtils.getDefaultProfileImageUri(context).toString(),
+                ImageUtils.getDefaultHeaderImageUri(context).toString(),
                 Integer.MIN_VALUE);
     }
 }

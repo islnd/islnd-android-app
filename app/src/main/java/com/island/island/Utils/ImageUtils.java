@@ -24,6 +24,12 @@ public class ImageUtils
     private static String IMAGE_DIR = "images";
     private static String PNG_EXT = ".png";
 
+    private static String ASSETS_DIR = "file:///android_asset";
+    private static String DEFAULT_HEADER_ASSET = "default_header.jpg";
+    private static String DEFAULT_PROFILE_ASSET = "default_profile.jpg";
+
+    private static String SLASH = "/";
+
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath)
     {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
@@ -52,7 +58,7 @@ public class ImageUtils
     public static Uri saveBitmapToInternalStorage(Context context, Bitmap bitmap)
     {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File bitmapPath = new File (directory, getCurrentTimeJpgString());
+        File bitmapPath = new File (directory, getCurrentTimePngString());
         FileOutputStream outputStream = null;
 
         try
@@ -106,7 +112,6 @@ public class ImageUtils
         Uri newUri = null;
         if (bitmap != null) {
             newUri = saveBitmapToInternalStorage(context, bitmap);
-            Log.v(TAG, "Failed to get bitmap from uri.");
         }
         return newUri;
     }
@@ -122,7 +127,7 @@ public class ImageUtils
         return bitmap;
     }
 
-    private static String getCurrentTimeJpgString() {
+    private static String getCurrentTimePngString() {
         return System.currentTimeMillis() + PNG_EXT;
     }
 
@@ -143,6 +148,32 @@ public class ImageUtils
         }
 
         return bitmap;
+    }
+
+    public static Uri getDefaultProfileImageUri(Context context) {
+        File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
+        File image = new File (directory, DEFAULT_PROFILE_ASSET);
+
+        if (!image.exists()) {
+            saveBitmapToInternalStorage(
+                    context,
+                    getBitmapFromAssets(context, IMAGE_DIR + SLASH + DEFAULT_PROFILE_ASSET),
+                    DEFAULT_PROFILE_ASSET);
+        }
+        return Uri.fromFile(image);
+    }
+
+    public static Uri getDefaultHeaderImageUri(Context context) {
+        File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
+        File image = new File (directory, DEFAULT_HEADER_ASSET);
+
+        if (!image.exists()) {
+            saveBitmapToInternalStorage(
+                    context,
+                    getBitmapFromAssets(context, IMAGE_DIR + SLASH + DEFAULT_HEADER_ASSET),
+                    DEFAULT_HEADER_ASSET);
+        }
+        return Uri.fromFile(image);
     }
 
     public static byte[] getByteArrayFromBitmap(Bitmap bitmap) {

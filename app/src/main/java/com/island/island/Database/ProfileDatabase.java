@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.island.island.Models.Profile;
+import com.island.island.Utils.ImageUtils;
 
 public class ProfileDatabase extends SQLiteOpenHelper {
 
@@ -21,6 +22,8 @@ public class ProfileDatabase extends SQLiteOpenHelper {
     private static final String ABOUT_ME = "ABOUT_ME";
     private static final String PROFILE_IMAGE_URI = "PROFILE_IMAGE_URI";
     private static final String HEADER_IMAGE_URI = "HEADER_IMAGE_URI";
+
+    private static Context mContext = null;
 
     private ProfileDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -46,6 +49,7 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         if (SINGLE == null) {
             SINGLE = new ProfileDatabase(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
+        mContext = context;
 
         return SINGLE;
     }
@@ -83,6 +87,20 @@ public class ProfileDatabase extends SQLiteOpenHelper {
                 results.getString(2),
                 results.getString(3),
                 Integer.MIN_VALUE);
+    }
+
+    public String getProfileImageUri(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {PROFILE_IMAGE_URI};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return ImageUtils.getDefaultProfileImageUri(mContext).toString();
+        }
+
+        results.moveToNext();
+        return results.getString(0);
     }
 
     public void update(Profile profile) {

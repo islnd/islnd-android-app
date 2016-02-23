@@ -47,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity
 
     private List<Post> mArrayOfPosts;
     private String mProfileUsername;
+    Profile mProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,7 +78,7 @@ public class ProfileActivity extends AppCompatActivity
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        Profile profile = ProfileDatabase.getInstance(this).get(mProfileUsername);
+        mProfile = ProfileDatabase.getInstance(this).get(mProfileUsername);
 
         if(Utils.isUser(this, mProfileUsername))
         {
@@ -88,12 +89,12 @@ public class ProfileActivity extends AppCompatActivity
             });
         }
 
-        aboutMe.setText(profile.getAboutMe());
+        aboutMe.setText(mProfile.getAboutMe());
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mProfileUsername);
-        profileImage.setImageURI(Uri.parse(profile.getProfileImageUri()));
-        headerImage.setImageURI(Uri.parse(profile.getHeaderImageUri()));
+        profileImage.setImageURI(Uri.parse(mProfile.getProfileImageUri()));
+        headerImage.setImageURI(Uri.parse(mProfile.getHeaderImageUri()));
 
         // User posts
         // TODO get the real posts
@@ -147,7 +148,16 @@ public class ProfileActivity extends AppCompatActivity
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
         // TODO: Get profile image uri from database and send string with intent
-        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, "");
+        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, mProfile.getProfileImageUri());
+        startActivity(intent);
+    }
+
+    public void viewHeaderImage(View view)
+    {
+        Intent intent = new Intent(this, ImageViewerActivity.class);
+
+        // TODO: Get profile image uri from database and send string with intent
+        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, mProfile.getHeaderImageUri());
         startActivity(intent);
     }
 
