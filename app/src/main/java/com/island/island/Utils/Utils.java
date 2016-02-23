@@ -15,11 +15,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-/**
- * Created by poo on 1/26/16.
- */
 public class Utils
 {
+    private static final String TAG = Utils.class.getSimpleName();
+
     public static String smartTimestampFromUnixTime(long unixTimeMillis)
     {
         // currentTimeMillis is already in UTC!
@@ -106,5 +105,17 @@ public class Utils
                 savedHeaderImageUri.toString(),
                 profile.getVersion()
         );
+    }
+
+    public static String getApiKey(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.api_key), "");
+    }
+
+    public static void setApiKey(Context context, String apiKey) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.api_key), apiKey);
+        editor.commit();
     }
 }

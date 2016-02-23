@@ -50,7 +50,7 @@ public class IslandDB
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-                MessageLayer.postPublicKey(username, CryptoUtil.decodePublicKey(publicKey));
+                MessageLayer.postPublicKey(context, username, CryptoUtil.decodePublicKey(publicKey));
                 Log.v(TAG, "post key completed");
                 return new Object();
             }
@@ -95,7 +95,7 @@ public class IslandDB
         new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... params) {
-                return MessageLayer.getPseudonym(params[0]);
+                return MessageLayer.getPseudonym(context, params[0]);
             }
 
             @Override

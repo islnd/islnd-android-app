@@ -13,6 +13,7 @@ import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.R;
+import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
@@ -31,7 +32,7 @@ public class MessageLayer {
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
         //FriendDatabase.getInstance(context).deleteAll();
-        List<EncryptedData> keys = Rest.getReaders(username);
+        List<EncryptedData> keys = Rest.getReaders(username, Utils.getApiKey(context));
         if (keys == null) {
             Log.d(TAG, "get readers returned null");
             return new ArrayList<>();
@@ -50,8 +51,8 @@ public class MessageLayer {
         return friends;
     }
 
-    public static void postPublicKey(String username, Key publicKey){
-        Rest.postPublicKey(username, CryptoUtil.encodeKey(publicKey));
+    public static void postPublicKey(Context context, String username, Key publicKey){
+        Rest.postPublicKey(username, CryptoUtil.encodeKey(publicKey), Utils.getApiKey(context));
     }
 
     public static List<Post> getPosts(Context context) {
@@ -62,7 +63,8 @@ public class MessageLayer {
 
         for (PseudonymKey key: keys) {
             int userId = friendDatabase.getUserId(key.getUsername());
-            List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym());
+            String apiKey = Utils.getApiKey(context);
+            List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym(), apiKey);
             if (encryptedPosts == null) {
                 Log.d(TAG, "get posts return null");
                 continue;
@@ -104,7 +106,7 @@ public class MessageLayer {
                 CryptoUtil.decodeSymmetricKey(myGroupKey));
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-        Rest.post(pseudonymSeed, encryptedPost);
+        Rest.post(pseudonymSeed, encryptedPost, Utils.getApiKey(context));
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {
@@ -118,11 +120,11 @@ public class MessageLayer {
                 CryptoUtil.decodeSymmetricKey(myGroupKey));
 
         String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-        Rest.postProfile(pseudonymSeed, profilePost);
+        Rest.postProfile(pseudonymSeed, profilePost, Utils.getApiKey(context));
     }
 
-    public static String getPseudonym(String seed) {
-        return Rest.getPseudonym(seed);
+    public static String getPseudonym(Context context, String seed) {
+        return Rest.getPseudonym(context, seed);
     }
 
     public static boolean addFriendFromEncodedIdentityString(Context context,
@@ -161,7 +163,8 @@ public class MessageLayer {
 
     public static ProfileWithImageData getMostRecentProfile(Context context, String username) {
         PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
-        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym());
+        String apiKey = Utils.getApiKey(context);
+        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym(), apiKey);
         if (encryptedProfiles == null) {
             Log.d(TAG, "profile response was null");
             return null;
