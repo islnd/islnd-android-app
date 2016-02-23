@@ -88,19 +88,12 @@ public class EditProfileActivity extends AppCompatActivity
         String myUsername = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getString(getApplicationContext().getString(R.string.user_name), "");
 
-        Bitmap profileImageBitmap = ImageUtils.getBitmapFromUri(
-                getApplicationContext(),
-                profileImageUri);
-        Bitmap headerImageBitmap = ImageUtils.getBitmapFromUri(
-                getApplicationContext(),
-                headerImageUri);
-
         ProfileWithImageData newProfileWithImageData = VersionedContentBuilder.buildProfile(
                 getApplicationContext(),
                 myUsername,
                 newAboutMeText,
-                ImageUtils.getByteArrayFromBitmap(profileImageBitmap),
-                ImageUtils.getByteArrayFromBitmap(headerImageBitmap)
+                ImageUtils.getByteArrayFromUri(getApplicationContext(), profileImageUri),
+                ImageUtils.getByteArrayFromUri(getApplicationContext(), headerImageUri)
         );
 
         Uri savedProfileImageUri = ImageUtils.saveBitmapToInternalFromUri(getApplicationContext(),

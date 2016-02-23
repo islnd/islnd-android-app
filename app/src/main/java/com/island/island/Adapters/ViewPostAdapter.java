@@ -155,7 +155,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUserName()));
-        ImageUtils.setPostProfileImageSampled(mContext, holder.profileImage, profileImageUri);
+        ImageUtils.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
         if(Utils.isUser(mContext, comment.getUserName()))
         {

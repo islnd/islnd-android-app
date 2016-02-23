@@ -33,8 +33,7 @@ public class ImageUtils
 
     private static String SLASH = "/";
 
-    private static int COMPRESSION = 80;
-    private static int SAMPLE_SIZE = 2;
+    private static int COMPRESSION = 65;
 
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath)
     {
@@ -158,7 +157,7 @@ public class ImageUtils
         return bitmap;
     }
 
-    private static String getCurrentTimeJpgString() {
+    public static String getCurrentTimeJpgString() {
         return System.currentTimeMillis() + JPG_EXT;
     }
 
@@ -208,6 +207,11 @@ public class ImageUtils
         return Uri.fromFile(image);
     }
 
+    public static byte[] getByteArrayFromUri(Context context, Uri uri) {
+        Bitmap bitmap = getBitmapFromUri(context, uri);
+        return getByteArrayFromBitmap(bitmap);
+    }
+
     public static byte[] getByteArrayFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, stream);
@@ -227,10 +231,6 @@ public class ImageUtils
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
-        Log.v(TAG, "height: " + height);
-        Log.v(TAG, "width: " + width);
-        Log.v(TAG, "reqHeight: " + reqHeight);
-        Log.v(TAG, "reqWidth: " + reqWidth);
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
