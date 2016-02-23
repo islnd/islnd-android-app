@@ -136,7 +136,7 @@ public class MessageLayer {
     }
 
     public static String getPseudonym(Context context, String seed) {
-        return Rest.getPseudonym(context, seed);
+        return Rest.getPseudonym(seed, Utils.getApiKey(context));
     }
 
     public static boolean addFriendFromEncodedIdentityString(Context context,
