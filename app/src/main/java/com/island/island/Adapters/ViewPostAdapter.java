@@ -2,6 +2,7 @@ package com.island.island.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
@@ -100,6 +102,10 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mContext.startActivity(profileIntent);
         });
 
+        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
+        holder.postProfileImage.setImageURI(profileImageUri);
+
         if(Utils.isUser(mContext, post.getUserName()))
         {
             holder.postOverflow.setVisibility(View.VISIBLE);
@@ -145,6 +151,10 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUserName());
             mContext.startActivity(profileIntent);
         });
+
+        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUserName()));
+        holder.profileImage.setImageURI(profileImageUri);
 
         if(Utils.isUser(mContext, comment.getUserName()))
         {

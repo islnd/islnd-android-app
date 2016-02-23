@@ -97,8 +97,9 @@ public class FeedActivity extends AppCompatActivity
         // Set user in nav drawer
         View header = navigationView.getHeaderView(0);
         ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
+        ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        final String userName = Utils.getUser(FeedActivity.this);
+        String userName = Utils.getUser(FeedActivity.this);
 
         navProfileImage.setOnClickListener(
                 (View v) ->
@@ -108,6 +109,12 @@ public class FeedActivity extends AppCompatActivity
                     startActivity(profileIntent);
                 });
         navUserName.setText(userName);
+
+        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(userName));
+        Uri headerImageUri = Uri.parse(profileDatabase.getHeaderImageUri(userName));
+        navProfileImage.setImageURI(profileImageUri);
+        navHeaderImage.setImageURI(headerImageUri);
 
         // Feed posts setup
         mArrayOfPosts = new ArrayList<>();

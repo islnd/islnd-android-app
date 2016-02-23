@@ -103,6 +103,20 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         return results.getString(0);
     }
 
+    public String getHeaderImageUri(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {HEADER_IMAGE_URI};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return ImageUtils.getDefaultHeaderImageUri(mContext).toString();
+        }
+
+        results.moveToNext();
+        return results.getString(0);
+    }
+
     public void update(Profile profile) {
         SQLiteDatabase writableDatabase = getWritableDatabase();
         writableDatabase.delete(
@@ -121,5 +135,7 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
     }
+
+
 }
 
