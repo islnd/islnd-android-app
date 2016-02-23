@@ -1,5 +1,6 @@
 package com.island.island.Models;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.island.messaging.Decoder;
@@ -53,8 +54,8 @@ public class ProfileWithImageData implements Serializable, ProtoSerializable, Ve
         return IslandProto.Profile.newBuilder()
                 .setUsername(this.username)
                 .setAboutMe(this.aboutMe)
-                .setProfileImage(this.profileImageByteArray.toString())
-                .setHeaderImage(this.headerImageByteArray.toString())
+                .setProfileImage(ByteString.copyFrom(this.profileImageByteArray))
+                .setHeaderImage(ByteString.copyFrom(this.headerImageByteArray))
                 .setVersion(this.version)
                 .build()
                 .toByteArray();
@@ -76,8 +77,8 @@ public class ProfileWithImageData implements Serializable, ProtoSerializable, Ve
         return new ProfileWithImageData(
                 profile.getUsername(),
                 profile.getAboutMe(),
-                profile.getProfileImage().getBytes(),
-                profile.getProfileImage().getBytes(),
+                profile.getProfileImage().toByteArray(),
+                profile.getHeaderImage().toByteArray(),
                 profile.getVersion());
     }
 }

@@ -2488,13 +2488,13 @@ public final class IslandProto {
     boolean hasAboutMe();
     String getAboutMe();
     
-    // required string profile_image = 3;
+    // required bytes profile_image = 3;
     boolean hasProfileImage();
-    String getProfileImage();
+    com.google.protobuf.ByteString getProfileImage();
     
-    // required string header_image = 4;
+    // required bytes header_image = 4;
     boolean hasHeaderImage();
-    String getHeaderImage();
+    com.google.protobuf.ByteString getHeaderImage();
     
     // required int32 version = 5;
     boolean hasVersion();
@@ -2593,68 +2593,24 @@ public final class IslandProto {
       }
     }
     
-    // required string profile_image = 3;
+    // required bytes profile_image = 3;
     public static final int PROFILE_IMAGE_FIELD_NUMBER = 3;
-    private java.lang.Object profileImage_;
+    private com.google.protobuf.ByteString profileImage_;
     public boolean hasProfileImage() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-    public String getProfileImage() {
-      java.lang.Object ref = profileImage_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          profileImage_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getProfileImageBytes() {
-      java.lang.Object ref = profileImage_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        profileImage_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public com.google.protobuf.ByteString getProfileImage() {
+      return profileImage_;
     }
     
-    // required string header_image = 4;
+    // required bytes header_image = 4;
     public static final int HEADER_IMAGE_FIELD_NUMBER = 4;
-    private java.lang.Object headerImage_;
+    private com.google.protobuf.ByteString headerImage_;
     public boolean hasHeaderImage() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
-    public String getHeaderImage() {
-      java.lang.Object ref = headerImage_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          headerImage_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getHeaderImageBytes() {
-      java.lang.Object ref = headerImage_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        headerImage_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public com.google.protobuf.ByteString getHeaderImage() {
+      return headerImage_;
     }
     
     // required int32 version = 5;
@@ -2670,8 +2626,8 @@ public final class IslandProto {
     private void initFields() {
       username_ = "";
       aboutMe_ = "";
-      profileImage_ = "";
-      headerImage_ = "";
+      profileImage_ = com.google.protobuf.ByteString.EMPTY;
+      headerImage_ = com.google.protobuf.ByteString.EMPTY;
       version_ = 0;
     }
     private byte memoizedIsInitialized = -1;
@@ -2713,10 +2669,10 @@ public final class IslandProto {
         output.writeBytes(2, getAboutMeBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getProfileImageBytes());
+        output.writeBytes(3, profileImage_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getHeaderImageBytes());
+        output.writeBytes(4, headerImage_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(5, version_);
@@ -2740,11 +2696,11 @@ public final class IslandProto {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getProfileImageBytes());
+          .computeBytesSize(3, profileImage_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getHeaderImageBytes());
+          .computeBytesSize(4, headerImage_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2878,9 +2834,9 @@ public final class IslandProto {
         bitField0_ = (bitField0_ & ~0x00000001);
         aboutMe_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        profileImage_ = "";
+        profileImage_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
-        headerImage_ = "";
+        headerImage_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000008);
         version_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -3127,22 +3083,15 @@ public final class IslandProto {
         onChanged();
       }
       
-      // required string profile_image = 3;
-      private java.lang.Object profileImage_ = "";
+      // required bytes profile_image = 3;
+      private com.google.protobuf.ByteString profileImage_ = com.google.protobuf.ByteString.EMPTY;
       public boolean hasProfileImage() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public String getProfileImage() {
-        java.lang.Object ref = profileImage_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          profileImage_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public com.google.protobuf.ByteString getProfileImage() {
+        return profileImage_;
       }
-      public Builder setProfileImage(String value) {
+      public Builder setProfileImage(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -3157,28 +3106,16 @@ public final class IslandProto {
         onChanged();
         return this;
       }
-      void setProfileImage(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
-        profileImage_ = value;
-        onChanged();
-      }
       
-      // required string header_image = 4;
-      private java.lang.Object headerImage_ = "";
+      // required bytes header_image = 4;
+      private com.google.protobuf.ByteString headerImage_ = com.google.protobuf.ByteString.EMPTY;
       public boolean hasHeaderImage() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
-      public String getHeaderImage() {
-        java.lang.Object ref = headerImage_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          headerImage_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public com.google.protobuf.ByteString getHeaderImage() {
+        return headerImage_;
       }
-      public Builder setHeaderImage(String value) {
+      public Builder setHeaderImage(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -3192,11 +3129,6 @@ public final class IslandProto {
         headerImage_ = getDefaultInstance().getHeaderImage();
         onChanged();
         return this;
-      }
-      void setHeaderImage(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
-        headerImage_ = value;
-        onChanged();
       }
       
       // required int32 version = 5;
@@ -3275,8 +3207,8 @@ public final class IslandProto {
       "\030\001 \002(\010\022\n\n\002id\030\002 \002(\t\022\016\n\006author\030\003 \002(\t\022\017\n\007co" +
       "ntent\030\004 \002(\t\022\021\n\ttimestamp\030\005 \002(\003\"k\n\007Profil" +
       "e\022\020\n\010username\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\t\022\025\n",
-      "\rprofile_image\030\003 \002(\t\022\024\n\014header_image\030\004 \002" +
-      "(\t\022\017\n\007version\030\005 \002(\005B\034\n\032org.island.messag" +
+      "\rprofile_image\030\003 \002(\014\022\024\n\014header_image\030\004 \002" +
+      "(\014\022\017\n\007version\030\005 \002(\005B\034\n\032org.island.messag" +
       "ing.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

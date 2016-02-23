@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,8 +24,12 @@ import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
+import java.util.Arrays;
+
 public class EditProfileActivity extends AppCompatActivity
 {
+    private static String TAG = EditProfileActivity.class.getSimpleName();
+
     private EditText aboutMe;
     private ImageView profileImage;
     private ImageView headerImage;
@@ -94,7 +99,6 @@ public class EditProfileActivity extends AppCompatActivity
                 ImageUtils.getByteArrayFromBitmap(headerImageBitmap)
         );
 
-        // Save images and get uris
         Uri savedProfileImageUri = ImageUtils.saveBitmapToInternalFromUri(getApplicationContext(),
                 profileImageUri);
         Uri savedHeaderImageUri = ImageUtils.saveBitmapToInternalFromUri(getApplicationContext(),
