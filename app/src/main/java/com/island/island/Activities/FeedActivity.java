@@ -259,9 +259,11 @@ public class FeedActivity extends AppCompatActivity
                 }
             }
             else if (requestCode == NEW_POST_RESULT) {
-                Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
-                mArrayOfPosts.add(0, post);
-                mAdapter.notifyDataSetChanged();
+                if (data != null) {
+                    Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
+                    mArrayOfPosts.add(0, post);
+                    mAdapter.notifyDataSetChanged();
+                }
             }
         }
     }
