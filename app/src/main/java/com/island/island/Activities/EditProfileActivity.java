@@ -77,7 +77,6 @@ public class EditProfileActivity extends AppCompatActivity
 
     public void saveProfile(View view)
     {
-        // TODO: handle image stuff for saving
         String newAboutMeText = aboutMe.getText().toString();
         String myUsername = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getString(getApplicationContext().getString(R.string.user_name), "");

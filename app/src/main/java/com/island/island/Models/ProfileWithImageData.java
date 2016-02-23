@@ -53,6 +53,8 @@ public class ProfileWithImageData implements Serializable, ProtoSerializable, Ve
         return IslandProto.Profile.newBuilder()
                 .setUsername(this.username)
                 .setAboutMe(this.aboutMe)
+                .setProfileImage(this.profileImageByteArray.toString())
+                .setHeaderImage(this.headerImageByteArray.toString())
                 .setVersion(this.version)
                 .build()
                 .toByteArray();
@@ -74,8 +76,8 @@ public class ProfileWithImageData implements Serializable, ProtoSerializable, Ve
         return new ProfileWithImageData(
                 profile.getUsername(),
                 profile.getAboutMe(),
-                profile.getProfileImageByteArray(),
-                profile.getProfileImageByteArray(),
+                profile.getProfileImage().getBytes(),
+                profile.getProfileImage().getBytes(),
                 profile.getVersion());
     }
 }

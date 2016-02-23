@@ -1,6 +1,7 @@
 package com.island.island.Activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -71,13 +72,12 @@ public class ProfileActivity extends AppCompatActivity
 
     private void showProfile() {
         // Setup profile header
-        ImageView profileHeader = (ImageView) findViewById(R.id.profile_header_image);
+        ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        Profile profile = ProfileDatabase.getInstance(this)
-                .get(mProfileUsername);
+        Profile profile = ProfileDatabase.getInstance(this).get(mProfileUsername);
 
         if(Utils.isUser(this, mProfileUsername))
         {
@@ -92,6 +92,8 @@ public class ProfileActivity extends AppCompatActivity
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mProfileUsername);
+        profileImage.setImageURI(Uri.parse(profile.getProfileImageUri()));
+        headerImage.setImageURI(Uri.parse(profile.getHeaderImageUri()));
 
         // User posts
         // TODO get the real posts

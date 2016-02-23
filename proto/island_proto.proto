@@ -32,5 +32,7 @@ message CommentUpdate {
 message Profile {
   required string username = 1;
   required string about_me = 2;
-  required int32 version = 3;
+  required string profile_image = 3;
+  required string header_image = 4;
+  required int32 version = 5;
 }
