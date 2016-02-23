@@ -17,6 +17,7 @@ import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.R;
+import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.GlancePostViewHolder;
 
@@ -67,7 +68,7 @@ public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
-        holder.postProfileImage.setImageURI(profileImageUri);
+        ImageUtils.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
         // View post on post click
         holder.itemView.setOnClickListener((View v) ->

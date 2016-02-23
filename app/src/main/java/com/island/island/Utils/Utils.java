@@ -101,8 +101,8 @@ public class Utils
         return new Profile(
                 profile.getUsername(),
                 profile.getAboutMe(),
-                savedProfileImageUri.toString(),
-                savedHeaderImageUri.toString(),
+                savedProfileImageUri,
+                savedHeaderImageUri,
                 profile.getVersion()
         );
     }
@@ -117,5 +117,17 @@ public class Utils
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(context.getString(R.string.api_key), apiKey);
         editor.commit();
+    }
+
+    public static float dpFromPx(final Context context, final float px) {
+        return px / context.getResources().getDisplayMetrics().density;
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
+
+    public static int getDpFromResource(Context context, int res) {
+        return (int) Utils.dpFromPx(context, context.getResources().getDimension(res));
     }
 }

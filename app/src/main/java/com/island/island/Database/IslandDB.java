@@ -221,6 +221,7 @@ public class IslandDB
             @Override
             protected Void doInBackground(Void... params) {
                 MessageLayer.postProfile(context, profile);
+                Log.v(TAG, "profile posted to server");
                 return null;
             }
         }.execute();

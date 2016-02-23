@@ -17,6 +17,7 @@ import com.island.island.Dialogs;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.R;
+import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.CommentViewHolder;
 import com.island.island.ViewHolders.PostViewHolder;
@@ -104,7 +105,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
-        holder.postProfileImage.setImageURI(profileImageUri);
+        ImageUtils.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
         if(Utils.isUser(mContext, post.getUserName()))
         {
@@ -154,7 +155,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUserName()));
-        holder.profileImage.setImageURI(profileImageUri);
+        ImageUtils.setPostProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
         if(Utils.isUser(mContext, comment.getUserName()))
         {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.util.Log;
 
 import com.island.island.Models.Profile;
@@ -59,8 +60,8 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(USER_NAME, profile.getUsername());
         values.put(ABOUT_ME, profile.getAboutMe());
-        values.put(PROFILE_IMAGE_URI, profile.getProfileImageUri());
-        values.put(HEADER_IMAGE_URI, profile.getHeaderImageUri());
+        values.put(PROFILE_IMAGE_URI, profile.getProfileImageUri().toString());
+        values.put(HEADER_IMAGE_URI, profile.getHeaderImageUri().toString());
         Log.v(TAG, "adding profile for " + profile.getUsername());
 
         writableDatabase.insert(DATABASE_NAME, null, values);
@@ -84,8 +85,8 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         results.moveToNext();
         return new Profile(results.getString(0),
                 results.getString(1),
-                results.getString(2),
-                results.getString(3),
+                Uri.parse(results.getString(2)),
+                Uri.parse(results.getString(3)),
                 Integer.MIN_VALUE);
     }
 

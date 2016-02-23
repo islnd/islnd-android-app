@@ -7,6 +7,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.ImageView;
+
+import com.island.island.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,7 +33,7 @@ public class ImageUtils
 
     private static String SLASH = "/";
 
-    private static int COMPRESSION = 100;
+    private static int COMPRESSION = 80;
     private static int SAMPLE_SIZE = 2;
 
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath)
@@ -130,18 +133,25 @@ public class ImageUtils
         return bitmap;
     }
 
-    public static Bitmap getSampledBitmapFromUri(Context context, Uri uri) {
-        InputStream input = null;
+    public static Bitmap getSampledBitmapFromUri(Context context, Uri uri, int reqWidth,
+                                                 int reqHeight) {
         Bitmap bitmap = null;
         try {
-            input = context.getContentResolver().openInputStream(uri);
-            BitmapFactory.Options bitmapOptions  = new BitmapFactory.Options();
-            bitmapOptions.inSampleSize = SAMPLE_SIZE;
-            bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
-            input.close();
+            // First decode with inJustDecodeBounds=true to check dimensions
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri),
+                    null, options);
+
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+            Log.v(TAG, "sample size: " + options.inSampleSize);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri),
+                    null, options);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -210,5 +220,97 @@ public class ImageUtils
 
     public static Uri saveBitmapToInternalFromByteArray(Context context, byte[] byteArray) {
         return saveBitmapToInternalStorage(context, getBitmapFromByteArray(byteArray));
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth,
+                                            int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        Log.v(TAG, "height: " + height);
+        Log.v(TAG, "width: " + width);
+        Log.v(TAG, "reqHeight: " + reqHeight);
+        Log.v(TAG, "reqWidth: " + reqWidth);
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    public static void setProfileImageSampled(Context context, ImageView imageView, Uri uri) {
+        int profileDimen = Utils.getDpFromResource(context, R.dimen.profile_profile_image);
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                profileDimen,
+                profileDimen));
+    }
+
+    public static void setHeaderImageSampled(Context context, ImageView imageView, Uri uri) {
+        int headerHeightDimen = Utils.getDpFromResource(context, R.dimen.profile_header_height);
+        int headerWidthDimen = 2*headerHeightDimen;
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                headerWidthDimen,
+                headerHeightDimen));
+    }
+
+    public static void setPostProfileImageSampled(Context context, ImageView imageView, Uri uri) {
+        int profileDimen = Utils.getDpFromResource(context, R.dimen.post_profile_image);
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                profileDimen,
+                profileDimen));
+    }
+
+    public static void setCommentProfileImageSampled(Context context, ImageView imageView, Uri uri) {
+        int profileDimen = Utils.getDpFromResource(context, R.dimen.comment_profile_image);
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                profileDimen,
+                profileDimen));
+    }
+
+    public static void setViewFriendImageSampled(Context context, ImageView imageView, Uri uri) {
+        int profileDimen = Utils.getDpFromResource(context, R.dimen.friend_profile_image);
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                profileDimen,
+                profileDimen));
+    }
+
+    public static void setNavProfileImageSampled(Context context, ImageView imageView, Uri uri) {
+        int profileDimen = Utils.getDpFromResource(context, R.dimen.nav_profile_image);
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                profileDimen,
+                profileDimen));
+    }
+
+    public static void setNavHeaderImageSampled(Context context, ImageView imageView, Uri uri) {
+        int headerHeightDimen = Utils.getDpFromResource(context, R.dimen.nav_header_height);
+        int headerWidthDimen = 2*headerHeightDimen;
+        imageView.setImageBitmap(ImageUtils.getSampledBitmapFromUri(
+                context,
+                uri,
+                headerWidthDimen,
+                headerHeightDimen));
     }
 }

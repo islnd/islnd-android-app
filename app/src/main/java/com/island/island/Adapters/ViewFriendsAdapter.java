@@ -16,6 +16,7 @@ import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.User;
 import com.island.island.R;
+import com.island.island.Utils.ImageUtils;
 import com.island.island.ViewHolders.FriendGlanceViewHolder;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(user.getUserName()));
-        holder.profileImage.setImageURI(profileImageUri);
+        ImageUtils.setViewFriendImageSampled(mContext, holder.profileImage, profileImageUri);
 
         holder.overflow.setOnClickListener((View v) ->
         {

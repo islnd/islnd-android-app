@@ -1,10 +1,6 @@
 package com.island.island.Models;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import org.island.messaging.Decoder;
-import org.island.messaging.ProtoSerializable;
-import org.island.messaging.proto.IslandProto;
+import android.net.Uri;
 
 import java.io.Serializable;
 
@@ -17,11 +13,11 @@ public class Profile implements Serializable, VersionedContent {
 
     private String username = "";
     private String aboutMe = "";
-    private String profileImageUri = "";
-    private String headerImageUri = "";
+    private Uri profileImageUri;
+    private Uri headerImageUri;
     private int version;
 
-    public Profile(String username, String aboutMe, String profileImageUri, String headerImageUri,
+    public Profile(String username, String aboutMe, Uri profileImageUri, Uri headerImageUri,
                    int version)
     {
         this.username = username;
@@ -41,11 +37,11 @@ public class Profile implements Serializable, VersionedContent {
         return aboutMe;
     }
 
-    public String getProfileImageUri() {
+    public Uri getProfileImageUri() {
         return profileImageUri;
     }
 
-    public String getHeaderImageUri() {
+    public Uri getHeaderImageUri() {
         return headerImageUri;
     }
 

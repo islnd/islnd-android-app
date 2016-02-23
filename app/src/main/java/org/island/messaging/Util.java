@@ -1,7 +1,6 @@
 package org.island.messaging;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.island.island.Models.Profile;
 import com.island.island.Models.VersionedContent;
@@ -36,8 +35,8 @@ public class Util {
         return new Profile(
                 username,
                 context.getString(R.string.profile_default_about_me),
-                ImageUtils.getDefaultProfileImageUri(context).toString(),
-                ImageUtils.getDefaultHeaderImageUri(context).toString(),
+                ImageUtils.getDefaultProfileImageUri(context),
+                ImageUtils.getDefaultHeaderImageUri(context),
                 Integer.MIN_VALUE);
     }
 }

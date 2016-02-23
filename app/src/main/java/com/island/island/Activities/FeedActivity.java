@@ -43,6 +43,7 @@ import com.island.island.Database.IslandDB;
 import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
@@ -113,8 +114,10 @@ public class FeedActivity extends AppCompatActivity
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(userName));
         Uri headerImageUri = Uri.parse(profileDatabase.getHeaderImageUri(userName));
-        navProfileImage.setImageURI(profileImageUri);
-        navHeaderImage.setImageURI(headerImageUri);
+        ImageUtils.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
+                profileImageUri);
+        ImageUtils.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
+                headerImageUri);
 
         // Feed posts setup
         mArrayOfPosts = new ArrayList<>();

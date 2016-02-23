@@ -1,5 +1,6 @@
 package com.island.island.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,6 +29,7 @@ import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
@@ -98,8 +100,9 @@ public class ProfileActivity extends AppCompatActivity
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mProfileUsername);
-        profileImage.setImageURI(Uri.parse(mProfile.getProfileImageUri()));
-        headerImage.setImageURI(Uri.parse(mProfile.getHeaderImageUri()));
+        Context context = getApplicationContext();
+        ImageUtils.setProfileImageSampled(context, profileImage, mProfile.getProfileImageUri());
+        ImageUtils.setHeaderImageSampled(context, headerImage, mProfile.getHeaderImageUri());
 
         // User posts
         // TODO get the real posts
