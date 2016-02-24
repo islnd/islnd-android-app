@@ -22,6 +22,9 @@ import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
+import com.soundcloud.android.crop.Crop;
+
+import java.io.File;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static String TAG = EditProfileActivity.class.getSimpleName();
@@ -37,6 +40,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private static final int SELECT_PROFILE_IMAGE = 1;
     private static final int SELECT_HEADER_IMAGE = 2;
+    private static final int CROP_PROFILE_IMAGE = 3;
+    private static final int CROP_HEADER_IMAGE = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,17 +72,24 @@ public class EditProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
+        if(resultCode == RESULT_OK) {
             if (requestCode == SELECT_PROFILE_IMAGE) {
-                profileImageUri = data.getData();
-                ImageUtils.setProfileImageSampled(getApplicationContext(),
-                        profileImage, profileImageUri);
-
-            }
-            else if(requestCode == SELECT_HEADER_IMAGE) {
-                headerImageUri = data.getData();
-                ImageUtils.setHeaderImageSampled(getApplicationContext(),
-                        headerImage, headerImageUri);
+                Uri destination = Uri.fromFile(new File(getCacheDir(), "croppedProfile"));
+                Crop.of(data.getData(), destination).asSquare().start(this, CROP_PROFILE_IMAGE);
+            } else if (requestCode == SELECT_HEADER_IMAGE) {
+                Uri destination = Uri.fromFile(new File(getCacheDir(), "croppedHeader"));
+                Crop.of(data.getData(), destination).withAspect(
+                        headerImage.getWidth(),
+                        headerImage.getHeight()
+                ).start(this, CROP_HEADER_IMAGE);
+            } else if (requestCode == CROP_PROFILE_IMAGE) {
+                profileImageUri = Crop.getOutput(data);
+                ImageUtils.setProfileImageSampled(getApplicationContext(), profileImage,
+                        profileImageUri);
+            } else if (requestCode == CROP_HEADER_IMAGE) {
+                headerImageUri = Crop.getOutput(data);
+                ImageUtils.setHeaderImageSampled(getApplicationContext(), headerImage,
+                        headerImageUri);
             }
         }
     }
@@ -119,18 +131,10 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     public void chooseProfileImage(View view) {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_image)),
-                SELECT_PROFILE_IMAGE);
+        Crop.pickImage(this, SELECT_PROFILE_IMAGE);
     }
 
     public void chooseHeaderImage(View view) {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_image)),
-                SELECT_HEADER_IMAGE);
+        Crop.pickImage(this, SELECT_HEADER_IMAGE);
     }
 }

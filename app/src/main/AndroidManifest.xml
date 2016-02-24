@@ -66,6 +66,9 @@
                   android:theme="@style/zxing_CaptureTheme"
                   android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity"
+            android:theme="@style/IslandCrop">
+        </activity>
         <receiver
             android:name=".SmsReceiver"
             android:permission="android.permission.BROADCAST_SMS"
