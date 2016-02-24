@@ -105,6 +105,10 @@ public class FriendDatabase extends SQLiteOpenHelper {
         return keys;
     }
 
+    public void getKey(int postAuthorId) {
+
+    }
+
     public PseudonymKey getKey(String username) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
 
@@ -167,5 +171,20 @@ public class FriendDatabase extends SQLiteOpenHelper {
 
         results.moveToNext();
         return results.getString(1);
+    }
+
+    public String getUsernameFromPseudonym(String postAuthorPseudonym) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        String[] columns = {USER_NAME, PSEUDONYM};
+        String selection = PSEUDONYM + " = ?";
+        String[] args = {postAuthorPseudonym};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return "";
+        }
+
+        results.moveToNext();
+        return results.getString(0);
     }
 }

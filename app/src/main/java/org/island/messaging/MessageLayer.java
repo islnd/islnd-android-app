@@ -2,12 +2,14 @@ package org.island.messaging;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.User;
@@ -16,10 +18,13 @@ import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
+import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.crypto.EncryptedPost;
 import org.island.messaging.crypto.EncryptedProfile;
 import org.island.messaging.crypto.ObjectEncrypter;
+import org.island.messaging.server.CommentQuery;
+import org.island.messaging.server.CommentQueryRequest;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -110,15 +115,28 @@ public class MessageLayer {
     public static void comment(Context context, CommentUpdate commentUpdate) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        String postAuthorGroupKey = FriendDatabase.getInstance(context).getKey()
+
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        String postAuthorPseudonym = commentUpdate.getPostAuthorPseudonym();
+        String postAuthorUsername = friendDatabase.getUsernameFromPseudonym(postAuthorPseudonym);
+        PseudonymKey postAuthorGroupKey = friendDatabase.getKey(postAuthorUsername);
 
         EncryptedComment encryptedComment = new EncryptedComment(
                 commentUpdate,
                 CryptoUtil.decodePrivateKey(privateKey),
-                CryptoUtil.decodeSymmetricKey(postAuthorGroupKey));
+                postAuthorGroupKey.getKey(),
+                postAuthorPseudonym,
+                commentUpdate.getPostId());
 
-        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-        Rest.post(pseudonymSeed, encryptedPost);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Rest.postComment(
+                        encryptedComment,
+                        Utils.getApiKey(context));
+                return null;
+            }
+        }.execute();
     }
 
     public static void postProfile(Context context, Profile profile) {
@@ -189,5 +207,25 @@ public class MessageLayer {
         }
 
         return Util.getNewest(profiles);
+    }
+
+    public static List<Comment> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
+        List<CommentQuery> queries = new ArrayList<>();
+        queries.add(new CommentQuery(postAuthorPseudonymKey.getPseudonym(), postId));
+        Log.v(TAG, String.format("query: pseud %s postId %s", postAuthorPseudonymKey.getPseudonym(), postId));
+        CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
+
+        List<EncryptedComment> encryptedComments = Rest.getComments(commentQueryPost, Utils.getApiKey(context));
+
+        List<Comment> comments = new ArrayList<>();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        for (EncryptedComment ec : encryptedComments) {
+            CommentUpdate commentUpdate = ec.decrypt(postAuthorPseudonymKey.getKey());
+            String commentAuthorUsername =
+                    friendDatabase.getUsernameFromPseudonym(commentUpdate.getPostAuthorPseudonym());
+            comments.add(new Comment(commentAuthorUsername, commentUpdate.getContent(), commentUpdate.getTimestamp()));
+        }
+
+        return comments;
     }
 }

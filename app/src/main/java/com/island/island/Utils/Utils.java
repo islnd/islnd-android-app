@@ -75,6 +75,11 @@ public class Utils
         return sharedPref.getString(context.getString(R.string.user_name), "");
     }
 
+    public static String getPseudonym(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.pseudonym), "");
+    }
+
     public static void setUser(Context context, String userName)
     {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);

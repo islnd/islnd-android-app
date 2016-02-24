@@ -23,10 +23,11 @@ message PostUpdate {
 
 message CommentUpdate {
   required bool is_delete = 1;
-  required string post_author = 3;
-  required string post_id = 2;
-  required string content = 4;
-  required int64 timestamp = 5;
+  required string post_author_pseudonym = 2;
+  required string comment_author_pseudonym = 3;
+  required string post_id = 4;
+  required string content = 5;
+  required int64 timestamp = 6;
 }
 
 message Profile {

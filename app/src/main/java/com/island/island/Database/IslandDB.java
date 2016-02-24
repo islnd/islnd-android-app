@@ -85,14 +85,6 @@ public class IslandDB
         //--Add a default profile
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
         profileDatabase.insert(Util.buildDefaultProfile(context, username));
-
-        //--Adding our data to the user database. Since getting our pseudonym is async, we can't
-        //  guarantee we will the data at this point. TODO fix this when we split the friend
-        //  database into two different databases
-        FriendDatabase.getInstance(context).addFriend(
-                new PseudonymKey(
-                        0, username, "",
-                        CryptoUtil.getKey())); // THIS KEY IS FAKE
     }
 
     private static void setPseudonym(Context context) {
@@ -115,6 +107,13 @@ public class IslandDB
 
                 Log.v(TAG, "pseudonym " + pseudonym);
                 Log.v(TAG, "pseudonym seed " + seed);
+
+                FriendDatabase.getInstance(context).addFriend(
+                        new PseudonymKey(
+                                0,
+                                Utils.getUser(context),
+                                Utils.getPseudonym(context),
+                                CryptoUtil.getKey())); // THIS KEY IS FAKE
             }
         }.execute(seed);
     }
@@ -224,17 +223,21 @@ public class IslandDB
     {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         int postUserId = friendDatabase.getUserId(post.getUserName()); // this will be user database
+        Log.v(TAG, String.format("username %s has id %d", post.getUserName(), postUserId));
         int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
         String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
+        String myPseudonym = Utils.getPseudonym(context);
         String postId = post.getPostId();
+
         //--TODO comment update should be built in message layer
         CommentUpdate commentUpdate = CommentUpdate.buildComment(
                 postAuthorPseudonym,
+                myPseudonym,
                 postId,
                 comment.getComment());
-        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
 
-        MessageLayer.comment(postAuthorPseudonym, postId, comment.getComment());
+        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
+        MessageLayer.comment(context, commentUpdate);
     }
 
     public static void postProfile(Context context, Profile profile) {
