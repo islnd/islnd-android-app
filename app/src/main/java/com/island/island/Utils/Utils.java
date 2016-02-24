@@ -3,9 +3,12 @@ package com.island.island.Utils;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 import com.island.island.R;
 
 import java.text.SimpleDateFormat;
@@ -89,6 +92,21 @@ public class Utils
         Log.v(tag, memoryClass + "mb available");
     }
 
+    public static Profile saveProfileWithImageData(Context context, ProfileWithImageData profile) {
+        Uri savedProfileImageUri = ImageUtils.saveBitmapToInternalFromByteArray(context,
+                profile.getProfileImageByteArray());
+        Uri savedHeaderImageUri = ImageUtils.saveBitmapToInternalFromByteArray(context,
+                profile.getHeaderImageByteArray());
+
+        return new Profile(
+                profile.getUsername(),
+                profile.getAboutMe(),
+                savedProfileImageUri,
+                savedHeaderImageUri,
+                profile.getVersion()
+        );
+    }
+
     public static String getApiKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.api_key), "");
@@ -99,5 +117,17 @@ public class Utils
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(context.getString(R.string.api_key), apiKey);
         editor.commit();
+    }
+
+    public static float dpFromPx(final Context context, final float px) {
+        return px / context.getResources().getDisplayMetrics().density;
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
+
+    public static int getDpFromResource(Context context, int res) {
+        return (int) Utils.dpFromPx(context, context.getResources().getDimension(res));
     }
 }

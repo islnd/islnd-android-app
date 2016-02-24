@@ -25,6 +25,7 @@
                 android:id="@+id/profile_header_image"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_header_height"
+                android:scaleType="centerCrop"
                 android:src="@drawable/side_nav_bar"/>
 
             <RelativeLayout
@@ -52,8 +53,7 @@
                 android:id="@+id/profile_profile_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_person_black_24dp"
-                android:background="@android:color/white"/>
+                android:scaleType="centerCrop"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
