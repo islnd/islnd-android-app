@@ -38,8 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity
-{
+public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
     public static String USER_NAME_EXTRA = "USER_NAME";
 
@@ -50,11 +49,10 @@ public class ProfileActivity extends AppCompatActivity
 
     private List<Post> mArrayOfPosts;
     private String mProfileUsername;
-    Profile mProfile;
+    private Profile mProfile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,11 +85,9 @@ public class ProfileActivity extends AppCompatActivity
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        if(Utils.isUser(this, mProfileUsername))
-        {
+        if(Utils.isUser(this, mProfileUsername)) {
             editProfile.setVisibility(View.VISIBLE);
-            editProfile.setOnClickListener((View v) ->
-            {
+            editProfile.setOnClickListener((View v) -> {
                 startActivity(new Intent(this, EditProfileActivity.class));
             });
         }
@@ -112,17 +108,14 @@ public class ProfileActivity extends AppCompatActivity
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
-        refreshLayout.setOnRefreshListener(
-                () ->
-                {
+        refreshLayout.setOnRefreshListener(() -> {
                     // TODO: Run async task again
                     refreshLayout.setRefreshing(false);
                 });
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile_menu, menu);
 
@@ -131,12 +124,10 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.remove_friend)
-        {
+        if (id == R.id.remove_friend) {
             Dialogs.removeFriendDialog(this, mProfileUsername);
             // TODO: What behavior do we want after removing friend?
             // Probably go back to feed.
@@ -145,27 +136,24 @@ public class ProfileActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void startNewPostActivity(View view)
-    {
+    public void startNewPostActivity(View view) {
         Intent newPostIntent = new Intent(ProfileActivity.this, NewPostActivity.class);
         startActivity(newPostIntent);
     }
 
-    public void viewProfileImage(View view)
-    {
+    public void viewProfileImage(View view) {
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
-        // TODO: Get profile image uri from database and send string with intent
-        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, mProfile.getProfileImageUri());
+        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
+                mProfile.getProfileImageUri().toString());
         startActivity(intent);
     }
 
-    public void viewHeaderImage(View view)
-    {
+    public void viewHeaderImage(View view) {
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
-        // TODO: Get profile image uri from database and send string with intent
-        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI, mProfile.getHeaderImageUri());
+        intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
+                mProfile.getHeaderImageUri().toString());
         startActivity(intent);
     }
 

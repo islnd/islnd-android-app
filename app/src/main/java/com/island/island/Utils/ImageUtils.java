@@ -19,9 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Created by poo on 2/10/2016.
- */
 public class ImageUtils
 {
     private static String TAG = ImageUtils.class.getSimpleName();
@@ -39,11 +36,10 @@ public class ImageUtils
     {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
         File bitmapPath = new File (directory, filePath);
-        FileOutputStream outputStream = null;
 
         try
         {
-            outputStream = new FileOutputStream(bitmapPath);
+            FileOutputStream outputStream = new FileOutputStream(bitmapPath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, outputStream);
             try
             {
@@ -64,11 +60,10 @@ public class ImageUtils
     {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
         File bitmapPath = new File (directory, getCurrentTimeJpgString());
-        FileOutputStream outputStream = null;
 
         try
         {
-            outputStream = new FileOutputStream(bitmapPath);
+            FileOutputStream outputStream = new FileOutputStream(bitmapPath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, outputStream);
             try
             {
@@ -144,7 +139,6 @@ public class ImageUtils
 
             // Calculate inSampleSize
             options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-            Log.v(TAG, "sample size: " + options.inSampleSize);
 
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
