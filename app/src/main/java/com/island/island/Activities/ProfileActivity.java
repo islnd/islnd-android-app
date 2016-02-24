@@ -2,7 +2,6 @@ package com.island.island.Activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -11,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,18 +22,13 @@ import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
-import com.island.island.Models.ProfileWithImageData;
-import com.island.island.Models.User;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 
-import org.island.messaging.MessageLayer;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -69,17 +62,14 @@ public class ProfileActivity extends AppCompatActivity {
 
         Intent profileIntent = getIntent();
         mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        showProfile();
+        mProfile = IslandDB.getProfile(getApplicationContext(), mProfileUsername);
+        if (mProfile != null) {
+            showProfile();
+        }
         new GetProfileTask().execute();
     }
 
     private void showProfile() {
-        mProfile = ProfileDatabase.getInstance(this).get(mProfileUsername);
-
-        if (mProfile == null) {
-            return;
-        }
-
         ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
@@ -159,27 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private class GetProfileTask extends AsyncTask<Void, Void, Void> {
         protected Void doInBackground(Void... params) {
-            if (!Utils.isUser(getApplicationContext(), mProfileUsername)) {
-                ProfileWithImageData profileWithImageData = MessageLayer.getMostRecentProfile(
-                        getApplicationContext(),
-                        mProfileUsername);
-                if (profileWithImageData == null) {
-                    Log.v(TAG, "no profile on network for " + mProfileUsername);
-                    return null;
-                }
-
-                ProfileDatabase profileDatabase =
-                        ProfileDatabase.getInstance(getApplicationContext());
-                Profile profile = Utils.saveProfileWithImageData(getApplicationContext(),
-                        profileWithImageData);
-                String username = profileWithImageData.getUsername();
-
-                if (profileDatabase.hasProfile(username)) {
-                    profileDatabase.update(profile);
-                } else {
-                    profileDatabase.insert(profile);
-                }
-            }
+            mProfile = IslandDB.getMostRecentProfile(getApplicationContext(), mProfileUsername);
 
             return null;
         }

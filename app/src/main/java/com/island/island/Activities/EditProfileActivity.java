@@ -84,8 +84,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     public void saveProfile(View view) {
         String newAboutMeText = aboutMe.getText().toString();
-        String myUsername = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getString(getApplicationContext().getString(R.string.user_name), "");
+        String myUsername = Utils.getUser(getApplicationContext());
 
         // TODO: Implement separate REST calls for profile/header images
         Uri newProfileUri = profileImageUri == null ? prevProfileImageUri : profileImageUri;

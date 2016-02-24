@@ -226,4 +226,35 @@ public class IslandDB
             }
         }.execute();
     }
+
+    public static Profile getProfile(Context context, String username) {
+        return ProfileDatabase.getInstance(context).get(username);
+    }
+
+    public static Profile getMostRecentProfile(Context context, String username) {
+        Profile profile;
+
+        if (!Utils.isUser(context, username)) {
+            ProfileWithImageData profileWithImageData = MessageLayer.getMostRecentProfile(
+                    context,
+                    username);
+            if (profileWithImageData == null) {
+                Log.v(TAG, "no profile on network for " + username);
+                return null;
+            }
+
+            ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
+            profile = Utils.saveProfileWithImageData(context, profileWithImageData);
+
+            if (profileDatabase.hasProfile(username)) {
+                profileDatabase.update(profile);
+            } else {
+                profileDatabase.insert(profile);
+            }
+        } else {
+            profile = ProfileDatabase.getInstance(context).get(username);
+        }
+
+        return profile;
+    }
 }
