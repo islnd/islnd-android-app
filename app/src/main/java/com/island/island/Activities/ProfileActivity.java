@@ -63,13 +63,13 @@ public class ProfileActivity extends AppCompatActivity {
         Intent profileIntent = getIntent();
         mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
         mProfile = IslandDB.getProfile(getApplicationContext(), mProfileUsername);
-        if (mProfile != null) {
-            showProfile();
-        }
         new GetProfileTask().execute();
     }
 
     private void showProfile() {
+        if (mProfile == null) {
+            return;
+        }
         ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
