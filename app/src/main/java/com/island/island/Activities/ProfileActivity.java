@@ -63,6 +63,7 @@ public class ProfileActivity extends AppCompatActivity {
         Intent profileIntent = getIntent();
         mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
         mProfile = IslandDB.getProfile(getApplicationContext(), mProfileUsername);
+        showProfile();
         new GetProfileTask().execute();
     }
 
