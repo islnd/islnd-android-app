@@ -11,6 +11,9 @@ import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 import com.island.island.R;
 
+import org.island.messaging.crypto.CryptoUtil;
+
+import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -83,6 +86,11 @@ public class Utils
         return sharedPref.getString(context.getString(R.string.pseudonym), "");
     }
 
+    public static Key getGroupKey(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return CryptoUtil.decodeSymmetricKey(sharedPref.getString(context.getString(R.string.group_key), ""));
+    }
+
     public static void setUser(Context context, String userName)
     {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -100,7 +108,8 @@ public class Utils
     public static Profile saveProfileWithImageData(Context context, ProfileWithImageData profile) {
         Uri savedProfileImageUri = ImageUtils.saveBitmapToInternalFromByteArray(context,
                 profile.getProfileImageByteArray());
-        Uri savedHeaderImageUri = ImageUtils.saveBitmapToInternalFromByteArray(context,
+        Uri savedHeaderImageUri = ImageUtils.saveBitmapToInternalFromByteArray(
+                context,
                 profile.getHeaderImageByteArray());
 
         return new Profile(

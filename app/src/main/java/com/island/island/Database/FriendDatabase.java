@@ -181,7 +181,7 @@ public class FriendDatabase extends SQLiteOpenHelper {
         String[] args = {postAuthorPseudonym};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         if (results.getCount() == 0) {
-            return "";
+            return null;
         }
 
         results.moveToNext();

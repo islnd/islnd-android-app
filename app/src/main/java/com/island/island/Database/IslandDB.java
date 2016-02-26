@@ -114,7 +114,7 @@ public class IslandDB
                                 0,
                                 Utils.getUser(context),
                                 Utils.getPseudonym(context),
-                                CryptoUtil.getKey())); // THIS KEY IS FAKE
+                                Utils.getGroupKey(context)));
             }
         }.execute(seed);
     }

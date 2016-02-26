@@ -69,7 +69,6 @@ public class ViewPostActivity extends AppCompatActivity
         mViewPostList.addAll(comments);
 
         // Get comments from network
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
         new GetCommentsTask().execute(post.getUserName(), post.getPostId());
 
         // Swipe to refresh

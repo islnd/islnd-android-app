@@ -98,4 +98,8 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
     public String getPostAuthorPseudonym() {
         return postAuthorPseudonym;
     }
+
+    public String getCommentAuthorPseudonym() {
+        return commentAuthorPseudonym;
+    }
 }

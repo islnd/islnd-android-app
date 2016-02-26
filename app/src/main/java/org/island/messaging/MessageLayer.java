@@ -33,6 +33,7 @@ import java.util.List;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
+    private static final String UNKNOWN_USER_NAME = "<UNKNOWN USER NAME>";
 
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
@@ -68,6 +69,7 @@ public class MessageLayer {
 
         for (PseudonymKey key: keys) {
             int userId = friendDatabase.getUserId(key.getUsername());
+            Log.v(TAG, String.format("getting posts for %s userid %d", key.getUsername(), userId));
             String apiKey = Utils.getApiKey(context);
             List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym(), apiKey);
             if (encryptedPosts == null) {
@@ -75,6 +77,7 @@ public class MessageLayer {
                 continue;
             }
 
+            Log.v(TAG, String.format("found %d posts", encryptedPosts.size()));
             PostDatabase postDatabase = PostDatabase.getInstance(context);
             for (EncryptedPost post: encryptedPosts) {
                 //--TODO check that post is signed
@@ -216,14 +219,20 @@ public class MessageLayer {
         Log.v(TAG, String.format("query: pseud %s postId %s", postAuthorPseudonymKey.getPseudonym(), postId));
         CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
 
-        List<EncryptedComment> encryptedComments = Rest.getComments(commentQueryPost, Utils.getApiKey(context));
+        List<EncryptedComment> encryptedComments = Rest.getComments(
+                commentQueryPost,
+                Utils.getApiKey(context));
 
         List<Comment> comments = new ArrayList<>();
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         for (EncryptedComment ec : encryptedComments) {
             CommentUpdate commentUpdate = ec.decrypt(postAuthorPseudonymKey.getKey());
             String commentAuthorUsername =
-                    friendDatabase.getUsernameFromPseudonym(commentUpdate.getPostAuthorPseudonym());
+                    friendDatabase.getUsernameFromPseudonym(commentUpdate.getCommentAuthorPseudonym());
+            if (commentAuthorUsername == null) {
+                commentAuthorUsername = UNKNOWN_USER_NAME;
+            }
+
             comments.add(new Comment(commentAuthorUsername, commentUpdate.getContent(), commentUpdate.getTimestamp()));
         }
 

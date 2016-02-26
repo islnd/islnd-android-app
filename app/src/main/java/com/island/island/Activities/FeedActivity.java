@@ -75,8 +75,10 @@ public class FeedActivity extends NavBaseActivity {
         if (requestCode == NEW_POST_RESULT) {
             if (data != null) {
                 Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
+                Log.v(TAG, String.format("%s %s", post.getContent(), post.getKey()));
                 mArrayOfPosts.add(0, post);
                 mAdapter.notifyDataSetChanged();
+                mPostMap.add(post.getKey());
             }
         }
     }
@@ -104,6 +106,7 @@ public class FeedActivity extends NavBaseActivity {
                 : friendDatabase.getUsername(userId);
 
         String key = postAuthor + p.getTimestamp();
+        Log.v(TAG, String.format("%s %s", p.getContent(), key));
         if (mPostMap.contains(key)) {
             return false;
         }
@@ -163,6 +166,7 @@ public class FeedActivity extends NavBaseActivity {
         private boolean addPostsToFeed(List<Post> posts) {
             boolean postAdded = false;
             for (Post p : posts) {
+                Log.v(TAG, String.format("%s %s", p.getContent(), p.getKey()));
                 if (!mPostMap.contains(p.getKey())) {
                     mPostMap.add(p.getKey());
 
