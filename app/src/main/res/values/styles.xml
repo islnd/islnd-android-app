@@ -22,4 +22,11 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="IslandCrop" parent="Crop">
+        <item name="showThirds">true</item>
+        <item name="showCircle">true</item>
+        <item name="showHandles">always</item>
+        <item name="highlightColor">@android:color/white</item>
+    </style>
+
 </resources>

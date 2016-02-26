@@ -2,6 +2,7 @@ package com.island.island.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,9 +13,11 @@ import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Activities.ViewPostActivity;
+import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
 import com.island.island.R;
+import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.GlancePostViewHolder;
 
@@ -62,6 +65,10 @@ public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
             profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
             mContext.startActivity(profileIntent);
         });
+
+        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
+        ImageUtils.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
         // View post on post click
         holder.itemView.setOnClickListener((View v) ->

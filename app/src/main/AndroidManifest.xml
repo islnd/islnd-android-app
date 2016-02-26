@@ -2,10 +2,11 @@
 <manifest package="com.island.island"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -64,6 +65,9 @@
                   android:stateNotNeeded="true"
                   android:theme="@style/zxing_CaptureTheme"
                   android:windowSoftInputMode="stateAlwaysHidden">
+        </activity>
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity"
+            android:theme="@style/IslandCrop">
         </activity>
         <receiver
             android:name=".SmsReceiver"

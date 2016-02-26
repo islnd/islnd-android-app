@@ -10,6 +10,7 @@ import android.util.Log;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
@@ -240,14 +241,46 @@ public class IslandDB
         MessageLayer.comment(context, commentUpdate);
     }
 
-    public static void postProfile(Context context, Profile profile) {
+    public static void postProfile(Context context, ProfileWithImageData profile) {
         new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... params) {
                 MessageLayer.postProfile(context, profile);
+                Log.v(TAG, "profile posted to server");
                 return null;
             }
         }.execute();
+    }
+
+    public static Profile getProfile(Context context, String username) {
+        return ProfileDatabase.getInstance(context).get(username);
+    }
+
+    public static Profile getMostRecentProfile(Context context, String username) {
+        Profile profile;
+
+        if (!Utils.isUser(context, username)) {
+            ProfileWithImageData profileWithImageData = MessageLayer.getMostRecentProfile(
+                    context,
+                    username);
+            if (profileWithImageData == null) {
+                Log.v(TAG, "no profile on network for " + username);
+                return null;
+            }
+
+            ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
+            profile = Utils.saveProfileWithImageData(context, profileWithImageData);
+
+            if (profileDatabase.hasProfile(username)) {
+                profileDatabase.update(profile);
+            } else {
+                profileDatabase.insert(profile);
+            }
+        } else {
+            profile = ProfileDatabase.getInstance(context).get(username);
+        }
+
+        return profile;
     }
 }

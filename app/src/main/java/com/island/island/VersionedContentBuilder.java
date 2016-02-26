@@ -8,17 +8,20 @@ import android.util.Log;
 import com.island.island.Activities.NewPostActivity;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
+import com.island.island.Models.ProfileWithImageData;
 
 import org.island.messaging.PostUpdate;
 
 public class VersionedContentBuilder {
     private static final String TAG = VersionedContentBuilder.class.getSimpleName();
 
-    public static Profile buildProfile(Context context, String username, String string) {
+    public static ProfileWithImageData buildProfile(Context context, String username, String aboutMe,
+                                       byte[] profileImageByteArray, byte[] headerImageByteArray) {
         int newVersion = getNewVersionAndUpdate(
                 context,
                 context.getString(R.string.previous_profile_version_key));
-        return new Profile(username, string, newVersion);
+        return new ProfileWithImageData(username, aboutMe, profileImageByteArray,
+                headerImageByteArray, newVersion);
     }
 
     public static PostUpdate buildPost(Context context, String content) {

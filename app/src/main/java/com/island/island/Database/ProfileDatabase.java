@@ -5,9 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.util.Log;
 
 import com.island.island.Models.Profile;
+import com.island.island.Utils.ImageUtils;
 
 public class ProfileDatabase extends SQLiteOpenHelper {
 
@@ -19,6 +21,10 @@ public class ProfileDatabase extends SQLiteOpenHelper {
 
     private static final String USER_NAME = "USER_NAME";
     private static final String ABOUT_ME = "ABOUT_ME";
+    private static final String PROFILE_IMAGE_URI = "PROFILE_IMAGE_URI";
+    private static final String HEADER_IMAGE_URI = "HEADER_IMAGE_URI";
+
+    private static Context mContext = null;
 
     private ProfileDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -26,8 +32,11 @@ public class ProfileDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE " + DATABASE_NAME
-                + " (" + USER_NAME + " TEXT, " + ABOUT_ME + " TEXT)";
+        String sql = "CREATE TABLE " + DATABASE_NAME + " ("
+                + USER_NAME + " TEXT, "
+                + ABOUT_ME + " TEXT, "
+                + PROFILE_IMAGE_URI + " TEXT, "
+                + HEADER_IMAGE_URI + " TEXT)";
         Log.v(TAG, String.format("Creating database %s", DATABASE_NAME));
         db.execSQL(sql);
     }
@@ -41,6 +50,7 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         if (SINGLE == null) {
             SINGLE = new ProfileDatabase(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
+        mContext = context;
 
         return SINGLE;
     }
@@ -50,6 +60,8 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(USER_NAME, profile.getUsername());
         values.put(ABOUT_ME, profile.getAboutMe());
+        values.put(PROFILE_IMAGE_URI, profile.getProfileImageUri().toString());
+        values.put(HEADER_IMAGE_URI, profile.getHeaderImageUri().toString());
         Log.v(TAG, "adding profile for " + profile.getUsername());
 
         writableDatabase.insert(DATABASE_NAME, null, values);
@@ -62,7 +74,7 @@ public class ProfileDatabase extends SQLiteOpenHelper {
 
     public Profile get(String username) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
-        String[] columns = {USER_NAME, ABOUT_ME};
+        String[] columns = {USER_NAME, ABOUT_ME, PROFILE_IMAGE_URI, HEADER_IMAGE_URI};
         String selection = USER_NAME + " = ?";
         String[] args = {username};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
@@ -71,7 +83,39 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         }
 
         results.moveToNext();
-        return new Profile(results.getString(0), results.getString(1), Integer.MIN_VALUE);
+        return new Profile(results.getString(0),
+                results.getString(1),
+                Uri.parse(results.getString(2)),
+                Uri.parse(results.getString(3)),
+                Integer.MIN_VALUE);
+    }
+
+    public String getProfileImageUri(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {PROFILE_IMAGE_URI};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return ImageUtils.getDefaultProfileImageUri(mContext).toString();
+        }
+
+        results.moveToNext();
+        return results.getString(0);
+    }
+
+    public String getHeaderImageUri(String username) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {HEADER_IMAGE_URI};
+        String selection = USER_NAME + " = ?";
+        String[] args = {username};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        if (results.getCount() == 0) {
+            return ImageUtils.getDefaultHeaderImageUri(mContext).toString();
+        }
+
+        results.moveToNext();
+        return results.getString(0);
     }
 
     public void update(Profile profile) {
@@ -84,13 +128,15 @@ public class ProfileDatabase extends SQLiteOpenHelper {
         insert(profile);
     }
 
-    public boolean hasProfile(Profile profile) {
+    public boolean hasProfile(String username) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
         String[] columns = {USER_NAME};
         String selection = USER_NAME + " = ?";
-        String[] args = { profile.getUsername() };
+        String[] args = { username };
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
     }
+
+
 }
 

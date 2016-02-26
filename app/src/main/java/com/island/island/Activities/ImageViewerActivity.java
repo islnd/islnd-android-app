@@ -26,7 +26,7 @@ public class ImageViewerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Load image
+        // TODO: Consider scaling the image...
         Intent intent = getIntent();
         Uri imageUri = Uri.parse(intent.getStringExtra(IMAGE_VIEW_URI));
         ImageView imageView = (ImageView) findViewById(R.id.image_view);
