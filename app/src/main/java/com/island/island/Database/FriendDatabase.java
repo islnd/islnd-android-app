@@ -105,10 +105,6 @@ public class FriendDatabase extends SQLiteOpenHelper {
         return keys;
     }
 
-    public void getKey(int postAuthorId) {
-
-    }
-
     public PseudonymKey getKey(String username) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
 
