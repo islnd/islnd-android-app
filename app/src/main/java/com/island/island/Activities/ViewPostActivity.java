@@ -28,7 +28,9 @@ import org.island.messaging.PseudonymKey;
 import org.island.messaging.Util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class ViewPostActivity extends AppCompatActivity
@@ -40,6 +42,7 @@ public class ViewPostActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
     private ArrayList mViewPostList;
+    private Set<String> mCommentMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,6 +55,7 @@ public class ViewPostActivity extends AppCompatActivity
 
         // List view stuff
         mViewPostList = new ArrayList<>();
+        mCommentMap = new HashSet<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -67,6 +71,9 @@ public class ViewPostActivity extends AppCompatActivity
         // Add comments to list
         List<Comment> comments = post.getComments();
         mViewPostList.addAll(comments);
+        for (Comment comment : comments) {
+            mCommentMap.add(comment.getKey());
+        }
 
         // Get comments from network
         new GetCommentsTask().execute(post.getUserName(), post.getPostId());
@@ -106,7 +113,14 @@ public class ViewPostActivity extends AppCompatActivity
             PseudonymKey pk = FriendDatabase.getInstance(getApplicationContext()).getKey(params[0]);
             String postId = params[1];
             List<Comment> comments = MessageLayer.getComments(getApplicationContext(), pk, postId);
-            mViewPostList.addAll(comments);
+
+            for (Comment comment : comments) {
+                if (!mCommentMap.contains(comment.getKey())) {
+                    mCommentMap.add(comment.getKey());
+                    mViewPostList.add(comment);
+                }
+            }
+
             return null;
         }
 

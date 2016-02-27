@@ -142,22 +142,22 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         final Comment comment = (Comment) mList.get(position);
         final ImageView overflow = holder.overflow;
 
-        holder.userName.setText(comment.getUserName());
+        holder.userName.setText(comment.getUsername());
         holder.comment.setText(comment.getComment());
 
         // Go to profile on picture click
         holder.profileImage.setOnClickListener((View v) ->
         {
             Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUserName());
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUsername());
             mContext.startActivity(profileIntent);
         });
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUserName()));
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUsername()));
         ImageUtils.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
-        if(Utils.isUser(mContext, comment.getUserName()))
+        if(Utils.isUser(mContext, comment.getUsername()))
         {
             holder.overflow.setVisibility(View.VISIBLE);
 

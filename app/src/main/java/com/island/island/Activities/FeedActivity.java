@@ -127,7 +127,9 @@ public class FeedActivity extends NavBaseActivity {
     }
 
     private List<Comment> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
+        Log.v(TAG, String.format("get comments for post user id %d post id %s ", p.getUserId(), p.getPostId()));
         List<RawComment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
+        Log.v(TAG, String.format("found %d comments", rawComments.size()));
         List<Comment> comments = new ArrayList<>();
         for (RawComment rc : rawComments) {
             String commentUsername = friendDatabase.getUsername(rc.getCommentUserId());

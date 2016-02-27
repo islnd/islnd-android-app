@@ -86,4 +86,18 @@ public class CommentDatabase extends SQLiteOpenHelper {
 
         return comments;
     }
+
+    public boolean contains(int postAuthorId, int commentAuthorId, long timestamp) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {POST_USER_ID, COMMENT_USER_ID, TIMESTAMP};
+        String selection = POST_USER_ID + " = ? AND "
+                + COMMENT_USER_ID + " = ? AND "
+                + TIMESTAMP + " = ?";
+        String[] args = {String.valueOf(postAuthorId),
+                String.valueOf(commentAuthorId),
+                String.valueOf(timestamp) };
+        
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        return results.getCount() > 0;
+    }
 }

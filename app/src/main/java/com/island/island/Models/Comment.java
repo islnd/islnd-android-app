@@ -4,19 +4,19 @@ import java.io.Serializable;
 
 public class Comment implements Serializable
 {
-    private String userName;
+    private String username;
     private String comment;
     private long timestamp;
 
     public Comment(String username, String comment, long timestamp)
     {
-        this.userName = username;
+        this.username = username;
         this.comment = comment;
         this.timestamp = timestamp;
     }
 
     public Comment(String username, String commentText) {
-        this.userName = username;
+        this.username = username;
         this.comment = commentText;
         this.timestamp = System.currentTimeMillis();
     }
@@ -31,13 +31,17 @@ public class Comment implements Serializable
         this.comment = comment;
     }
 
-    public String getUserName()
+    public String getUsername()
     {
-        return userName;
+        return username;
     }
 
-    public void setUserName(String userName)
+    public void setUsername(String username)
     {
-        this.userName = userName;
+        this.username = username;
+    }
+
+    public String getKey() {
+        return username + timestamp;
     }
 }
