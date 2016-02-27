@@ -86,9 +86,21 @@ public class Utils
         return sharedPref.getString(context.getString(R.string.pseudonym), "");
     }
 
+    public static String getPseudonymSeed(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.pseudonym_seed), "");
+    }
+
     public static Key getGroupKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return CryptoUtil.decodeSymmetricKey(sharedPref.getString(context.getString(R.string.group_key), ""));
+        return CryptoUtil.decodeSymmetricKey(
+                sharedPref.getString(context.getString(R.string.group_key), ""));
+    }
+
+    public static Key getPrivateKey(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return CryptoUtil.decodePrivateKey(
+                sharedPref.getString(context.getString(R.string.private_key), ""));
     }
 
     public static void setUser(Context context, String userName)

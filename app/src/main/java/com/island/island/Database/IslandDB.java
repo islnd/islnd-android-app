@@ -17,6 +17,7 @@ import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.CommentUpdate;
+import org.island.messaging.PostUpdate;
 import org.island.messaging.PseudonymKey;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
@@ -165,22 +166,26 @@ public class IslandDB
         }.execute();
     }
 
-    public static void post(Context context, String content)
+    public static PostUpdate post(Context context, String content)
     /**
      * Encrypts content and posts to database.
      *
      * @param content Plaintext content to be posted.
      */
     {
-        new AsyncTask<String, Void, Void>() {
+        PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
+        int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
+        PostDatabase.getInstance(context).insert(myUserId, postUpdate);
 
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Void doInBackground(String... params) {
-                MessageLayer.post(context, params[0]);
+            protected Void doInBackground(Void... params) {
+                MessageLayer.post(context, postUpdate);
                 return null;
             }
+        }.execute();
 
-        }.execute(content);
+        return postUpdate;
     }
 
     public static void allowReader(String username)

@@ -16,7 +16,6 @@ import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
-import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedComment;
@@ -37,7 +36,6 @@ public class MessageLayer {
 
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
-        //FriendDatabase.getInstance(context).deleteAll();
         List<EncryptedData> keys = Rest.getReaders(username, Utils.getApiKey(context));
         if (keys == null) {
             Log.d(TAG, "get readers returned null");
@@ -101,19 +99,13 @@ public class MessageLayer {
         return posts;
     }
 
-    public static void post(Context context, String content) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
-        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-
+    public static void post(Context context, PostUpdate postUpdate) {
         EncryptedPost encryptedPost = new EncryptedPost(
                 postUpdate,
-                CryptoUtil.decodePrivateKey(privateKey),
-                CryptoUtil.decodeSymmetricKey(myGroupKey));
+                Utils.getPrivateKey(context),
+                Utils.getGroupKey(context));
 
-        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-        Rest.post(pseudonymSeed, encryptedPost, Utils.getApiKey(context));
+        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
     }
 
     public static void comment(Context context, CommentUpdate commentUpdate) {

@@ -10,13 +10,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
-import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
-import com.island.island.Database.PostDatabase;
 import com.island.island.Models.Post;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
-import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.PostUpdate;
 
@@ -43,12 +40,7 @@ public class NewPostActivity extends AppCompatActivity
             Snackbar.make(view, getString(R.string.empty_string_post), Snackbar.LENGTH_LONG).show();
         }
         else {
-            //--TODO activity is doing too much here
-            IslandDB.post(getApplicationContext(), postText);
-            PostUpdate post = VersionedContentBuilder.buildPost(this, postText);
-            int myUserId = FriendDatabase.getInstance(this).getUserId(Utils.getUser(this));
-            PostDatabase.getInstance(this).insert(myUserId, post);
-
+            PostUpdate post = IslandDB.post(getApplicationContext(), postText);
             setResult(Activity.RESULT_OK, buildReturnIntent(post));
             finish();
         }
