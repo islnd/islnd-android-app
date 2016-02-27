@@ -159,22 +159,24 @@ public class FeedActivity extends NavBaseActivity {
                 commentQueries.add(new CommentQuery(postAuthorPseudonym, post.getPostId()));
             }
 
-            return MessageLayer.getComments(getApplicationContext(), commentQueries);
+            return MessageLayer.getCommentCollection(getApplicationContext(), commentQueries);
         }
 
         @Override
         protected void onPostExecute(CommentCollection commentCollection) {
-            boolean modified = false;
+            boolean anyPostUpdated = false;
 
             for (Post post : mArrayOfPosts) {
-                List<Comment> rawComments = commentCollection.getComments(post);
-                List<CommentViewModel> comments = Utils.buildComments(getApplicationContext(), rawComments);
-                if (post.addComments(comments)) {
-                    modified = true;
+                List<Comment> comments = commentCollection.getComments(post);
+                List<CommentViewModel> commentViewModels = Utils.buildCommentViewModels(
+                        getApplicationContext(),
+                        comments);
+                if (post.addComments(commentViewModels)) {
+                    anyPostUpdated = true;
                 }
             }
 
-            if (modified) {
+            if (anyPostUpdated) {
                 mAdapter.notifyDataSetChanged();
             }
         }

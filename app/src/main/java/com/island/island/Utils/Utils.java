@@ -162,7 +162,7 @@ public class Utils
         return (int) Utils.dpFromPx(context, context.getResources().getDimension(res));
     }
 
-    public static List<CommentViewModel> buildComments(Context context, List<Comment> rawComments) {
+    public static List<CommentViewModel> buildCommentViewModels(Context context, List<Comment> rawComments) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         List<CommentViewModel> comments = new ArrayList<>();
         for (Comment rawComment : rawComments) {

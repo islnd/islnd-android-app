@@ -207,19 +207,14 @@ public class MessageLayer {
         return Util.getNewest(profiles);
     }
 
-    public static List<CommentViewModel> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
+    public static List<CommentViewModel> getCommentCollection(Context context, int postAuthorId, String postId) {
         List<CommentQuery> queries = new ArrayList<>();
-        queries.add(new CommentQuery(postAuthorPseudonymKey.getPseudonym(), postId));
-        CommentCollection commentCollection = getComments(context, queries);
-
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        int postAuthorId = friendDatabase.getUserId(
-                friendDatabase.getUsernameFromPseudonym(postAuthorPseudonymKey.getPseudonym()));
-        List<Comment> rawComments = commentCollection.getComments(postAuthorId, postId);
-        return Utils.buildComments(context, rawComments);
+        CommentCollection commentCollection = getCommentCollection(context, queries);
+        List<Comment> comments = commentCollection.getComments(postAuthorId, postId);
+        return Utils.buildCommentViewModels(context, comments);
     }
 
-    public static CommentCollection getComments(Context context, List<CommentQuery> queries) {
+    public static CommentCollection getCommentCollection(Context context, List<CommentQuery> queries) {
         CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
 
         List<EncryptedComment> encryptedComments = Rest.getComments(

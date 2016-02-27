@@ -15,7 +15,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
-import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
@@ -24,7 +23,6 @@ import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
-import org.island.messaging.PseudonymKey;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -75,7 +73,7 @@ public class ViewPostActivity extends AppCompatActivity
         }
 
         // Get comments from network
-        new GetCommentsTask().execute(post.getUserName(), post.getPostId());
+        new GetCommentsTask().execute(post);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -106,12 +104,13 @@ public class ViewPostActivity extends AppCompatActivity
         }
     }
 
-    private class GetCommentsTask extends AsyncTask<String, Void, Void> {
+    private class GetCommentsTask extends AsyncTask<Post, Void, Void> {
         @Override
-        protected Void doInBackground(String... params) {
-            PseudonymKey pk = FriendDatabase.getInstance(getApplicationContext()).getKey(params[0]);
-            String postId = params[1];
-            List<CommentViewModel> comments = MessageLayer.getComments(getApplicationContext(), pk, postId);
+        protected Void doInBackground(Post... params) {
+            List<CommentViewModel> comments = MessageLayer.getCommentCollection(
+                    getApplicationContext(),
+                    post.getUserId(),
+                    post.getPostId());
 
             for (CommentViewModel comment : comments) {
                 if (!mCommentMap.contains(comment.getKey())) {

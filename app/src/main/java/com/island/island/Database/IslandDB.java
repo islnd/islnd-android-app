@@ -220,7 +220,7 @@ public class IslandDB
      */
     {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        int postUserId = friendDatabase.getUserId(post.getUserName()); // this will be user database
+        int postUserId = post.getUserId();
         Log.v(TAG, String.format("username %s has id %d", post.getUserName(), postUserId));
         int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
         String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
