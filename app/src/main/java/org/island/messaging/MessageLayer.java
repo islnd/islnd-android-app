@@ -10,11 +10,11 @@ import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
-import com.island.island.Models.RawComment;
+import com.island.island.Models.Comment;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
@@ -207,7 +207,7 @@ public class MessageLayer {
         return Util.getNewest(profiles);
     }
 
-    public static List<Comment> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
+    public static List<CommentViewModel> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
         List<CommentQuery> queries = new ArrayList<>();
         queries.add(new CommentQuery(postAuthorPseudonymKey.getPseudonym(), postId));
         CommentCollection commentCollection = getComments(context, queries);
@@ -215,7 +215,7 @@ public class MessageLayer {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         int postAuthorId = friendDatabase.getUserId(
                 friendDatabase.getUsernameFromPseudonym(postAuthorPseudonymKey.getPseudonym()));
-        List<RawComment> rawComments = commentCollection.getComments(postAuthorId, postId);
+        List<Comment> rawComments = commentCollection.getComments(postAuthorId, postId);
         return Utils.buildComments(context, rawComments);
     }
 

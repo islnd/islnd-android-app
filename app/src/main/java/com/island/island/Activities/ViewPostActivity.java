@@ -16,7 +16,7 @@ import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
 import com.island.island.Database.FriendDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -25,7 +25,6 @@ import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
 import org.island.messaging.PseudonymKey;
-import org.island.messaging.Util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,9 +68,9 @@ public class ViewPostActivity extends AppCompatActivity
         mViewPostList.add(post);
 
         // Add comments to list
-        List<Comment> comments = post.getComments();
+        List<CommentViewModel> comments = post.getComments();
         mViewPostList.addAll(comments);
-        for (Comment comment : comments) {
+        for (CommentViewModel comment : comments) {
             mCommentMap.add(comment.getKey());
         }
 
@@ -101,7 +100,7 @@ public class ViewPostActivity extends AppCompatActivity
         }
         else
         {
-            IslandDB.addCommentToPost(this, post, new Comment(Utils.getUser(this), commentText));
+            IslandDB.addCommentToPost(this, post, new CommentViewModel(Utils.getUser(this), commentText));
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
@@ -112,9 +111,9 @@ public class ViewPostActivity extends AppCompatActivity
         protected Void doInBackground(String... params) {
             PseudonymKey pk = FriendDatabase.getInstance(getApplicationContext()).getKey(params[0]);
             String postId = params[1];
-            List<Comment> comments = MessageLayer.getComments(getApplicationContext(), pk, postId);
+            List<CommentViewModel> comments = MessageLayer.getComments(getApplicationContext(), pk, postId);
 
-            for (Comment comment : comments) {
+            for (CommentViewModel comment : comments) {
                 if (!mCommentMap.contains(comment.getKey())) {
                     mCommentMap.add(comment.getKey());
                     mViewPostList.add(comment);

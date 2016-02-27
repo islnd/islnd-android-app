@@ -17,10 +17,10 @@ public class Post implements Serializable
     private final long timestamp;
     private final String content;
     private final String postId;
-    private final List<Comment> comments;
+    private final List<CommentViewModel> comments;
 
     public Post(String userName, int userId, String postId, long timestamp, String content,
-                List<Comment> comments)
+                List<CommentViewModel> comments)
     {
         this.userName = userName;
         this.userId = userId;
@@ -46,7 +46,7 @@ public class Post implements Serializable
     }
 
 
-    public List<Comment> getComments()
+    public List<CommentViewModel> getComments()
     {
         return comments;
     }
@@ -59,9 +59,9 @@ public class Post implements Serializable
         return postId;
     }
 
-    public boolean addComments(List<Comment> newComments) {
+    public boolean addComments(List<CommentViewModel> newComments) {
         boolean addedAny = false;
-        for (Comment comment : newComments) {
+        for (CommentViewModel comment : newComments) {
             if (!hasComment(comment.getKey())) {
                 this.comments.add(comment);
                 addedAny = true;
@@ -72,7 +72,7 @@ public class Post implements Serializable
     }
 
     private boolean hasComment(String key) {
-        for (Comment comment : this.comments) {
+        for (CommentViewModel comment : this.comments) {
             if (comment.getKey().equals(key)) {
                 return true;
             }

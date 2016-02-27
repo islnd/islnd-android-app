@@ -8,10 +8,10 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
-import com.island.island.Models.RawComment;
+import com.island.island.Models.Comment;
 import com.island.island.R;
 
 import org.island.messaging.crypto.CryptoUtil;
@@ -162,12 +162,12 @@ public class Utils
         return (int) Utils.dpFromPx(context, context.getResources().getDimension(res));
     }
 
-    public static List<Comment> buildComments(Context context, List<RawComment> rawComments) {
+    public static List<CommentViewModel> buildComments(Context context, List<Comment> rawComments) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        List<Comment> comments = new ArrayList<>();
-        for (RawComment rawComment : rawComments) {
+        List<CommentViewModel> comments = new ArrayList<>();
+        for (Comment rawComment : rawComments) {
             String username = friendDatabase.getUsername(rawComment.getCommentUserId());
-            comments.add(new Comment(username, rawComment.getContent(), rawComment.getTimestamp()));
+            comments.add(new CommentViewModel(username, rawComment.getContent(), rawComment.getTimestamp()));
         }
 
         return comments;

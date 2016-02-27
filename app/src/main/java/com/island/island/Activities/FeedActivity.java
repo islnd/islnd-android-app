@@ -13,9 +13,9 @@ import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
-import com.island.island.Models.RawComment;
+import com.island.island.Models.Comment;
 import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
@@ -127,14 +127,14 @@ public class FeedActivity extends NavBaseActivity {
         return true;
     }
 
-    private List<Comment> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
+    private List<CommentViewModel> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
         Log.v(TAG, String.format("get comments for post user id %d post id %s ", p.getUserId(), p.getPostId()));
-        List<RawComment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
+        List<Comment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
         Log.v(TAG, String.format("found %d comments", rawComments.size()));
-        List<Comment> comments = new ArrayList<>();
-        for (RawComment rc : rawComments) {
+        List<CommentViewModel> comments = new ArrayList<>();
+        for (Comment rc : rawComments) {
             String commentUsername = friendDatabase.getUsername(rc.getCommentUserId());
-            comments.add(new Comment(commentUsername, rc.getContent(), rc.getTimestamp()));
+            comments.add(new CommentViewModel(commentUsername, rc.getContent(), rc.getTimestamp()));
         }
 
         return comments;
@@ -167,8 +167,8 @@ public class FeedActivity extends NavBaseActivity {
             boolean modified = false;
 
             for (Post post : mArrayOfPosts) {
-                List<RawComment> rawComments = commentCollection.getComments(post);
-                List<Comment> comments = Utils.buildComments(getApplicationContext(), rawComments);
+                List<Comment> rawComments = commentCollection.getComments(post);
+                List<CommentViewModel> comments = Utils.buildComments(getApplicationContext(), rawComments);
                 if (post.addComments(comments)) {
                     modified = true;
                 }

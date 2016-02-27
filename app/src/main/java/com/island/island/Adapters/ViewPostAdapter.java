@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
@@ -139,7 +139,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void bindComment(CommentViewHolder holder, int position)
     {
-        final Comment comment = (Comment) mList.get(position);
+        final CommentViewModel comment = (CommentViewModel) mList.get(position);
         final ImageView overflow = holder.overflow;
 
         holder.userName.setText(comment.getUsername());

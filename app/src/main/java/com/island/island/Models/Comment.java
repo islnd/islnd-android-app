@@ -1,47 +1,29 @@
 package com.island.island.Models;
 
-import java.io.Serializable;
+public class Comment {
+    private final int postUserId;
+    private final String postId;
+    private final int commentUserId;
+    private final String content;
+    private final long timestamp;
 
-public class Comment implements Serializable
-{
-    private String username;
-    private String comment;
-    private long timestamp;
-
-    public Comment(String username, String comment, long timestamp)
-    {
-        this.username = username;
-        this.comment = comment;
+    public Comment(int postUserId, String postId, int commentUserId, String content, long timestamp) {
+        this.postUserId = postUserId;
+        this.postId = postId;
+        this.commentUserId = commentUserId;
+        this.content = content;
         this.timestamp = timestamp;
     }
 
-    public Comment(String username, String commentText) {
-        this.username = username;
-        this.comment = commentText;
-        this.timestamp = System.currentTimeMillis();
+    public int getCommentUserId() {
+        return commentUserId;
     }
 
-    public String getComment()
-    {
-        return comment;
+    public String getContent() {
+        return content;
     }
 
-    public void setComment(String comment)
-    {
-        this.comment = comment;
-    }
-
-    public String getUsername()
-    {
-        return username;
-    }
-
-    public void setUsername(String username)
-    {
-        this.username = username;
-    }
-
-    public String getKey() {
-        return username + timestamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 }

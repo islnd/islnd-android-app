@@ -7,11 +7,10 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
-import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
@@ -22,16 +21,9 @@ import org.island.messaging.PseudonymKey;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
-import org.island.messaging.proto.IslandProto;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.security.KeyPair;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by David Thompson on 12/20/2015.
@@ -219,7 +211,7 @@ public class IslandDB
 
     }
 
-    public static void addCommentToPost(Context context, Post post, Comment comment)
+    public static void addCommentToPost(Context context, Post post, CommentViewModel comment)
     /**
      * Adds comment to existing post
      *
