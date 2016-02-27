@@ -2,18 +2,23 @@ package com.island.island.Models;
 
 import java.io.Serializable;
 
-/**
- * Created by poo on 1/29/2016.
- */
 public class Comment implements Serializable
 {
-    private String userName = "";
-    private String comment = "";
+    private String userName;
+    private String comment;
+    private long timestamp;
 
-    public Comment(String userName, String comment)
+    public Comment(String username, String comment, long timestamp)
     {
-        this.userName = userName;
+        this.userName = username;
         this.comment = comment;
+        this.timestamp = timestamp;
+    }
+
+    public Comment(String username, String commentText) {
+        this.userName = username;
+        this.comment = commentText;
+        this.timestamp = System.currentTimeMillis();
     }
 
     public String getComment()

@@ -2,6 +2,7 @@ package com.island.island.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,11 +15,17 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
+import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+import com.island.island.Utils.Utils;
+
+import org.island.messaging.MessageLayer;
+import org.island.messaging.PseudonymKey;
+import org.island.messaging.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +39,7 @@ public class ViewPostActivity extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
+    private ArrayList mViewPostList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,22 +51,25 @@ public class ViewPostActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // List view stuff
-        ArrayList viewPostList = new ArrayList<>();
+        mViewPostList = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ViewPostAdapter(viewPostList, this);
+        mAdapter = new ViewPostAdapter(mViewPostList, this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Get intent with post info
         Intent intent = getIntent();
         post = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
-        viewPostList.add(post);
+        mViewPostList.add(post);
 
         // Add comments to list
         List<Comment> comments = post.getComments();
-        viewPostList.addAll(comments);
+        mViewPostList.addAll(comments);
+
+        // Get comments from network
+        new GetCommentsTask().execute(post.getUserName(), post.getPostId());
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -83,9 +94,25 @@ public class ViewPostActivity extends AppCompatActivity
         }
         else
         {
-            IslandDB.addCommentToPost(post, new Comment("", commentText));
+            IslandDB.addCommentToPost(this, post, new Comment(Utils.getUser(this), commentText));
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
+        }
+    }
+
+    private class GetCommentsTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            PseudonymKey pk = FriendDatabase.getInstance(getApplicationContext()).getKey(params[0]);
+            String postId = params[1];
+            List<Comment> comments = MessageLayer.getComments(getApplicationContext(), pk, postId);
+            mViewPostList.addAll(comments);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mAdapter.notifyDataSetChanged();
         }
     }
 }

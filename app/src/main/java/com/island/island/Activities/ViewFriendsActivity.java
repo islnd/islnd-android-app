@@ -18,6 +18,7 @@ import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
+import com.island.island.Utils.Utils;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
@@ -132,7 +133,10 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
             List<PseudonymKey> pks = FriendDatabase.getInstance(getApplicationContext()).getKeys();
             List<User> allFriends = new ArrayList<>();
             for (PseudonymKey pk : pks) {
-                allFriends.add(new User(pk.getUsername()));
+                String username = pk.getUsername();
+                if (!Utils.isUser(getApplicationContext(), username)) {
+                    allFriends.add(new User(username));
+                }
             }
 
             if (allFriends.size() > 0) {

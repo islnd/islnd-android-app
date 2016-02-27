@@ -16,9 +16,13 @@ import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
+import org.island.messaging.CommentUpdate;
+import org.island.messaging.PostUpdate;
+import org.island.messaging.PseudonymKey;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
+import org.island.messaging.proto.IslandProto;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,6 +109,13 @@ public class IslandDB
 
                 Log.v(TAG, "pseudonym " + pseudonym);
                 Log.v(TAG, "pseudonym seed " + seed);
+
+                FriendDatabase.getInstance(context).addFriend(
+                        new PseudonymKey(
+                                0,
+                                Utils.getUser(context),
+                                Utils.getPseudonym(context),
+                                Utils.getGroupKey(context)));
             }
         }.execute(seed);
     }
@@ -155,22 +166,26 @@ public class IslandDB
         }.execute();
     }
 
-    public static void post(Context context, String content)
+    public static PostUpdate post(Context context, String content)
     /**
      * Encrypts content and posts to database.
      *
      * @param content Plaintext content to be posted.
      */
     {
-        new AsyncTask<String, Void, Void>() {
+        PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
+        int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
+        PostDatabase.getInstance(context).insert(myUserId, postUpdate);
 
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Void doInBackground(String... params) {
-                MessageLayer.post(context, params[0]);
+            protected Void doInBackground(Void... params) {
+                MessageLayer.post(context, postUpdate);
                 return null;
             }
+        }.execute();
 
-        }.execute(content);
+        return postUpdate;
     }
 
     public static void allowReader(String username)
@@ -204,7 +219,7 @@ public class IslandDB
 
     }
 
-    public static void addCommentToPost(Post post, Comment comment)
+    public static void addCommentToPost(Context context, Post post, Comment comment)
     /**
      * Adds comment to existing post
      *
@@ -212,7 +227,23 @@ public class IslandDB
      * @param comment Comment that I'm adding.
      */
     {
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        int postUserId = friendDatabase.getUserId(post.getUserName()); // this will be user database
+        Log.v(TAG, String.format("username %s has id %d", post.getUserName(), postUserId));
+        int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
+        String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
+        String myPseudonym = Utils.getPseudonym(context);
+        String postId = post.getPostId();
 
+        //--TODO comment update should be built in message layer
+        CommentUpdate commentUpdate = CommentUpdate.buildComment(
+                postAuthorPseudonym,
+                myPseudonym,
+                postId,
+                comment.getComment());
+
+        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
+        MessageLayer.comment(context, commentUpdate);
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {

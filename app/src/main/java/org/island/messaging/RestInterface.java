@@ -1,8 +1,12 @@
 package org.island.messaging;
 
+import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.crypto.EncryptedPost;
 import org.island.messaging.crypto.EncryptedProfile;
+import org.island.messaging.server.CommentQuery;
+import org.island.messaging.server.CommentQueryRequest;
+import org.island.messaging.server.CommentQueryResponse;
 import org.island.messaging.server.ProfileResponse;
 import org.island.messaging.server.PseudonymResponse;
 
@@ -33,6 +37,16 @@ public interface RestInterface {
             @Body EncryptedPost encryptedPost,
             @Query("apiKey") String apiKey);
 
+
+    @POST("/getComments/") // TODO rename to /commentQuery/
+    Call<CommentQueryResponse> getComments(
+            @Body CommentQueryRequest commentQueryPost,
+            @Query("apiKey") String apiKey);
+
+    @POST("/comment/")
+    Call<Object> postComment(
+            @Body EncryptedComment postCommentRequest,
+            @Query("apiKey") String apiKey);
 
     @GET("/pseudonym/{seed}")
     Call<PseudonymResponse> pseduonym(

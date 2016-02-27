@@ -10,9 +10,14 @@ import android.util.Log;
 import android.view.View;
 
 import com.island.island.Adapters.PostAdapter;
+import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
+import com.island.island.Database.ProfileDatabase;
+import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
+import com.island.island.Database.IslandDB;
+import com.island.island.Models.RawComment;
 import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
@@ -70,8 +75,10 @@ public class FeedActivity extends NavBaseActivity {
         if (requestCode == NEW_POST_RESULT) {
             if (data != null) {
                 Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
+                Log.v(TAG, String.format("%s %s", post.getContent(), post.getKey()));
                 mArrayOfPosts.add(0, post);
                 mAdapter.notifyDataSetChanged();
+                mPostMap.add(post.getKey());
             }
         }
     }
@@ -79,9 +86,10 @@ public class FeedActivity extends NavBaseActivity {
     private void getPostsFromDatabase() {
         List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
         FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
+        CommentDatabase commentDatabase = CommentDatabase.getInstance(this);
         boolean listChanged = false;
         for (RawPost p : localPosts) {
-            if (addPostToFeed(friendDatabase, p)) {
+            if (addPostToFeed(friendDatabase, commentDatabase, p)) {
                 listChanged = true;
             }
         }
@@ -91,13 +99,14 @@ public class FeedActivity extends NavBaseActivity {
         }
     }
 
-    private boolean addPostToFeed(FriendDatabase friendDatabase, RawPost p) {
+    private boolean addPostToFeed(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
         int userId = p.getUserId();
         String postAuthor = userId == 0
                 ? Utils.getUser(this)
                 : friendDatabase.getUsername(userId);
 
         String key = postAuthor + p.getTimestamp();
+        Log.v(TAG, String.format("%s %s", p.getContent(), key));
         if (mPostMap.contains(key)) {
             return false;
         }
@@ -108,12 +117,24 @@ public class FeedActivity extends NavBaseActivity {
                 insertionPoint,
                 new Post(
                         postAuthor,
+                        p.getPostId(),
                         p.getTimestamp(),
                         p.getContent(),
-                        new ArrayList<>()
+                        getCommentsForPost(friendDatabase, commentDatabase, p)
                 ));
 
         return true;
+    }
+
+    private List<Comment> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
+        List<RawComment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
+        List<Comment> comments = new ArrayList<>();
+        for (RawComment rc : rawComments) {
+            String commentUsername = friendDatabase.getUsername(rc.getCommentUserId());
+            comments.add(new Comment(commentUsername, rc.getContent(), rc.getTimestamp()));
+        }
+
+        return comments;
     }
 
     public void startNewPostActivity(View view) {
@@ -145,6 +166,7 @@ public class FeedActivity extends NavBaseActivity {
         private boolean addPostsToFeed(List<Post> posts) {
             boolean postAdded = false;
             for (Post p : posts) {
+                Log.v(TAG, String.format("%s %s", p.getContent(), p.getKey()));
                 if (!mPostMap.contains(p.getKey())) {
                     mPostMap.add(p.getKey());
 

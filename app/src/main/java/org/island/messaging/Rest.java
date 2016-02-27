@@ -2,9 +2,14 @@ package org.island.messaging;
 
 import android.util.Log;
 
+import com.island.island.Utils.Utils;
+
+import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.crypto.EncryptedPost;
 import org.island.messaging.crypto.EncryptedProfile;
+import org.island.messaging.server.CommentQueryRequest;
+import org.island.messaging.server.CommentQueryResponse;
 import org.island.messaging.server.ProfileResponse;
 import org.island.messaging.server.PseudonymResponse;
 
@@ -20,6 +25,7 @@ public class Rest {
     private static final String TAG = Rest.class.getSimpleName();
 
     private final static String HOST = "https://islnd.io:1935";
+    private static final int HTTP_OK = 200;
 
     public static List<EncryptedData> getReaders(String username, String apiKey) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -48,7 +54,7 @@ public class Rest {
 
         try {
             Response<String> response = service.postPublicKey(username, publicKey, apiKey).execute();
-            if (response.code() != 200) {
+            if (response.code() != HTTP_OK) {
                 Log.v(TAG, "/publicKey POST returned code " + response.code());
             }
         } catch (IOException e) {
@@ -114,7 +120,7 @@ public class Rest {
         RestInterface service = retrofit.create(RestInterface.class);
         try {
             Response<PseudonymResponse> result = service.pseduonym(seed, apiKey).execute();
-            if (result.code() == 200) {
+            if (result.code() == HTTP_OK) {
                 return result.body().getPseudonym();
             }
             else {
@@ -136,11 +142,53 @@ public class Rest {
         RestInterface service = retrofit.create(RestInterface.class);
         try {
             Response<ProfileResponse> response = service.getProfiles(pseudonym, apiKey).execute();
-            if (response.code() == 200) {
+            if (response.code() == HTTP_OK) {
                 return response.body().getProfiles();
             }
             else {
                 Log.d(TAG, "/profile GET returned code " + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static void postComment(EncryptedComment encryptedComment, String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Response<Object> response = service.postComment(encryptedComment, apiKey).execute();
+            if (response.code() != HTTP_OK) {
+                Log.d(TAG, "post comment returned code" + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<EncryptedComment> getComments(CommentQueryRequest commentQueryPost, String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Response<CommentQueryResponse> response =
+                    service.getComments(commentQueryPost, apiKey).execute();
+            if (response.code() == HTTP_OK) {
+                return response.body().getComments();
+            }
+            else {
+                Log.d(TAG, "post comment returned code" + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

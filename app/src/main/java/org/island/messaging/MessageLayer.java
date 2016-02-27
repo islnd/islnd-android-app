@@ -2,25 +2,29 @@ package org.island.messaging;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
-import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
+import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.crypto.EncryptedPost;
 import org.island.messaging.crypto.EncryptedProfile;
 import org.island.messaging.crypto.ObjectEncrypter;
+import org.island.messaging.server.CommentQuery;
+import org.island.messaging.server.CommentQueryRequest;
 
 import java.security.Key;
 import java.util.ArrayList;
@@ -28,10 +32,10 @@ import java.util.List;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
+    private static final String UNKNOWN_USER_NAME = "<UNKNOWN USER NAME>";
 
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
-        //FriendDatabase.getInstance(context).deleteAll();
         List<EncryptedData> keys = Rest.getReaders(username, Utils.getApiKey(context));
         if (keys == null) {
             Log.d(TAG, "get readers returned null");
@@ -63,6 +67,7 @@ public class MessageLayer {
 
         for (PseudonymKey key: keys) {
             int userId = friendDatabase.getUserId(key.getUsername());
+            Log.v(TAG, String.format("getting posts for %s userid %d", key.getUsername(), userId));
             String apiKey = Utils.getApiKey(context);
             List<EncryptedPost> encryptedPosts = Rest.getPosts(key.getPseudonym(), apiKey);
             if (encryptedPosts == null) {
@@ -70,6 +75,7 @@ public class MessageLayer {
                 continue;
             }
 
+            Log.v(TAG, String.format("found %d posts", encryptedPosts.size()));
             PostDatabase postDatabase = PostDatabase.getInstance(context);
             for (EncryptedPost post: encryptedPosts) {
                 //--TODO check that post is signed
@@ -82,6 +88,7 @@ public class MessageLayer {
 
                     posts.add(new Post(
                                     key.getUsername(),
+                                    postUpdate.getId(),
                                     postUpdate.getTimestamp(),
                                     postUpdate.getContent(),
                                     new ArrayList<>()));
@@ -92,21 +99,40 @@ public class MessageLayer {
         return posts;
     }
 
-    public static void post(Context context, String content) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String lastId = preferences.getString(context.getString(R.string.post_id_key), "0");
-        String newId = String.valueOf(Integer.parseInt(lastId) + 1);
-        PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
-        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-
+    public static void post(Context context, PostUpdate postUpdate) {
         EncryptedPost encryptedPost = new EncryptedPost(
                 postUpdate,
-                CryptoUtil.decodePrivateKey(privateKey),
-                CryptoUtil.decodeSymmetricKey(myGroupKey));
+                Utils.getPrivateKey(context),
+                Utils.getGroupKey(context));
 
-        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-        Rest.post(pseudonymSeed, encryptedPost, Utils.getApiKey(context));
+        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
+    }
+
+    public static void comment(Context context, CommentUpdate commentUpdate) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
+
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        String postAuthorPseudonym = commentUpdate.getPostAuthorPseudonym();
+        String postAuthorUsername = friendDatabase.getUsernameFromPseudonym(postAuthorPseudonym);
+        PseudonymKey postAuthorGroupKey = friendDatabase.getKey(postAuthorUsername);
+
+        EncryptedComment encryptedComment = new EncryptedComment(
+                commentUpdate,
+                CryptoUtil.decodePrivateKey(privateKey),
+                postAuthorGroupKey.getKey(),
+                postAuthorPseudonym,
+                commentUpdate.getPostId());
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Rest.postComment(
+                        encryptedComment,
+                        Utils.getApiKey(context));
+                return null;
+            }
+        }.execute();
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {
@@ -177,5 +203,31 @@ public class MessageLayer {
         }
 
         return Util.getNewest(profiles);
+    }
+
+    public static List<Comment> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
+        List<CommentQuery> queries = new ArrayList<>();
+        queries.add(new CommentQuery(postAuthorPseudonymKey.getPseudonym(), postId));
+        Log.v(TAG, String.format("query: pseud %s postId %s", postAuthorPseudonymKey.getPseudonym(), postId));
+        CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
+
+        List<EncryptedComment> encryptedComments = Rest.getComments(
+                commentQueryPost,
+                Utils.getApiKey(context));
+
+        List<Comment> comments = new ArrayList<>();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        for (EncryptedComment ec : encryptedComments) {
+            CommentUpdate commentUpdate = ec.decrypt(postAuthorPseudonymKey.getKey());
+            String commentAuthorUsername =
+                    friendDatabase.getUsernameFromPseudonym(commentUpdate.getCommentAuthorPseudonym());
+            if (commentAuthorUsername == null) {
+                commentAuthorUsername = UNKNOWN_USER_NAME;
+            }
+
+            comments.add(new Comment(commentAuthorUsername, commentUpdate.getContent(), commentUpdate.getTimestamp()));
+        }
+
+        return comments;
     }
 }
