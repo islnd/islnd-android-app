@@ -14,6 +14,7 @@ import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
+import com.island.island.Models.RawComment;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
@@ -89,7 +90,7 @@ public class MessageLayer {
 
                     posts.add(new Post(
                                     key.getUsername(),
-                                    postUpdate.getId(),
+                                    userId, postUpdate.getId(),
                                     postUpdate.getTimestamp(),
                                     postUpdate.getContent(),
                                     new ArrayList<>()));
@@ -209,43 +210,48 @@ public class MessageLayer {
     public static List<Comment> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
         List<CommentQuery> queries = new ArrayList<>();
         queries.add(new CommentQuery(postAuthorPseudonymKey.getPseudonym(), postId));
-        Log.v(TAG, String.format("query: pseud %s postId %s", postAuthorPseudonymKey.getPseudonym(), postId));
+        CommentCollection commentCollection = getComments(context, queries);
+
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        int postAuthorId = friendDatabase.getUserId(
+                friendDatabase.getUsernameFromPseudonym(postAuthorPseudonymKey.getPseudonym()));
+        List<RawComment> rawComments = commentCollection.getComments(postAuthorId, postId);
+        return Utils.buildComments(context, rawComments);
+    }
+
+    public static CommentCollection getComments(Context context, List<CommentQuery> queries) {
         CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
 
         List<EncryptedComment> encryptedComments = Rest.getComments(
                 commentQueryPost,
                 Utils.getApiKey(context));
 
-        List<Comment> comments = new ArrayList<>();
-
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         CommentDatabase commentDatabase = CommentDatabase.getInstance(context);
 
+        CommentCollection comments = new CommentCollection();
         for (EncryptedComment ec : encryptedComments) {
+            PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(
+                    friendDatabase.getUsernameFromPseudonym(ec.getPostAuthorPseudonym()));
+
             CommentUpdate commentUpdate = ec.decrypt(postAuthorPseudonymKey.getKey());
             String commentAuthorUsername =
                     friendDatabase.getUsernameFromPseudonym(commentUpdate.getCommentAuthorPseudonym());
+
             if (commentAuthorUsername == null) {
                 commentAuthorUsername = UNKNOWN_USER_NAME;
             }
 
-            comments.add(
-                    new Comment(
-                            commentAuthorUsername,
-                            commentUpdate.getContent(),
-                            commentUpdate.getTimestamp()));
-
             int postAuthorId = friendDatabase.getUserId(postAuthorPseudonymKey.getUsername());
             int commentAuthorId = friendDatabase.getUserId(commentAuthorUsername);
+
+            comments.add(postAuthorId, commentAuthorId, commentUpdate);
+
             if (!commentDatabase.contains(postAuthorId, commentAuthorId, commentUpdate.getTimestamp())) {
                 commentDatabase.insert(commentAuthorId, postAuthorId, commentUpdate);
             }
         }
 
         return comments;
-    }
-
-    public static void getComments(Context applicationContext, List<CommentQuery> commentQueries) {
-
     }
 }

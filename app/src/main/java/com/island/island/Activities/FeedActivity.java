@@ -22,6 +22,8 @@ import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
+import org.island.messaging.CommentCollection;
+import org.island.messaging.server.CommentQuery;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -115,6 +117,7 @@ public class FeedActivity extends NavBaseActivity {
                 insertionPoint,
                 new Post(
                         postAuthor,
+                        userId,
                         p.getPostId(),
                         p.getTimestamp(),
                         p.getContent(),
@@ -142,32 +145,31 @@ public class FeedActivity extends NavBaseActivity {
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
-    private class GetCommentsFromServerTask extends AsyncTask<Void, Void, List<PostToComments>> {
+    private class GetCommentsFromServerTask extends AsyncTask<Void, Void, CommentCollection> {
         private final String TAG = GetCommentsFromServerTask.class.getSimpleName();
 
         @Override
-        protected List<PostToComments> doInBackground(Void... params) {
-            List<PostToComments> postsToComments = new ArrayList<>();
+        protected CommentCollection doInBackground(Void... params) {
+            List<CommentQuery> commentQueries = new ArrayList<>();
             FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
 
             //--This iteration is probably not thread safe...
             for (Post post : mArrayOfPosts) {
-                List<Comment> comments = MessageLayer.getComments(
-                        getApplicationContext(),
-                        friendDatabase.getKey(post.getUserName()),
-                        post.getPostId());
-                postsToComments.add(new PostToComments(post.getPostId(), comments));
+                String postAuthorPseudonym = friendDatabase.getKey(post.getUserName()).getPseudonym();
+                commentQueries.add(new CommentQuery(postAuthorPseudonym, post.getPostId()));
             }
 
-            return postsToComments;
+            return MessageLayer.getComments(getApplicationContext(), commentQueries);
         }
 
         @Override
-        protected void onPostExecute(List<PostToComments> postsToComments) {
+        protected void onPostExecute(CommentCollection commentCollection) {
             boolean modified = false;
-            for (PostToComments commentToPost : postsToComments) {
-                Post post = findPost(commentToPost.postId);
-                if (post.addComments(commentToPost.comments)) {
+
+            for (Post post : mArrayOfPosts) {
+                List<RawComment> rawComments = commentCollection.getComments(post);
+                List<Comment> comments = Utils.buildComments(getApplicationContext(), rawComments);
+                if (post.addComments(comments)) {
                     modified = true;
                 }
             }
@@ -176,16 +178,6 @@ public class FeedActivity extends NavBaseActivity {
                 mAdapter.notifyDataSetChanged();
             }
         }
-    }
-
-    private Post findPost(String postId) {
-        for (Post post : mArrayOfPosts) {
-            if (post.getPostId().equals(postId)) {
-                return post;
-            }
-        }
-
-        return null;
     }
 
     private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>> {
@@ -237,15 +229,5 @@ public class FeedActivity extends NavBaseActivity {
         }
 
         return insertionPoint;
-    }
-
-    private class PostToComments {
-        String postId;
-        List<Comment> comments;
-
-        public PostToComments(String postId, List<Comment> comments) {
-            this.postId = postId;
-            this.comments = comments;
-        }
     }
 }

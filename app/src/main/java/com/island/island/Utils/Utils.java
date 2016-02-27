@@ -7,15 +7,20 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.island.island.Database.FriendDatabase;
+import com.island.island.Models.Comment;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
+import com.island.island.Models.RawComment;
 import com.island.island.R;
 
 import org.island.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 public class Utils
@@ -155,5 +160,16 @@ public class Utils
 
     public static int getDpFromResource(Context context, int res) {
         return (int) Utils.dpFromPx(context, context.getResources().getDimension(res));
+    }
+
+    public static List<Comment> buildComments(Context context, List<RawComment> rawComments) {
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        List<Comment> comments = new ArrayList<>();
+        for (RawComment rawComment : rawComments) {
+            String username = friendDatabase.getUsername(rawComment.getCommentUserId());
+            comments.add(new Comment(username, rawComment.getContent(), rawComment.getTimestamp()));
+        }
+
+        return comments;
     }
 }
