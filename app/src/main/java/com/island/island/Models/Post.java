@@ -71,4 +71,26 @@ public class Post implements Serializable
     public String getPostId() {
         return postId;
     }
+
+    public boolean addComments(List<Comment> newComments) {
+        boolean addedAny = false;
+        for (Comment comment : newComments) {
+            if (!hasComment(comment.getKey())) {
+                this.comments.add(comment);
+                addedAny = true;
+            }
+        }
+
+        return addedAny;
+    }
+
+    private boolean hasComment(String key) {
+        for (Comment comment : this.comments) {
+            if (comment.getKey().equals(key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

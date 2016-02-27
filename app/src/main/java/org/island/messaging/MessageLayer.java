@@ -244,4 +244,8 @@ public class MessageLayer {
 
         return comments;
     }
+
+    public static void getComments(Context applicationContext, List<CommentQuery> commentQueries) {
+
+    }
 }

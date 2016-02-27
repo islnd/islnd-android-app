@@ -13,10 +13,8 @@ import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
-import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.Comment;
 import com.island.island.Models.Post;
-import com.island.island.Database.IslandDB;
 import com.island.island.Models.RawComment;
 import com.island.island.Models.RawPost;
 import com.island.island.R;
@@ -144,6 +142,52 @@ public class FeedActivity extends NavBaseActivity {
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
+    private class GetCommentsFromServerTask extends AsyncTask<Void, Void, List<PostToComments>> {
+        private final String TAG = GetCommentsFromServerTask.class.getSimpleName();
+
+        @Override
+        protected List<PostToComments> doInBackground(Void... params) {
+            List<PostToComments> postsToComments = new ArrayList<>();
+            FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
+
+            //--This iteration is probably not thread safe...
+            for (Post post : mArrayOfPosts) {
+                List<Comment> comments = MessageLayer.getComments(
+                        getApplicationContext(),
+                        friendDatabase.getKey(post.getUserName()),
+                        post.getPostId());
+                postsToComments.add(new PostToComments(post.getPostId(), comments));
+            }
+
+            return postsToComments;
+        }
+
+        @Override
+        protected void onPostExecute(List<PostToComments> postsToComments) {
+            boolean modified = false;
+            for (PostToComments commentToPost : postsToComments) {
+                Post post = findPost(commentToPost.postId);
+                if (post.addComments(commentToPost.comments)) {
+                    modified = true;
+                }
+            }
+
+            if (modified) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private Post findPost(String postId) {
+        for (Post post : mArrayOfPosts) {
+            if (post.getPostId().equals(postId)) {
+                return post;
+            }
+        }
+
+        return null;
+    }
+
     private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>> {
         private final String TAG = GetPostsFromServerTask.class.getSimpleName();
 
@@ -163,6 +207,8 @@ public class FeedActivity extends NavBaseActivity {
 
             mRefreshLayout.setRefreshing(false);
             Utils.printAvailableMemory(getApplicationContext(), TAG);
+
+            new GetCommentsFromServerTask().execute();
         }
 
         private boolean addPostsToFeed(List<Post> posts) {
@@ -191,5 +237,15 @@ public class FeedActivity extends NavBaseActivity {
         }
 
         return insertionPoint;
+    }
+
+    private class PostToComments {
+        String postId;
+        List<Comment> comments;
+
+        public PostToComments(String postId, List<Comment> comments) {
+            this.postId = postId;
+            this.comments = comments;
+        }
     }
 }
