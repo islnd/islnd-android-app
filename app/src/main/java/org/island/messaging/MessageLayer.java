@@ -90,7 +90,8 @@ public class MessageLayer {
 
                     posts.add(new Post(
                                     key.getUsername(),
-                                    userId, postUpdate.getId(),
+                                    userId,
+                                    postUpdate.getId(),
                                     postUpdate.getTimestamp(),
                                     postUpdate.getContent(),
                                     new ArrayList<>()));

@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class CommentViewModel implements Serializable
 {
-    private String username;
-    private String comment;
-    private long timestamp;
+    private final String username;
+    private final String comment;
+    private final long timestamp;
 
     public CommentViewModel(String username, String comment, long timestamp)
     {
@@ -26,19 +26,9 @@ public class CommentViewModel implements Serializable
         return comment;
     }
 
-    public void setComment(String comment)
-    {
-        this.comment = comment;
-    }
-
     public String getUsername()
     {
         return username;
-    }
-
-    public void setUsername(String username)
-    {
-        this.username = username;
     }
 
     public String getKey() {

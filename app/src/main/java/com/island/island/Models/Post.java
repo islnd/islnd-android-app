@@ -19,7 +19,11 @@ public class Post implements Serializable
     private final String postId;
     private final List<CommentViewModel> comments;
 
-    public Post(String userName, int userId, String postId, long timestamp, String content,
+    public Post(String userName,
+                int userId,
+                String postId,
+                long timestamp,
+                String content,
                 List<CommentViewModel> comments)
     {
         this.userName = userName;

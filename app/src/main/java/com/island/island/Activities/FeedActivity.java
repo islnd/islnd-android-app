@@ -121,23 +121,15 @@ public class FeedActivity extends NavBaseActivity {
                         p.getPostId(),
                         p.getTimestamp(),
                         p.getContent(),
-                        getCommentsForPost(friendDatabase, commentDatabase, p)
+                        getCommentsForPost(commentDatabase, p)
                 ));
 
         return true;
     }
 
-    private List<CommentViewModel> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
-        Log.v(TAG, String.format("get comments for post user id %d post id %s ", p.getUserId(), p.getPostId()));
-        List<Comment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
-        Log.v(TAG, String.format("found %d comments", rawComments.size()));
-        List<CommentViewModel> comments = new ArrayList<>();
-        for (Comment rc : rawComments) {
-            String commentUsername = friendDatabase.getUsername(rc.getCommentUserId());
-            comments.add(new CommentViewModel(commentUsername, rc.getContent(), rc.getTimestamp()));
-        }
-
-        return comments;
+    private List<CommentViewModel> getCommentsForPost(CommentDatabase commentDatabase, RawPost post) {
+        List<Comment> comments = commentDatabase.getComments(post.getUserId(), post.getPostId());
+        return Utils.buildCommentViewModels(this, comments);
     }
 
     public void startNewPostActivity(View view) {
@@ -153,9 +145,8 @@ public class FeedActivity extends NavBaseActivity {
             List<CommentQuery> commentQueries = new ArrayList<>();
             FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
 
-            //--This iteration is probably not thread safe...
             for (Post post : mArrayOfPosts) {
-                String postAuthorPseudonym = friendDatabase.getKey(post.getUserName()).getPseudonym();
+                String postAuthorPseudonym = friendDatabase.getPseudonym(post.getUserId());
                 commentQueries.add(new CommentQuery(postAuthorPseudonym, post.getPostId()));
             }
 
@@ -167,10 +158,12 @@ public class FeedActivity extends NavBaseActivity {
             boolean anyPostUpdated = false;
 
             for (Post post : mArrayOfPosts) {
-                List<Comment> comments = commentCollection.getComments(post);
+                List<Comment> commentsForPost = commentCollection.getComments(
+                        post.getUserId(),
+                        post.getPostId());
                 List<CommentViewModel> commentViewModels = Utils.buildCommentViewModels(
                         getApplicationContext(),
-                        comments);
+                        commentsForPost);
                 if (post.addComments(commentViewModels)) {
                     anyPostUpdated = true;
                 }

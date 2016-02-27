@@ -39,10 +39,6 @@ public class CommentCollection {
                         commentUpdate.getTimestamp()));
     }
 
-    public List<Comment> getComments(Post post) {
-        return getComments(post.getUserId(), post.getPostId());
-    }
-
     public List<Comment> getComments(int postAuthorId, String postId) {
         if (!map.containsKey(postAuthorId)) {
             return new ArrayList<>();
