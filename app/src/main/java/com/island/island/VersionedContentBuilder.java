@@ -10,6 +10,7 @@ import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 
+import org.island.messaging.CommentUpdate;
 import org.island.messaging.PostUpdate;
 
 public class VersionedContentBuilder {
@@ -29,6 +30,23 @@ public class VersionedContentBuilder {
                 context,
                 context.getString(R.string.post_version_key));
         return PostUpdate.buildPost(content, String.valueOf(newVersion));
+    }
+
+    public static CommentUpdate buildComment(
+            Context context,
+            String postAuthorPseudonym,
+            String commentAuthorPseudonym,
+            String postId,
+            String content) {
+        int newVersion = getNewVersionAndUpdate(
+                context,
+                context.getString(R.string.comment_version_key));
+        return CommentUpdate.buildComment(
+                postAuthorPseudonym,
+                commentAuthorPseudonym,
+                postId,
+                String.valueOf(newVersion),
+                content);
     }
 
     private static int getNewVersionAndUpdate(Context context, String versionKey) {

@@ -20,6 +20,7 @@ import com.island.island.Models.User;
 import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedComment;
@@ -72,7 +73,9 @@ public class MessageLayer {
         String apiKey = Utils.getApiKey(context);
 
         for (PseudonymKey friendPseudonymKey: keys) {
-            List<EncryptedPost> encryptedPosts = Rest.getPosts(friendPseudonymKey.getPseudonym(), apiKey);
+            List<EncryptedPost> encryptedPosts = Rest.getPosts(
+                    friendPseudonymKey.getPseudonym(),
+                    apiKey);
             if (encryptedPosts == null) {
                 continue;
             }
@@ -136,18 +139,24 @@ public class MessageLayer {
         Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
     }
 
-    public static void comment(Context context, CommentUpdate commentUpdate) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-
+    public static void comment(Context context, int postUserId, String postId, String content) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        String postAuthorPseudonym = commentUpdate.getPostAuthorPseudonym();
-        String postAuthorUsername = friendDatabase.getUsernameFromPseudonym(postAuthorPseudonym);
-        PseudonymKey postAuthorGroupKey = friendDatabase.getKey(postAuthorUsername);
+        int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
+        String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
+        String myPseudonym = Utils.getPseudonym(context);
+        CommentUpdate commentUpdate = VersionedContentBuilder.buildComment(
+                context,
+                postAuthorPseudonym,
+                myPseudonym,
+                postId,
+                content);
 
+        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
+
+        PseudonymKey postAuthorGroupKey = friendDatabase.getKey(postUserId);
         EncryptedComment encryptedComment = new EncryptedComment(
                 commentUpdate,
-                CryptoUtil.decodePrivateKey(privateKey),
+                Utils.getPrivateKey(context),
                 postAuthorGroupKey.getKey(),
                 postAuthorPseudonym,
                 commentUpdate.getPostId());
@@ -253,7 +262,7 @@ public class MessageLayer {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         CommentDatabase commentDatabase = CommentDatabase.getInstance(context);
 
-        CommentCollection comments = new CommentCollection();
+        CommentCollection commentCollection= new CommentCollection();
         for (EncryptedComment ec : encryptedComments) {
             PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(
                     friendDatabase.getUsernameFromPseudonym(ec.getPostAuthorPseudonym()));
@@ -269,13 +278,18 @@ public class MessageLayer {
             int postAuthorId = friendDatabase.getUserId(postAuthorPseudonymKey.getUsername());
             int commentAuthorId = friendDatabase.getUserId(commentAuthorUsername);
 
-            comments.add(postAuthorId, commentAuthorId, commentUpdate);
+            if (commentUpdate.isDeletion()) {
+                //--TODO do delete stuff
+            }
+            else {
+                commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
+            }
 
-            if (!commentDatabase.contains(postAuthorId, commentAuthorId, commentUpdate.getTimestamp())) {
+            if (!commentDatabase.contains(commentAuthorId, commentUpdate.getCommentId())) {
                 commentDatabase.insert(commentAuthorId, postAuthorId, commentUpdate);
             }
         }
 
-        return comments;
+        return commentCollection;
     }
 }

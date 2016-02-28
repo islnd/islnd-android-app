@@ -221,23 +221,11 @@ public class IslandDB
      * @param comment Comment that I'm adding.
      */
     {
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        int postUserId = post.getUserId();
-        Log.v(TAG, String.format("username %s has id %d", post.getUserName(), postUserId));
-        int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
-        String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
-        String myPseudonym = Utils.getPseudonym(context);
-        String postId = post.getPostId();
-
-        //--TODO comment update should be built in message layer
-        CommentUpdate commentUpdate = CommentUpdate.buildComment(
-                postAuthorPseudonym,
-                myPseudonym,
-                postId,
+        MessageLayer.comment(
+                context,
+                post.getUserId(),
+                post.getPostId(),
                 comment.getComment());
-
-        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
-        MessageLayer.comment(context, commentUpdate);
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {

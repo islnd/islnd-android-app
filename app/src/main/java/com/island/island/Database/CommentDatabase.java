@@ -24,6 +24,7 @@ public class CommentDatabase extends SQLiteOpenHelper {
     private static final String COMMENT_USER_ID = "COMMENT_USER_ID";
     private static final String POST_USER_ID = "POST_USER_ID";
     private static final String POST_ID = "POST_ID";
+    private static final String COMMENT_ID = "COMMENT_ID";
     private static final String CONTENT = "CONTENT";
     private static final String TIMESTAMP = "TIMESTAMP";
 
@@ -36,6 +37,7 @@ public class CommentDatabase extends SQLiteOpenHelper {
         String sql = "CREATE TABLE " + DATABASE_NAME + " ("
                 + COMMENT_USER_ID + " INT, "
                 + POST_USER_ID + " INT, "
+                + COMMENT_ID + " TEXT, "
                 + POST_ID + " TEXT, "
                 + CONTENT + " TEXT, "
                 + TIMESTAMP + " INT)";
@@ -89,16 +91,13 @@ public class CommentDatabase extends SQLiteOpenHelper {
         return comments;
     }
 
-    public boolean contains(int postAuthorId, int commentAuthorId, long timestamp) {
+    public boolean contains(int commentAuthorId, String commentId) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
-        String[] columns = {POST_USER_ID, COMMENT_USER_ID, TIMESTAMP};
-        String selection = POST_USER_ID + " = ? AND "
-                + COMMENT_USER_ID + " = ? AND "
-                + TIMESTAMP + " = ?";
-        String[] args = {String.valueOf(postAuthorId),
-                String.valueOf(commentAuthorId),
-                String.valueOf(timestamp) };
-        
+        String[] columns = {COMMENT_USER_ID, COMMENT_ID};
+        String selection = COMMENT_USER_ID + " = ? AND "
+                + COMMENT_ID + " = ?";
+        String[] args = {String.valueOf(commentAuthorId), commentId};
+
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
     }
