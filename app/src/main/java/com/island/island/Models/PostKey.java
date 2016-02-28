@@ -14,7 +14,7 @@ public class PostKey implements Serializable {
         this.postId = postId;
     }
 
-    private int getUserId() {
+    public int getUserId() {
         return this.userId;
     }
 

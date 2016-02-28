@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.island.island.Models.Post;
 import com.island.island.Models.RawPost;
 
 import org.island.messaging.PostUpdate;
@@ -66,6 +67,18 @@ public class PostDatabase extends SQLiteOpenHelper {
         writableDatabase.insert(DATABASE_NAME, null, values);
     }
 
+    public void insert(int userId, Post post) {
+        SQLiteDatabase writableDatabase = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(USER_ID, userId);
+        values.put(POST_ID, post.getPostId());
+        values.put(CONTENT, post.getContent());
+        values.put(TIMESTAMP, post.getTimestamp());
+        Log.v(TAG, String.format("adding post. user id %d. post id %s", userId, post.getPostId()));
+
+        writableDatabase.insert(DATABASE_NAME, null, values);
+    }
+
     public List<RawPost> getAll() {
         List<RawPost> posts = new ArrayList<>();
         SQLiteDatabase readableDatabase = getReadableDatabase();
@@ -89,11 +102,20 @@ public class PostDatabase extends SQLiteOpenHelper {
         db.delete(DATABASE_NAME, null, null);
     }
 
-    public boolean contains(int userId, PostUpdate postUpdate) {
+    public boolean contains(int userId, Post post) {
         SQLiteDatabase readableDatabase = getReadableDatabase();
         String[] columns = {USER_ID, TIMESTAMP};
         String selection = USER_ID + " = ? AND " + TIMESTAMP + " = ?";
-        String[] args = {String.valueOf(userId), String.valueOf(postUpdate.getTimestamp())};
+        String[] args = {String.valueOf(userId), String.valueOf(post.getTimestamp())};
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        return results.getCount() > 0;
+    }
+
+    public boolean contains(int userId, String postId) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {USER_ID, POST_ID};
+        String selection = USER_ID + " = ? AND " + POST_ID + " = ?";
+        String[] args = {String.valueOf(userId), postId};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
     }
@@ -102,6 +124,8 @@ public class PostDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         String selection = USER_ID + " = ? AND " + POST_ID + " = ?";
         String[] args = {String.valueOf(userId), postId};
+        Log.v(TAG, String.format("deleting post. user id %d. post id %s", userId, postId));
+
         db.delete(DATABASE_NAME, selection, args);
     }
 }
