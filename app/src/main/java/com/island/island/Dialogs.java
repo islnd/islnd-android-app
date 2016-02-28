@@ -6,16 +6,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.island.island.Activities.FeedActivity;
 import com.island.island.Activities.ShowQRActivity;
 import com.island.island.Database.IslandDB;
+import com.island.island.Models.Post;
+import com.island.island.Models.PostKey;
+import com.island.island.Utils.Utils;
 
-/**
- * Created by poo on 2/10/2016.
- */
+import java.util.ArrayList;
+
 public class Dialogs
 {
+    private static final String TAG = Dialogs.class.getSimpleName();
+
     public static void removeFriendDialog(Context context, String userName)
     {
         final String removeFriend = userName;
@@ -24,24 +30,6 @@ public class Dialogs
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
                     IslandDB.removeReader(removeFriend);
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    public static void deletePostDialog(Context context, int postUserId, String postId)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(context.getString(R.string.delete_post_dialog))
-                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
-                {
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            IslandDB.deletePost(context, postUserId, postId);
-                            return null;
-                        }
-                    }.execute();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

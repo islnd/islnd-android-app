@@ -1,10 +1,13 @@
 package com.island.island.Activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,9 +18,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
+import com.island.island.DeletePostFragment;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
+import com.island.island.Models.PostKey;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
@@ -30,9 +35,9 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ViewPostActivity extends AppCompatActivity
+public class ViewPostActivity extends AppCompatActivity implements DeletePostFragment.NoticeDeletePostListener
 {
-    private Post post = null;
+    private Post mPost = null;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -62,18 +67,18 @@ public class ViewPostActivity extends AppCompatActivity
 
         // Get intent with post info
         Intent intent = getIntent();
-        post = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
-        mViewPostList.add(post);
+        mPost = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
+        mViewPostList.add(mPost);
 
         // Add comments to list
-        List<CommentViewModel> comments = post.getComments();
+        List<CommentViewModel> comments = mPost.getComments();
         mViewPostList.addAll(comments);
         for (CommentViewModel comment : comments) {
             mCommentMap.add(comment.getKey());
         }
 
         // Get comments from network
-        new GetCommentsTask().execute(post);
+        new GetCommentsTask().execute(mPost);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -98,10 +103,28 @@ public class ViewPostActivity extends AppCompatActivity
         }
         else
         {
-            IslandDB.addCommentToPost(this, post, new CommentViewModel(Utils.getUser(this), commentText));
+            IslandDB.addCommentToPost(
+                    this,
+                    mPost,
+                    new CommentViewModel(Utils.getUser(this), commentText));
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
+    }
+
+    @Override
+    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
+        setResult(Activity.RESULT_OK, buildReturnIntent(mPost.getUserId(), mPost.getPostId()));
+        finish();
+    }
+
+    @NonNull
+    private Intent buildReturnIntent(int postAuthorId, String postId) {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(
+                PostKey.POST_KEY_EXTRA,
+                new PostKey(postAuthorId, postId));
+        return returnIntent;
     }
 
     private class GetCommentsTask extends AsyncTask<Post, Void, Void> {
@@ -109,8 +132,8 @@ public class ViewPostActivity extends AppCompatActivity
         protected Void doInBackground(Post... params) {
             List<CommentViewModel> comments = MessageLayer.getCommentCollection(
                     getApplicationContext(),
-                    post.getUserId(),
-                    post.getPostId());
+                    mPost.getUserId(),
+                    mPost.getPostId());
 
             for (CommentViewModel comment : comments) {
                 if (!mCommentMap.contains(comment.getKey())) {
