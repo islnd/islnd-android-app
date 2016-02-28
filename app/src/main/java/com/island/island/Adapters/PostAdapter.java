@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Activities.ViewPostActivity;
+import com.island.island.Database.IslandDB;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
@@ -91,9 +92,7 @@ public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
                     switch (item.getItemId())
                     {
                         case R.id.delete_post:
-                            Dialogs.deletePostDialog(mContext, "");
-                            // TODO: Behavior after removal?
-                            // TODO: Don't have postIds yet
+                            Dialogs.deletePostDialog(mContext, post.getUserId(), post.getPostId());
                     }
 
                     return true;

@@ -16,6 +16,7 @@ import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 import com.island.island.Models.Comment;
 import com.island.island.Models.User;
+import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
 
@@ -44,7 +45,7 @@ public class MessageLayer {
             return new ArrayList<>();
         }
 
-        //decrypt the friends and add to DB
+        //decrypt the friends and addPost to DB
         List<User> friends = new ArrayList<>();
         for (EncryptedData encryptedPseudonymKey : keys) {
             PseudonymKey pseudonymKey = ObjectEncrypter.decryptPseudonymKey(
@@ -61,12 +62,12 @@ public class MessageLayer {
         Rest.postPublicKey(username, CryptoUtil.encodeKey(publicKey), Utils.getApiKey(context));
     }
 
-    public static List<Post> getPosts(Context context) {
+    public static PostCollection getPosts(Context context) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         PostDatabase postDatabase = PostDatabase.getInstance(context);
 
         ArrayList<PseudonymKey> keys = friendDatabase.getKeys();
-        List<Post> posts = new ArrayList<>();
+        PostCollection postCollection = new PostCollection();
 
         for (PseudonymKey key: keys) {
             int userId = friendDatabase.getUserId(key.getUsername());
@@ -79,27 +80,36 @@ public class MessageLayer {
             }
 
             Log.v(TAG, String.format("found %d posts", encryptedPosts.size()));
-            for (EncryptedPost post: encryptedPosts) {
+            for (EncryptedPost encryptedPost: encryptedPosts) {
                 //--TODO check that post is signed
-                PostUpdate postUpdate = post.decrypt(key.getKey());
-                if (postUpdate != null
-                        && !postUpdate.isDeletion()) {
+                PostUpdate postUpdate = encryptedPost.decrypt(key.getKey());
+                if (postUpdate == null) {
+                    continue;
+                }
+
+                if (postUpdate.isDeletion()) {
+                    Log.v(TAG, String.format("found post delete for user %d post %s", userId, postUpdate.getId()));
+                    postCollection.addDelete(userId, postUpdate.getId());
+                }
+                else {
                     if (!postDatabase.contains(userId, postUpdate)) {
                         postDatabase.insert(userId, postUpdate);
                     }
 
-                    posts.add(new Post(
-                                    key.getUsername(),
-                                    userId,
-                                    postUpdate.getId(),
-                                    postUpdate.getTimestamp(),
-                                    postUpdate.getContent(),
-                                    new ArrayList<>()));
+                    final Post post = new Post(
+                            key.getUsername(),
+                            userId,
+                            postUpdate.getId(),
+                            postUpdate.getTimestamp(),
+                            postUpdate.getContent(),
+                            new ArrayList<>());
+
+                    postCollection.addPost(post);
                 }
             }
         }
 
-        return posts;
+        return postCollection;
     }
 
     public static void post(Context context, PostUpdate postUpdate) {
@@ -221,6 +231,9 @@ public class MessageLayer {
         List<EncryptedComment> encryptedComments = Rest.getComments(
                 commentQueryPost,
                 Utils.getApiKey(context));
+        if (encryptedComments == null) {
+            return new CommentCollection();
+        }
 
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         CommentDatabase commentDatabase = CommentDatabase.getInstance(context);

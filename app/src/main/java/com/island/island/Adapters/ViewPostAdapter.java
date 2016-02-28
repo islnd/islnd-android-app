@@ -120,7 +120,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     switch (item.getItemId())
                     {
                         case R.id.delete_post:
-                            Dialogs.deletePostDialog(mContext, "");
+                            Dialogs.deletePostDialog(mContext, post.getUserId(), post.getPostId());
                             // TODO: Behavior after removal?
                             // TODO: Don't have postIds yet
                     }

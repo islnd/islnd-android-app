@@ -55,8 +55,8 @@ public class Post implements Serializable
         return comments;
     }
 
-    public String getKey() {
-        return getUserName() + getTimestamp();
+    public PostKey getKey() {
+        return new PostKey(this.userId, this.postId);
     }
 
     public String getPostId() {

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.island.island.Activities.ShowQRActivity;
@@ -28,13 +29,19 @@ public class Dialogs
                 .show();
     }
 
-    public static void deletePostDialog(Context context, String postId)
+    public static void deletePostDialog(Context context, int postUserId, String postId)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(context.getString(R.string.delete_post_dialog))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    // TODO: Add remove post!
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            IslandDB.deletePost(context, postUserId, postId);
+                            return null;
+                        }
+                    }.execute();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

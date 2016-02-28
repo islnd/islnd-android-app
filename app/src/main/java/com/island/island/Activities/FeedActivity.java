@@ -16,7 +16,9 @@ import com.island.island.Database.PostDatabase;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Comment;
+import com.island.island.Models.PostKey;
 import com.island.island.Models.RawPost;
+import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
@@ -39,7 +41,7 @@ public class FeedActivity extends NavBaseActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Post> mArrayOfPosts;
-    private Set<String> mPostMap;
+    private Set<PostKey> mPostMap;
     private SwipeRefreshLayout mRefreshLayout;
 
     @Override
@@ -75,7 +77,6 @@ public class FeedActivity extends NavBaseActivity {
         if (requestCode == NEW_POST_RESULT) {
             if (data != null) {
                 Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
-                Log.v(TAG, String.format("%s %s", post.getContent(), post.getKey()));
                 mArrayOfPosts.add(0, post);
                 mAdapter.notifyDataSetChanged();
                 mPostMap.add(post.getKey());
@@ -105,24 +106,22 @@ public class FeedActivity extends NavBaseActivity {
                 ? Utils.getUser(this)
                 : friendDatabase.getUsername(userId);
 
-        String key = postAuthor + p.getTimestamp();
-        Log.v(TAG, String.format("%s %s", p.getContent(), key));
-        if (mPostMap.contains(key)) {
+        final Post post = new Post(
+                postAuthor,
+                userId,
+                p.getPostId(),
+                p.getTimestamp(),
+                p.getContent(),
+                getCommentsForPost(commentDatabase, p)
+        );
+
+        if (mPostMap.contains(post.getKey())) {
             return false;
         }
 
-        mPostMap.add(key);
+        mPostMap.add(post.getKey());
         int insertionPoint = getIndexToInsertPost(p.getTimestamp());
-        mArrayOfPosts.add(
-                insertionPoint,
-                new Post(
-                        postAuthor,
-                        userId,
-                        p.getPostId(),
-                        p.getTimestamp(),
-                        p.getContent(),
-                        getCommentsForPost(commentDatabase, p)
-                ));
+        mArrayOfPosts.add(insertionPoint, post);
 
         return true;
     }
@@ -175,18 +174,18 @@ public class FeedActivity extends NavBaseActivity {
         }
     }
 
-    private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>> {
+    private class GetPostsFromServerTask extends AsyncTask<Void, Void, PostCollection> {
         private final String TAG = GetPostsFromServerTask.class.getSimpleName();
 
         @Override
-        protected List<Post> doInBackground(Void... params) {
+        protected PostCollection doInBackground(Void... params) {
             return MessageLayer.getPosts(getApplicationContext());
         }
 
         @Override
-        protected void onPostExecute(List<Post> posts) {
-            if (posts != null) {
-                boolean adapterChanged = addPostsToFeed(posts);
+        protected void onPostExecute(PostCollection postCollection) {
+            if (postCollection != null) {
+                boolean adapterChanged = addPostsToFeed(postCollection);
                 if (adapterChanged) {
                     mAdapter.notifyDataSetChanged();
                 }
@@ -198,20 +197,41 @@ public class FeedActivity extends NavBaseActivity {
             new GetCommentsFromServerTask().execute();
         }
 
-        private boolean addPostsToFeed(List<Post> posts) {
-            boolean postAdded = false;
-            for (Post p : posts) {
-                Log.v(TAG, String.format("%s %s", p.getContent(), p.getKey()));
-                if (!mPostMap.contains(p.getKey())) {
-                    mPostMap.add(p.getKey());
-
-                    int insertionPoint = getIndexToInsertPost(p.getTimestamp());
-                    mArrayOfPosts.add(insertionPoint, p);
-                    postAdded = true;
+        private boolean addPostsToFeed(PostCollection postCollection) {
+            boolean postsModified = false;
+            for (Post post : postCollection.getPosts()) {
+                Log.v(TAG, String.format("%s %s", post.getContent(), post.getKey()));
+                if (!mPostMap.contains(post.getKey())) {
+                    mPostMap.add(post.getKey());
+                    int insertionPoint = getIndexToInsertPost(post.getTimestamp());
+                    mArrayOfPosts.add(insertionPoint, post);
+                    postsModified = true;
                 }
             }
 
-            return postAdded;
+            for (PostKey postKey : postCollection.getDeletedKeys()) {
+                int index = findPost(postKey);
+                if (index != -1) {
+                    mArrayOfPosts.remove(index);
+                    postsModified = true;
+                    Log.d(TAG, "removing post at index " + index);
+                }
+                else {
+                    Log.d(TAG, "tried to delete post not in feed");
+                }
+            }
+
+            return postsModified;
+        }
+
+        private int findPost(PostKey postKey) {
+            for (int i = 0; i < mArrayOfPosts.size(); i++) {
+                if (mArrayOfPosts.get(i).getKey().equals(postKey)) {
+                    return i;
+                }
+            }
+
+            return -1;
         }
     }
 

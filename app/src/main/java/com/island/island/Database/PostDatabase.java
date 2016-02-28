@@ -97,4 +97,11 @@ public class PostDatabase extends SQLiteOpenHelper {
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
     }
+
+    public void delete(int userId, String postId) {
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = USER_ID + " = ? AND " + POST_ID + " = ?";
+        String[] args = {String.valueOf(userId), postId};
+        db.delete(DATABASE_NAME, selection, args);
+    }
 }
