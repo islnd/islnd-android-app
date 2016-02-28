@@ -88,7 +88,11 @@ public class MessageLayer {
                 }
 
                 if (postUpdate.isDeletion()) {
-                    Log.v(TAG, String.format("found post delete for user %d post %s", userId, postUpdate.getId()));
+                    if (!postDatabase.contains(userId, postUpdate)) {
+                        Log.v(TAG, String.format("deleting from db user %d post %s", userId, postUpdate.getId()));
+                        postDatabase.delete(userId, postUpdate.getId());
+                    }
+
                     postCollection.addDelete(userId, postUpdate.getId());
                 }
                 else {
