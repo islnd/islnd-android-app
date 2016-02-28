@@ -61,7 +61,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
 
         refreshLayout.setOnRefreshListener(() ->
         {
-            // TODO: This will add duplicates, okay for now
+            // TODO: This will addPost duplicates, okay for now
             new GetFriendsTask().execute();
         });
     }

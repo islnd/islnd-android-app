@@ -3,6 +3,8 @@ package com.island.island.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.DeletePostFragment;
 import com.island.island.Dialogs;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
@@ -24,9 +27,6 @@ import com.island.island.ViewHolders.PostViewHolder;
 
 import java.util.ArrayList;
 
-/**
- * Created by poo on 2/3/2016.
- */
 public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     private ArrayList mList = new ArrayList<>();
@@ -120,9 +120,11 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     switch (item.getItemId())
                     {
                         case R.id.delete_post:
-                            Dialogs.deletePostDialog(mContext, "");
-                            // TODO: Behavior after removal?
-                            // TODO: Don't have postIds yet
+                            DialogFragment deletePostFragment =
+                                    DeletePostFragment.buildWithArgs(post.getUserId(), post.getPostId());
+                            deletePostFragment.show(
+                                    ((FragmentActivity) mContext).getSupportFragmentManager(),
+                                    mContext.getString(R.string.fragment_delete_post));
                     }
 
                     return true;

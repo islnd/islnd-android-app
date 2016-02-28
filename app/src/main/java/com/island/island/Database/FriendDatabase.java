@@ -13,7 +13,7 @@ import org.island.messaging.PseudonymKey;
 import java.util.ArrayList;
 
 /*
-    When we add support for unfriending and changing pseudonyms,
+    When we addPost support for unfriending and changing pseudonyms,
     this table will become two tables. The two tables will allow
     a constant user id and public key, while the pseudonym and group
     key change.

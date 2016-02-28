@@ -3,6 +3,7 @@ package com.island.island.Activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,10 +14,13 @@ import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
+import com.island.island.DeletePostFragment;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Comment;
+import com.island.island.Models.PostKey;
 import com.island.island.Models.RawPost;
+import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
@@ -30,16 +34,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FeedActivity extends NavBaseActivity {
+public class FeedActivity extends NavBaseActivity implements DeletePostFragment.NoticeDeletePostListener {
     private final static String TAG = FeedActivity.class.getSimpleName();
 
-    private final static int NEW_POST_RESULT = 1;
+    private static final int NEW_POST_RESULT = 1;
+    public static final int DELETE_POST_RESULT = 2;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Post> mArrayOfPosts;
-    private Set<String> mPostMap;
+    private Set<PostKey> mPostMap;
     private SwipeRefreshLayout mRefreshLayout;
 
     @Override
@@ -75,10 +80,14 @@ public class FeedActivity extends NavBaseActivity {
         if (requestCode == NEW_POST_RESULT) {
             if (data != null) {
                 Post post = (Post) data.getSerializableExtra(Post.POST_EXTRA);
-                Log.v(TAG, String.format("%s %s", post.getContent(), post.getKey()));
                 mArrayOfPosts.add(0, post);
                 mAdapter.notifyDataSetChanged();
                 mPostMap.add(post.getKey());
+            }
+        } else if (requestCode == DELETE_POST_RESULT) {
+            if (data != null) {
+                PostKey postKey = (PostKey) data.getSerializableExtra(PostKey.POST_KEY_EXTRA);
+                removePostFromFeed(postKey);
             }
         }
     }
@@ -105,24 +114,22 @@ public class FeedActivity extends NavBaseActivity {
                 ? Utils.getUser(this)
                 : friendDatabase.getUsername(userId);
 
-        String key = postAuthor + p.getTimestamp();
-        Log.v(TAG, String.format("%s %s", p.getContent(), key));
-        if (mPostMap.contains(key)) {
+        final Post post = new Post(
+                postAuthor,
+                userId,
+                p.getPostId(),
+                p.getTimestamp(),
+                p.getContent(),
+                getCommentsForPost(commentDatabase, p)
+        );
+
+        if (mPostMap.contains(post.getKey())) {
             return false;
         }
 
-        mPostMap.add(key);
+        mPostMap.add(post.getKey());
         int insertionPoint = getIndexToInsertPost(p.getTimestamp());
-        mArrayOfPosts.add(
-                insertionPoint,
-                new Post(
-                        postAuthor,
-                        userId,
-                        p.getPostId(),
-                        p.getTimestamp(),
-                        p.getContent(),
-                        getCommentsForPost(commentDatabase, p)
-                ));
+        mArrayOfPosts.add(insertionPoint, post);
 
         return true;
     }
@@ -135,6 +142,24 @@ public class FeedActivity extends NavBaseActivity {
     public void startNewPostActivity(View view) {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
+    }
+
+    @Override
+    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
+        Bundle args = dialogFragment.getArguments();
+        String postId = args.getString(DeletePostFragment.POST_ID_BUNDLE_KEY);
+        int postUserId = args.getInt(DeletePostFragment.USER_ID_BUNDLE_KEY);
+        final PostKey postKey = new PostKey(postUserId, postId);
+        removePostFromFeed(postKey);
+    }
+
+    private void removePostFromFeed(PostKey postKey) {
+        int index = findPost(postKey);
+        if (index != -1) {
+            mArrayOfPosts.remove(index);
+            mAdapter.notifyDataSetChanged();
+            mPostMap.remove(postKey);
+        }
     }
 
     private class GetCommentsFromServerTask extends AsyncTask<Void, Void, CommentCollection> {
@@ -175,18 +200,18 @@ public class FeedActivity extends NavBaseActivity {
         }
     }
 
-    private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>> {
+    private class GetPostsFromServerTask extends AsyncTask<Void, Void, PostCollection> {
         private final String TAG = GetPostsFromServerTask.class.getSimpleName();
 
         @Override
-        protected List<Post> doInBackground(Void... params) {
+        protected PostCollection doInBackground(Void... params) {
             return MessageLayer.getPosts(getApplicationContext());
         }
 
         @Override
-        protected void onPostExecute(List<Post> posts) {
-            if (posts != null) {
-                boolean adapterChanged = addPostsToFeed(posts);
+        protected void onPostExecute(PostCollection postCollection) {
+            if (postCollection != null) {
+                boolean adapterChanged = addPostsToFeed(postCollection);
                 if (adapterChanged) {
                     mAdapter.notifyDataSetChanged();
                 }
@@ -198,21 +223,42 @@ public class FeedActivity extends NavBaseActivity {
             new GetCommentsFromServerTask().execute();
         }
 
-        private boolean addPostsToFeed(List<Post> posts) {
-            boolean postAdded = false;
-            for (Post p : posts) {
-                Log.v(TAG, String.format("%s %s", p.getContent(), p.getKey()));
-                if (!mPostMap.contains(p.getKey())) {
-                    mPostMap.add(p.getKey());
-
-                    int insertionPoint = getIndexToInsertPost(p.getTimestamp());
-                    mArrayOfPosts.add(insertionPoint, p);
-                    postAdded = true;
+        private boolean addPostsToFeed(PostCollection postCollection) {
+            boolean postsModified = false;
+            for (Post post : postCollection.getPosts()) {
+                Log.v(TAG, String.format("%s %s", post.getContent(), post.getKey()));
+                if (!mPostMap.contains(post.getKey())) {
+                    mPostMap.add(post.getKey());
+                    int insertionPoint = getIndexToInsertPost(post.getTimestamp());
+                    mArrayOfPosts.add(insertionPoint, post);
+                    postsModified = true;
                 }
             }
 
-            return postAdded;
+            for (PostKey postKey : postCollection.getDeletedKeys()) {
+                int index = findPost(postKey);
+                if (index != -1) {
+                    mArrayOfPosts.remove(index);
+                    postsModified = true;
+                    Log.d(TAG, "removing post at index " + index);
+                }
+                else {
+                    Log.d(TAG, "tried to delete post not in feed");
+                }
+            }
+
+            return postsModified;
         }
+    }
+
+    private int findPost(PostKey postKey) {
+        for (int i = 0; i < mArrayOfPosts.size(); i++) {
+            if (mArrayOfPosts.get(i).getKey().equals(postKey)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private int getIndexToInsertPost(long postTimestamp) {

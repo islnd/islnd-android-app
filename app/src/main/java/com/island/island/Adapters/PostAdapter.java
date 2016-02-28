@@ -1,20 +1,23 @@
 package com.island.island.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
+import com.island.island.Activities.FeedActivity;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Activities.ViewPostActivity;
 import com.island.island.Database.ProfileDatabase;
-import com.island.island.Dialogs;
+import com.island.island.DeletePostFragment;
 import com.island.island.Models.Post;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
@@ -24,9 +27,6 @@ import com.island.island.ViewHolders.GlancePostViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by root on 2/2/16.
- */
 public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
 {
     private List<Post> mPosts = new ArrayList<>();
@@ -75,7 +75,7 @@ public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
         {
             Intent viewPostIntent = new Intent(mContext, ViewPostActivity.class);
             viewPostIntent.putExtra(Post.POST_EXTRA, post);
-            mContext.startActivity(viewPostIntent);
+            ((Activity)mContext).startActivityForResult(viewPostIntent, FeedActivity.DELETE_POST_RESULT);
         });
 
         if(Utils.isUser(mContext, post.getUserName()))
@@ -91,9 +91,11 @@ public class PostAdapter extends RecyclerView.Adapter<GlancePostViewHolder>
                     switch (item.getItemId())
                     {
                         case R.id.delete_post:
-                            Dialogs.deletePostDialog(mContext, "");
-                            // TODO: Behavior after removal?
-                            // TODO: Don't have postIds yet
+                            DialogFragment deletePostFragment =
+                                    DeletePostFragment.buildWithArgs(post.getUserId(), post.getPostId());
+                            deletePostFragment.show(
+                                    ((FragmentActivity) mContext).getSupportFragmentManager(),
+                                    mContext.getString(R.string.fragment_delete_post));
                     }
 
                     return true;

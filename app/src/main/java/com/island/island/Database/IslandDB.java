@@ -18,9 +18,11 @@ import com.island.island.VersionedContentBuilder;
 import org.island.messaging.CommentUpdate;
 import org.island.messaging.PostUpdate;
 import org.island.messaging.PseudonymKey;
+import org.island.messaging.Rest;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
+import org.island.messaging.crypto.EncryptedPost;
 
 import java.security.KeyPair;
 import java.security.SecureRandom;
@@ -279,5 +281,17 @@ public class IslandDB
         }
 
         return profile;
+    }
+
+    public static void deletePost(Context context, int userId, String postId) {
+        Log.v(TAG, String.format("deleting post. user %d post %s", userId, postId));
+        PostDatabase postDatabase = PostDatabase.getInstance(context);
+        postDatabase.delete(userId, postId);
+        PostUpdate deletePost = PostUpdate.buildDelete(postId);
+        EncryptedPost ep = new EncryptedPost(
+                deletePost,
+                Utils.getPrivateKey(context),
+                Utils.getGroupKey(context));
+        Rest.post(Utils.getPseudonymSeed(context), ep, Utils.getApiKey(context));
     }
 }
