@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
@@ -139,25 +139,25 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void bindComment(CommentViewHolder holder, int position)
     {
-        final Comment comment = (Comment) mList.get(position);
+        final CommentViewModel comment = (CommentViewModel) mList.get(position);
         final ImageView overflow = holder.overflow;
 
-        holder.userName.setText(comment.getUserName());
+        holder.userName.setText(comment.getUsername());
         holder.comment.setText(comment.getComment());
 
         // Go to profile on picture click
         holder.profileImage.setOnClickListener((View v) ->
         {
             Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUserName());
+            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUsername());
             mContext.startActivity(profileIntent);
         });
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUserName()));
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUsername()));
         ImageUtils.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
-        if(Utils.isUser(mContext, comment.getUserName()))
+        if(Utils.isUser(mContext, comment.getUsername()))
         {
             holder.overflow.setVisibility(View.VISIBLE);
 

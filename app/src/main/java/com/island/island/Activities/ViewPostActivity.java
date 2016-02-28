@@ -15,8 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
-import com.island.island.Database.FriendDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
@@ -24,11 +23,11 @@ import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
-import org.island.messaging.PseudonymKey;
-import org.island.messaging.Util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class ViewPostActivity extends AppCompatActivity
@@ -40,6 +39,7 @@ public class ViewPostActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
     private ArrayList mViewPostList;
+    private Set<String> mCommentMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,6 +52,7 @@ public class ViewPostActivity extends AppCompatActivity
 
         // List view stuff
         mViewPostList = new ArrayList<>();
+        mCommentMap = new HashSet<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -65,11 +66,14 @@ public class ViewPostActivity extends AppCompatActivity
         mViewPostList.add(post);
 
         // Add comments to list
-        List<Comment> comments = post.getComments();
+        List<CommentViewModel> comments = post.getComments();
         mViewPostList.addAll(comments);
+        for (CommentViewModel comment : comments) {
+            mCommentMap.add(comment.getKey());
+        }
 
         // Get comments from network
-        new GetCommentsTask().execute(post.getUserName(), post.getPostId());
+        new GetCommentsTask().execute(post);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -94,19 +98,27 @@ public class ViewPostActivity extends AppCompatActivity
         }
         else
         {
-            IslandDB.addCommentToPost(this, post, new Comment(Utils.getUser(this), commentText));
+            IslandDB.addCommentToPost(this, post, new CommentViewModel(Utils.getUser(this), commentText));
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
     }
 
-    private class GetCommentsTask extends AsyncTask<String, Void, Void> {
+    private class GetCommentsTask extends AsyncTask<Post, Void, Void> {
         @Override
-        protected Void doInBackground(String... params) {
-            PseudonymKey pk = FriendDatabase.getInstance(getApplicationContext()).getKey(params[0]);
-            String postId = params[1];
-            List<Comment> comments = MessageLayer.getComments(getApplicationContext(), pk, postId);
-            mViewPostList.addAll(comments);
+        protected Void doInBackground(Post... params) {
+            List<CommentViewModel> comments = MessageLayer.getCommentCollection(
+                    getApplicationContext(),
+                    post.getUserId(),
+                    post.getPostId());
+
+            for (CommentViewModel comment : comments) {
+                if (!mCommentMap.contains(comment.getKey())) {
+                    mCommentMap.add(comment.getKey());
+                    mViewPostList.add(comment);
+                }
+            }
+
             return null;
         }
 

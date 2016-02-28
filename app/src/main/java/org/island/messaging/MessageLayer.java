@@ -6,13 +6,15 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
+import com.island.island.Models.Comment;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
@@ -61,6 +63,7 @@ public class MessageLayer {
 
     public static List<Post> getPosts(Context context) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        PostDatabase postDatabase = PostDatabase.getInstance(context);
 
         ArrayList<PseudonymKey> keys = friendDatabase.getKeys();
         List<Post> posts = new ArrayList<>();
@@ -76,7 +79,6 @@ public class MessageLayer {
             }
 
             Log.v(TAG, String.format("found %d posts", encryptedPosts.size()));
-            PostDatabase postDatabase = PostDatabase.getInstance(context);
             for (EncryptedPost post: encryptedPosts) {
                 //--TODO check that post is signed
                 PostUpdate postUpdate = post.decrypt(key.getKey());
@@ -88,6 +90,7 @@ public class MessageLayer {
 
                     posts.add(new Post(
                                     key.getUsername(),
+                                    userId,
                                     postUpdate.getId(),
                                     postUpdate.getTimestamp(),
                                     postUpdate.getContent(),
@@ -205,27 +208,44 @@ public class MessageLayer {
         return Util.getNewest(profiles);
     }
 
-    public static List<Comment> getComments(Context context, PseudonymKey postAuthorPseudonymKey, String postId) {
+    public static List<CommentViewModel> getCommentCollection(Context context, int postAuthorId, String postId) {
         List<CommentQuery> queries = new ArrayList<>();
-        queries.add(new CommentQuery(postAuthorPseudonymKey.getPseudonym(), postId));
-        Log.v(TAG, String.format("query: pseud %s postId %s", postAuthorPseudonymKey.getPseudonym(), postId));
+        CommentCollection commentCollection = getCommentCollection(context, queries);
+        List<Comment> comments = commentCollection.getComments(postAuthorId, postId);
+        return Utils.buildCommentViewModels(context, comments);
+    }
+
+    public static CommentCollection getCommentCollection(Context context, List<CommentQuery> queries) {
         CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
 
         List<EncryptedComment> encryptedComments = Rest.getComments(
                 commentQueryPost,
                 Utils.getApiKey(context));
 
-        List<Comment> comments = new ArrayList<>();
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        CommentDatabase commentDatabase = CommentDatabase.getInstance(context);
+
+        CommentCollection comments = new CommentCollection();
         for (EncryptedComment ec : encryptedComments) {
+            PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(
+                    friendDatabase.getUsernameFromPseudonym(ec.getPostAuthorPseudonym()));
+
             CommentUpdate commentUpdate = ec.decrypt(postAuthorPseudonymKey.getKey());
             String commentAuthorUsername =
                     friendDatabase.getUsernameFromPseudonym(commentUpdate.getCommentAuthorPseudonym());
+
             if (commentAuthorUsername == null) {
                 commentAuthorUsername = UNKNOWN_USER_NAME;
             }
 
-            comments.add(new Comment(commentAuthorUsername, commentUpdate.getContent(), commentUpdate.getTimestamp()));
+            int postAuthorId = friendDatabase.getUserId(postAuthorPseudonymKey.getUsername());
+            int commentAuthorId = friendDatabase.getUserId(commentAuthorUsername);
+
+            comments.add(postAuthorId, commentAuthorId, commentUpdate);
+
+            if (!commentDatabase.contains(postAuthorId, commentAuthorId, commentUpdate.getTimestamp())) {
+                commentDatabase.insert(commentAuthorId, postAuthorId, commentUpdate);
+            }
         }
 
         return comments;

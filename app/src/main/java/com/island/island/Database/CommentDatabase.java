@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.island.island.Models.RawComment;
+import com.island.island.Models.Comment;
 
 import org.island.messaging.CommentUpdate;
 
@@ -69,8 +69,8 @@ public class CommentDatabase extends SQLiteOpenHelper {
         writableDatabase.insert(DATABASE_NAME, null, values);
     }
 
-    public List<RawComment> getComments(int postUserId, String postId) {
-        List<RawComment> comments = new ArrayList<>();
+    public List<Comment> getComments(int postUserId, String postId) {
+        List<Comment> comments = new ArrayList<>();
         SQLiteDatabase readableDatabase = getReadableDatabase();
 
         String[] columns = {COMMENT_USER_ID, CONTENT, TIMESTAMP};
@@ -78,12 +78,28 @@ public class CommentDatabase extends SQLiteOpenHelper {
         String[] args = {String.valueOf(postUserId), postId};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, query, args, "", "", "");
         while(results.moveToNext()) {
-            comments.add(new RawComment(
+            comments.add(new Comment(
+                            postUserId,
+                            postId,
                             results.getInt(0),
                             results.getString(1),
                             results.getLong(2)));
         }
 
         return comments;
+    }
+
+    public boolean contains(int postAuthorId, int commentAuthorId, long timestamp) {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+        String[] columns = {POST_USER_ID, COMMENT_USER_ID, TIMESTAMP};
+        String selection = POST_USER_ID + " = ? AND "
+                + COMMENT_USER_ID + " = ? AND "
+                + TIMESTAMP + " = ?";
+        String[] args = {String.valueOf(postAuthorId),
+                String.valueOf(commentAuthorId),
+                String.valueOf(timestamp) };
+        
+        Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
+        return results.getCount() > 0;
     }
 }

@@ -1,7 +1,6 @@
 package com.island.island.Models;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,16 +12,22 @@ public class Post implements Serializable
 {
     public static String POST_EXTRA = "POST_OBJECT";
 
-    private String userName = "";
-    private long timestamp;
-    private String content = "";
-    private String postId = "";
-    private List<Comment> comments = new ArrayList<>();
+    private final String userName;
+    private final int userId;
+    private final long timestamp;
+    private final String content;
+    private final String postId;
+    private final List<CommentViewModel> comments;
 
-    public Post(String userName, String postId, long timestamp, String content,
-                List<Comment> comments)
+    public Post(String userName,
+                int userId,
+                String postId,
+                long timestamp,
+                String content,
+                List<CommentViewModel> comments)
     {
         this.userName = userName;
+        this.userId = userId;
         this.postId = postId;
         this.timestamp = timestamp;
         this.content = content;
@@ -32,11 +37,6 @@ public class Post implements Serializable
     public String getUserName()
     {
         return userName;
-    }
-
-    public void setUserName(String userName)
-    {
-        this.userName = userName;
     }
 
     public long getTimestamp()
@@ -49,19 +49,10 @@ public class Post implements Serializable
         return content;
     }
 
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
 
-    public List<Comment> getComments()
+    public List<CommentViewModel> getComments()
     {
         return comments;
-    }
-
-    public void setComments(List<Comment> comments)
-    {
-        this.comments = comments;
     }
 
     public String getKey() {
@@ -70,5 +61,31 @@ public class Post implements Serializable
 
     public String getPostId() {
         return postId;
+    }
+
+    public boolean addComments(List<CommentViewModel> newComments) {
+        boolean addedAny = false;
+        for (CommentViewModel comment : newComments) {
+            if (!hasComment(comment.getKey())) {
+                this.comments.add(comment);
+                addedAny = true;
+            }
+        }
+
+        return addedAny;
+    }
+
+    private boolean hasComment(String key) {
+        for (CommentViewModel comment : this.comments) {
+            if (comment.getKey().equals(key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 }

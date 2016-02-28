@@ -19,4 +19,8 @@ public class EncryptedComment extends SymmetricEncryptedData {
         SignedObject signedObject = this.getSignedObject(groupKey);
         return CommentUpdate.fromProto(signedObject.getObject());
     }
+
+    public String getPostAuthorPseudonym() {
+        return postAuthorPseudonym;
+    }
 }

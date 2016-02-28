@@ -13,17 +13,17 @@ import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
-import com.island.island.Database.ProfileDatabase;
-import com.island.island.Models.Comment;
+import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
-import com.island.island.Database.IslandDB;
-import com.island.island.Models.RawComment;
+import com.island.island.Models.Comment;
 import com.island.island.Models.RawPost;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
+import org.island.messaging.CommentCollection;
+import org.island.messaging.server.CommentQuery;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -117,29 +117,62 @@ public class FeedActivity extends NavBaseActivity {
                 insertionPoint,
                 new Post(
                         postAuthor,
+                        userId,
                         p.getPostId(),
                         p.getTimestamp(),
                         p.getContent(),
-                        getCommentsForPost(friendDatabase, commentDatabase, p)
+                        getCommentsForPost(commentDatabase, p)
                 ));
 
         return true;
     }
 
-    private List<Comment> getCommentsForPost(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
-        List<RawComment> rawComments = commentDatabase.getComments(p.getUserId(), p.getPostId());
-        List<Comment> comments = new ArrayList<>();
-        for (RawComment rc : rawComments) {
-            String commentUsername = friendDatabase.getUsername(rc.getCommentUserId());
-            comments.add(new Comment(commentUsername, rc.getContent(), rc.getTimestamp()));
-        }
-
-        return comments;
+    private List<CommentViewModel> getCommentsForPost(CommentDatabase commentDatabase, RawPost post) {
+        List<Comment> comments = commentDatabase.getComments(post.getUserId(), post.getPostId());
+        return Utils.buildCommentViewModels(this, comments);
     }
 
     public void startNewPostActivity(View view) {
         Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
+    }
+
+    private class GetCommentsFromServerTask extends AsyncTask<Void, Void, CommentCollection> {
+        private final String TAG = GetCommentsFromServerTask.class.getSimpleName();
+
+        @Override
+        protected CommentCollection doInBackground(Void... params) {
+            List<CommentQuery> commentQueries = new ArrayList<>();
+            FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
+
+            for (Post post : mArrayOfPosts) {
+                String postAuthorPseudonym = friendDatabase.getPseudonym(post.getUserId());
+                commentQueries.add(new CommentQuery(postAuthorPseudonym, post.getPostId()));
+            }
+
+            return MessageLayer.getCommentCollection(getApplicationContext(), commentQueries);
+        }
+
+        @Override
+        protected void onPostExecute(CommentCollection commentCollection) {
+            boolean anyPostUpdated = false;
+
+            for (Post post : mArrayOfPosts) {
+                List<Comment> commentsForPost = commentCollection.getComments(
+                        post.getUserId(),
+                        post.getPostId());
+                List<CommentViewModel> commentViewModels = Utils.buildCommentViewModels(
+                        getApplicationContext(),
+                        commentsForPost);
+                if (post.addComments(commentViewModels)) {
+                    anyPostUpdated = true;
+                }
+            }
+
+            if (anyPostUpdated) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     private class GetPostsFromServerTask extends AsyncTask<Void, Void, List<Post>> {
@@ -161,6 +194,8 @@ public class FeedActivity extends NavBaseActivity {
 
             mRefreshLayout.setRefreshing(false);
             Utils.printAvailableMemory(getApplicationContext(), TAG);
+
+            new GetCommentsFromServerTask().execute();
         }
 
         private boolean addPostsToFeed(List<Post> posts) {
