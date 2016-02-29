@@ -49,7 +49,6 @@ public class Post implements Serializable
         return content;
     }
 
-
     public List<CommentViewModel> getComments()
     {
         return comments;
@@ -75,7 +74,7 @@ public class Post implements Serializable
         return addedAny;
     }
 
-    private boolean hasComment(String key) {
+    private boolean hasComment(CommentKey key) {
         for (CommentViewModel comment : this.comments) {
             if (comment.getKey().equals(key)) {
                 return true;
@@ -87,5 +86,20 @@ public class Post implements Serializable
 
     public int getUserId() {
         return userId;
+    }
+
+    public boolean deleteComments(List<CommentKey> keysToDelete) {
+        boolean anyDeleted = false;
+        for (CommentKey keyToDelete : keysToDelete) {
+            for (CommentViewModel comment : comments) {
+                if (comment.getKey().equals(keyToDelete)) {
+                    comments.remove(comment);
+                    anyDeleted = true;
+                    break;
+                }
+            }
+        }
+
+        return anyDeleted;
     }
 }

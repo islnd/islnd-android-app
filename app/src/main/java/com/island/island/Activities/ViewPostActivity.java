@@ -18,14 +18,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
+import com.island.island.DeleteCommentFragment;
 import com.island.island.DeletePostFragment;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
 import com.island.island.Models.PostKey;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
-import com.island.island.Utils.Utils;
 
 import org.island.messaging.MessageLayer;
 
@@ -35,7 +36,9 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ViewPostActivity extends AppCompatActivity implements DeletePostFragment.NoticeDeletePostListener
+public class ViewPostActivity extends AppCompatActivity
+        implements DeletePostFragment.NoticeDeletePostListener,
+        DeleteCommentFragment.NoticeDeleteCommentListener
 {
     private Post mPost = null;
 
@@ -44,7 +47,7 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
     private ArrayList mViewPostList;
-    private Set<String> mCommentMap;
+    private Set<CommentKey> mCommentMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -106,7 +109,8 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
             IslandDB.addCommentToPost(
                     this,
                     mPost,
-                    new CommentViewModel(Utils.getUser(this), commentText));
+                    commentText);
+
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
@@ -125,6 +129,11 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
                 PostKey.POST_KEY_EXTRA,
                 new PostKey(postAuthorId, postId));
         return returnIntent;
+    }
+
+    @Override
+    public void onDeleteCommentDialogPositiveClick(DialogFragment dialogFragment) {
+        //--TODO remove the comment from this activity
     }
 
     private class GetCommentsTask extends AsyncTask<Post, Void, Void> {

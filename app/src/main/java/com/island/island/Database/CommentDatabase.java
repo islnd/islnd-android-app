@@ -63,6 +63,7 @@ public class CommentDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COMMENT_USER_ID, commentUserId);
         values.put(POST_USER_ID, postUserId);
+        values.put(COMMENT_ID, commentUpdate.getCommentId());
         values.put(POST_ID, commentUpdate.getPostId());
         values.put(CONTENT, commentUpdate.getContent());
         values.put(TIMESTAMP, commentUpdate.getTimestamp());
@@ -75,7 +76,7 @@ public class CommentDatabase extends SQLiteOpenHelper {
         List<Comment> comments = new ArrayList<>();
         SQLiteDatabase readableDatabase = getReadableDatabase();
 
-        String[] columns = {COMMENT_USER_ID, CONTENT, TIMESTAMP};
+        String[] columns = {COMMENT_USER_ID, COMMENT_ID, CONTENT, TIMESTAMP};
         String query = POST_USER_ID + " = ? AND " + POST_ID + " = ?";
         String[] args = {String.valueOf(postUserId), postId};
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, query, args, "", "", "");
@@ -85,7 +86,8 @@ public class CommentDatabase extends SQLiteOpenHelper {
                             postId,
                             results.getInt(0),
                             results.getString(1),
-                            results.getLong(2)));
+                            results.getString(2),
+                            results.getLong(3)));
         }
 
         return comments;

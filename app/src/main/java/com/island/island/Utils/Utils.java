@@ -162,14 +162,20 @@ public class Utils
         return (int) Utils.dpFromPx(context, context.getResources().getDimension(res));
     }
 
-    public static List<CommentViewModel> buildCommentViewModels(Context context, List<Comment> rawComments) {
+    public static List<CommentViewModel> buildCommentViewModels(Context context, List<Comment> comments) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        List<CommentViewModel> comments = new ArrayList<>();
-        for (Comment rawComment : rawComments) {
-            String username = friendDatabase.getUsername(rawComment.getCommentUserId());
-            comments.add(new CommentViewModel(username, rawComment.getContent(), rawComment.getTimestamp()));
+        List<CommentViewModel> commentViewModels = new ArrayList<>();
+        for (Comment comment : comments) {
+            String username = friendDatabase.getUsername(comment.getCommentUserId());
+            commentViewModels.add(
+                    new CommentViewModel(
+                            username,
+                            comment.getCommentUserId(),
+                            comment.getCommentId(),
+                            comment.getContent(),
+                            comment.getTimestamp()));
         }
 
-        return comments;
+        return commentViewModels;
     }
 }

@@ -74,4 +74,5 @@
     <string name="api_key">api_key</string>
     <string name="fragment_delete_post">fragment_delete_post</string>
     <string name="comment_version_key">comment_version_key</string>
+    <string name="fragment_delete_comment">fragment_delete_comment</string>
 </resources>

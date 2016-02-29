@@ -15,6 +15,7 @@ import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.DeletePostFragment;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Comment;
@@ -190,6 +191,13 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
                         getApplicationContext(),
                         commentsForPost);
                 if (post.addComments(commentViewModels)) {
+                    anyPostUpdated = true;
+                }
+
+                List<CommentKey> keysToDelete = commentCollection.getDeletions(
+                        post.getUserId(),
+                        post.getPostId());
+                if (post.deleteComments(keysToDelete)) {
                     anyPostUpdated = true;
                 }
             }

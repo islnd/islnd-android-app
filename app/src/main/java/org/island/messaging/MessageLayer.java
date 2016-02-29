@@ -279,7 +279,16 @@ public class MessageLayer {
             int commentAuthorId = friendDatabase.getUserId(commentAuthorUsername);
 
             if (commentUpdate.isDeletion()) {
-                //--TODO do delete stuff
+                if (commentAuthorId == -1) {
+                    //--TODO handle this
+                    //--with an asymmetric friend relation and with comments encrypted with the
+                    //  posters group key, we have a situation where if user A allows user B,
+                    //  user B and comment on a post from user A, and user A does not know user B's
+                    //  display name or profile because B never allowed A!
+                } else {
+                    Log.v(TAG, String.format("from server deleted user %d comment %s", commentAuthorId, commentUpdate.getCommentId()));
+                    commentCollection.addDelete(commentAuthorId, commentUpdate.getCommentId());
+                }
             }
             else {
                 commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);

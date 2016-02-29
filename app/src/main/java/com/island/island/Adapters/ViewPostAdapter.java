@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,8 +16,8 @@ import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.DeleteCommentFragment;
 import com.island.island.DeletePostFragment;
-import com.island.island.Dialogs;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.R;
@@ -29,11 +30,14 @@ import java.util.ArrayList;
 
 public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
+    private static final String TAG = ViewPostAdapter.class.getSimpleName();
+
     private ArrayList mList = new ArrayList<>();
     private Context mContext = null;
 
     private static final int POST = 0;
     private static final int COMMENT = 1;
+    private Post mPost;
 
     public ViewPostAdapter(ArrayList list, Context context)
     {
@@ -89,25 +93,26 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void bindPost(PostViewHolder holder)
     {
-        Post post = (Post) mList.get(0);
+        mPost = (Post) mList.get(0);
 
-        holder.postUserName.setText(post.getUserName());
-        holder.postTimestamp.setText(Utils.smartTimestampFromUnixTime(post.getTimestamp()));
-        holder.postContent.setText(post.getContent());
+        holder.postUserName.setText(mPost.getUserName());
+        holder.postTimestamp.setText(Utils.smartTimestampFromUnixTime(mPost.getTimestamp()));
+        holder.postContent.setText(mPost.getContent());
 
         // Go to profile on picture click
-        holder.postProfileImage.setOnClickListener((View v) ->
-        {
-            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
-            mContext.startActivity(profileIntent);
-        });
+        holder.postProfileImage.setOnClickListener(
+                (View v) ->
+                {
+                    Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+                    profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, mPost.getUserName());
+                    mContext.startActivity(profileIntent);
+                });
 
         ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
+        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(mPost.getUserName()));
         ImageUtils.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
-        if(Utils.isUser(mContext, post.getUserName()))
+        if(Utils.isUser(mContext, mPost.getUserName()))
         {
             holder.postOverflow.setVisibility(View.VISIBLE);
 
@@ -121,7 +126,7 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     {
                         case R.id.delete_post:
                             DialogFragment deletePostFragment =
-                                    DeletePostFragment.buildWithArgs(post.getUserId(), post.getPostId());
+                                    DeletePostFragment.buildWithArgs(mPost.getUserId(), mPost.getPostId());
                             deletePostFragment.show(
                                     ((FragmentActivity) mContext).getSupportFragmentManager(),
                                     mContext.getString(R.string.fragment_delete_post));
@@ -171,10 +176,16 @@ public class ViewPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 {
                     switch (item.getItemId())
                     {
-                        case R.id.delete_post:
-                            Dialogs.deleteCommentDialog(mContext);
-                            // TODO: Behavior after removal?
-                            // TODO: Don't have postIds yet
+                        case R.id.delete_comment:
+                            DialogFragment deleteCommentFragment =
+                                    DeleteCommentFragment.buildWithArgs(
+                                            mPost.getUserId(),
+                                            mPost.getPostId(),
+                                            comment.getUserId(),
+                                            comment.getCommentId());
+                            deleteCommentFragment.show(
+                                    ((FragmentActivity) mContext).getSupportFragmentManager(),
+                                    mContext.getString(R.string.fragment_delete_comment));
                     }
 
                     return true;

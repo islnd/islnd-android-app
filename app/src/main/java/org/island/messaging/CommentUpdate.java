@@ -23,7 +23,12 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
         this.timestamp = timestamp;
     }
 
-    public static CommentUpdate buildComment(String postAuthorPseudonym, String commentAuthorPseudonym, String postId, String commentId, String content) {
+    public static CommentUpdate buildComment(
+            String postAuthorPseudonym,
+            String commentAuthorPseudonym,
+            String postId,
+            String commentId,
+            String content) {
         return new CommentUpdate(
                 false,
                 postAuthorPseudonym,
@@ -31,6 +36,21 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 postId,
                 commentId,
                 content,
+                Util.getContentTimestamp());
+    }
+
+    public static CommentUpdate buildDelete(
+            String postAuthorPseudonym,
+            String commentAuthorPseudonym,
+            String postId,
+            String commentId) {
+        return new CommentUpdate(
+                true,
+                postAuthorPseudonym,
+                commentAuthorPseudonym,
+                postId,
+                commentId,
+                "",
                 Util.getContentTimestamp());
     }
 
