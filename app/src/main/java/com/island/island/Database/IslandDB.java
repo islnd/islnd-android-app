@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.island.island.Models.Comment;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
@@ -172,6 +173,8 @@ public class IslandDB
         int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
         PostDatabase.getInstance(context).insert(myUserId, postUpdate);
 
+        Log.v(TAG, String.format("making post user id %d post id %s", myUserId, postUpdate.getId()));
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -214,7 +217,7 @@ public class IslandDB
 
     }
 
-    public static void addCommentToPost(Context context, Post post, String commentText)
+    public static Comment addCommentToPost(Context context, Post post, String commentText)
     /**
      * Adds comment to existing post
      *
@@ -222,7 +225,7 @@ public class IslandDB
      * @param comment Comment that I'm adding.
      */
     {
-        MessageLayer.comment(
+        return MessageLayer.comment(
                 context,
                 post.getUserId(),
                 post.getPostId(),

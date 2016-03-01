@@ -166,16 +166,24 @@ public class Utils
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         List<CommentViewModel> commentViewModels = new ArrayList<>();
         for (Comment comment : comments) {
-            String username = friendDatabase.getUsername(comment.getCommentUserId());
-            commentViewModels.add(
-                    new CommentViewModel(
-                            username,
-                            comment.getCommentUserId(),
-                            comment.getCommentId(),
-                            comment.getContent(),
-                            comment.getTimestamp()));
+            commentViewModels.add(buildCommentViewModel(friendDatabase, comment));
         }
 
         return commentViewModels;
+    }
+
+    public static CommentViewModel buildCommentViewModel(Context context, Comment comment) {
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        return buildCommentViewModel(friendDatabase, comment);
+    }
+
+    private static CommentViewModel buildCommentViewModel(FriendDatabase friendDatabase, Comment comment) {
+        String username = friendDatabase.getUsername(comment.getCommentUserId());
+        return new CommentViewModel(
+                username,
+                comment.getCommentUserId(),
+                comment.getCommentId(),
+                comment.getContent(),
+                comment.getTimestamp());
     }
 }

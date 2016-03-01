@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public class CommentCollection {
-
     Map<PostKey, List<Comment>> postKeyToComments;
     Map<PostKey, List<CommentKey>> postKeyToCommentDeletions;
 
@@ -34,13 +33,6 @@ public class CommentCollection {
 
     private void addComment(int postAuthorId, int commentAuthorId, CommentUpdate commentUpdate) {
         final PostKey postKey = new PostKey(postAuthorId, commentUpdate.getPostId());
-        final CommentKey commentKey = new CommentKey(commentAuthorId, commentUpdate.getCommentId());
-        if (postKeyToCommentDeletions.containsKey(postKey)
-                && postKeyToCommentDeletions.get(postKey).contains(commentKey)) {
-            postKeyToCommentDeletions.get(postKey).remove(commentKey);
-            return;
-        }
-
         if (!postKeyToComments.containsKey(postKey)) {
             postKeyToComments.put(postKey, new ArrayList<>());
         }
@@ -58,17 +50,18 @@ public class CommentCollection {
     private void deleteComment(int commentAuthorId, String commentId, int postAuthorId, String postId) {
         final CommentKey commentKey = new CommentKey(commentAuthorId, commentId);
         final PostKey postKey = new PostKey(postAuthorId, postId);
-        if (postKeyToComments.containsKey(postKey)
-                && postKeyToComments.get(postKey).contains(commentKey)) {
-            postKeyToComments.get(postKey).remove(commentKey);
-        }
-        else {
-            if (!postKeyToCommentDeletions.containsKey(postKey)) {
-                postKeyToCommentDeletions.put(postKey, new ArrayList<>());
+        if (postKeyToComments.containsKey(postKey)) {
+            int index = findComment(postKeyToComments.get(postKey), commentKey);
+            if (index >= 0) {
+                postKeyToComments.get(postKey).remove(index);
             }
-
-            postKeyToCommentDeletions.get(postKey).add(commentKey);
         }
+
+        if (!postKeyToCommentDeletions.containsKey(postKey)) {
+            postKeyToCommentDeletions.put(postKey, new ArrayList<>());
+        }
+
+        postKeyToCommentDeletions.get(postKey).add(commentKey);
     }
 
     public Map<PostKey, List<Comment>> getCommentsGroupedByPostKey() {
@@ -79,12 +72,13 @@ public class CommentCollection {
         return postKeyToCommentDeletions;
     }
 
-    public List<Comment> getComments(int postAuthorId, String postId) {
-        final PostKey postKey = new PostKey(postAuthorId, postId);
-        if (!postKeyToComments.containsKey(postKey)) {
-            return new ArrayList<>();
+    private int findComment(List<Comment> comments, CommentKey commentKey) {
+        for (int i = 0; i < comments.size(); i++) {
+            if (comments.get(i).getKey().equals(commentKey)) {
+                return i;
+            }
         }
 
-        return postKeyToComments.get(postKey);
+        return -1;
     }
 }

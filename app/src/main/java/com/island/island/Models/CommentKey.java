@@ -11,6 +11,14 @@ public class CommentKey {
         this.commentId = commentId;
     }
 
+    public String getCommentId() {
+        return commentId;
+    }
+
+    public int getCommentAuthorId() {
+        return commentAuthorId;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof CommentKey)) {
@@ -31,11 +39,8 @@ public class CommentKey {
                 .toHashCode();
     }
 
-    public String getCommentId() {
-        return commentId;
-    }
-
-    public int getCommentAuthorId() {
-        return commentAuthorId;
+    @Override
+    public String toString() {
+        return String.format("user id %d comment id %s", this.commentAuthorId, this.commentId);
     }
 }

@@ -14,8 +14,8 @@ import com.island.island.Database.IslandDB;
 public class DeleteCommentFragment extends DialogFragment {
     private static final String POST_USER_ID_BUNDLE_KEY = "POST_USER_ID_PARAM";
     private static final String POST_ID_BUNDLE_KEY = "POST_ID_PARAM";
-    private static final String COMMENT_USER_ID_BUNDLE_KEY = "COMMENT_USER_ID_PARAM";
-    private static final String COMMENT_ID_BUNDLE_KEY = "COMMENT_ID_PARAM";
+    public static final String COMMENT_USER_ID_BUNDLE_KEY = "COMMENT_USER_ID_PARAM";
+    public static final String COMMENT_ID_BUNDLE_KEY = "COMMENT_ID_PARAM";
 
     private NoticeDeleteCommentListener mListener;
 
@@ -50,6 +50,9 @@ public class DeleteCommentFragment extends DialogFragment {
                             String commentId = getArguments().getString(COMMENT_ID_BUNDLE_KEY);
                             int commentUserId = getArguments().getInt(COMMENT_USER_ID_BUNDLE_KEY);
 
+                            mListener.onDeleteCommentDialogPositiveClick(this);
+
+                            //--Send delete to server
                             new AsyncTask<Void, Void, Void>() {
                                 @Override
                                 protected Void doInBackground(Void... params) {

@@ -141,7 +141,7 @@ public class MessageLayer {
         Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
     }
 
-    public static void comment(Context context, int postUserId, String postId, String content) {
+    public static Comment comment(Context context, int postUserId, String postId, String content) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
         String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
@@ -172,6 +172,14 @@ public class MessageLayer {
                 return null;
             }
         }.execute();
+
+        return new Comment(
+                postUserId,
+                postId,
+                commentUserId,
+                commentUpdate.getCommentId(),
+                content,
+                commentUpdate.getTimestamp());
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {
@@ -244,11 +252,12 @@ public class MessageLayer {
         return Util.getNewest(profiles);
     }
 
-    public static List<CommentViewModel> getCommentCollection(Context context, int postAuthorId, String postId) {
+    public static CommentCollection getCommentCollection(Context context, int postAuthorId, String postId) {
+        Log.v(TAG, String.format("getting comments user id %d post id %s", postAuthorId, postId));
         List<CommentQuery> queries = new ArrayList<>();
-        CommentCollection commentCollection = getCommentCollection(context, queries);
-        List<Comment> comments = commentCollection.getComments(postAuthorId, postId);
-        return Utils.buildCommentViewModels(context, comments);
+        String postAuthorPseudonym = FriendDatabase.getInstance(context).getPseudonym(postAuthorId);
+        queries.add(new CommentQuery(postAuthorPseudonym, postId));
+        return getCommentCollection(context, queries);
     }
 
     public static CommentCollection getCommentCollection(Context context, List<CommentQuery> queries) {

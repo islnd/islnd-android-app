@@ -279,7 +279,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         return -1;
     }
 
-    //--This method find the index to insert a post or find the
+    //--This method finds the index to insert a post or find the
     //  first index of a post with a given timestamp
     private int getIndexToInsertPost(long postTimestamp) {
         //--TODO binary search

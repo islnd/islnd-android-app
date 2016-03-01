@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.island.island.DeletePostFragment;
 import com.island.island.Models.Comment;
 import com.island.island.Models.CommentKey;
 
@@ -93,8 +92,7 @@ public class CommentDatabase extends SQLiteOpenHelper {
         values.put(POST_ID, postId);
         values.put(CONTENT, content);
         values.put(TIMESTAMP, timestamp);
-        Log.v(TAG, String.format("adding comment. commentuser: %d postuser %d. post id %s",
-                        commentUserId, postUserId, postId));
+        Log.v(TAG, String.format("adding comment. %s", new CommentKey(commentUserId, commentId)));
 
         writableDatabase.insert(DATABASE_NAME, null, values);
     }

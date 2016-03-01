@@ -1,5 +1,7 @@
 package com.island.island.Models;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,6 +12,8 @@ import java.util.List;
  */
 public class Post implements Serializable
 {
+    private static final String TAG = Post.class.getSimpleName();
+
     public static String POST_EXTRA = "POST_OBJECT";
 
     private final String userName;
@@ -62,6 +66,15 @@ public class Post implements Serializable
         return postId;
     }
 
+    public boolean addComment(CommentViewModel comment) {
+        if (!hasComment(comment.getKey())) {
+            this.comments.add(comment);
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean addComments(List<CommentViewModel> newComments) {
         boolean addedAny = false;
         for (CommentViewModel comment : newComments) {
@@ -101,5 +114,15 @@ public class Post implements Serializable
         }
 
         return anyDeleted;
+    }
+
+    public void deleteComment(CommentKey keyToDelete) {
+        for (CommentViewModel comment : comments) {
+            if (comment.getKey().equals(keyToDelete)) {
+                Log.v(TAG, "comment removed");
+                comments.remove(comment);
+                break;
+            }
+        }
     }
 }
