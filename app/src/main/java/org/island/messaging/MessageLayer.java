@@ -10,6 +10,7 @@ import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.PostKey;
@@ -34,6 +35,7 @@ import org.island.messaging.server.CommentQueryRequest;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
@@ -278,24 +280,31 @@ public class MessageLayer {
             int postAuthorId = friendDatabase.getUserId(postAuthorPseudonymKey.getUsername());
             int commentAuthorId = friendDatabase.getUserId(commentAuthorUsername);
 
-            if (commentUpdate.isDeletion()) {
-                if (commentAuthorId == -1) {
-                    //--TODO handle this
-                    //--with an asymmetric friend relation and with comments encrypted with the
-                    //  posters group key, we have a situation where if user A allows user B,
-                    //  user B and comment on a post from user A, and user A does not know user B's
-                    //  display name or profile because B never allowed A!
-                } else {
-                    Log.v(TAG, String.format("from server deleted user %d comment %s", commentAuthorId, commentUpdate.getCommentId()));
-                    commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
-                }
-            }
-            else {
-                commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
+            if (commentUpdate.isDeletion()
+                    && commentAuthorId == -1) {
+                Log.v(TAG, "adding commment for unknown user");
             }
 
-            if (!commentDatabase.contains(commentAuthorId, commentUpdate.getCommentId())) {
-                commentDatabase.insert(commentAuthorId, postAuthorId, commentUpdate);
+            commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
+        }
+
+        Map<PostKey, List<Comment>> postKeyToComments = commentCollection.getCommentsGroupedByPostKey();
+        for (PostKey postKey : postKeyToComments.keySet()) {
+            List<Comment> comments = postKeyToComments.get(postKey);
+            for (Comment comment : comments) {
+                if (!commentDatabase.contains(comment)) {
+                    commentDatabase.insert(comment, postKey.getUserId(), postKey.getPostId());
+                }
+            }
+        }
+
+        Map<PostKey, List<CommentKey>> postKeyToDeletions = commentCollection.getDeletions();
+        for (PostKey postKey : postKeyToDeletions.keySet()) {
+            List<CommentKey> deletions = postKeyToDeletions.get(postKey);
+            for (CommentKey keyToDelete : deletions) {
+                if (commentDatabase.contains(keyToDelete)) {
+                    commentDatabase.delete(keyToDelete);
+                }
             }
         }
 

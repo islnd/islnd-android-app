@@ -7,7 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.island.island.DeletePostFragment;
 import com.island.island.Models.Comment;
+import com.island.island.Models.CommentKey;
 
 import org.island.messaging.CommentUpdate;
 
@@ -58,18 +60,54 @@ public class CommentDatabase extends SQLiteOpenHelper {
         return SINGLE;
     }
 
+    public void insert(Comment comment, int postUserId, String postId) {
+        insert(comment.getCommentUserId(),
+                postUserId,
+                comment.getCommentId(),
+                postId,
+                comment.getContent(),
+                comment.getTimestamp());
+    }
+
     public void insert(int commentUserId, int postUserId, CommentUpdate commentUpdate) {
+        insert(commentUserId,
+                postUserId,
+                commentUpdate.getCommentId(),
+                commentUpdate.getPostId(),
+                commentUpdate.getContent(),
+                commentUpdate.getTimestamp());
+    }
+
+    private void insert(
+            int commentUserId,
+            int postUserId,
+            String commentId,
+            String postId,
+            String content,
+            long timestamp) {
         SQLiteDatabase writableDatabase = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COMMENT_USER_ID, commentUserId);
         values.put(POST_USER_ID, postUserId);
-        values.put(COMMENT_ID, commentUpdate.getCommentId());
-        values.put(POST_ID, commentUpdate.getPostId());
-        values.put(CONTENT, commentUpdate.getContent());
-        values.put(TIMESTAMP, commentUpdate.getTimestamp());
-        Log.v(TAG, String.format("adding comment. commentuser: %d postuser %d. post id %s", commentUserId, postUserId, commentUpdate.getPostId()));
+        values.put(COMMENT_ID, commentId);
+        values.put(POST_ID, postId);
+        values.put(CONTENT, content);
+        values.put(TIMESTAMP, timestamp);
+        Log.v(TAG, String.format("adding comment. commentuser: %d postuser %d. post id %s",
+                        commentUserId, postUserId, postId));
 
         writableDatabase.insert(DATABASE_NAME, null, values);
+    }
+
+    public void delete(CommentKey commentKey) {
+        SQLiteDatabase writableDatabase = getWritableDatabase();
+        String selection = COMMENT_USER_ID + " = ? AND " + COMMENT_ID + " = ?";
+        String[] args = {
+                String.valueOf(commentKey.getCommentAuthorId()),
+                commentKey.getCommentId()};
+        Log.v(TAG, String.format("deleting comment: %s", commentKey));
+
+        writableDatabase.delete(DATABASE_NAME, selection, args);
     }
 
     public List<Comment> getComments(int postUserId, String postId) {
@@ -102,5 +140,13 @@ public class CommentDatabase extends SQLiteOpenHelper {
 
         Cursor results = readableDatabase.query(DATABASE_NAME, columns, selection, args, "", "", "");
         return results.getCount() > 0;
+    }
+
+    public boolean contains(Comment comment) {
+        return contains(comment.getCommentUserId(), comment.getCommentId());
+    }
+
+    public boolean contains(CommentKey commentKey) {
+        return contains(commentKey.getCommentAuthorId(), commentKey.getCommentId());
     }
 }
