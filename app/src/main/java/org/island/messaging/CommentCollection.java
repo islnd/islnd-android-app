@@ -2,79 +2,89 @@ package org.island.messaging;
 
 import com.island.island.Models.CommentKey;
 import com.island.island.Models.Comment;
+import com.island.island.Models.PostKey;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class CommentCollection {
 
-    //--PostAuthorId->PostId->Comments
-    HashMap<Integer, HashMap<String, List<Comment>>> map;
-    private Set<CommentKey> deletedKeys;
+    Map<PostKey, List<Comment>> postKeyToComments;
+    Map<PostKey, List<CommentKey>> postKeyToCommentDeletions;
 
     public CommentCollection() {
-        this.map = new HashMap<>();
-        this.deletedKeys = new HashSet<>();
+        this.postKeyToComments = new HashMap<>();
+        this.postKeyToCommentDeletions = new HashMap<>();
     }
 
     public void add(int postAuthorId, int commentAuthorId, CommentUpdate commentUpdate) {
         if (commentUpdate.isDeletion()) {
+            deleteComment(
+                    commentAuthorId,
+                    commentUpdate.getCommentId(),
+                    postAuthorId,
+                    commentUpdate.getPostId());
+        }
+        else {
+            addComment(postAuthorId, commentAuthorId, commentUpdate);
+        }
+    }
+
+    private void addComment(int postAuthorId, int commentAuthorId, CommentUpdate commentUpdate) {
+        final PostKey postKey = new PostKey(postAuthorId, commentUpdate.getPostId());
+        final CommentKey commentKey = new CommentKey(commentAuthorId, commentUpdate.getCommentId());
+        if (postKeyToCommentDeletions.containsKey(postKey)
+                && postKeyToCommentDeletions.get(postKey).contains(commentKey)) {
+            postKeyToCommentDeletions.get(postKey).remove(commentKey);
             return;
         }
 
-        if (!map.containsKey(postAuthorId)) {
-            map.put(postAuthorId, new HashMap<>());
+        if (!postKeyToComments.containsKey(postKey)) {
+            postKeyToComments.put(postKey, new ArrayList<>());
         }
 
-        final String postId = commentUpdate.getPostId();
-        if (!map.get(postAuthorId).containsKey(postId)) {
-            map.get(postAuthorId).put(postId, new ArrayList<>());
-        }
-
-        map.get(postAuthorId).get(postId).add(
+        postKeyToComments.get(postKey).add(
                 new Comment(
                         postAuthorId,
-                        postId,
+                        commentUpdate.getPostId(),
                         commentAuthorId,
                         commentUpdate.getCommentId(),
                         commentUpdate.getContent(),
                         commentUpdate.getTimestamp()));
     }
 
-    public List<Comment> getComments(int postAuthorId, String postId) {
-        if (!map.containsKey(postAuthorId)) {
-            return new ArrayList<>();
+    private void deleteComment(int commentAuthorId, String commentId, int postAuthorId, String postId) {
+        final CommentKey commentKey = new CommentKey(commentAuthorId, commentId);
+        final PostKey postKey = new PostKey(postAuthorId, postId);
+        if (postKeyToComments.containsKey(postKey)
+                && postKeyToComments.get(postKey).contains(commentKey)) {
+            postKeyToComments.get(postKey).remove(commentKey);
         }
-
-        if (!map.get(postAuthorId).containsKey(postId)) {
-            return new ArrayList<>();
-        }
-
-        List<Comment> comments = new ArrayList<>();
-        for (Comment comment : map.get(postAuthorId).get(postId)) {
-            if (!deletedKeys.contains(comment.getKey())) {
-                comments.add(comment);
+        else {
+            if (!postKeyToCommentDeletions.containsKey(postKey)) {
+                postKeyToCommentDeletions.put(postKey, new ArrayList<>());
             }
-        }
 
-        return comments;
+            postKeyToCommentDeletions.get(postKey).add(commentKey);
+        }
     }
 
-    public List<CommentKey> getDeletions(int userId, String postId) {
-        //--TODO we should only return the keys associated with the particular post
-        List<CommentKey> commentKeys = new ArrayList<>();
-        for (CommentKey commentKey : deletedKeys) {
-            commentKeys.add(commentKey);
-        }
-
-        return commentKeys;
+    public Map<PostKey, List<Comment>> getCommentsGroupedByPostKey() {
+        return postKeyToComments;
     }
 
-    public void addDelete(int commentAuthorId, String commentId) {
-        CommentKey commentKey = new CommentKey(commentAuthorId, commentId);
-        deletedKeys.add(commentKey);
+    public Map<PostKey, List<CommentKey>> getDeletions() {
+        return postKeyToCommentDeletions;
+    }
+
+    public List<Comment> getComments(int postAuthorId, String postId) {
+        final PostKey postKey = new PostKey(postAuthorId, postId);
+        if (!postKeyToComments.containsKey(postKey)) {
+            return new ArrayList<>();
+        }
+
+        return postKeyToComments.get(postKey);
     }
 }

@@ -287,7 +287,7 @@ public class MessageLayer {
                     //  display name or profile because B never allowed A!
                 } else {
                     Log.v(TAG, String.format("from server deleted user %d comment %s", commentAuthorId, commentUpdate.getCommentId()));
-                    commentCollection.addDelete(commentAuthorId, commentUpdate.getCommentId());
+                    commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
                 }
             }
             else {
