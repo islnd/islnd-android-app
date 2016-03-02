@@ -6,10 +6,12 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 public class IslndProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static final String TAG = IslndProvider.class.getSimpleName();
     private IslndDbHelper mOpenHelper;
 
     static final int POST = 100;
@@ -116,6 +118,7 @@ public class IslndProvider extends ContentProvider {
         }
 
         getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
+        Log.v(TAG, "Insert");
         return returnUri;
     }
 

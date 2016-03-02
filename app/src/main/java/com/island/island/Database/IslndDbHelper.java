@@ -23,7 +23,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 PostEntry.COLUMN_USER_ID + " INTEGER NOT NULL," +
                 PostEntry.COLUMN_POST_ID + " TEXT NOT NULL," +
                 PostEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL," +
-                PostEntry.COLUMN_CONTENT + " TEXT NOT NULL," +
+                PostEntry.COLUMN_CONTENT + " TEXT NOT NULL" +
                 " );";
 
         db.execSQL(SQL_CREATE_POST_TABLE);

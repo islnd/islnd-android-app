@@ -1,6 +1,7 @@
 package com.island.island.Activities;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -13,6 +14,7 @@ import android.view.View;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.IslndContract;
 import com.island.island.Database.PostDatabase;
 import com.island.island.DeletePostFragment;
 import com.island.island.Models.CommentKey;
@@ -63,7 +65,24 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PostAdapter(this, mArrayOfPosts);
+        String[] projection = new String[]{
+                IslndContract.PostEntry.COLUMN_USER_ID,
+                IslndContract.PostEntry.COLUMN_POST_ID,
+                IslndContract.PostEntry.COLUMN_TIMESTAMP,
+                IslndContract.PostEntry.COLUMN_CONTENT,
+        };
+        Cursor postCursor = getContentResolver().query(
+                IslndContract.PostEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null
+        );
+        postCursor.setNotificationUri(
+                getContentResolver(),
+                IslndContract.PostEntry.CONTENT_URI
+        );
+        mAdapter = new PostAdapter(this, postCursor);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 

@@ -1,5 +1,6 @@
 package com.island.island.Database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -171,7 +172,16 @@ public class IslandDB
     {
         PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
         int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
-        PostDatabase.getInstance(context).insert(myUserId, postUpdate);
+        //PostDatabase.getInstance(context).insert(myUserId, postUpdate);
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.PostEntry.COLUMN_USER_ID, myUserId);
+        values.put(IslndContract.PostEntry.COLUMN_POST_ID, postUpdate.getId());
+        values.put(IslndContract.PostEntry.COLUMN_CONTENT, postUpdate.getContent());
+        values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, postUpdate.getTimestamp());
+        context.getContentResolver().insert(
+                IslndContract.PostEntry.CONTENT_URI,
+                values
+        );
 
         Log.v(TAG, String.format("making post user id %d post id %s", myUserId, postUpdate.getId()));
 

@@ -2,6 +2,7 @@ package com.island.island.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.island.island.Adapters.PostAdapter;
+import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
 import com.island.island.Models.Post;
@@ -56,7 +58,20 @@ public class ProfileActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PostAdapter(this, mArrayOfPosts);
+        String[] projection = new String[]{
+                IslndContract.PostEntry.COLUMN_USER_ID,
+                IslndContract.PostEntry.COLUMN_POST_ID,
+                IslndContract.PostEntry.COLUMN_TIMESTAMP,
+                IslndContract.PostEntry.COLUMN_CONTENT,
+        };
+        Cursor postCursor = getContentResolver().query(
+                IslndContract.PostEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null
+        );
+        mAdapter = new PostAdapter(this, postCursor);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
