@@ -15,6 +15,7 @@ import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.PostDatabase;
 import com.island.island.DeletePostFragment;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Comment;
@@ -30,8 +31,10 @@ import org.island.messaging.CommentCollection;
 import org.island.messaging.server.CommentQuery;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class FeedActivity extends NavBaseActivity implements DeletePostFragment.NoticeDeletePostListener {
@@ -46,6 +49,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
     private List<Post> mArrayOfPosts;
     private Set<PostKey> mPostMap;
     private SwipeRefreshLayout mRefreshLayout;
+    private Map<PostKey, Long> mPostKeyToTimestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         // Feed posts setup
         mArrayOfPosts = new ArrayList<>();
         mPostMap = new HashSet<>();
+        mPostKeyToTimestamp = new HashMap<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -83,6 +88,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
                 mArrayOfPosts.add(0, post);
                 mAdapter.notifyDataSetChanged();
                 mPostMap.add(post.getKey());
+                mPostKeyToTimestamp.put(post.getKey(), post.getTimestamp());
             }
         } else if (requestCode == DELETE_POST_RESULT) {
             if (data != null) {
@@ -130,6 +136,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         mPostMap.add(post.getKey());
         int insertionPoint = getIndexToInsertPost(p.getTimestamp());
         mArrayOfPosts.add(insertionPoint, post);
+        mPostKeyToTimestamp.put(post.getKey(), post.getTimestamp());
 
         return true;
     }
@@ -182,14 +189,24 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         protected void onPostExecute(CommentCollection commentCollection) {
             boolean anyPostUpdated = false;
 
-            for (Post post : mArrayOfPosts) {
-                List<Comment> commentsForPost = commentCollection.getComments(
-                        post.getUserId(),
-                        post.getPostId());
+            Map<PostKey, List<Comment>> postKeyToComments = commentCollection.getCommentsGroupedByPostKey();
+            for (PostKey postKey : postKeyToComments.keySet()) {
+                int index = getPostIndex(postKey);
+
                 List<CommentViewModel> commentViewModels = Utils.buildCommentViewModels(
                         getApplicationContext(),
-                        commentsForPost);
-                if (post.addComments(commentViewModels)) {
+                        postKeyToComments.get(postKey));
+                if (mArrayOfPosts.get(index).addComments(commentViewModels)) {
+                    anyPostUpdated = true;
+                }
+            }
+
+            Map<PostKey, List<CommentKey>> postKeyToDeletions = commentCollection.getDeletions();
+            for (PostKey postKey : postKeyToDeletions.keySet()) {
+                List<CommentKey> deletions = postKeyToDeletions.get(postKey);
+                int index = getPostIndex(postKey);
+
+                if (mArrayOfPosts.get(index).deleteComments(deletions)) {
                     anyPostUpdated = true;
                 }
             }
@@ -231,6 +248,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
                     mPostMap.add(post.getKey());
                     int insertionPoint = getIndexToInsertPost(post.getTimestamp());
                     mArrayOfPosts.add(insertionPoint, post);
+                    mPostKeyToTimestamp.put(post.getKey(), post.getTimestamp());
                     postsModified = true;
                 }
             }
@@ -261,7 +279,10 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         return -1;
     }
 
+    //--This method finds the index to insert a post or find the
+    //  first index of a post with a given timestamp
     private int getIndexToInsertPost(long postTimestamp) {
+        //--TODO binary search
         int insertionPoint = 0;
         while (insertionPoint < mArrayOfPosts.size()
                 && postTimestamp < mArrayOfPosts.get(insertionPoint).getTimestamp()) {
@@ -270,5 +291,17 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         }
 
         return insertionPoint;
+    }
+
+    private int getPostIndex(PostKey postKey) {
+        int index = getIndexToInsertPost(getTimestamp(postKey));
+        while (!mArrayOfPosts.get(index).getKey().equals(postKey)) {
+            index++;
+        }
+        return index;
+    }
+
+    private long getTimestamp(PostKey postKey) {
+        return mPostKeyToTimestamp.get(postKey);
     }
 }

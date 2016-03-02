@@ -58,7 +58,6 @@ public class DeletePostFragment extends DialogFragment {
 
     @Override
     public void onAttach(Activity activity) {
-        Log.v(TAG, "attaching...");
         super.onAttach(activity);
 
         try {

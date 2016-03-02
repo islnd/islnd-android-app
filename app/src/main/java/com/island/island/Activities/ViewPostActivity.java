@@ -13,12 +13,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.island.island.Adapters.ViewPostAdapter;
+import com.island.island.DeleteCommentFragment;
 import com.island.island.DeletePostFragment;
+import com.island.island.Models.Comment;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Database.IslandDB;
@@ -27,6 +31,7 @@ import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
 
+import org.island.messaging.CommentCollection;
 import org.island.messaging.MessageLayer;
 
 import java.util.ArrayList;
@@ -35,7 +40,9 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ViewPostActivity extends AppCompatActivity implements DeletePostFragment.NoticeDeletePostListener
+public class ViewPostActivity extends AppCompatActivity
+        implements DeletePostFragment.NoticeDeletePostListener,
+        DeleteCommentFragment.NoticeDeleteCommentListener
 {
     private Post mPost = null;
 
@@ -44,7 +51,7 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
     private ArrayList mViewPostList;
-    private Set<String> mCommentMap;
+    private Set<CommentKey> mCommentMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -82,10 +89,10 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
-
         refreshLayout.setOnRefreshListener(() ->
         {
             // TODO: Run async task again
+            new GetCommentsTask().execute(mPost);
             refreshLayout.setRefreshing(false);
         });
     }
@@ -103,10 +110,14 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
         }
         else
         {
-            IslandDB.addCommentToPost(
+            Comment comment = IslandDB.addCommentToPost(
                     this,
                     mPost,
-                    new CommentViewModel(Utils.getUser(this), commentText));
+                    commentText);
+
+            addCommentToPostAndTimeline(comment);
+
+            //--Clear edit text
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
@@ -127,27 +138,94 @@ public class ViewPostActivity extends AppCompatActivity implements DeletePostFra
         return returnIntent;
     }
 
-    private class GetCommentsTask extends AsyncTask<Post, Void, Void> {
-        @Override
-        protected Void doInBackground(Post... params) {
-            List<CommentViewModel> comments = MessageLayer.getCommentCollection(
+    @Override
+    public void onDeleteCommentDialogPositiveClick(DialogFragment dialogFragment) {
+        Bundle args = dialogFragment.getArguments();
+        int commentUserId = args.getInt(DeleteCommentFragment.COMMENT_USER_ID_BUNDLE_KEY);
+        String commentId = args.getString(DeleteCommentFragment.COMMENT_ID_BUNDLE_KEY);
+
+        final CommentKey commentKey = new CommentKey(commentUserId, commentId);
+        removeCommentFromPostAndTimeline(commentKey);
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private class GetCommentsTask extends AsyncTask<Post, Void, CommentCollection> {
+        private final String TAG = GetCommentsTask.class.getSimpleName();
+
+        protected CommentCollection doInBackground(Post... params) {
+            Log.v(TAG, "starting get comments task");
+            return MessageLayer.getCommentCollection(
                     getApplicationContext(),
                     mPost.getUserId(),
                     mPost.getPostId());
-
-            for (CommentViewModel comment : comments) {
-                if (!mCommentMap.contains(comment.getKey())) {
-                    mCommentMap.add(comment.getKey());
-                    mViewPostList.add(comment);
-                }
-            }
-
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            mAdapter.notifyDataSetChanged();
+        protected void onPostExecute(CommentCollection commentCollection) {
+            boolean commentsUpdated = false;
+
+            //-add comments
+            List<CommentViewModel> comments = Utils.buildCommentViewModels(
+                    getApplicationContext(),
+                    commentCollection.getCommentsGroupedByPostKey()
+                            .get(mPost.getKey()));
+            for (CommentViewModel comment : comments) {
+                if (addCommentToPostAndTimeline(comment)) {
+                    commentsUpdated = true;
+                }
+            }
+
+            //--delete comments
+            List<CommentKey> deletions = commentCollection
+                    .getDeletions()
+                    .get(mPost.getKey());
+            for (CommentKey deletion : deletions) {
+                if (removeCommentFromPostAndTimeline(deletion)) {
+                    commentsUpdated = true;
+                }
+            }
+
+            if (commentsUpdated) {
+                mAdapter.notifyDataSetChanged();
+            }
         }
+    }
+
+    private boolean removeCommentFromPostAndTimeline(CommentKey keyToDelete) {
+        if (!mCommentMap.contains(keyToDelete)) {
+            return false;
+        }
+
+        mPost.deleteComment(keyToDelete);
+        mCommentMap.remove(keyToDelete);
+        int index = findComment(keyToDelete);
+        mViewPostList.remove(index);
+        return true;
+    }
+
+    private boolean addCommentToPostAndTimeline(Comment comment) {
+        return addCommentToPostAndTimeline(Utils.buildCommentViewModel(this, comment));
+    }
+
+    private boolean addCommentToPostAndTimeline(CommentViewModel commentViewModel) {
+        if (mCommentMap.contains(commentViewModel.getKey())) {
+            return false;
+        }
+
+        mCommentMap.add(commentViewModel.getKey());
+        mPost.addComment(commentViewModel);
+        mViewPostList.add(commentViewModel);
+        return true;
+    }
+
+    private int findComment(CommentKey commentKey) {
+        for (int i = 1; i < mViewPostList.size(); i++) {
+            if (((CommentViewModel)mViewPostList.get(i)).getKey().equals(commentKey)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

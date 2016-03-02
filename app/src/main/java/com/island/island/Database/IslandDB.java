@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.island.island.Models.Comment;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
@@ -22,6 +23,7 @@ import org.island.messaging.Rest;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
+import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedPost;
 
 import java.security.KeyPair;
@@ -171,6 +173,8 @@ public class IslandDB
         int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
         PostDatabase.getInstance(context).insert(myUserId, postUpdate);
 
+        Log.v(TAG, String.format("making post user id %d post id %s", myUserId, postUpdate.getId()));
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -213,7 +217,7 @@ public class IslandDB
 
     }
 
-    public static void addCommentToPost(Context context, Post post, CommentViewModel comment)
+    public static Comment addCommentToPost(Context context, Post post, String commentText)
     /**
      * Adds comment to existing post
      *
@@ -221,23 +225,11 @@ public class IslandDB
      * @param comment Comment that I'm adding.
      */
     {
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        int postUserId = post.getUserId();
-        Log.v(TAG, String.format("username %s has id %d", post.getUserName(), postUserId));
-        int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
-        String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
-        String myPseudonym = Utils.getPseudonym(context);
-        String postId = post.getPostId();
-
-        //--TODO comment update should be built in message layer
-        CommentUpdate commentUpdate = CommentUpdate.buildComment(
-                postAuthorPseudonym,
-                myPseudonym,
-                postId,
-                comment.getComment());
-
-        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
-        MessageLayer.comment(context, commentUpdate);
+        return MessageLayer.comment(
+                context,
+                post.getUserId(),
+                post.getPostId(),
+                commentText);
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {
@@ -288,10 +280,34 @@ public class IslandDB
         PostDatabase postDatabase = PostDatabase.getInstance(context);
         postDatabase.delete(userId, postId);
         PostUpdate deletePost = PostUpdate.buildDelete(postId);
-        EncryptedPost ep = new EncryptedPost(
+        EncryptedPost encryptedPost = new EncryptedPost(
                 deletePost,
                 Utils.getPrivateKey(context),
                 Utils.getGroupKey(context));
-        Rest.post(Utils.getPseudonymSeed(context), ep, Utils.getApiKey(context));
+        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
+    }
+
+    public static void deleteComment(
+            Context context,
+            int postUserId,
+            String postId,
+            int commentUserId,
+            String commentId) {
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+        PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(postUserId);
+        String commentAuthorPseudonym = friendDatabase.getPseudonym(commentUserId);
+        CommentUpdate deleteComment = CommentUpdate.buildDelete(
+                postAuthorPseudonymKey.getPseudonym(),
+                commentAuthorPseudonym,
+                postId,
+                commentId);
+
+        EncryptedComment encryptedComment = new EncryptedComment(
+                deleteComment,
+                Utils.getPrivateKey(context),
+                postAuthorPseudonymKey.getKey(),
+                postAuthorPseudonymKey.getPseudonym(),
+                postId);
+        Rest.postComment(encryptedComment, Utils.getApiKey(context));
     }
 }

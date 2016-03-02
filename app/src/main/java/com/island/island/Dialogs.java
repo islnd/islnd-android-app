@@ -35,18 +35,6 @@ public class Dialogs
                 .show();
     }
 
-    public static void deleteCommentDialog(Context context)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(context.getString(R.string.delete_comment_dialog))
-                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
-                {
-                        // TODO: Add remove comment!
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
     public static void allowUserDialog(Context context)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);

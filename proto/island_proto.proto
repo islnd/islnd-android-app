@@ -26,8 +26,9 @@ message CommentUpdate {
   required string post_author_pseudonym = 2;
   required string comment_author_pseudonym = 3;
   required string post_id = 4;
-  required string content = 5;
-  required int64 timestamp = 6;
+  required string comment_id = 5;
+  required string content = 6;
+  required int64 timestamp = 7;
 }
 
 message Profile {

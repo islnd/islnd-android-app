@@ -5,18 +5,24 @@ import java.io.Serializable;
 public class CommentViewModel implements Serializable
 {
     private final String username;
+    private final int userId;
+    private final String commentId;
     private final String comment;
     private final long timestamp;
 
-    public CommentViewModel(String username, String comment, long timestamp)
+    public CommentViewModel(String username, int userId, String commentId, String comment, long timestamp)
     {
         this.username = username;
+        this.userId = userId;
+        this.commentId = commentId;
         this.comment = comment;
         this.timestamp = timestamp;
     }
 
-    public CommentViewModel(String username, String commentText) {
+    public CommentViewModel(String username, int userId, String commentId, String commentText) {
         this.username = username;
+        this.userId = userId;
+        this.commentId = commentId;
         this.comment = commentText;
         this.timestamp = System.currentTimeMillis();
     }
@@ -31,7 +37,15 @@ public class CommentViewModel implements Serializable
         return username;
     }
 
-    public String getKey() {
-        return username + timestamp;
+    public CommentKey getKey() {
+        return new CommentKey(userId, commentId);
+    }
+
+    public String getCommentId() {
+        return commentId;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 }

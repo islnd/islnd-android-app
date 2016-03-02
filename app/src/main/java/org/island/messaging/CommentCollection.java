@@ -1,53 +1,84 @@
 package org.island.messaging;
 
-import com.island.island.Models.Post;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.Comment;
+import com.island.island.Models.PostKey;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CommentCollection {
-
-    //--PostAuthorId->PostId->Comments
-    HashMap<Integer, HashMap<String, List<Comment>>> map;
+    Map<PostKey, List<Comment>> postKeyToComments;
+    Map<PostKey, List<CommentKey>> postKeyToCommentDeletions;
 
     public CommentCollection() {
-        this.map = new HashMap<>();
+        this.postKeyToComments = new HashMap<>();
+        this.postKeyToCommentDeletions = new HashMap<>();
     }
 
     public void add(int postAuthorId, int commentAuthorId, CommentUpdate commentUpdate) {
         if (commentUpdate.isDeletion()) {
-            return;
+            deleteComment(
+                    commentAuthorId,
+                    commentUpdate.getCommentId(),
+                    postAuthorId,
+                    commentUpdate.getPostId());
+        }
+        else {
+            addComment(postAuthorId, commentAuthorId, commentUpdate);
+        }
+    }
+
+    private void addComment(int postAuthorId, int commentAuthorId, CommentUpdate commentUpdate) {
+        final PostKey postKey = new PostKey(postAuthorId, commentUpdate.getPostId());
+        if (!postKeyToComments.containsKey(postKey)) {
+            postKeyToComments.put(postKey, new ArrayList<>());
         }
 
-        if (!map.containsKey(postAuthorId)) {
-            map.put(postAuthorId, new HashMap<>());
-        }
-
-        final String postId = commentUpdate.getPostId();
-        if (!map.get(postAuthorId).containsKey(postId)) {
-            map.get(postAuthorId).put(postId, new ArrayList<>());
-        }
-
-        map.get(postAuthorId).get(postId).add(
+        postKeyToComments.get(postKey).add(
                 new Comment(
                         postAuthorId,
-                        postId,
+                        commentUpdate.getPostId(),
                         commentAuthorId,
+                        commentUpdate.getCommentId(),
                         commentUpdate.getContent(),
                         commentUpdate.getTimestamp()));
     }
 
-    public List<Comment> getComments(int postAuthorId, String postId) {
-        if (!map.containsKey(postAuthorId)) {
-            return new ArrayList<>();
+    private void deleteComment(int commentAuthorId, String commentId, int postAuthorId, String postId) {
+        final CommentKey commentKey = new CommentKey(commentAuthorId, commentId);
+        final PostKey postKey = new PostKey(postAuthorId, postId);
+        if (postKeyToComments.containsKey(postKey)) {
+            int index = findComment(postKeyToComments.get(postKey), commentKey);
+            if (index >= 0) {
+                postKeyToComments.get(postKey).remove(index);
+            }
         }
 
-        if (!map.get(postAuthorId).containsKey(postId)) {
-            return new ArrayList<>();
+        if (!postKeyToCommentDeletions.containsKey(postKey)) {
+            postKeyToCommentDeletions.put(postKey, new ArrayList<>());
         }
 
-        return map.get(postAuthorId).get(postId);
+        postKeyToCommentDeletions.get(postKey).add(commentKey);
+    }
+
+    public Map<PostKey, List<Comment>> getCommentsGroupedByPostKey() {
+        return postKeyToComments;
+    }
+
+    public Map<PostKey, List<CommentKey>> getDeletions() {
+        return postKeyToCommentDeletions;
+    }
+
+    private int findComment(List<Comment> comments, CommentKey commentKey) {
+        for (int i = 0; i < comments.size(); i++) {
+            if (comments.get(i).getKey().equals(commentKey)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

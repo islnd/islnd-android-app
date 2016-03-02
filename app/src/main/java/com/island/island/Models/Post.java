@@ -1,5 +1,7 @@
 package com.island.island.Models;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,6 +12,8 @@ import java.util.List;
  */
 public class Post implements Serializable
 {
+    private static final String TAG = Post.class.getSimpleName();
+
     public static String POST_EXTRA = "POST_OBJECT";
 
     private final String userName;
@@ -49,7 +53,6 @@ public class Post implements Serializable
         return content;
     }
 
-
     public List<CommentViewModel> getComments()
     {
         return comments;
@@ -61,6 +64,15 @@ public class Post implements Serializable
 
     public String getPostId() {
         return postId;
+    }
+
+    public boolean addComment(CommentViewModel comment) {
+        if (!hasComment(comment.getKey())) {
+            this.comments.add(comment);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean addComments(List<CommentViewModel> newComments) {
@@ -75,7 +87,7 @@ public class Post implements Serializable
         return addedAny;
     }
 
-    private boolean hasComment(String key) {
+    private boolean hasComment(CommentKey key) {
         for (CommentViewModel comment : this.comments) {
             if (comment.getKey().equals(key)) {
                 return true;
@@ -87,5 +99,30 @@ public class Post implements Serializable
 
     public int getUserId() {
         return userId;
+    }
+
+    public boolean deleteComments(List<CommentKey> keysToDelete) {
+        boolean anyDeleted = false;
+        for (CommentKey keyToDelete : keysToDelete) {
+            for (CommentViewModel comment : comments) {
+                if (comment.getKey().equals(keyToDelete)) {
+                    comments.remove(comment);
+                    anyDeleted = true;
+                    break;
+                }
+            }
+        }
+
+        return anyDeleted;
+    }
+
+    public void deleteComment(CommentKey keyToDelete) {
+        for (CommentViewModel comment : comments) {
+            if (comment.getKey().equals(keyToDelete)) {
+                Log.v(TAG, "comment removed");
+                comments.remove(comment);
+                break;
+            }
+        }
     }
 }

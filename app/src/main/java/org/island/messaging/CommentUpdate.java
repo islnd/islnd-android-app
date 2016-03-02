@@ -9,25 +9,48 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
     private final String postAuthorPseudonym;
     private final String commentAuthorPseudonym;
     private final String postId;
+    private final String commentId;
     private final String content;
     private final long timestamp;
 
-    private CommentUpdate(boolean isDelete, String postAuthorPseudonym, String commentAuthorPseudonym, String postId, String content, long timestamp) {
+    private CommentUpdate(boolean isDelete, String postAuthorPseudonym, String commentAuthorPseudonym, String postId, String commentId, String content, long timestamp) {
         this.isDelete = isDelete;
         this.postAuthorPseudonym = postAuthorPseudonym;
         this.commentAuthorPseudonym = commentAuthorPseudonym;
         this.postId = postId;
+        this.commentId = commentId;
         this.content = content;
         this.timestamp = timestamp;
     }
 
-    public static CommentUpdate buildComment(String postAuthorPseudonym, String commentAuthorPseudonym, String postId, String content) {
+    public static CommentUpdate buildComment(
+            String postAuthorPseudonym,
+            String commentAuthorPseudonym,
+            String postId,
+            String commentId,
+            String content) {
         return new CommentUpdate(
                 false,
                 postAuthorPseudonym,
                 commentAuthorPseudonym,
                 postId,
+                commentId,
                 content,
+                Util.getContentTimestamp());
+    }
+
+    public static CommentUpdate buildDelete(
+            String postAuthorPseudonym,
+            String commentAuthorPseudonym,
+            String postId,
+            String commentId) {
+        return new CommentUpdate(
+                true,
+                postAuthorPseudonym,
+                commentAuthorPseudonym,
+                postId,
+                commentId,
+                "",
                 Util.getContentTimestamp());
     }
 
@@ -50,6 +73,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 .setPostAuthorPseudonym(this.postAuthorPseudonym)
                 .setCommentAuthorPseudonym(this.commentAuthorPseudonym)
                 .setPostId(this.postId)
+                .setCommentId(this.commentId)
                 .setIsDelete(this.isDelete)
                 .setTimestamp(this.timestamp)
                 .build()
@@ -73,6 +97,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 commentUpdate.getPostAuthorPseudonym(),
                 commentUpdate.getCommentAuthorPseudonym(),
                 commentUpdate.getPostId(),
+                commentUpdate.getCommentId(),
                 commentUpdate.getContent(),
                 commentUpdate.getTimestamp());
     }
@@ -88,6 +113,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 && otherComment.isDelete == this.isDelete
                 && otherComment.postAuthorPseudonym.equals(this.postAuthorPseudonym)
                 && otherComment.postId.equals(this.postId)
+                && otherComment.commentId.equals(this.commentId)
                 && otherComment.timestamp == this.timestamp;
     }
 
@@ -101,5 +127,9 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
 
     public String getCommentAuthorPseudonym() {
         return commentAuthorPseudonym;
+    }
+
+    public String getCommentId() {
+        return commentId;
     }
 }
