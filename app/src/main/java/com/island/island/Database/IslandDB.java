@@ -172,7 +172,6 @@ public class IslandDB
     {
         PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
         int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
-        //PostDatabase.getInstance(context).insert(myUserId, postUpdate);
         ContentValues values = new ContentValues();
         values.put(IslndContract.PostEntry.COLUMN_USER_ID, myUserId);
         values.put(IslndContract.PostEntry.COLUMN_POST_ID, postUpdate.getId());
@@ -193,6 +192,7 @@ public class IslandDB
             }
         }.execute();
 
+        //--TODO we might be able to remove this
         return postUpdate;
     }
 
@@ -287,14 +287,15 @@ public class IslandDB
 
     public static void deletePost(Context context, int userId, String postId) {
         Log.v(TAG, String.format("deleting post. user %d post %s", userId, postId));
-        PostDatabase postDatabase = PostDatabase.getInstance(context);
-        postDatabase.delete(userId, postId);
-        PostUpdate deletePost = PostUpdate.buildDelete(postId);
-        EncryptedPost encryptedPost = new EncryptedPost(
-                deletePost,
-                Utils.getPrivateKey(context),
-                Utils.getGroupKey(context));
-        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
+        //--TODO delete the post
+//        PostDatabase postDatabase = PostDatabase.getInstance(context);
+//        postDatabase.delete(userId, postId);
+//        PostUpdate deletePost = PostUpdate.buildDelete(postId);
+//        EncryptedPost encryptedPost = new EncryptedPost(
+//                deletePost,
+//                Utils.getPrivateKey(context),
+//                Utils.getGroupKey(context));
+//        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
     }
 
     public static void deleteComment(

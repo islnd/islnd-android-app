@@ -1,5 +1,6 @@
 package org.island.messaging;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -8,10 +9,9 @@ import android.util.Log;
 
 import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.FriendDatabase;
-import com.island.island.Database.PostDatabase;
+import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.Models.CommentKey;
-import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.PostKey;
 import com.island.island.Models.Profile;
@@ -68,8 +68,6 @@ public class MessageLayer {
 
     public static PostCollection getPosts(Context context) {
         FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        PostDatabase postDatabase = PostDatabase.getInstance(context);
-
         ArrayList<PseudonymKey> keys = friendDatabase.getKeys();
         PostCollection postCollection = new PostCollection();
         String apiKey = Utils.getApiKey(context);
@@ -98,7 +96,7 @@ public class MessageLayer {
             }
         }
 
-        updateDatabase(postDatabase, postCollection);
+        addPostsToContentProvider(context, postCollection);
         return postCollection;
     }
 
@@ -118,17 +116,23 @@ public class MessageLayer {
         }
     }
 
-    private static void updateDatabase(PostDatabase postDatabase, PostCollection postCollection) {
+    private static void addPostsToContentProvider(Context context, PostCollection postCollection) {
         for (Post post : postCollection.getPosts()) {
-            if (!postDatabase.contains(post.getUserId(), post)) {
-                postDatabase.insert(post.getUserId(), post);
-            }
+            //--TODO only insert if not in DB
+            //--TODO use batch insert
+            ContentValues values = new ContentValues();
+            values.put(IslndContract.PostEntry.COLUMN_USER_ID, post.getUserId());
+            values.put(IslndContract.PostEntry.COLUMN_POST_ID, post.getPostId());
+            values.put(IslndContract.PostEntry.COLUMN_CONTENT, post.getContent());
+            values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, post.getTimestamp());
+            context.getContentResolver().insert(
+                    IslndContract.PostEntry.CONTENT_URI,
+                    values
+            );
         }
 
         for (PostKey postKey : postCollection.getDeletedKeys()) {
-            if (postDatabase.contains(postKey.getUserId(), postKey.getPostId())) {
-                postDatabase.delete(postKey.getUserId(), postKey.getPostId());
-            }
+            //--TODO handle deletes
         }
     }
 

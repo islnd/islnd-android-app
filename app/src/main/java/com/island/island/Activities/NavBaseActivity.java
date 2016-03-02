@@ -31,7 +31,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
-import com.island.island.Database.PostDatabase;
+import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
@@ -349,7 +349,10 @@ public class NavBaseActivity extends AppCompatActivity
                 (DialogInterface dialog, int id) -> {
                     FriendDatabase.getInstance(getApplicationContext()).deleteAll();
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
-                    PostDatabase.getInstance(getApplicationContext()).deleteAll();
+                    getContentResolver().delete(
+                            IslndContract.PostEntry.CONTENT_URI,
+                            null,
+                            null);
                     IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
