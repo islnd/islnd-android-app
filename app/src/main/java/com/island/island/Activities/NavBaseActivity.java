@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
@@ -52,6 +53,13 @@ public class NavBaseActivity extends AppCompatActivity
     private EditText mSmsEditText = null;
     private View mDialogView = null;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.drawer_layout);
+        onCreateDrawer();
+    }
+
     private void onCreateDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -85,12 +93,6 @@ public class NavBaseActivity extends AppCompatActivity
                 profileImageUri);
         ImageUtils.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
                 headerImageUri);
-    }
-
-    @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        super.setContentView(layoutResID);
-        onCreateDrawer();
     }
 
     @Override
@@ -189,6 +191,10 @@ public class NavBaseActivity extends AppCompatActivity
                 return;
             }
         }
+    }
+
+    private void selectItem(int position) {
+
     }
 
     private void qrCodeActionDialog() {
