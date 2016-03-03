@@ -7,10 +7,11 @@ import android.provider.BaseColumns;
 
 public class IslndContract {
 
-    public static final String CONTENT_AUTHORITY = "org.islnd.android.islnd.app";
+    public static final String CONTENT_AUTHORITY = "com.island.island.Database";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_POST = "post";
     public static final String PATH_USER = "user";
+    private static final String PATH_COMMENT = "comment";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -61,5 +62,33 @@ public class IslndContract {
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+    }
+
+    public static final class CommentEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_COMMENT).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_COMMENT;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_COMMENT;
+
+        public static final String TABLE_NAME = "comment";
+
+        public static final String COLUMN_POST_USER_ID = "post_user_id";
+        public static final String COLUMN_POST_ID = "post_id";
+        public static final String COLUMN_COMMENT_USER_ID = "comment_user_id";
+        public static final String COLUMN_COMMENT_ID = "comment_id";
+        public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+//
+//        public static int getUserIdFromUri(Uri uri) {
+//            return 0;
+//        }
+//
+//        public static String getPostIdFromUri(Uri uri) {
+//            return null;
+//        }
     }
 }

@@ -19,6 +19,8 @@ public class IslndProvider extends ContentProvider {
     static final int POST_WITH_USER = 101;
     static final int USER = 200;
     static final int USER_WITH_ID = 201;
+    static final int COMMENT = 300;
+    static final int COMMENT_WITH_POST_USER_ID_AND_POST_ID = 301;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -88,6 +90,12 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getCommentsByUserIdAndPostId(Uri uri, String[] projection, String sortOrder) {
+//        int userId = IslndContract.CommentEntry.getUserIdFromUri(uri);
+//        String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
+        throw new UnsupportedOperationException("blah");
+    }
+
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = IslndContract.CONTENT_AUTHORITY;
@@ -133,6 +141,10 @@ public class IslndProvider extends ContentProvider {
             }
             case USER_WITH_ID: {
                 retCursor = getUserByUserId(uri, projection, sortOrder);
+                break;
+            }
+            case COMMENT_WITH_POST_USER_ID_AND_POST_ID: {
+                retCursor = getCommentsByUserIdAndPostId(uri, projection, sortOrder);
                 break;
             }
 

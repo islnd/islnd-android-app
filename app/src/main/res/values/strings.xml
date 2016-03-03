@@ -75,4 +75,7 @@
     <string name="fragment_delete_post">fragment_delete_post</string>
     <string name="comment_version_key">comment_version_key</string>
     <string name="fragment_delete_comment">fragment_delete_comment</string>
+    <string name="content_authority">com.island.island.Database</string>
+    <string name="sync_account_type">islnd.io</string>
+    <string name="sync_account">islnd_sync_account</string>
 </resources>

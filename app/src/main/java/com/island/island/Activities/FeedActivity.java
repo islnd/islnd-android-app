@@ -1,6 +1,10 @@
 package com.island.island.Activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -27,6 +31,7 @@ import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.Utils;
+import com.island.island.sync.CommentsSyncAdapter;
 
 import org.island.messaging.MessageLayer;
 import org.island.messaging.CommentCollection;
@@ -44,11 +49,14 @@ public class FeedActivity extends NavBaseActivity implements
     private static final int NEW_POST_RESULT = 1;
     public static final int DELETE_POST_RESULT = 2;
 
+    private static final int POST_LOADER_ID = 0;
+
     private RecyclerView mRecyclerView;
     private PostAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
     private boolean mAdapterInitialized;
+    private ContentResolver mResolver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +68,7 @@ public class FeedActivity extends NavBaseActivity implements
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(POST_LOADER_ID, null, this);
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -71,6 +79,14 @@ public class FeedActivity extends NavBaseActivity implements
                     new GetPostsFromServerTask().execute();
                     mRefreshLayout.setRefreshing(false);
                 });
+
+        Account account = createSyncAccount(this);
+        mResolver = getContentResolver();
+        mResolver.setSyncAutomatically(
+                account,
+                getString(R.string.content_authority),
+                true);
+        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
     private List<CommentViewModel> getCommentsForPost(CommentDatabase commentDatabase, RawPost post) {
@@ -96,30 +112,39 @@ public class FeedActivity extends NavBaseActivity implements
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(TAG, "onCreateLoader");
-        if (id != 0) return null;
+        if (id == POST_LOADER_ID) {
+            String[] projection = new String[]{
+                    IslndContract.UserEntry.COLUMN_USERNAME,
+                    IslndContract.UserEntry.COLUMN_PSEUDONYM,
+                    IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
+                    IslndContract.PostEntry.COLUMN_USER_ID,
+                    IslndContract.PostEntry.COLUMN_POST_ID,
+                    IslndContract.PostEntry.COLUMN_TIMESTAMP,
+                    IslndContract.PostEntry.COLUMN_CONTENT,
+            };
 
-        String[] projection = new String[]{
-                IslndContract.UserEntry.COLUMN_USERNAME,
-                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
-                IslndContract.PostEntry.COLUMN_USER_ID,
-                IslndContract.PostEntry.COLUMN_POST_ID,
-                IslndContract.PostEntry.COLUMN_TIMESTAMP,
-                IslndContract.PostEntry.COLUMN_CONTENT,
-        };
+            return new CursorLoader(
+                    this,
+                    IslndContract.PostEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    IslndContract.PostEntry.COLUMN_TIMESTAMP + " DESC"
+            );
+        }
 
-        return new CursorLoader(
-                this,
-                IslndContract.PostEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                IslndContract.PostEntry.COLUMN_TIMESTAMP + " DESC"
-        );
+        return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.v(TAG, "onLoadFinished");
+        if (loader.getId() == POST_LOADER_ID) {
+            setPostsOnAdapter(data);
+        }
+    }
+
+    private void setPostsOnAdapter(Cursor data) {
+        Log.v(TAG, "post load finished");
         if (mAdapterInitialized) {
             mAdapter.swapCursor(data);
         }
@@ -137,42 +162,13 @@ public class FeedActivity extends NavBaseActivity implements
         mAdapter.swapCursor(null);
     }
 
-    private class GetCommentsFromServerTask extends AsyncTask<Void, Void, CommentCollection> {
+    private class GetCommentsFromServerTask extends AsyncTask<List<CommentQuery>, Void, Void> {
         private final String TAG = GetCommentsFromServerTask.class.getSimpleName();
 
         @Override
-        protected CommentCollection doInBackground(Void... params) {
-            List<CommentQuery> commentQueries = new ArrayList<>();
-//            FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
-
-//            for (Post post : mArrayOfPosts) {
-//                String postAuthorPseudonym = friendDatabase.getPseudonym(post.getUserId());
-//                commentQueries.add(new CommentQuery(postAuthorPseudonym, post.getPostId()));
-//            }
-
-            return MessageLayer.getCommentCollection(getApplicationContext(), commentQueries);
-        }
-
-        @Override
-        protected void onPostExecute(CommentCollection commentCollection) {
-            boolean anyPostUpdated = false;
-
-            Map<PostKey, List<Comment>> postKeyToComments = commentCollection.getCommentsGroupedByPostKey();
-            for (PostKey postKey : postKeyToComments.keySet()) {
-
-                List<CommentViewModel> commentViewModels = Utils.buildCommentViewModels(
-                        getApplicationContext(),
-                        postKeyToComments.get(postKey));
-            }
-
-            Map<PostKey, List<CommentKey>> postKeyToDeletions = commentCollection.getDeletions();
-            for (PostKey postKey : postKeyToDeletions.keySet()) {
-                List<CommentKey> deletions = postKeyToDeletions.get(postKey);
-            }
-
-            if (anyPostUpdated) {
-                mAdapter.notifyDataSetChanged();
-            }
+        protected Void doInBackground(List<CommentQuery>... params) {
+            MessageLayer.getCommentCollection(getApplicationContext(), params[0]);
+            return null;
         }
     }
 
@@ -183,5 +179,33 @@ public class FeedActivity extends NavBaseActivity implements
         protected PostCollection doInBackground(Void... params) {
             return MessageLayer.getPosts(getApplicationContext());
         }
+    }
+
+    public static Account createSyncAccount(Context context) {
+        Account newAccount = new Account(
+                context.getString(R.string.sync_account),
+                context.getString(R.string.sync_account_type));
+
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+        } else {
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+        }
+
+        return newAccount;
     }
 }
