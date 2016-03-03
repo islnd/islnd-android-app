@@ -13,6 +13,7 @@ import android.provider.ContactsContract;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -35,6 +36,8 @@ import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
 import com.island.island.Database.PostDatabase;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.DeletePostFragment;
+import com.island.island.Models.PostKey;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
@@ -42,7 +45,8 @@ import com.island.island.Utils.Utils;
 import org.island.messaging.MessageLayer;
 
 public class NavBaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener  {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        DeletePostFragment.NoticeDeletePostListener  {
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
     private final static int REQUEST_SMS = 0;
@@ -172,6 +176,7 @@ public class NavBaseActivity extends AppCompatActivity
                 Log.d(TAG, "Contents: " + contents);
                 MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
             }
+            return;
         // Not QR result
         } else {
             if (requestCode == CONTACT_RESULT && resultCode == RESULT_OK) {
@@ -205,6 +210,14 @@ public class NavBaseActivity extends AppCompatActivity
                 }
                 return;
             }
+        }
+    }
+
+    @Override
+    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        if (fragment instanceof FeedActivity) {
+            ((FeedActivity) fragment).onDeletePostDialogPositiveClick(dialogFragment);
         }
     }
 
@@ -355,7 +368,6 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void editUsernameDialog() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         mDialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
         builder.setView(mDialogView);

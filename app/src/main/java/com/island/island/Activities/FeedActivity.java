@@ -3,6 +3,7 @@ package com.island.island.Activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -60,7 +61,6 @@ public class FeedActivity extends Fragment implements DeletePostFragment.NoticeD
 
         View v = inflater.inflate(R.layout.content_feed, container, false);
 
-
         // Feed posts setup
         mArrayOfPosts = new ArrayList<>();
         mPostMap = new HashSet<>();
@@ -68,7 +68,7 @@ public class FeedActivity extends Fragment implements DeletePostFragment.NoticeD
         mRecyclerView = (RecyclerView) v.findViewById(R.id.feed_recycler_view);
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PostAdapter(getContext(), mArrayOfPosts);
+        mAdapter = new PostAdapter(getActivity(), mArrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
@@ -81,6 +81,13 @@ public class FeedActivity extends Fragment implements DeletePostFragment.NoticeD
 
         mRefreshLayout.setOnRefreshListener(() -> {
             new GetPostsFromServerTask().execute();
+        });
+
+        // TODO: handle onclicks more betterer
+        // Fab
+        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
+        fab.setOnClickListener((View view) -> {
+            startNewPostActivity();
         });
         return v;
     }
@@ -152,7 +159,7 @@ public class FeedActivity extends Fragment implements DeletePostFragment.NoticeD
         return Utils.buildCommentViewModels(getContext(), comments);
     }
 
-    public void startNewPostActivity(View view) {
+    public void startNewPostActivity() {
         Intent newPostIntent = new Intent(getContext(), NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
