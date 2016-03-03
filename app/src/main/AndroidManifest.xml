@@ -46,11 +46,6 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
         </activity>
         <activity
-            android:name=".Activities.ViewFriendsActivity"
-            android:label="@string/title_activity_view_friends"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
             android:name=".Activities.EditProfileActivity"
             android:label="@string/title_activity_edit_profile"
             android:theme="@style/AppTheme.NoActionBar"

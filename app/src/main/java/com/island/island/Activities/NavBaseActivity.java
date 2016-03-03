@@ -14,6 +14,8 @@ import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -109,9 +111,12 @@ public class NavBaseActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        Fragment fragment = null;
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        Class fragmentClass = null;
         switch (id) {
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
@@ -119,7 +124,7 @@ public class NavBaseActivity extends AppCompatActivity
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
-                startActivity(new Intent(this, ViewFriendsActivity.class));
+                fragmentClass = ViewFriendsActivity.class;
                 break;
             case R.id.nav_settings:
                 break;
@@ -140,6 +145,15 @@ public class NavBaseActivity extends AppCompatActivity
                 editApiKey();
                 break;
         }
+
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -191,10 +205,6 @@ public class NavBaseActivity extends AppCompatActivity
                 return;
             }
         }
-    }
-
-    private void selectItem(int position) {
-
     }
 
     private void qrCodeActionDialog() {
