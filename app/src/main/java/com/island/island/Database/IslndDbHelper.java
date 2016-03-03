@@ -5,10 +5,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.island.island.Database.IslndContract.PostEntry;
+import com.island.island.Database.IslndContract.UserEntry;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -26,12 +27,21 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 PostEntry.COLUMN_CONTENT + " TEXT NOT NULL" +
                 " );";
 
+        final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
+                UserEntry._ID + " INTEGER PRIMARY KEY," +
+                UserEntry.COLUMN_USERNAME + " TEXT NOT NULL," +
+                UserEntry.COLUMN_PSEUDONYM + " TEXT NOT NULL," +
+                UserEntry.COLUMN_GROUP_KEY + " TEXT NOT NULL" +
+                " );";
+
         db.execSQL(SQL_CREATE_POST_TABLE);
+        db.execSQL(SQL_CREATE_USER_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + PostEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME);
         onCreate(db);
     }
 }

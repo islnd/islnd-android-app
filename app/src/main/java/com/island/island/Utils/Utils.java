@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
@@ -163,27 +162,15 @@ public class Utils
     }
 
     public static List<CommentViewModel> buildCommentViewModels(Context context, List<Comment> comments) {
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
         List<CommentViewModel> commentViewModels = new ArrayList<>();
         for (Comment comment : comments) {
-            commentViewModels.add(buildCommentViewModel(friendDatabase, comment));
+            commentViewModels.add(buildCommentViewModel(null, comment));
         }
 
         return commentViewModels;
     }
 
     public static CommentViewModel buildCommentViewModel(Context context, Comment comment) {
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        return buildCommentViewModel(friendDatabase, comment);
-    }
-
-    private static CommentViewModel buildCommentViewModel(FriendDatabase friendDatabase, Comment comment) {
-        String username = friendDatabase.getUsername(comment.getCommentUserId());
-        return new CommentViewModel(
-                username,
-                comment.getCommentUserId(),
-                comment.getCommentId(),
-                comment.getContent(),
-                comment.getTimestamp());
+        throw new UnsupportedOperationException("working on it");
     }
 }

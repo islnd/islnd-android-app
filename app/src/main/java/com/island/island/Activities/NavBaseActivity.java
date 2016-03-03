@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.DataUtils;
 import com.island.island.Database.IslandDB;
 import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
@@ -125,7 +125,8 @@ public class NavBaseActivity extends AppCompatActivity
                 qrCodeActionDialog();
                 break;
             case R.id.delete_database:
-                FriendDatabase.getInstance(this).deleteAll();
+                int deleted = DataUtils.deleteUsers(this);
+                Log.v(TAG, String.format("removed %d users", deleted));
                 ProfileDatabase.getInstance(this).deleteAll();
                 break;
             case R.id.sms_allow_user:
@@ -347,7 +348,8 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-                    FriendDatabase.getInstance(getApplicationContext()).deleteAll();
+                    int deleted = DataUtils.deleteUsers(this);
+                    Log.v(TAG, String.format("removed %d users", deleted));
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
                     getContentResolver().delete(
                             IslndContract.PostEntry.CONTENT_URI,

@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.island.island.Activities.ProfileActivity;
 import com.island.island.Database.ProfileDatabase;
@@ -22,9 +21,6 @@ import com.island.island.ViewHolders.FriendGlanceViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by poo on 2/3/2016.
- */
 public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHolder>
 {
     private List<User> mList = new ArrayList<>();

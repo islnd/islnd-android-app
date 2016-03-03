@@ -107,12 +107,11 @@ public class IslandDB
                 Log.v(TAG, "pseudonym " + pseudonym);
                 Log.v(TAG, "pseudonym seed " + seed);
 
-                FriendDatabase.getInstance(context).addFriend(
-                        new PseudonymKey(
-                                0,
-                                Utils.getUser(context),
-                                Utils.getPseudonym(context),
-                                Utils.getGroupKey(context)));
+                DataUtils.insertUser(
+                        context,
+                        Utils.getUser(context),
+                        Utils.getPseudonym(context),
+                        Utils.getGroupKey(context));
             }
         }.execute(seed);
     }
@@ -171,7 +170,7 @@ public class IslandDB
      */
     {
         PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
-        int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
+        int myUserId = DataUtils.getUserId(context, Utils.getUser(context));
         ContentValues values = new ContentValues();
         values.put(IslndContract.PostEntry.COLUMN_USER_ID, myUserId);
         values.put(IslndContract.PostEntry.COLUMN_POST_ID, postUpdate.getId());
@@ -304,21 +303,21 @@ public class IslandDB
             String postId,
             int commentUserId,
             String commentId) {
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(postUserId);
-        String commentAuthorPseudonym = friendDatabase.getPseudonym(commentUserId);
-        CommentUpdate deleteComment = CommentUpdate.buildDelete(
-                postAuthorPseudonymKey.getPseudonym(),
-                commentAuthorPseudonym,
-                postId,
-                commentId);
-
-        EncryptedComment encryptedComment = new EncryptedComment(
-                deleteComment,
-                Utils.getPrivateKey(context),
-                postAuthorPseudonymKey.getKey(),
-                postAuthorPseudonymKey.getPseudonym(),
-                postId);
-        Rest.postComment(encryptedComment, Utils.getApiKey(context));
+//        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
+//        PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(postUserId);
+//        String commentAuthorPseudonym = friendDatabase.getPseudonym(commentUserId);
+//        CommentUpdate deleteComment = CommentUpdate.buildDelete(
+//                postAuthorPseudonymKey.getPseudonym(),
+//                commentAuthorPseudonym,
+//                postId,
+//                commentId);
+//
+//        EncryptedComment encryptedComment = new EncryptedComment(
+//                deleteComment,
+//                Utils.getPrivateKey(context),
+//                postAuthorPseudonymKey.getKey(),
+//                postAuthorPseudonymKey.getPseudonym(),
+//                postId);
+//        Rest.postComment(encryptedComment, Utils.getApiKey(context));
     }
 }

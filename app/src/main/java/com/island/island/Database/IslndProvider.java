@@ -16,19 +16,41 @@ public class IslndProvider extends ContentProvider {
 
     static final int POST = 100;
     static final int POST_WITH_USER = 101;
+    static final int USER = 200;
+    static final int USER_WITH_ID = 201;
 
-    private static final String sUserIdSelection =
+    private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
-                    "." + IslndContract.PostEntry.COLUMN_POST_ID + " = ? ";
+                    "." + IslndContract.PostEntry.COLUMN_USER_ID + " = ? ";
+    private static final String sUserTableUserIdSelection =
+            IslndContract.UserEntry.TABLE_NAME +
+                    "." + IslndContract.UserEntry._ID + " = ? ";
 
     private Cursor getPostsByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
 
         String[] selectionArgs = new String[] {Integer.toString(userId)};
-        String selection = sUserIdSelection;
+        String selection = sPostTableUserIdSelection;
 
         return mOpenHelper.getReadableDatabase().query(
                 IslndContract.PostEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getUserByUserId(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.UserEntry.getUserIdFromUri(uri);
+
+        String[] selectionArgs = new String[] {Integer.toString(userId)};
+        String selection = sUserTableUserIdSelection;
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.UserEntry.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,
@@ -44,6 +66,10 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_POST, POST);
         matcher.addURI(authority, IslndContract.PATH_POST + "/#", POST_WITH_USER);
+
+        matcher.addURI(authority, IslndContract.PATH_USER, USER);
+        matcher.addURI(authority, IslndContract.PATH_USER + "/#", USER_WITH_ID);
+
         return matcher;
     }
 
@@ -74,6 +100,21 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getPostsByUserId(uri, projection, sortOrder);
                 break;
             }
+            case USER: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.UserEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case USER_WITH_ID: {
+                retCursor = getUserByUserId(uri, projection, sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -93,6 +134,10 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.PostEntry.CONTENT_TYPE;
             case POST_WITH_USER:
                 return IslndContract.PostEntry.CONTENT_TYPE;
+            case USER:
+                return IslndContract.UserEntry.CONTENT_TYPE;
+            case USER_WITH_ID:
+                return IslndContract.UserEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -113,12 +158,19 @@ public class IslndProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case USER: {
+                long _id = db.insert(IslndContract.UserEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = IslndContract.UserEntry.buildUserUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
         getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
-        Log.v(TAG, "Insert");
         return returnUri;
     }
 
@@ -161,10 +213,16 @@ public class IslndProvider extends ContentProvider {
         }
 
         switch (match) {
-            case POST:
+            case POST: {
                 rowsDeleted = db.delete(
                         IslndContract.PostEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            }
+            case USER: {
+                rowsDeleted = db.delete(
+                        IslndContract.UserEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

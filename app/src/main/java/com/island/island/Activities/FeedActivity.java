@@ -16,7 +16,6 @@ import android.view.View;
 
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
-import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslndContract;
 import com.island.island.DeletePostFragment;
 import com.island.island.Models.CommentKey;
@@ -114,21 +113,19 @@ public class FeedActivity extends NavBaseActivity implements
                 null,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP + " DESC"
         );
-
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.v(TAG, "load finished");
-        if (!mAdapterInitialized) {
+        if (mAdapterInitialized) {
+            mAdapter.swapCursor(data);
+        }
+        else {
             mAdapterInitialized = true;
-
             mAdapter = new PostAdapter(this, data);
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
-
-        mAdapter.swapCursor(data);
     }
 
     @Override
@@ -142,7 +139,7 @@ public class FeedActivity extends NavBaseActivity implements
         @Override
         protected CommentCollection doInBackground(Void... params) {
             List<CommentQuery> commentQueries = new ArrayList<>();
-            FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
+//            FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
 
 //            for (Post post : mArrayOfPosts) {
 //                String postAuthorPseudonym = friendDatabase.getPseudonym(post.getUserId());
