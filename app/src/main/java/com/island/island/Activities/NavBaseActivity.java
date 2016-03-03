@@ -135,17 +135,14 @@ public class NavBaseActivity extends AppCompatActivity
                 fragment = new ViewFriendsActivity();
                 isFragment = true;
                 break;
-            case R.id.nav_settings:
+            case R.id.nav_add_friend:
+                addFriendActionDialog();
                 break;
-            case R.id.qr_code:
-                qrCodeActionDialog();
+            case R.id.nav_settings:
                 break;
             case R.id.delete_database:
                 FriendDatabase.getInstance(this).deleteAll();
                 ProfileDatabase.getInstance(this).deleteAll();
-                break;
-            case R.id.sms_allow_user:
-                smsAllowDialog();
                 break;
             case R.id.edit_username:
                 editUsernameDialog();
@@ -219,6 +216,22 @@ public class NavBaseActivity extends AppCompatActivity
         if (fragment instanceof FeedActivity) {
             ((FeedActivity) fragment).onDeletePostDialogPositiveClick(dialogFragment);
         }
+    }
+
+    private void addFriendActionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.add_friend_dialog)
+                .setItems(R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
+                    switch (which) {
+                        case 0: // QR
+                            qrCodeActionDialog();
+                            break;
+                        case 1: // SMS
+                            smsAllowDialog();
+                            break;
+                    }
+                })
+                .show();
     }
 
     private void qrCodeActionDialog() {

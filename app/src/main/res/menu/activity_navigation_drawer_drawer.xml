@@ -15,13 +15,8 @@
             android:title="@string/nav_friends_title"
             android:icon="@drawable/ic_people_black_24dp"/>
         <item
-            android:id="@+id/qr_code"
-            android:title="@string/nav_qr_title"
-            android:icon="@drawable/ic_qrcode_black_24dp"/>
-        <item
-            android:id="@+id/sms_allow_user"
-            android:title="@string/nav_sms_title"
-            android:icon="@drawable/ic_textsms_black_24dp"/>
+            android:id="@+id/nav_add_friend"
+            android:title="@string/nav_add_friend"/>
         <item
             android:id="@+id/nav_settings"
             android:title="@string/nav_settings_title"
