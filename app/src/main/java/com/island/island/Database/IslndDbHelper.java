@@ -9,7 +9,7 @@ import com.island.island.Database.IslndContract.UserEntry;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -24,8 +24,13 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 PostEntry.COLUMN_USER_ID + " INTEGER NOT NULL," +
                 PostEntry.COLUMN_POST_ID + " TEXT NOT NULL," +
                 PostEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL," +
-                PostEntry.COLUMN_CONTENT + " TEXT NOT NULL" +
-                " );";
+                PostEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
+
+                " FOREIGN KEY (" + PostEntry.COLUMN_USER_ID + ") REFERENCES " +
+                UserEntry.TABLE_NAME + " (" + UserEntry._ID + "), " +
+
+                " UNIQUE (" + PostEntry.COLUMN_USER_ID + ", " +
+                PostEntry.COLUMN_POST_ID + ") ON CONFLICT IGNORE);";
 
         final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
                 UserEntry._ID + " INTEGER PRIMARY KEY," +

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -22,9 +23,36 @@ public class IslndProvider extends ContentProvider {
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
                     "." + IslndContract.PostEntry.COLUMN_USER_ID + " = ? ";
+
     private static final String sUserTableUserIdSelection =
             IslndContract.UserEntry.TABLE_NAME +
                     "." + IslndContract.UserEntry._ID + " = ? ";
+
+    private static final SQLiteQueryBuilder sPostQueryBuilder;
+
+    static {
+        sPostQueryBuilder = new SQLiteQueryBuilder();
+
+        sPostQueryBuilder.setTables(
+                IslndContract.PostEntry.TABLE_NAME + " INNER JOIN " +
+                        IslndContract.UserEntry.TABLE_NAME +
+                        " ON " + IslndContract.PostEntry.TABLE_NAME + "."
+                + IslndContract.PostEntry.COLUMN_USER_ID + " = " + IslndContract.UserEntry.TABLE_NAME
+                + "." + IslndContract.UserEntry._ID
+        );
+    }
+
+    private Cursor getPosts(Uri uri, String[] projection, String sortOrder) {
+        return sPostQueryBuilder.query(
+                mOpenHelper.getReadableDatabase(),
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
 
     private Cursor getPostsByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
@@ -32,8 +60,8 @@ public class IslndProvider extends ContentProvider {
         String[] selectionArgs = new String[] {Integer.toString(userId)};
         String selection = sPostTableUserIdSelection;
 
-        return mOpenHelper.getReadableDatabase().query(
-                IslndContract.PostEntry.TABLE_NAME,
+        return sPostQueryBuilder.query(
+                mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -85,15 +113,7 @@ public class IslndProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case POST: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        IslndContract.PostEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getPosts(uri, projection, sortOrder);
                 break;
             }
             case POST_WITH_USER: {
@@ -151,11 +171,15 @@ public class IslndProvider extends ContentProvider {
 
         switch (match) {
             case POST: {
-                long _id = db.insert(IslndContract.PostEntry.TABLE_NAME, null, values);
+                long _id = db.insertWithOnConflict(
+                        IslndContract.PostEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
                 if ( _id > 0 )
                     returnUri = IslndContract.PostEntry.buildPostUri(_id);
                 else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    return null;
                 break;
             }
             case USER: {
@@ -170,6 +194,7 @@ public class IslndProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
+        Log.v(TAG, "insert");
         getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
         return returnUri;
     }

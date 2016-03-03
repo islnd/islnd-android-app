@@ -51,18 +51,26 @@ public class DataUtils {
                 IslndContract.UserEntry._ID,
         };
 
-        Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
-                projection,
-                IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                new String[] {username},
-                null);
+        Cursor cursor = null;
 
-        if (cursor.moveToFirst()) {
-            return cursor.getInt(0);
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
+                    new String[] {username},
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+            else {
+                return -1;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-
-        return -1;
     }
 
     public static int deleteUsers(Context context) {

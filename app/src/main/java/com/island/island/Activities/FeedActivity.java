@@ -95,10 +95,12 @@ public class FeedActivity extends NavBaseActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(TAG, "onCreateLoader");
         if (id != 0) return null;
 
         String[] projection = new String[]{
-                IslndContract.PostEntry._ID,
+                IslndContract.UserEntry.COLUMN_USERNAME,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
                 IslndContract.PostEntry.COLUMN_USER_ID,
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
@@ -117,6 +119,7 @@ public class FeedActivity extends NavBaseActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(TAG, "onLoadFinished");
         if (mAdapterInitialized) {
             mAdapter.swapCursor(data);
         }
@@ -130,7 +133,8 @@ public class FeedActivity extends NavBaseActivity implements
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        Log.v(TAG, "onLoaderReset");
+        mAdapter.swapCursor(null);
     }
 
     private class GetCommentsFromServerTask extends AsyncTask<Void, Void, CommentCollection> {

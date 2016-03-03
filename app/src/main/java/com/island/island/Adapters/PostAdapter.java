@@ -50,7 +50,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
     @Override
     public void onBindViewHolder(GlancePostViewHolder holder, Cursor cursor) {
         Post post = new Post(
-                "Fake Name",
+                cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME)),
                 cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_POST_ID)),
                 cursor.getLong(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_TIMESTAMP)),
