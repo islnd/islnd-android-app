@@ -75,7 +75,12 @@
     <string name="fragment_delete_post">fragment_delete_post</string>
     <string name="comment_version_key">comment_version_key</string>
     <string name="fragment_delete_comment">fragment_delete_comment</string>
+    <string name="nav_feed_title">Feed</string>
+    <string name="nav_profile_title">Profile</string>
+    <string name="nav_friends_title">Friends</string>
+    <string name="nav_qr_title">QR code</string>
+    <string name="nav_sms_title">SMS Allow User</string>
+    <string name="nav_settings_title">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

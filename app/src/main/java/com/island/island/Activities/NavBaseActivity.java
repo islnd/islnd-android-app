@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -60,6 +59,11 @@ public class NavBaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+
+        // Set launching fragment
+        Fragment fragment = new FeedActivity();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     }
 
     private void onCreateDrawer() {
@@ -108,23 +112,24 @@ public class NavBaseActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment = null;
+        boolean isFragment = false;
 
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        Class fragmentClass = null;
-        switch (id) {
+        switch (item.getItemId()) {
+            case R.id.nav_feed:
+                fragment = new FeedActivity();
+                isFragment = true;
+                break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
                 profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Utils.getUser(this));
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
-                fragmentClass = ViewFriendsActivity.class;
+                fragment = new ViewFriendsActivity();
+                isFragment = true;
                 break;
             case R.id.nav_settings:
                 break;
@@ -146,14 +151,10 @@ public class NavBaseActivity extends AppCompatActivity
                 break;
         }
 
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (isFragment) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

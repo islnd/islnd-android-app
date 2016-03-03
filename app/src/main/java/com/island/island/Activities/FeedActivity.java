@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.CommentDatabase;
@@ -37,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FeedActivity extends NavBaseActivity implements DeletePostFragment.NoticeDeletePostListener {
+public class FeedActivity extends Fragment implements DeletePostFragment.NoticeDeletePostListener {
     private final static String TAG = FeedActivity.class.getSimpleName();
 
     private static final int NEW_POST_RESULT = 1;
@@ -52,35 +55,38 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
     private Map<PostKey, Long> mPostKeyToTimestamp;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.content_feed, container, false);
+
 
         // Feed posts setup
         mArrayOfPosts = new ArrayList<>();
         mPostMap = new HashSet<>();
         mPostKeyToTimestamp = new HashMap<>();
-        mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
-        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.feed_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PostAdapter(this, mArrayOfPosts);
+        mAdapter = new PostAdapter(getContext(), mArrayOfPosts);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         // Populate feed
         getPostsFromDatabase();
         new GetPostsFromServerTask().execute();
 
         // Swipe to refresh
-        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+        mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
 
         mRefreshLayout.setOnRefreshListener(() -> {
             new GetPostsFromServerTask().execute();
         });
+        return v;
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == NEW_POST_RESULT) {
             if (data != null) {
@@ -99,9 +105,9 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
     }
 
     private void getPostsFromDatabase() {
-        List<RawPost> localPosts = PostDatabase.getInstance(this).getAll();
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(this);
-        CommentDatabase commentDatabase = CommentDatabase.getInstance(this);
+        List<RawPost> localPosts = PostDatabase.getInstance(getContext()).getAll();
+        FriendDatabase friendDatabase = FriendDatabase.getInstance(getContext());
+        CommentDatabase commentDatabase = CommentDatabase.getInstance(getContext());
         boolean listChanged = false;
         for (RawPost p : localPosts) {
             if (addPostToFeed(friendDatabase, commentDatabase, p)) {
@@ -117,7 +123,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
     private boolean addPostToFeed(FriendDatabase friendDatabase, CommentDatabase commentDatabase, RawPost p) {
         int userId = p.getUserId();
         String postAuthor = userId == 0
-                ? Utils.getUser(this)
+                ? Utils.getUser(getContext())
                 : friendDatabase.getUsername(userId);
 
         final Post post = new Post(
@@ -143,11 +149,11 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
 
     private List<CommentViewModel> getCommentsForPost(CommentDatabase commentDatabase, RawPost post) {
         List<Comment> comments = commentDatabase.getComments(post.getUserId(), post.getPostId());
-        return Utils.buildCommentViewModels(this, comments);
+        return Utils.buildCommentViewModels(getContext(), comments);
     }
 
     public void startNewPostActivity(View view) {
-        Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
+        Intent newPostIntent = new Intent(getContext(), NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
@@ -175,14 +181,14 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
         @Override
         protected CommentCollection doInBackground(Void... params) {
             List<CommentQuery> commentQueries = new ArrayList<>();
-            FriendDatabase friendDatabase = FriendDatabase.getInstance(getApplicationContext());
+            FriendDatabase friendDatabase = FriendDatabase.getInstance(getContext());
 
             for (Post post : mArrayOfPosts) {
                 String postAuthorPseudonym = friendDatabase.getPseudonym(post.getUserId());
                 commentQueries.add(new CommentQuery(postAuthorPseudonym, post.getPostId()));
             }
 
-            return MessageLayer.getCommentCollection(getApplicationContext(), commentQueries);
+            return MessageLayer.getCommentCollection(getContext(), commentQueries);
         }
 
         @Override
@@ -194,7 +200,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
                 int index = getPostIndex(postKey);
 
                 List<CommentViewModel> commentViewModels = Utils.buildCommentViewModels(
-                        getApplicationContext(),
+                        getContext(),
                         postKeyToComments.get(postKey));
                 if (mArrayOfPosts.get(index).addComments(commentViewModels)) {
                     anyPostUpdated = true;
@@ -222,7 +228,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
 
         @Override
         protected PostCollection doInBackground(Void... params) {
-            return MessageLayer.getPosts(getApplicationContext());
+            return MessageLayer.getPosts(getContext());
         }
 
         @Override
@@ -235,7 +241,7 @@ public class FeedActivity extends NavBaseActivity implements DeletePostFragment.
             }
 
             mRefreshLayout.setRefreshing(false);
-            Utils.printAvailableMemory(getApplicationContext(), TAG);
+            Utils.printAvailableMemory(getContext(), TAG);
 
             new GetCommentsFromServerTask().execute();
         }
