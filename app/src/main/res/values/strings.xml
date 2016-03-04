@@ -52,9 +52,9 @@
 
     <string name="allow_user_dialog">Allow user?</string>
 
-    <string name="get_qr_code">Get QR Code</string>
+    <string name="get_qr_code">Get Friend\'s QR Code</string>
+    <string name="qr_dialog_title">Show this to your friend</string>
 
-    <string name="qr_action_dialog">Pick QR Action</string>
     <string name="title_activity_show_qr">ShowQRActivity</string>
     <string name="pseudonym_key_id">pseudonym_key_id</string>
     <string name="sms_prefix">ISLAND-#-#-</string>

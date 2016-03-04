@@ -214,7 +214,9 @@ public class NavBaseActivity extends AppCompatActivity
         Utils.buildQrCode(qrImageView,
                 MessageLayer.getEncodedIdentityString(getApplicationContext()));
 
-        builder.setView(dialogView).show();
+        builder.setView(dialogView)
+                .setTitle(getString(R.string.qr_dialog_title))
+                .show();
     }
 
     private void smsAllowDialog() {
