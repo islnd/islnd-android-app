@@ -4,14 +4,18 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
 import com.island.island.Database.FriendDatabase;
@@ -27,8 +31,7 @@ import org.island.messaging.PseudonymKey;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewFriendsActivity extends AppCompatActivity implements SearchView.OnQueryTextListener
-{
+public class ViewFriendsActivity extends Fragment implements SearchView.OnQueryTextListener {
     private RecyclerView mRecyclerView;
     private ViewFriendsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -37,60 +40,49 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
     private SwipeRefreshLayout refreshLayout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_friends);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.content_view_friends, container, false);
+        setHasOptionsMenu(true);
 
         // Feed posts setup
         friendsList = new ArrayList<>();
         adapterList = new ArrayList<>();
-        mRecyclerView = (RecyclerView) findViewById(R.id.view_friends_recycler_view);
-        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.view_friends_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ViewFriendsAdapter(adapterList, this);
+        mAdapter = new ViewFriendsAdapter(adapterList, getContext());
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         new GetFriendsTask().execute();
 
         // Swipe to refresh
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
 
-        refreshLayout.setOnRefreshListener(() ->
-        {
+        refreshLayout.setOnRefreshListener(() -> {
             // TODO: This will addPost duplicates, okay for now
             new GetFriendsTask().execute();
         });
+        return v;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.view_friends_menu, menu);
 
-        /*
-        https://stackoverflow.com/questions/30398247/how-to-filter-a-recyclerview-with-a-searchview
-         */
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setOnQueryTextListener(this);
-
-        return true;
     }
 
-    private List<User> filter(List<User> friends, String query)
-    {
+    private List<User> filter(List<User> friends, String query) {
         query = query.toLowerCase();
 
         final List<User> filteredList = new ArrayList<>();
-        for (User friend : friends)
-        {
+        for (User friend : friends) {
             final String text = friend.getUserName().toLowerCase();
-            if (text.contains(query))
-            {
+            if (text.contains(query)) {
                 filteredList.add(friend);
             }
         }
@@ -104,8 +96,7 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
     }
 
     @Override
-    public boolean onQueryTextChange(String newText)
-    {
+    public boolean onQueryTextChange(String newText) {
         final List<User> filteredModelList = filter(friendsList, newText);
         mAdapter.animateTo(filteredModelList);
         mRecyclerView.scrollToPosition(0);
@@ -117,24 +108,24 @@ public class ViewFriendsActivity extends AppCompatActivity implements SearchView
         private final String TAG = GetFriendsTask.class.getSimpleName();
 
         SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String username = preferences.getString(getApplicationContext().getString(R.string.user_name), "");
-        String privateKey = preferences.getString(getApplicationContext().getString(R.string.private_key), "");
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        String username = preferences.getString(getContext().getString(R.string.user_name), "");
+        String privateKey = preferences.getString(getContext().getString(R.string.private_key), "");
 
         @Override
         protected Void doInBackground(Void... params) {
-            MessageLayer.getReaders(getApplicationContext(), username, CryptoUtil.decodePrivateKey(
+            MessageLayer.getReaders(getContext(), username, CryptoUtil.decodePrivateKey(
                             privateKey));
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            List<PseudonymKey> pks = FriendDatabase.getInstance(getApplicationContext()).getKeys();
+            List<PseudonymKey> pks = FriendDatabase.getInstance(getContext()).getKeys();
             List<User> allFriends = new ArrayList<>();
             for (PseudonymKey pk : pks) {
                 String username = pk.getUsername();
-                if (!Utils.isUser(getApplicationContext(), username)) {
+                if (!Utils.isUser(getContext(), username)) {
                     allFriends.add(new User(username));
                 }
             }
