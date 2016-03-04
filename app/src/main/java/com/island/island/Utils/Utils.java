@@ -3,10 +3,17 @@ package com.island.island.Utils;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.ImageView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Profile;
@@ -185,5 +192,30 @@ public class Utils
                 comment.getCommentId(),
                 comment.getContent(),
                 comment.getTimestamp());
+    }
+
+    public static void buildQrCode(ImageView qrImageView, String content) {
+        final int DIMEN = 250;
+
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = null;
+        try {
+            bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, DIMEN, DIMEN);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+
+        if(bitMatrix == null) {
+            return;
+        }
+
+        Bitmap bmp = Bitmap.createBitmap(DIMEN, DIMEN, Bitmap.Config.RGB_565);
+        for (int x = 0; x < DIMEN; x++) {
+            for (int y = 0; y < DIMEN; y++) {
+                bmp.setPixel(x, y, bitMatrix.get(x,y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+
+        qrImageView.setImageBitmap(bmp);
     }
 }

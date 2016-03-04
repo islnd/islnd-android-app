@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.annotation.LayoutRes;
@@ -23,12 +25,17 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.island.island.Database.FriendDatabase;
 import com.island.island.Database.IslandDB;
 import com.island.island.Database.PostDatabase;
@@ -193,21 +200,21 @@ public class NavBaseActivity extends AppCompatActivity
 
     private void qrCodeActionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.qr_action_dialog)
-                .setItems(R.array.qr_actions, (DialogInterface dialog, int which) -> {
-                    switch (which) {
-                        case 0: // Show QR
-                            startActivity(new Intent(this, ShowQRActivity.class));
-                            break;
-                        case 1: // Get QR
-                            IntentIntegrator integrator = new IntentIntegrator(this);
-                            integrator.setCaptureActivity(VerticalCaptureActivity.class);
-                            integrator.setOrientationLocked(false);
-                            integrator.initiateScan();
-                            break;
-                    }
-                })
-                .show();
+        View dialogView = getLayoutInflater().inflate(R.layout.qr_dialog, null);
+
+        Button getQrButton = (Button) dialogView.findViewById(R.id.get_qr_button);
+        getQrButton.setOnClickListener((View v) -> {
+            IntentIntegrator integrator = new IntentIntegrator(this);
+            integrator.setCaptureActivity(VerticalCaptureActivity.class);
+            integrator.setOrientationLocked(false);
+            integrator.initiateScan();
+        });
+
+        ImageView qrImageView = (ImageView) dialogView.findViewById(R.id.qr_image_view);
+        Utils.buildQrCode(qrImageView,
+                MessageLayer.getEncodedIdentityString(getApplicationContext()));
+
+        builder.setView(dialogView).show();
     }
 
     private void smsAllowDialog() {

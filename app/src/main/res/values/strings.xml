@@ -52,10 +52,7 @@
 
     <string name="allow_user_dialog">Allow user?</string>
 
-    <string-array name="qr_actions">
-        <item>Show QR Code</item>
-        <item>Get QR Code</item>
-    </string-array>
+    <string name="get_qr_code">Get QR Code</string>
 
     <string name="qr_action_dialog">Pick QR Action</string>
     <string name="title_activity_show_qr">ShowQRActivity</string>
