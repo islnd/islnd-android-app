@@ -8,8 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.island.island.Models.Comment;
-import com.island.island.Models.CommentViewModel;
 import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
@@ -17,15 +15,10 @@ import com.island.island.R;
 import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
-import org.island.messaging.CommentUpdate;
 import org.island.messaging.PostUpdate;
-import org.island.messaging.PseudonymKey;
-import org.island.messaging.Rest;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
-import org.island.messaging.crypto.EncryptedComment;
-import org.island.messaging.crypto.EncryptedPost;
 
 import java.security.KeyPair;
 import java.security.SecureRandom;
@@ -226,7 +219,7 @@ public class IslandDB
 
     }
 
-    public static Comment addCommentToPost(Context context, Post post, String commentText)
+    public static void addCommentToPost(Context context, Post post, String commentText)
     /**
      * Adds comment to existing post
      *
@@ -234,7 +227,7 @@ public class IslandDB
      * @param comment Comment that I'm adding.
      */
     {
-        return MessageLayer.comment(
+        MessageLayer.comment(
                 context,
                 post.getUserId(),
                 post.getPostId(),

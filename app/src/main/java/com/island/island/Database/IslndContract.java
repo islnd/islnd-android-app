@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 public class IslndContract {
 
@@ -11,7 +12,7 @@ public class IslndContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_POST = "post";
     public static final String PATH_USER = "user";
-    private static final String PATH_COMMENT = "comment";
+    public static final String PATH_COMMENT = "comment";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -31,7 +32,7 @@ public class IslndContract {
         public static final String COLUMN_TIMESTAMP = "timestamp";
 
         public static int getUserIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(2));
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
 
         public static Uri buildPostUri(long id) {
@@ -65,6 +66,7 @@ public class IslndContract {
     }
 
     public static final class CommentEntry implements BaseColumns {
+        private static final String TAG = CommentEntry.class.getSimpleName();
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_COMMENT).build();
@@ -82,13 +84,24 @@ public class IslndContract {
         public static final String COLUMN_COMMENT_ID = "comment_id";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_TIMESTAMP = "timestamp";
-//
-//        public static int getUserIdFromUri(Uri uri) {
-//            return 0;
-//        }
-//
-//        public static String getPostIdFromUri(Uri uri) {
-//            return null;
-//        }
+
+        public static Uri buildCommentUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static int getUserIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
+
+        public static String getPostIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
+        }
+
+        public static Uri buildCommentUriWithPostAuthorIdAndPostId(int postAuthorId, String postId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(postAuthorId))
+                    .appendPath(postId)
+                    .build();
+        }
     }
 }

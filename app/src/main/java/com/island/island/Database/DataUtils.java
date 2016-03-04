@@ -80,4 +80,42 @@ public class DataUtils {
                 null
         );
     }
+
+    public static Key getGroupKey(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_GROUP_KEY,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.UserEntry.CONTENT_URI,
+                projection,
+                IslndContract.UserEntry._ID + " = ?",
+                new String[] {Integer.toString(userId)},
+                null);
+
+        if (cursor.moveToFirst()) {
+            return CryptoUtil.decodeSymmetricKey(cursor.getString(0));
+        }
+
+        return null;
+    }
+
+    public static String getUsernameFromPseudonym(Context context, String pseudonym) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_USERNAME,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.UserEntry.CONTENT_URI,
+                projection,
+                IslndContract.UserEntry.COLUMN_PSEUDONYM + " = ?",
+                new String[] {pseudonym},
+                null);
+
+        if (cursor.moveToFirst()) {
+            return cursor.getString(0);
+        }
+
+        return null;
+    }
 }

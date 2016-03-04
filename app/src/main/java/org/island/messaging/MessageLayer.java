@@ -4,23 +4,22 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.DataUtils;
 import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
-import com.island.island.Models.CommentKey;
 import com.island.island.Models.Post;
 import com.island.island.Models.PostKey;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
-import com.island.island.Models.Comment;
 import com.island.island.Models.User;
 import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.Utils.Utils;
+import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.crypto.EncryptedComment;
@@ -34,11 +33,9 @@ import org.island.messaging.server.CommentQueryRequest;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
-    private static final String UNKNOWN_USER_NAME = "<UNKNOWN USER NAME>";
 
     public static List<User> getReaders(Context context, String username, Key privateKey) {
         //call the REST service
@@ -179,46 +176,46 @@ public class MessageLayer {
         Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
     }
 
-    public static Comment comment(Context context, int postUserId, String postId, String content) {
-//        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-//        int commentUserId = friendDatabase.getUserId(Utils.getUser(context));
-//        String postAuthorPseudonym = friendDatabase.getPseudonym(postUserId); // this will be pseudonym database
-//        String myPseudonym = Utils.getPseudonym(context);
-//        CommentUpdate commentUpdate = VersionedContentBuilder.buildComment(
-//                context,
-//                postAuthorPseudonym,
-//                myPseudonym,
-//                postId,
-//                content);
-//
-//        CommentDatabase.getInstance(context).insert(commentUserId, postUserId, commentUpdate);
-//
-//        PseudonymKey postAuthorGroupKey = friendDatabase.getKey(postUserId);
-//        EncryptedComment encryptedComment = new EncryptedComment(
-//                commentUpdate,
-//                Utils.getPrivateKey(context),
-//                postAuthorGroupKey.getKey(),
-//                postAuthorPseudonym,
-//                commentUpdate.getPostId());
-//
-//        new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                Rest.postComment(
-//                        encryptedComment,
-//                        Utils.getApiKey(context));
-//                return null;
-//            }
-//        }.execute();
-//
-//        return new Comment(
-//                postUserId,
-//                postId,
-//                commentUserId,
-//                commentUpdate.getCommentId(),
-//                content,
-//                commentUpdate.getTimestamp());
-        return null;
+    public static void comment(Context context, int postUserId, String postId, String content) {
+        String postAuthorPseudonym = DataUtils.getPseudonym(context, postUserId);
+        String myPseudonym = Utils.getPseudonym(context);
+        int myId = DataUtils.getUserId(context, Utils.getUser(context));
+        CommentUpdate commentUpdate = VersionedContentBuilder.buildComment(
+                context,
+                postAuthorPseudonym,
+                myPseudonym,
+                postId,
+                content);
+
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.CommentEntry.COLUMN_POST_USER_ID, postUserId);
+        values.put(IslndContract.CommentEntry.COLUMN_POST_ID, postId);
+        values.put(IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID, myId);
+        values.put(IslndContract.CommentEntry.COLUMN_COMMENT_ID, commentUpdate.getCommentId());
+        values.put(IslndContract.CommentEntry.COLUMN_TIMESTAMP, commentUpdate.getTimestamp());
+        values.put(IslndContract.CommentEntry.COLUMN_CONTENT, commentUpdate.getContent());
+
+        context.getContentResolver().insert(
+                IslndContract.CommentEntry.CONTENT_URI,
+                values);
+
+        Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
+        EncryptedComment encryptedComment = new EncryptedComment(
+                commentUpdate,
+                Utils.getPrivateKey(context),
+                postAuthorGroupKey,
+                postAuthorPseudonym,
+                commentUpdate.getPostId());
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Rest.postComment(
+                        encryptedComment,
+                        Utils.getApiKey(context));
+                return null;
+            }
+        }.execute();
     }
 
     public static void postProfile(Context context, ProfileWithImageData profile) {
@@ -302,65 +299,44 @@ public class MessageLayer {
         List<CommentQuery> queries = new ArrayList<>();
         String postAuthorPseudonym = DataUtils.getPseudonym(context, postAuthorId);
         queries.add(new CommentQuery(postAuthorPseudonym, postId));
-        return getCommentCollection(context, queries);
+        return getCommentCollection(context, queries, postAuthorId);
     }
 
-    public static CommentCollection getCommentCollection(Context context, List<CommentQuery> queries) {
+    public static CommentCollection getCommentCollection(
+            Context context,
+            List<CommentQuery> queries,
+            int postAuthorId) {
         CommentCollection commentCollection= new CommentCollection();
-//        CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
-//
-//        List<EncryptedComment> encryptedComments = Rest.getComments(
-//                commentQueryPost,
-//                Utils.getApiKey(context));
-//        if (encryptedComments == null) {
-//            return new CommentCollection();
-//        }
-//
-//        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-//        CommentDatabase commentDatabase = CommentDatabase.getInstance(context);
-//
-//        for (EncryptedComment ec : encryptedComments) {
-//            PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(
-//                    friendDatabase.getUsernameFromPseudonym(ec.getPostAuthorPseudonym()));
-//
-//            CommentUpdate commentUpdate = ec.decrypt(postAuthorPseudonymKey.getKey());
-//            String commentAuthorUsername =
-//                    friendDatabase.getUsernameFromPseudonym(commentUpdate.getCommentAuthorPseudonym());
-//
-//            if (commentAuthorUsername == null) {
-//                commentAuthorUsername = UNKNOWN_USER_NAME;
-//            }
-//
-//            int postAuthorId = friendDatabase.getUserId(postAuthorPseudonymKey.getUsername());
-//            int commentAuthorId = friendDatabase.getUserId(commentAuthorUsername);
-//
-//            if (commentUpdate.isDeletion()
-//                    && commentAuthorId == -1) {
-//                Log.v(TAG, "adding commment for unknown user");
-//            }
-//
-//            commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
-//        }
-//
-//        Map<PostKey, List<Comment>> postKeyToComments = commentCollection.getCommentsGroupedByPostKey();
-//        for (PostKey postKey : postKeyToComments.keySet()) {
-//            List<Comment> comments = postKeyToComments.get(postKey);
-//            for (Comment comment : comments) {
-//                if (!commentDatabase.contains(comment)) {
-//                    commentDatabase.insert(comment, postKey.getUserId(), postKey.getPostId());
-//                }
-//            }
-//        }
-//
-//        Map<PostKey, List<CommentKey>> postKeyToDeletions = commentCollection.getDeletions();
-//        for (PostKey postKey : postKeyToDeletions.keySet()) {
-//            List<CommentKey> deletions = postKeyToDeletions.get(postKey);
-//            for (CommentKey keyToDelete : deletions) {
-//                if (commentDatabase.contains(keyToDelete)) {
-//                    commentDatabase.delete(keyToDelete);
-//                }
-//            }
-//        }
+        CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
+
+        List<EncryptedComment> encryptedComments = Rest.getComments(
+                commentQueryPost,
+                Utils.getApiKey(context));
+        if (encryptedComments == null) {
+            return new CommentCollection();
+        }
+
+        for (EncryptedComment ec : encryptedComments) {
+
+            CommentUpdate commentUpdate = ec.decrypt(DataUtils.getGroupKey(context, postAuthorId));
+            final String commentAuthorPseudonym = commentUpdate.getCommentAuthorPseudonym();
+            String commentAuthorUsername = DataUtils.getUsernameFromPseudonym(
+                    context,
+                    commentAuthorPseudonym);
+
+            if (commentAuthorUsername == null) {
+                Log.d(TAG, "could not find a username for pseudonym " + commentAuthorPseudonym);
+                throw new UnsupportedOperationException("Friend relations must be symmetric!");
+            }
+
+            int commentAuthorId = DataUtils.getUserId(context, commentAuthorUsername);
+            if (commentUpdate.isDeletion()
+                    && commentAuthorId == -1) {
+                Log.v(TAG, "adding commment for unknown user");
+            }
+
+            commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
+        }
 
         return commentCollection;
     }

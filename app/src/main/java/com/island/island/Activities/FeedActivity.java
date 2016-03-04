@@ -19,27 +19,13 @@ import android.util.Log;
 import android.view.View;
 
 import com.island.island.Adapters.PostAdapter;
-import com.island.island.Database.CommentDatabase;
 import com.island.island.Database.IslndContract;
 import com.island.island.DeletePostFragment;
-import com.island.island.Models.CommentKey;
-import com.island.island.Models.CommentViewModel;
-import com.island.island.Models.Comment;
-import com.island.island.Models.PostKey;
-import com.island.island.Models.RawPost;
 import com.island.island.PostCollection;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
-import com.island.island.Utils.Utils;
-import com.island.island.sync.CommentsSyncAdapter;
 
 import org.island.messaging.MessageLayer;
-import org.island.messaging.CommentCollection;
-import org.island.messaging.server.CommentQuery;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class FeedActivity extends NavBaseActivity implements
         DeletePostFragment.NoticeDeletePostListener,
@@ -87,11 +73,6 @@ public class FeedActivity extends NavBaseActivity implements
                 getString(R.string.content_authority),
                 true);
         mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
-    }
-
-    private List<CommentViewModel> getCommentsForPost(CommentDatabase commentDatabase, RawPost post) {
-        List<Comment> comments = commentDatabase.getComments(post.getUserId(), post.getPostId());
-        return Utils.buildCommentViewModels(this, comments);
     }
 
     public void startNewPostActivity(View view) {
@@ -162,16 +143,6 @@ public class FeedActivity extends NavBaseActivity implements
         mAdapter.swapCursor(null);
     }
 
-    private class GetCommentsFromServerTask extends AsyncTask<List<CommentQuery>, Void, Void> {
-        private final String TAG = GetCommentsFromServerTask.class.getSimpleName();
-
-        @Override
-        protected Void doInBackground(List<CommentQuery>... params) {
-            MessageLayer.getCommentCollection(getApplicationContext(), params[0]);
-            return null;
-        }
-    }
-
     private class GetPostsFromServerTask extends AsyncTask<Void, Void, PostCollection> {
         private final String TAG = GetPostsFromServerTask.class.getSimpleName();
 
@@ -187,24 +158,7 @@ public class FeedActivity extends NavBaseActivity implements
                 context.getString(R.string.sync_account_type));
 
         AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-        }
+        accountManager.addAccountExplicitly(newAccount, null, null);
 
         return newAccount;
     }

@@ -1,9 +1,15 @@
 package com.island.island.Activities;
 
 import android.app.Activity;
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -13,12 +19,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.island.island.Adapters.CursorRecyclerViewAdapter;
 import com.island.island.Adapters.ViewPostAdapter;
+import com.island.island.Database.IslndContract;
 import com.island.island.DeleteCommentFragment;
 import com.island.island.DeletePostFragment;
 import com.island.island.Models.Comment;
@@ -29,7 +36,6 @@ import com.island.island.Database.IslandDB;
 import com.island.island.Models.PostKey;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
-import com.island.island.Utils.Utils;
 
 import org.island.messaging.CommentCollection;
 import org.island.messaging.MessageLayer;
@@ -42,16 +48,22 @@ import java.util.Set;
 
 public class ViewPostActivity extends AppCompatActivity
         implements DeletePostFragment.NoticeDeletePostListener,
-        DeleteCommentFragment.NoticeDeleteCommentListener
+        DeleteCommentFragment.NoticeDeleteCommentListener,
+        LoaderManager.LoaderCallbacks<Cursor>
 {
+    private static final int COMMENT_LOADER_ID = 0;
+    private static final String POST_AUTHOR_ID_BUNDLE_KEY = "post_author_bundle_key";
+    private static final String POST_ID_BUNDLE_KEY = "post_id_bundle_key";
+
     private Post mPost = null;
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private CursorRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
     private ArrayList mViewPostList;
     private Set<CommentKey> mCommentMap;
+    private boolean mAdapterInitialized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -68,9 +80,6 @@ public class ViewPostActivity extends AppCompatActivity
         mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ViewPostAdapter(mViewPostList, this);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Get intent with post info
         Intent intent = getIntent();
@@ -84,15 +93,18 @@ public class ViewPostActivity extends AppCompatActivity
             mCommentMap.add(comment.getKey());
         }
 
-        // Get comments from network
-        new GetCommentsTask().execute(mPost);
+        Bundle args = new Bundle();
+        args.putInt(POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
+        args.putString(POST_ID_BUNDLE_KEY, mPost.getPostId());
+        getLoaderManager().initLoader(COMMENT_LOADER_ID, args, this);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         refreshLayout.setOnRefreshListener(() ->
         {
             // TODO: Run async task again
-            new GetCommentsTask().execute(mPost);
+            AsyncTaskLoader getComments = new GetCommentsLoader(this, mPost.getUserId(), mPost.getPostId());
+            getComments.forceLoad();
             refreshLayout.setRefreshing(false);
         });
     }
@@ -110,12 +122,10 @@ public class ViewPostActivity extends AppCompatActivity
         }
         else
         {
-            Comment comment = IslandDB.addCommentToPost(
+            IslandDB.addCommentToPost(
                     this,
                     mPost,
                     commentText);
-
-            addCommentToPostAndTimeline(comment);
 
             //--Clear edit text
             addCommentEditText.setText("");
@@ -145,87 +155,117 @@ public class ViewPostActivity extends AppCompatActivity
         String commentId = args.getString(DeleteCommentFragment.COMMENT_ID_BUNDLE_KEY);
 
         final CommentKey commentKey = new CommentKey(commentUserId, commentId);
-        removeCommentFromPostAndTimeline(commentKey);
+        //--TODO do the delete!
 
         mAdapter.notifyDataSetChanged();
     }
 
-    private class GetCommentsTask extends AsyncTask<Post, Void, CommentCollection> {
-        private final String TAG = GetCommentsTask.class.getSimpleName();
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (id == COMMENT_LOADER_ID) {
+            String[] projection = new String[]{
+                    IslndContract.UserEntry.COLUMN_USERNAME,
+                    IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry._ID,
+                    IslndContract.CommentEntry.COLUMN_POST_USER_ID,
+                    IslndContract.CommentEntry.COLUMN_POST_ID,
+                    IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID,
+                    IslndContract.CommentEntry.COLUMN_COMMENT_ID,
+                    IslndContract.CommentEntry.COLUMN_TIMESTAMP,
+                    IslndContract.CommentEntry.COLUMN_CONTENT,
+            };
 
-        protected CommentCollection doInBackground(Post... params) {
-            Log.v(TAG, "starting get comments task");
-            return MessageLayer.getCommentCollection(
-                    getApplicationContext(),
-                    mPost.getUserId(),
-                    mPost.getPostId());
+            int postAuthorId = args.getInt(POST_AUTHOR_ID_BUNDLE_KEY);
+            String postId = args.getString(POST_ID_BUNDLE_KEY);
+            return new CursorLoader(
+                    this,
+                    IslndContract.CommentEntry.buildCommentUriWithPostAuthorIdAndPostId(postAuthorId, postId),
+                    projection,
+                    null,
+                    null,
+                    IslndContract.CommentEntry.COLUMN_TIMESTAMP + " DESC"
+            );
+        }
+
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (mAdapterInitialized) {
+            mAdapter.swapCursor(data);
+        } else {
+            mAdapterInitialized = true;
+            mAdapter = new ViewPostAdapter(this, data);
+            mRecyclerView.setAdapter(mAdapter);
+            mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        //--TODO ?
+    }
+
+    private class GetCommentsLoader extends AsyncTaskLoader<Void> {
+
+        private final int postUserId;
+        private final String postId;
+        private final ContentResolver mContentResolver;
+
+        public GetCommentsLoader(Context context, int postUserId, String postId) {
+            super(context);
+            this.postUserId = postUserId;
+            this.postId = postId;
+            mContentResolver = context.getContentResolver();
         }
 
         @Override
-        protected void onPostExecute(CommentCollection commentCollection) {
-            boolean commentsUpdated = false;
-
-            //-add comments
-            List<CommentViewModel> comments = Utils.buildCommentViewModels(
+        public Void loadInBackground() {
+            CommentCollection commentCollection = MessageLayer.getCommentCollection(
                     getApplicationContext(),
-                    commentCollection.getCommentsGroupedByPostKey()
-                            .get(mPost.getKey()));
-            for (CommentViewModel comment : comments) {
-                if (addCommentToPostAndTimeline(comment)) {
-                    commentsUpdated = true;
-                }
-            }
+                    postUserId,
+                    postId);
 
-            //--delete comments
-            List<CommentKey> deletions = commentCollection
-                    .getDeletions()
-                    .get(mPost.getKey());
-            for (CommentKey deletion : deletions) {
-                if (removeCommentFromPostAndTimeline(deletion)) {
-                    commentsUpdated = true;
-                }
-            }
+            ContentValues[] values =
+                    convertCommentsToContentValues(
+                            commentCollection.getCommentsGroupedByPostKey().get(new PostKey(postUserId, postId)),
+                            postUserId,
+                            postId);
 
-            if (commentsUpdated) {
-                mAdapter.notifyDataSetChanged();
-            }
+            mContentResolver.bulkInsert(
+                    IslndContract.CommentEntry.CONTENT_URI,
+                    values);
+
+            return null;
         }
     }
 
-    private boolean removeCommentFromPostAndTimeline(CommentKey keyToDelete) {
-        if (!mCommentMap.contains(keyToDelete)) {
-            return false;
+    private ContentValues[] convertCommentsToContentValues(List<Comment> commentUpdates, int postUserId, String postId) {
+        ContentValues[] values = new ContentValues[commentUpdates.size()];
+        for (int i = 0; i < commentUpdates.size(); i++) {
+            Comment commentUpdate = commentUpdates.get(i);
+
+            values[i] = new ContentValues();
+            values[i].put(
+                    IslndContract.CommentEntry.COLUMN_POST_USER_ID,
+                    postUserId);
+            values[i].put(
+                    IslndContract.CommentEntry.COLUMN_POST_ID,
+                    postId);
+            values[i].put(
+                    IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID,
+                    commentUpdate.getCommentUserId());
+            values[i].put(
+                    IslndContract.CommentEntry.COLUMN_COMMENT_ID,
+                    commentUpdate.getCommentId());
+            values[i].put(
+                    IslndContract.CommentEntry.COLUMN_TIMESTAMP,
+                    commentUpdate.getTimestamp());
+            values[i].put(
+                    IslndContract.CommentEntry.COLUMN_CONTENT,
+                    commentUpdate.getContent());
         }
 
-        mPost.deleteComment(keyToDelete);
-        mCommentMap.remove(keyToDelete);
-        int index = findComment(keyToDelete);
-        mViewPostList.remove(index);
-        return true;
-    }
-
-    private boolean addCommentToPostAndTimeline(Comment comment) {
-        return addCommentToPostAndTimeline(Utils.buildCommentViewModel(this, comment));
-    }
-
-    private boolean addCommentToPostAndTimeline(CommentViewModel commentViewModel) {
-        if (mCommentMap.contains(commentViewModel.getKey())) {
-            return false;
-        }
-
-        mCommentMap.add(commentViewModel.getKey());
-        mPost.addComment(commentViewModel);
-        mViewPostList.add(commentViewModel);
-        return true;
-    }
-
-    private int findComment(CommentKey commentKey) {
-        for (int i = 1; i < mViewPostList.size(); i++) {
-            if (((CommentViewModel)mViewPostList.get(i)).getKey().equals(commentKey)) {
-                return i;
-            }
-        }
-
-        return -1;
+        return values;
     }
 }

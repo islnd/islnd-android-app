@@ -14,6 +14,11 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
     private final long timestamp;
 
     private CommentUpdate(boolean isDelete, String postAuthorPseudonym, String commentAuthorPseudonym, String postId, String commentId, String content, long timestamp) {
+        assert postAuthorPseudonym != null;
+        assert commentAuthorPseudonym != null;
+        assert postId != null;
+        assert commentId != null;
+
         this.isDelete = isDelete;
         this.postAuthorPseudonym = postAuthorPseudonym;
         this.commentAuthorPseudonym = commentAuthorPseudonym;

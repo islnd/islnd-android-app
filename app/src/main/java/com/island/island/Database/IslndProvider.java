@@ -44,6 +44,18 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private static final SQLiteQueryBuilder sCommentQueryBuilder;
+
+    static {
+        sCommentQueryBuilder = new SQLiteQueryBuilder();
+
+        sCommentQueryBuilder.setTables(
+                IslndContract.CommentEntry.TABLE_NAME + " INNER JOIN " + IslndContract.UserEntry.TABLE_NAME +
+                        " ON " + IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID +
+                        " = " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID
+        );
+    }
+
     private Cursor getPosts(Uri uri, String[] projection, String sortOrder) {
         return sPostQueryBuilder.query(
                 mOpenHelper.getReadableDatabase(),
@@ -90,10 +102,23 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
-    private Cursor getCommentsByUserIdAndPostId(Uri uri, String[] projection, String sortOrder) {
-//        int userId = IslndContract.CommentEntry.getUserIdFromUri(uri);
-//        String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
-        throw new UnsupportedOperationException("blah");
+    private Cursor getCommentsByPostAuthorIdAndPostId(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.CommentEntry.getUserIdFromUri(uri);
+        String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
+
+        String selection = IslndContract.CommentEntry.COLUMN_POST_USER_ID + " = ? AND " +
+                IslndContract.CommentEntry.COLUMN_POST_ID + " = ?";
+        String[] selectionArgs = {Integer.toString(userId), postId};
+
+        return sCommentQueryBuilder.query(
+                mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
     }
 
     private static UriMatcher buildUriMatcher() {
@@ -102,6 +127,9 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_POST, POST);
         matcher.addURI(authority, IslndContract.PATH_POST + "/#", POST_WITH_USER);
+
+        matcher.addURI(authority, IslndContract.PATH_COMMENT, COMMENT);
+        matcher.addURI(authority, IslndContract.PATH_COMMENT + "/#/*", COMMENT_WITH_POST_USER_ID_AND_POST_ID);
 
         matcher.addURI(authority, IslndContract.PATH_USER, USER);
         matcher.addURI(authority, IslndContract.PATH_USER + "/#", USER_WITH_ID);
@@ -144,7 +172,7 @@ public class IslndProvider extends ContentProvider {
                 break;
             }
             case COMMENT_WITH_POST_USER_ID_AND_POST_ID: {
-                retCursor = getCommentsByUserIdAndPostId(uri, projection, sortOrder);
+                retCursor = getCommentsByPostAuthorIdAndPostId(uri, projection, sortOrder);
                 break;
             }
 
@@ -200,6 +228,23 @@ public class IslndProvider extends ContentProvider {
                     returnUri = IslndContract.UserEntry.buildUserUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case COMMENT: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.CommentEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if ( _id > 0 ) {
+                    Log.v(TAG, "inserted comment");
+                    returnUri = IslndContract.CommentEntry.buildCommentUri(_id);
+                }
+                else {
+                    Log.v(TAG, "insert comment failed");
+                    return null;
+                }
+
                 break;
             }
             default:

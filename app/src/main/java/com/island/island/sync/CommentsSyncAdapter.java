@@ -36,13 +36,15 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public CommentsSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-        mContentResolver = context.getContentResolver();
-        pseudonymToUserId = new HashMap<>();
-        pseudonymToGroupKey = new HashMap<>();
+        init(context);
     }
 
     public CommentsSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
+        init(context);
+    }
+
+    private void init(Context context) {
         mContentResolver = context.getContentResolver();
         pseudonymToUserId = new HashMap<>();
         pseudonymToGroupKey = new HashMap<>();
@@ -68,10 +70,19 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
 
         buildPseudonymToGroupKeyMap(cursor);
         List<CommentQuery> commentQueries = buildCommentQueries(cursor);
+        for (CommentQuery commentQuery : commentQueries) {
+            Log.v(TAG, commentQuery.toString());
+        }
 
         //--Run query
         CommentQueryRequest commentQueryRequest = new CommentQueryRequest(commentQueries);
         List<EncryptedComment> encryptedComments = Rest.getComments(commentQueryRequest, Utils.getApiKey(getContext()));
+        if (encryptedComments == null) {
+            Log.d(TAG, "getting comments returned null!");
+            return;
+        }
+
+        Log.v(TAG, String.format("comment service received %d comments", encryptedComments.size()));
 
         //--Decrypt the comments
         List<CommentUpdate> commentUpdates = new ArrayList<>();
@@ -134,6 +145,11 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
         ContentValues[] values = new ContentValues[commentUpdates.size()];
         for (int i = 0; i < commentUpdates.size(); i++) {
             CommentUpdate commentUpdate = commentUpdates.get(i);
+            if (pseudonymToUserId.get(commentUpdate.getPostAuthorPseudonym()) == null) {
+                Log.d(TAG, "can't find pseudonym " + commentUpdate.getPostAuthorPseudonym());
+            }
+
+            values[i] = new ContentValues();
             values[i].put(
                     IslndContract.CommentEntry.COLUMN_POST_USER_ID,
                     pseudonymToUserId.get(commentUpdate.getPostAuthorPseudonym()));
@@ -161,6 +177,7 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
         String[] projection = {
                 IslndContract.UserEntry._ID,
                 IslndContract.UserEntry.COLUMN_PSEUDONYM,
+                IslndContract.UserEntry.COLUMN_USERNAME,
         };
         Cursor cursor = mContentResolver.query(
                 IslndContract.UserEntry.CONTENT_URI,
@@ -179,6 +196,7 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
                     cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_PSEUDONYM));
             final int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.UserEntry._ID));
             pseudonymToUserId.put(pseudonym, userId);
+            Log.v(TAG, String.format("Adding user %s to map", cursor.getString(2)));
         } while (cursor.moveToNext());
     }
 }

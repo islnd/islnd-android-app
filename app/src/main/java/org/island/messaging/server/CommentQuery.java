@@ -10,4 +10,9 @@ public class CommentQuery {
         this.postAuthorPseudonym = postAuthorPseudonym;
         this.postId = postId;
     }
+
+    @Override
+    public String toString() {
+        return String.format("post author pseud %s post id %s", postAuthorPseudonym, postId);
+    }
 }
