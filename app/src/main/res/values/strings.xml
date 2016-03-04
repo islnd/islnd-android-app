@@ -52,10 +52,8 @@
 
     <string name="allow_user_dialog">Allow user?</string>
 
-    <string-array name="qr_actions">
-        <item>Show QR Code</item>
-        <item>Get QR Code</item>
-    </string-array>
+    <string name="get_qr_code">Get Friend\'s QR Code</string>
+    <string name="qr_dialog_title">Show this to your friend</string>
 
     <string-array name="nav_add_friend_actions">
         <item>QR Code</item>
@@ -63,7 +61,7 @@
     </string-array>
 
     <string name="add_friend_dialog">Pick Add Friend Action</string>
-    <string name="qr_action_dialog">Pick QR Action</string>
+
     <string name="title_activity_show_qr">ShowQRActivity</string>
     <string name="pseudonym_key_id">pseudonym_key_id</string>
     <string name="sms_prefix">ISLAND-#-#-</string>
