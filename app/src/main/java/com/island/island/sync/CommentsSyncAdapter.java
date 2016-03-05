@@ -9,12 +9,18 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.island.island.Database.DataUtils;
 import com.island.island.Database.IslndContract;
+import com.island.island.Models.Comment;
+import com.island.island.Models.CommentKey;
+import com.island.island.Models.PostKey;
 import com.island.island.Utils.Utils;
 
+import org.island.messaging.CommentCollection;
 import org.island.messaging.CommentUpdate;
 import org.island.messaging.Rest;
 import org.island.messaging.crypto.CryptoUtil;
@@ -85,17 +91,27 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.v(TAG, String.format("comment service received %d comments", encryptedComments.size()));
 
         //--Decrypt the comments
-        List<CommentUpdate> commentUpdates = new ArrayList<>();
+        CommentCollection commentCollection = new CommentCollection();
         for (EncryptedComment encryptedComment : encryptedComments) {
             CommentUpdate commentUpdate = encryptedComment.decrypt(getKey(encryptedComment.getPostAuthorPseudonym()));
-            commentUpdates.add(commentUpdate);
+            commentCollection.add(
+                    pseudonymToUserId.get(commentUpdate.getPostAuthorPseudonym()),
+                    pseudonymToUserId.get(commentUpdate.getCommentAuthorPseudonym()),
+                    commentUpdate);
         }
 
-        //--save the comments
-        ContentValues[] values = convertCommentsToContentValues(commentUpdates);
+        // Add new comments to content provider
+        ContentValues[] values = convertCommentsToContentValues(commentCollection);
         mContentResolver.bulkInsert(
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
+
+        // Delete comments from content provider
+        for (PostKey postKey :commentCollection.getDeletions().keySet()) {
+            for (CommentKey commentKey : commentCollection.getDeletions().get(postKey)) {
+                DataUtils.deleteComment(mContentResolver, commentKey);
+            }
+        }
 
         Log.v(TAG, "completed on perform sync");
     }
@@ -140,35 +156,41 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
         return commentQueries;
     }
 
-    @NonNull
-    private ContentValues[] convertCommentsToContentValues(List<CommentUpdate> commentUpdates) {
-        ContentValues[] values = new ContentValues[commentUpdates.size()];
-        for (int i = 0; i < commentUpdates.size(); i++) {
-            CommentUpdate commentUpdate = commentUpdates.get(i);
-            if (pseudonymToUserId.get(commentUpdate.getPostAuthorPseudonym()) == null) {
-                Log.d(TAG, "can't find pseudonym " + commentUpdate.getPostAuthorPseudonym());
+    private ContentValues[] convertCommentsToContentValues(CommentCollection commentCollection) {
+        Map<PostKey, List<Comment>> commentUpdates = commentCollection.getCommentsGroupedByPostKey();
+        List<ContentValues> setOfValues = new ArrayList<>();
+        for (PostKey postKey : commentUpdates.keySet()) {
+            for (Comment commentUpdate : commentUpdates.get(postKey)) {
+                ContentValues values = buildContentValues(postKey, commentUpdate);
+                setOfValues.add(values);
             }
-
-            values[i] = new ContentValues();
-            values[i].put(
-                    IslndContract.CommentEntry.COLUMN_POST_USER_ID,
-                    pseudonymToUserId.get(commentUpdate.getPostAuthorPseudonym()));
-            values[i].put(
-                    IslndContract.CommentEntry.COLUMN_POST_ID,
-                    commentUpdate.getPostId());
-            values[i].put(
-                    IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID,
-                    pseudonymToUserId.get(commentUpdate.getCommentAuthorPseudonym()));
-            values[i].put(
-                    IslndContract.CommentEntry.COLUMN_COMMENT_ID,
-                    commentUpdate.getCommentId());
-            values[i].put(
-                    IslndContract.CommentEntry.COLUMN_TIMESTAMP,
-                    commentUpdate.getTimestamp());
-            values[i].put(
-                    IslndContract.CommentEntry.COLUMN_CONTENT,
-                    commentUpdate.getContent());
         }
+
+        ContentValues[] arrayOfValues = new ContentValues[setOfValues.size()];
+        setOfValues.toArray(arrayOfValues);
+        return arrayOfValues;
+    }
+
+    private ContentValues buildContentValues(PostKey postKey, Comment commentUpdate) {
+        ContentValues values = new ContentValues();
+        values.put(
+                IslndContract.CommentEntry.COLUMN_POST_USER_ID,
+                postKey.getUserId());
+        values.put(
+                IslndContract.CommentEntry.COLUMN_POST_ID,
+                postKey.getPostId());
+        values.put(
+                IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID,
+                commentUpdate.getCommentUserId());
+        values.put(
+                IslndContract.CommentEntry.COLUMN_COMMENT_ID,
+                commentUpdate.getCommentId());
+        values.put(
+                IslndContract.CommentEntry.COLUMN_TIMESTAMP,
+                commentUpdate.getTimestamp());
+        values.put(
+                IslndContract.CommentEntry.COLUMN_CONTENT,
+                commentUpdate.getContent());
 
         return values;
     }

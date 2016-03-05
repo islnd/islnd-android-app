@@ -1,10 +1,12 @@
 package com.island.island.Database;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
 import com.island.island.Activities.NavBaseActivity;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.PostKey;
 
 import org.island.messaging.PseudonymKey;
@@ -130,5 +132,21 @@ public class DataUtils {
                 IslndContract.PostEntry.CONTENT_URI,
                 selection,
                 args);
+    }
+
+    public static void deleteComment(ContentResolver contentResolver, CommentKey commentKey) {
+        String selection = IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID + " = ? AND " +
+                IslndContract.CommentEntry.COLUMN_COMMENT_ID + " = ?";
+        String[] args = new String[] {
+                Integer.toString(commentKey.getCommentAuthorId()),
+                commentKey.getCommentId()};
+        contentResolver.delete(
+                IslndContract.CommentEntry.CONTENT_URI,
+                selection,
+                args);
+    }
+
+    public static void deleteComment(Context context, CommentKey commentKey) {
+        deleteComment(context.getContentResolver(), commentKey);
     }
 }

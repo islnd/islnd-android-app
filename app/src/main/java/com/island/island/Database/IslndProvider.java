@@ -300,6 +300,11 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.PostEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case COMMENT: {
+                rowsDeleted = db.delete(
+                        IslndContract.CommentEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             case USER: {
                 rowsDeleted = db.delete(
                         IslndContract.UserEntry.TABLE_NAME, selection, selectionArgs);

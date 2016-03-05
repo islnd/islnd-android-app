@@ -5,8 +5,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.island.island.Database.DataUtils;
 import com.island.island.Database.IslndContract;
 import com.island.island.Models.Comment;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.PostKey;
 
 import org.island.messaging.CommentCollection;
@@ -36,15 +38,26 @@ public class NetworkCommentLoader extends AsyncTaskLoader<Void> {
                 postUserId,
                 postId);
 
+        final PostKey postKey = new PostKey(postUserId, postId);
         ContentValues[] values =
                 convertCommentsToContentValues(
-                        commentCollection.getCommentsGroupedByPostKey().get(new PostKey(postUserId, postId)),
+                        commentCollection.getCommentsGroupedByPostKey().get(
+                                postKey),
                         postUserId,
                         postId);
 
         mContentResolver.bulkInsert(
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
+
+        if (commentCollection.getDeletions() == null
+                || commentCollection.getDeletions().get(postKey) == null) {
+            return null;
+        }
+
+        for (CommentKey commentKeyToDelete : commentCollection.getDeletions().get(postKey)) {
+            DataUtils.deleteComment(mContext, commentKeyToDelete);
+        }
 
         return null;
     }

@@ -40,17 +40,17 @@ public class ViewPostActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Get intent with post info
+        Intent intent = getIntent();
+        mPost = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
+
         // List view stuff
         mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ViewPostAdapter(this, null);
+        mAdapter = new ViewPostAdapter(this, null, mPost.getKey());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-
-        // Get intent with post info
-        Intent intent = getIntent();
-        mPost = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
 
         // Load the local comments
         Bundle args = new Bundle();

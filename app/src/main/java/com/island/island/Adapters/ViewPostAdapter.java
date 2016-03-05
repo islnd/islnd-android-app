@@ -19,30 +19,30 @@ import com.island.island.Activities.ProfileActivity;
 import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.DeleteCommentFragment;
-import com.island.island.DeletePostFragment;
-import com.island.island.Models.Comment;
 import com.island.island.Models.CommentViewModel;
-import com.island.island.Models.Post;
+import com.island.island.Models.PostKey;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
 import com.island.island.ViewHolders.CommentViewHolder;
-import com.island.island.ViewHolders.PostViewHolder;
-
-import java.util.ArrayList;
 
 public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>
 {
     private static final String TAG = ViewPostAdapter.class.getSimpleName();
 
     private Context mContext = null;
+    private final int mPostUserId;
+    private final String mPostId;
+
 
     private static final int COMMENT = 1;
 
-    public ViewPostAdapter(Context context, Cursor cursor)
+    public ViewPostAdapter(Context context, Cursor cursor, PostKey key)
     {
         super(context, cursor);
         mContext = context;
+        mPostUserId = key.getUserId();
+        mPostId = key.getPostId();
     }
 
     @Override
@@ -69,7 +69,8 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
         holder.comment.setText(comment.getComment());
 
         // Go to profile on picture click
-        holder.profileImage.setOnClickListener((View v) ->
+        holder.profileImage.setOnClickListener(
+                (View v) ->
                 {
                     Intent profileIntent = new Intent(mContext, ProfileActivity.class);
                     profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUsername());
@@ -80,23 +81,23 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
         Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUsername()));
         ImageUtils.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
-        if(Utils.isUser(mContext, comment.getUsername()))
-        {
+        if (Utils.isUser(mContext, comment.getUsername())) {
             holder.overflow.setVisibility(View.VISIBLE);
 
-            holder.overflow.setOnClickListener((View v) ->
+            holder.overflow.setOnClickListener(
+                    (View v) ->
                     {
                         PopupMenu popup = new PopupMenu(mContext, overflow);
                         popup.getMenuInflater().inflate(R.menu.comment_menu, popup.getMenu());
-                        popup.setOnMenuItemClickListener((MenuItem item) ->
+                        popup.setOnMenuItemClickListener(
+                                (MenuItem item) ->
                                 {
-                                    switch (item.getItemId())
-                                    {
+                                    switch (item.getItemId()) {
                                         case R.id.delete_comment:
                                             DialogFragment deleteCommentFragment =
                                                     DeleteCommentFragment.buildWithArgs(
-                                                            0, //--TODO fix deletes
-                                                            "0", // TODO fix deletes
+                                                            mPostUserId,
+                                                            mPostId,
                                                             comment.getUserId(),
                                                             comment.getCommentId());
                                             deleteCommentFragment.show(
@@ -109,9 +110,7 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
 
                         popup.show();
                     });
-        }
-        else
-        {
+        } else {
             holder.overflow.setVisibility(View.GONE);
         }
     }
