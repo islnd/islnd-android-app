@@ -20,18 +20,13 @@ import android.widget.TextView;
 
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.IslndContract;
-import com.island.island.Database.ProfileDatabase;
 import com.island.island.Dialogs;
-import com.island.island.Models.Post;
 import com.island.island.Models.Profile;
 import com.island.island.Database.IslandDB;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
 import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
@@ -42,7 +37,6 @@ public class ProfileActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
 
-    private List<Post> mArrayOfPosts;
     private String mProfileUsername;
     private Profile mProfile;
 
@@ -54,11 +48,15 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Post list stuff
-        mArrayOfPosts = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        //--TODO this should use a loader
         String[] projection = new String[]{
+                IslndContract.UserEntry.COLUMN_USERNAME,
+                IslndContract.UserEntry.COLUMN_PSEUDONYM,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
                 IslndContract.PostEntry.COLUMN_USER_ID,
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
@@ -67,8 +65,8 @@ public class ProfileActivity extends AppCompatActivity {
         Cursor postCursor = getContentResolver().query(
                 IslndContract.PostEntry.CONTENT_URI,
                 projection,
-                null,
-                null,
+                IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
+                new String[] {Utils.getUser(getApplicationContext())},
                 null
         );
         mAdapter = new PostAdapter(this, postCursor);
@@ -105,11 +103,6 @@ public class ProfileActivity extends AppCompatActivity {
         Context context = getApplicationContext();
         ImageUtils.setProfileImageSampled(context, profileImage, mProfile.getProfileImageUri());
         ImageUtils.setHeaderImageSampled(context, headerImage, mProfile.getHeaderImageUri());
-
-        // User posts
-        // TODO get the real posts
-//        List<Post> userPosts = IslandDB.getPostsForUser(new User(mProfileUsername));
-//        mArrayOfPosts.addAll(userPosts);
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
