@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.island.island.Activities.ProfileActivity">
+    tools:context="io.islnd.android.islnd.app.activities.ProfileActivity">
 
     <include layout="@layout/content_profile"/>
 
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:layout_behavior="com.island.island.FABScrollBehavior"
+        app:layout_behavior="io.islnd.android.islnd.app.FabScrollBehavior"
         android:src="@drawable/ic_add_white_24dp"
         android:onClick="startNewPostActivity"/>
 
