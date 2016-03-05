@@ -1,6 +1,7 @@
 package com.island.island.Activities;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,15 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.island.island.Adapters.ViewFriendsAdapter;
-import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.IslndContract;
 import com.island.island.Models.User;
 import com.island.island.R;
 import com.island.island.SimpleDividerItemDecoration;
-import com.island.island.Utils.Utils;
 
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
-import org.island.messaging.PseudonymKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,14 +120,27 @@ public class ViewFriendsActivity extends Fragment implements SearchView.OnQueryT
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            List<PseudonymKey> pks = FriendDatabase.getInstance(getContext()).getKeys();
-            List<User> allFriends = new ArrayList<>();
-            for (PseudonymKey pk : pks) {
-                String username = pk.getUsername();
-                if (!Utils.isUser(getContext(), username)) {
-                    allFriends.add(new User(username));
-                }
+            String[] projection = new String[] {
+                    IslndContract.UserEntry.COLUMN_USERNAME
+            };
+
+            Cursor cursor = getContext().getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
+
+            if (!cursor.moveToFirst()) {
+                return;
             }
+
+            List<User> allFriends = new ArrayList<>();
+
+            do {
+                String username = cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME));
+                allFriends.add(new User(username));
+            } while (cursor.moveToNext());
 
             if (allFriends.size() > 0) {
                 adapterList.addAll(allFriends);

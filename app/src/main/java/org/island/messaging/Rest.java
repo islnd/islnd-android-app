@@ -2,8 +2,6 @@ package org.island.messaging;
 
 import android.util.Log;
 
-import com.island.island.Utils.Utils;
-
 import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedData;
 import org.island.messaging.crypto.EncryptedPost;

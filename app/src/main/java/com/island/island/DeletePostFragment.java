@@ -18,12 +18,6 @@ public class DeletePostFragment extends DialogFragment {
     public static final String USER_ID_BUNDLE_KEY = "USER_PARAM";
     public static final String POST_ID_BUNDLE_KEY = "POST_PARAM";
 
-    private NoticeDeletePostListener mListener;
-
-    public interface NoticeDeletePostListener {
-        void onDeletePostDialogPositiveClick(DialogFragment dialogFragment);
-    }
-
     public static DeletePostFragment buildWithArgs(int userId, String postId) {
         DeletePostFragment deletePostFragment = new DeletePostFragment();
         Bundle args = new Bundle();
@@ -42,7 +36,6 @@ public class DeletePostFragment extends DialogFragment {
                         {
                             String postId = getArguments().getString(POST_ID_BUNDLE_KEY);
                             int postUserId = getArguments().getInt(USER_ID_BUNDLE_KEY);
-                            mListener.onDeletePostDialogPositiveClick(this);
 
                             new AsyncTask<Void, Void, Void>() {
                                 @Override
@@ -54,17 +47,5 @@ public class DeletePostFragment extends DialogFragment {
                         })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            mListener = (NoticeDeletePostListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + "must implement " + NoticeDeletePostListener.class.getSimpleName());
-        }
     }
 }

@@ -1,15 +1,15 @@
 package com.island.island.Database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.island.island.Models.Comment;
-import com.island.island.Models.CommentViewModel;
+import com.island.island.Models.CommentKey;
 import com.island.island.Models.Post;
+import com.island.island.Models.PostKey;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 import com.island.island.R;
@@ -18,7 +18,6 @@ import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.CommentUpdate;
 import org.island.messaging.PostUpdate;
-import org.island.messaging.PseudonymKey;
 import org.island.messaging.Rest;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
@@ -26,21 +25,13 @@ import org.island.messaging.MessageLayer;
 import org.island.messaging.crypto.EncryptedComment;
 import org.island.messaging.crypto.EncryptedPost;
 
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 
-/**
- * Created by David Thompson on 12/20/2015.
- *
- * This class holds the functions to talk to the database.
- */
 public class IslandDB
 {
     private static final String TAG = "IslandDB";
-
-    // Used json minifier online
-    public static String mockData = "{\"users\":[\"Bill Gates\",\"Steve Jobs\",\"Fred Flintstone\",\"John Smith\",\"Thom Yorke\"],\"Bill Gates\":{\"posts\":{\"0\":{\"timestamp\":\"1453837198\",\"content\":\"I created Microsoft! I've got billions and dollars and I donate most of it to charity. Windows 10 is awesome. Vista was horrible.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"1\":{\"timestamp\":\"1253837198\",\"content\":\"I made a bunch of money today!\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"2\":{\"timestamp\":\"1253937198\",\"content\":\"I made even more money today!\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"Founder of Microsoft.\"}},\"Steve Jobs\":{\"posts\":{\"0\":{\"timestamp\":\"1453837000\",\"content\":\"*** British Voice *** Steve Jobs was cutting edge. He changed computing as we know it. His innovations are more important that you.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"1\":{\"timestamp\":\"1213857000\",\"content\":\"I'm innovative lol :)\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"Founder of Apple.\"}},\"Fred Flintstone\":{\"posts\":{\"0\":{\"timestamp\":\"1453830198\",\"content\":\"I am prehistoric. I know the guy that invented the wheel! My best friend is Barney. My pet dinosaur always tricks me.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"},{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]},\"1\":{\"timestamp\":\"1400830198\",\"content\":\"Watch my show tonight!\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"Citizen of Bedrock.\"}},\"John Smith\":{\"posts\":{\"0\":{\"timestamp\":\"1453807198\",\"content\":\"This post is boring just like my name :)\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"I ain't nothin'.\"}},\"Thom Yorke\":{\"posts\":{\"0\":{\"timestamp\":\"1450837198\",\"content\":\"I am radiohead lol. I have a high voice but it's cool because I'm nasty with a synth. Get at me Damon Albarn. Gorillaz suk lol ayyyyyyeeeee. ISLAND NEEDS TO SUPPORT EMOJIS AYYYYEEEEe.\",\"comments\":[{\"user\":\"Steve Jobs\",\"comment\":\"Microsoft suks!!!\"},{\"user\":\"Thom Yorke\",\"comment\":\"You inspired Okay Computer\"},{\"user\":\"Fred Flintstone\",\"comment\":\"YOU ARE A MAGICIAN!!!!!!!!!!!!!!\"},{\"user\":\"John Smith\",\"comment\":\"Nice weather we're having.\"}]}},\"profile\":{\"about_me\":\"I'm in that one band.\"}}}";
-    private static IdentityDatabase IDENTITY_DB;
 
     public static void postPublicKey(Context context)
     {
@@ -55,15 +46,6 @@ public class IslandDB
                 return new Object();
             }
         }.execute();
-    }
-
-    @NonNull
-    private static IdentityDatabase getIdentityDatabase(Context context) {
-        if (IDENTITY_DB == null) {
-            IDENTITY_DB = new IdentityDatabase(context);
-        }
-
-        return IDENTITY_DB;
     }
 
     public static void createIdentity(Context context, String username) {
@@ -106,12 +88,11 @@ public class IslandDB
                 Log.v(TAG, "pseudonym " + pseudonym);
                 Log.v(TAG, "pseudonym seed " + seed);
 
-                FriendDatabase.getInstance(context).addFriend(
-                        new PseudonymKey(
-                                0,
-                                Utils.getUser(context),
-                                Utils.getPseudonym(context),
-                                Utils.getGroupKey(context)));
+                DataUtils.insertUser(
+                        context,
+                        Utils.getUser(context),
+                        Utils.getPseudonym(context),
+                        Utils.getGroupKey(context));
             }
         }.execute(seed);
     }
@@ -170,8 +151,16 @@ public class IslandDB
      */
     {
         PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
-        int myUserId = FriendDatabase.getInstance(context).getUserId(Utils.getUser(context));
-        PostDatabase.getInstance(context).insert(myUserId, postUpdate);
+        int myUserId = DataUtils.getUserId(context, Utils.getUser(context));
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.PostEntry.COLUMN_USER_ID, myUserId);
+        values.put(IslndContract.PostEntry.COLUMN_POST_ID, postUpdate.getId());
+        values.put(IslndContract.PostEntry.COLUMN_CONTENT, postUpdate.getContent());
+        values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, postUpdate.getTimestamp());
+        context.getContentResolver().insert(
+                IslndContract.PostEntry.CONTENT_URI,
+                values
+        );
 
         Log.v(TAG, String.format("making post user id %d post id %s", myUserId, postUpdate.getId()));
 
@@ -183,6 +172,7 @@ public class IslandDB
             }
         }.execute();
 
+        //--TODO we might be able to remove this
         return postUpdate;
     }
 
@@ -217,7 +207,7 @@ public class IslandDB
 
     }
 
-    public static Comment addCommentToPost(Context context, Post post, String commentText)
+    public static void addCommentToPost(Context context, Post post, String commentText)
     /**
      * Adds comment to existing post
      *
@@ -225,7 +215,7 @@ public class IslandDB
      * @param comment Comment that I'm adding.
      */
     {
-        return MessageLayer.comment(
+        MessageLayer.comment(
                 context,
                 post.getUserId(),
                 post.getPostId(),
@@ -277,8 +267,7 @@ public class IslandDB
 
     public static void deletePost(Context context, int userId, String postId) {
         Log.v(TAG, String.format("deleting post. user %d post %s", userId, postId));
-        PostDatabase postDatabase = PostDatabase.getInstance(context);
-        postDatabase.delete(userId, postId);
+        DataUtils.deletePost(context, new PostKey(userId, postId));
         PostUpdate deletePost = PostUpdate.buildDelete(postId);
         EncryptedPost encryptedPost = new EncryptedPost(
                 deletePost,
@@ -293,11 +282,12 @@ public class IslandDB
             String postId,
             int commentUserId,
             String commentId) {
-        FriendDatabase friendDatabase = FriendDatabase.getInstance(context);
-        PseudonymKey postAuthorPseudonymKey = friendDatabase.getKey(postUserId);
-        String commentAuthorPseudonym = friendDatabase.getPseudonym(commentUserId);
+        String postAuthorPseudonym = DataUtils.getPseudonym(context, postUserId);
+        String commentAuthorPseudonym = DataUtils.getPseudonym(context, commentUserId);
+        Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
+
         CommentUpdate deleteComment = CommentUpdate.buildDelete(
-                postAuthorPseudonymKey.getPseudonym(),
+                postAuthorPseudonym,
                 commentAuthorPseudonym,
                 postId,
                 commentId);
@@ -305,9 +295,16 @@ public class IslandDB
         EncryptedComment encryptedComment = new EncryptedComment(
                 deleteComment,
                 Utils.getPrivateKey(context),
-                postAuthorPseudonymKey.getKey(),
-                postAuthorPseudonymKey.getPseudonym(),
+                postAuthorGroupKey,
+                postAuthorPseudonym,
                 postId);
+
+        // Delete local
+        DataUtils.deleteComment(
+                context,
+                new CommentKey(commentUserId, commentId));
+
+        // Delete from network
         Rest.postComment(encryptedComment, Utils.getApiKey(context));
     }
 }

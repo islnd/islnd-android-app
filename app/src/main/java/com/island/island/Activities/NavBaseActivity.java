@@ -33,15 +33,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.island.island.Database.FriendDatabase;
+import com.island.island.Database.DataUtils;
 import com.island.island.Database.IslandDB;
-import com.island.island.Database.PostDatabase;
+import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
 import com.island.island.DeletePostFragment;
 import com.island.island.Models.PostKey;
@@ -52,8 +48,8 @@ import com.island.island.Utils.Utils;
 import org.island.messaging.MessageLayer;
 
 public class NavBaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        DeletePostFragment.NoticeDeletePostListener  {
+        implements NavigationView.OnNavigationItemSelectedListener {
+
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
     private final static int REQUEST_SMS = 0;
@@ -148,7 +144,8 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.nav_settings:
                 break;
             case R.id.delete_database:
-                FriendDatabase.getInstance(this).deleteAll();
+                int deleted = DataUtils.deleteUsers(this);
+                Log.v(TAG, String.format("removed %d users", deleted));
                 ProfileDatabase.getInstance(this).deleteAll();
                 break;
             case R.id.edit_username:
@@ -214,14 +211,6 @@ public class NavBaseActivity extends AppCompatActivity
                 }
                 return;
             }
-        }
-    }
-
-    @Override
-    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        if (fragment instanceof FeedActivity) {
-            ((FeedActivity) fragment).onDeletePostDialogPositiveClick(dialogFragment);
         }
     }
 
@@ -398,9 +387,13 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-                    FriendDatabase.getInstance(getApplicationContext()).deleteAll();
+                    int deleted = DataUtils.deleteUsers(this);
+                    Log.v(TAG, String.format("removed %d users", deleted));
                     ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
-                    PostDatabase.getInstance(getApplicationContext()).deleteAll();
+                    getContentResolver().delete(
+                            IslndContract.PostEntry.CONTENT_URI,
+                            null,
+                            null);
                     IslandDB.createIdentity(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
