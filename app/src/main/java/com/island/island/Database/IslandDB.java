@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.island.island.Models.Post;
+import com.island.island.Models.PostKey;
 import com.island.island.Models.Profile;
 import com.island.island.Models.ProfileWithImageData;
 import com.island.island.R;
@@ -16,9 +17,11 @@ import com.island.island.Utils.Utils;
 import com.island.island.VersionedContentBuilder;
 
 import org.island.messaging.PostUpdate;
+import org.island.messaging.Rest;
 import org.island.messaging.Util;
 import org.island.messaging.crypto.CryptoUtil;
 import org.island.messaging.MessageLayer;
+import org.island.messaging.crypto.EncryptedPost;
 
 import java.security.KeyPair;
 import java.security.SecureRandom;
@@ -269,15 +272,13 @@ public class IslandDB
 
     public static void deletePost(Context context, int userId, String postId) {
         Log.v(TAG, String.format("deleting post. user %d post %s", userId, postId));
-        //--TODO delete the post
-//        PostDatabase postDatabase = PostDatabase.getInstance(context);
-//        postDatabase.delete(userId, postId);
-//        PostUpdate deletePost = PostUpdate.buildDelete(postId);
-//        EncryptedPost encryptedPost = new EncryptedPost(
-//                deletePost,
-//                Utils.getPrivateKey(context),
-//                Utils.getGroupKey(context));
-//        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
+        DataUtils.deletePost(context, new PostKey(userId, postId));
+        PostUpdate deletePost = PostUpdate.buildDelete(postId);
+        EncryptedPost encryptedPost = new EncryptedPost(
+                deletePost,
+                Utils.getPrivateKey(context),
+                Utils.getGroupKey(context));
+        Rest.post(Utils.getPseudonymSeed(context), encryptedPost, Utils.getApiKey(context));
     }
 
     public static void deleteComment(

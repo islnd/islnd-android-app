@@ -47,8 +47,7 @@ import java.util.Set;
 
 
 public class ViewPostActivity extends AppCompatActivity
-        implements DeletePostFragment.NoticeDeletePostListener,
-        DeleteCommentFragment.NoticeDeleteCommentListener,
+        implements DeleteCommentFragment.NoticeDeleteCommentListener,
         LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final int COMMENT_LOADER_ID = 0;
@@ -131,21 +130,6 @@ public class ViewPostActivity extends AppCompatActivity
             addCommentEditText.setText("");
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
-    }
-
-    @Override
-    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
-        setResult(Activity.RESULT_OK, buildReturnIntent(mPost.getUserId(), mPost.getPostId()));
-        finish();
-    }
-
-    @NonNull
-    private Intent buildReturnIntent(int postAuthorId, String postId) {
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra(
-                PostKey.POST_KEY_EXTRA,
-                new PostKey(postAuthorId, postId));
-        return returnIntent;
     }
 
     @Override

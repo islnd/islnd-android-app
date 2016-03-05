@@ -48,8 +48,8 @@ import com.island.island.Utils.Utils;
 import org.island.messaging.MessageLayer;
 
 public class NavBaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        DeletePostFragment.NoticeDeletePostListener  {
+        implements NavigationView.OnNavigationItemSelectedListener {
+
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
     private final static int REQUEST_SMS = 0;
@@ -211,14 +211,6 @@ public class NavBaseActivity extends AppCompatActivity
                 }
                 return;
             }
-        }
-    }
-
-    @Override
-    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        if (fragment instanceof FeedActivity) {
-            ((FeedActivity) fragment).onDeletePostDialogPositiveClick(dialogFragment);
         }
     }
 

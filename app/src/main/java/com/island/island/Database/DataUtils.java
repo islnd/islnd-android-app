@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.island.island.Activities.NavBaseActivity;
+import com.island.island.Models.PostKey;
 
 import org.island.messaging.PseudonymKey;
 import org.island.messaging.crypto.CryptoUtil;
@@ -117,5 +118,17 @@ public class DataUtils {
         }
 
         return null;
+    }
+
+    public static void deletePost(Context context, PostKey postKey) {
+        String selection = IslndContract.PostEntry.COLUMN_USER_ID + " = ? AND " +
+                IslndContract.PostEntry.COLUMN_POST_ID + " = ?";
+        String[] args = new String[] {
+                Integer.toString(postKey.getUserId()),
+                postKey.getPostId()};
+        context.getContentResolver().delete(
+                IslndContract.PostEntry.CONTENT_URI,
+                selection,
+                args);
     }
 }

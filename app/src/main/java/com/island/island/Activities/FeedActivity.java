@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.IslndContract;
-import com.island.island.DeletePostFragment;
 import com.island.island.PostCollection;
 import com.island.island.PostLoader;
 import com.island.island.R;
@@ -28,7 +27,7 @@ import com.island.island.SimpleDividerItemDecoration;
 
 import org.island.messaging.MessageLayer;
 
-public class FeedActivity extends Fragment implements DeletePostFragment.NoticeDeletePostListener {
+public class FeedActivity extends Fragment {
     private final static String TAG = FeedActivity.class.getSimpleName();
 
     private static final int NEW_POST_RESULT = 1;
@@ -88,16 +87,6 @@ public class FeedActivity extends Fragment implements DeletePostFragment.NoticeD
     public void startNewPostActivity() {
         Intent newPostIntent = new Intent(getContext(), NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
-    }
-
-    @Override
-    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
-        //--TODO fix deletes
-//        Bundle args = dialogFragment.getArguments();
-//        String postId = args.getString(DeletePostFragment.POST_ID_BUNDLE_KEY);
-//        int postUserId = args.getInt(DeletePostFragment.USER_ID_BUNDLE_KEY);
-//        final PostKey postKey = new PostKey(postUserId, postId);
-//        removePostFromFeed(postKey);
     }
 
     private class GetPostsFromServerTask extends AsyncTask<Void, Void, PostCollection> {

@@ -149,7 +149,6 @@ public class MessageLayer {
 
     private static void addPostsToContentProvider(Context context, PostCollection postCollection) {
         for (Post post : postCollection.getPosts()) {
-            //--TODO only insert if not in DB
             //--TODO use batch insert
             ContentValues values = new ContentValues();
             values.put(IslndContract.PostEntry.COLUMN_USER_ID, post.getUserId());
@@ -163,7 +162,7 @@ public class MessageLayer {
         }
 
         for (PostKey postKey : postCollection.getDeletedKeys()) {
-            //--TODO handle deletes
+            DataUtils.deletePost(context, postKey);
         }
     }
 
