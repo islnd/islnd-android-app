@@ -7,11 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.IslndContract;
@@ -23,9 +28,7 @@ import com.island.island.SimpleDividerItemDecoration;
 
 import org.island.messaging.MessageLayer;
 
-public class FeedActivity extends NavBaseActivity implements
-        DeletePostFragment.NoticeDeletePostListener {
-
+public class FeedActivity extends Fragment implements DeletePostFragment.NoticeDeletePostListener {
     private final static String TAG = FeedActivity.class.getSimpleName();
 
     private static final int NEW_POST_RESULT = 1;
@@ -38,23 +41,24 @@ public class FeedActivity extends NavBaseActivity implements
     private ContentResolver mResolver;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.content_feed, container, false);
 
         // Feed posts setup
-        mRecyclerView = (RecyclerView) findViewById(R.id.feed_recycler_view);
-        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.feed_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new PostAdapter(this, null);
-        getLoaderManager().initLoader(0, null, new PostLoader(this, mAdapter));
+        mAdapter = new PostAdapter(getContext(), null);
+        getLoaderManager().initLoader(0, null, new PostLoader(getContext(), mAdapter));
 
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         // Swipe to refresh
-        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+        mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
 
         mRefreshLayout.setOnRefreshListener(
                 () -> {
@@ -63,17 +67,26 @@ public class FeedActivity extends NavBaseActivity implements
                     mRefreshLayout.setRefreshing(false);
                 });
 
-        Account account = createSyncAccount(this);
-        mResolver = getContentResolver();
+        Account account = createSyncAccount(getContext());
+        mResolver = getContext().getContentResolver();
         mResolver.setSyncAutomatically(
                 account,
                 getString(R.string.content_authority),
                 true);
         mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
+
+        // TODO: handle onclicks more betterer
+        // Fab
+        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
+        fab.setOnClickListener((View view) -> {
+            startNewPostActivity();
+        });
+
+        return v;
     }
 
-    public void startNewPostActivity(View view) {
-        Intent newPostIntent = new Intent(FeedActivity.this, NewPostActivity.class);
+    public void startNewPostActivity() {
+        Intent newPostIntent = new Intent(getContext(), NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
     }
 
@@ -92,7 +105,7 @@ public class FeedActivity extends NavBaseActivity implements
 
         @Override
         protected PostCollection doInBackground(Void... params) {
-            return MessageLayer.getPosts(getApplicationContext());
+            return MessageLayer.getPosts(getContext());
         }
     }
 
@@ -101,7 +114,7 @@ public class FeedActivity extends NavBaseActivity implements
                 context.getString(R.string.sync_account),
                 context.getString(R.string.sync_account_type));
 
-        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
         accountManager.addAccountExplicitly(newAccount, null, null);
 
         return newAccount;

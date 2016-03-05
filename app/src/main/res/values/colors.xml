@@ -20,4 +20,5 @@
 
     <color name="black_active">#8a000000</color>
     <color name="black_inactive">#42000000</color>
+    <color name="black_tint">#61000000</color>
 </resources>

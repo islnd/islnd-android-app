@@ -7,12 +7,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +28,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +39,8 @@ import com.island.island.Database.DataUtils;
 import com.island.island.Database.IslandDB;
 import com.island.island.Database.IslndContract;
 import com.island.island.Database.ProfileDatabase;
+import com.island.island.DeletePostFragment;
+import com.island.island.Models.PostKey;
 import com.island.island.R;
 import com.island.island.Utils.ImageUtils;
 import com.island.island.Utils.Utils;
@@ -40,7 +48,8 @@ import com.island.island.Utils.Utils;
 import org.island.messaging.MessageLayer;
 
 public class NavBaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener  {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        DeletePostFragment.NoticeDeletePostListener  {
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
     private final static int REQUEST_SMS = 0;
@@ -51,6 +60,18 @@ public class NavBaseActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
     private View mDialogView = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.drawer_layout);
+        onCreateDrawer();
+
+        // Set launching fragment
+        Fragment fragment = new FeedActivity();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+    }
 
     private void onCreateDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -88,12 +109,6 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        super.setContentView(layoutResID);
-        onCreateDrawer();
-    }
-
-    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -104,33 +119,34 @@ public class NavBaseActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        Fragment fragment = null;
+        boolean isFragment = false;
 
-        switch (id) {
+        switch (item.getItemId()) {
+            case R.id.nav_feed:
+                fragment = new FeedActivity();
+                isFragment = true;
+                break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
                 profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Utils.getUser(this));
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
-                startActivity(new Intent(this, ViewFriendsActivity.class));
+                fragment = new ViewFriendsActivity();
+                isFragment = true;
+                break;
+            case R.id.nav_add_friend:
+                addFriendActionDialog();
                 break;
             case R.id.nav_settings:
-                break;
-            case R.id.qr_code:
-                qrCodeActionDialog();
                 break;
             case R.id.delete_database:
                 int deleted = DataUtils.deleteUsers(this);
                 Log.v(TAG, String.format("removed %d users", deleted));
                 ProfileDatabase.getInstance(this).deleteAll();
-                break;
-            case R.id.sms_allow_user:
-                smsAllowDialog();
                 break;
             case R.id.edit_username:
                 editUsernameDialog();
@@ -138,6 +154,11 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.edit_api_key:
                 editApiKey();
                 break;
+        }
+
+        if (isFragment) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -156,6 +177,7 @@ public class NavBaseActivity extends AppCompatActivity
                 Log.d(TAG, "Contents: " + contents);
                 MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
             }
+            return;
         // Not QR result
         } else {
             if (requestCode == CONTACT_RESULT && resultCode == RESULT_OK) {
@@ -192,22 +214,48 @@ public class NavBaseActivity extends AppCompatActivity
         }
     }
 
-    private void qrCodeActionDialog() {
+    @Override
+    public void onDeletePostDialogPositiveClick(DialogFragment dialogFragment) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        if (fragment instanceof FeedActivity) {
+            ((FeedActivity) fragment).onDeletePostDialogPositiveClick(dialogFragment);
+        }
+    }
+
+    private void addFriendActionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.qr_action_dialog)
-                .setItems(R.array.qr_actions, (DialogInterface dialog, int which) -> {
+        builder.setTitle(R.string.add_friend_dialog)
+                .setItems(R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
                     switch (which) {
-                        case 0: // Show QR
-                            startActivity(new Intent(this, ShowQRActivity.class));
+                        case 0: // QR
+                            qrCodeActionDialog();
                             break;
-                        case 1: // Get QR
-                            IntentIntegrator integrator = new IntentIntegrator(this);
-                            integrator.setCaptureActivity(VerticalCaptureActivity.class);
-                            integrator.setOrientationLocked(false);
-                            integrator.initiateScan();
+                        case 1: // SMS
+                            smsAllowDialog();
                             break;
                     }
                 })
+                .show();
+    }
+
+    private void qrCodeActionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.qr_dialog, null);
+
+        Button getQrButton = (Button) dialogView.findViewById(R.id.get_qr_button);
+        getQrButton.setOnClickListener((View v) -> {
+            IntentIntegrator integrator = new IntentIntegrator(this);
+            integrator.setCaptureActivity(VerticalCaptureActivity.class);
+            integrator.setOrientationLocked(false);
+            integrator.initiateScan();
+        });
+
+        ImageView qrImageView = (ImageView) dialogView.findViewById(R.id.qr_image_view);
+        Utils.buildQrCode(qrImageView,
+                MessageLayer.getEncodedIdentityString(getApplicationContext()));
+
+        builder.setView(dialogView)
+                .setTitle(getString(R.string.qr_dialog_title))
                 .show();
     }
 
@@ -339,7 +387,6 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void editUsernameDialog() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         mDialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
         builder.setView(mDialogView);
