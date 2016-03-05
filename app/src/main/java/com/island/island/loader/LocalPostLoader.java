@@ -1,4 +1,4 @@
-package com.island.island;
+package com.island.island.loader;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,12 +10,12 @@ import android.support.v4.content.Loader;
 import com.island.island.Adapters.PostAdapter;
 import com.island.island.Database.IslndContract;
 
-public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final Context mContext;
     private final PostAdapter mAdapter;
 
-    public PostLoader(Context context, PostAdapter postAdapter) {
+    public LocalPostLoader(Context context, PostAdapter postAdapter) {
         mContext = context;
         mAdapter = postAdapter;
     }
