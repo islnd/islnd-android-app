@@ -35,10 +35,10 @@ import com.google.zxing.integration.android.IntentResult;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
+import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
@@ -89,20 +89,23 @@ public class NavBaseActivity extends AppCompatActivity
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
         String userName = Util.getUser(NavBaseActivity.this);
 
-        navProfileImage.setOnClickListener((View v) -> {
+        navProfileImage.setOnClickListener(
+                (View v) -> {
                     Intent profileIntent = new Intent(NavBaseActivity.this, ProfileActivity.class);
                     profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
                     startActivity(profileIntent);
                 });
         navUserName.setText(userName);
 
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(userName));
-        Uri headerImageUri = Uri.parse(profileDatabase.getHeaderImageUri(userName));
-        ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
-                profileImageUri);
-        ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
-                headerImageUri);
+        Profile profile = DataUtils.getProfile(getApplicationContext(), userName);
+        if (profile != null) {
+            Uri profileImageUri = profile.getProfileImageUri();
+            Uri headerImageUri = profile.getHeaderImageUri();
+            ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
+                    profileImageUri);
+            ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
+                    headerImageUri);
+        }
     }
 
     @Override
@@ -141,9 +144,7 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.nav_settings:
                 break;
             case R.id.delete_database:
-                int deleted = DataUtils.deleteUsers(this);
-                Log.v(TAG, String.format("removed %d users", deleted));
-                ProfileDatabase.getInstance(this).deleteAll();
+                DataUtils.deleteAll(this);
                 break;
             case R.id.edit_username:
                 editUsernameDialog();
@@ -384,13 +385,7 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-                    int deleted = DataUtils.deleteUsers(this);
-                    Log.v(TAG, String.format("removed %d users", deleted));
-                    ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
-                    getContentResolver().delete(
-                            IslndContract.PostEntry.CONTENT_URI,
-                            null,
-                            null);
+                    DataUtils.deleteAll(this);
                     IslndDb.createIdentity(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)

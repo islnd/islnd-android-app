@@ -16,11 +16,12 @@ import android.widget.ImageView;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.DeleteCommentDialog;
 import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.PostKey;
+import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.CommentViewHolder;
@@ -76,8 +77,8 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
                     mContext.startActivity(profileIntent);
                 });
 
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(comment.getUsername()));
+        Profile profile = DataUtils.getProfile(mContext, comment.getUsername());
+        Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
         if (Util.isUser(mContext, comment.getUsername())) {

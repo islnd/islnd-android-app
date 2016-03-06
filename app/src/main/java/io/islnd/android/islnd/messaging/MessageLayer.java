@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
@@ -14,7 +15,6 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
 import io.islnd.android.islnd.messaging.server.CommentQuery;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
@@ -245,10 +245,10 @@ public class MessageLayer {
 
     private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
         //--TODO only add if not already friends
-        DataUtils.insertUser(context, pk);
+        long userId = DataUtils.insertUser(context, pk);
 
         Profile profile = io.islnd.android.islnd.messaging.Util.buildDefaultProfile(context, pk.getUsername());
-        ProfileDatabase.getInstance(context).insert(profile);
+        DataUtils.insertProfile(context, profile, userId);
 
         return true;
     }
@@ -269,28 +269,23 @@ public class MessageLayer {
     }
 
     public static ProfileWithImageData getMostRecentProfile(Context context, String username) {
-//        PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
-//        String apiKey = Util.getApiKey(context);
-//        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym(), apiKey);
-//        if (encryptedProfiles == null) {
-//            Log.d(TAG, "profile response was null");
-//            return null;
-//        }
-//
-//        List<ProfileWithImageData> profiles = new ArrayList<>();
-//        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
-//            //--TODO check signature
-//            profiles.add(encryptedProfile.decrypt(friendPK.getKey()));
-//        }
-//
-//        return Util.getNewest(profiles);
-        return new ProfileWithImageData(
-                "default",
-                "default",
-                null,
-                null,
-                0
-        );
+        String pseudonym = DataUtils.getPseudonym(context, username);
+        Key groupKey = DataUtils.getGroupKey(context, username);
+
+        String apiKey = Util.getApiKey(context);
+        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(pseudonym, apiKey);
+        if (encryptedProfiles == null) {
+            Log.d(TAG, "profile response was null");
+            return null;
+        }
+
+        List<ProfileWithImageData> profiles = new ArrayList<>();
+        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
+            //--TODO check signature
+            profiles.add(encryptedProfile.decrypt(groupKey));
+        }
+
+        return io.islnd.android.islnd.messaging.Util.getNewest(profiles);
     }
 
     public static CommentCollection getCommentCollection(Context context, int postAuthorId, String postId) {

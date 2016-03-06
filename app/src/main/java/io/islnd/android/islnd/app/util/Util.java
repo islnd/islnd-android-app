@@ -123,12 +123,6 @@ public class Util
         editor.commit();
     }
 
-    public static void printAvailableMemory(Context context, String tag) {
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        int memoryClass = am.getMemoryClass();
-        Log.v(tag, memoryClass + "mb available");
-    }
-
     public static Profile saveProfileWithImageData(Context context, ProfileWithImageData profile) {
         Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromByteArray(context,
                 profile.getProfileImageByteArray());

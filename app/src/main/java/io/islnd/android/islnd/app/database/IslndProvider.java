@@ -21,6 +21,8 @@ public class IslndProvider extends ContentProvider {
     static final int USER_WITH_ID = 201;
     static final int COMMENT = 300;
     static final int COMMENT_WITH_POST_USER_ID_AND_POST_ID = 301;
+    static final int PROFILE = 400;
+    static final int PROFILE_WITH_USER_ID = 401;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -52,6 +54,18 @@ public class IslndProvider extends ContentProvider {
         sCommentQueryBuilder.setTables(
                 IslndContract.CommentEntry.TABLE_NAME + " INNER JOIN " + IslndContract.UserEntry.TABLE_NAME +
                         " ON " + IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID +
+                        " = " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID
+        );
+    }
+
+    private static final SQLiteQueryBuilder sProfileQueryBuilder;
+
+    static {
+        sProfileQueryBuilder = new SQLiteQueryBuilder();
+
+        sProfileQueryBuilder.setTables(
+                IslndContract.ProfileEntry.TABLE_NAME + " INNER JOIN " + IslndContract.UserEntry.TABLE_NAME +
+                        " ON " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID +
                         " = " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID
         );
     }
@@ -102,6 +116,25 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getProfilesByUserId(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.ProfileEntry.getUserIdFromUri(uri);
+        Log.v(TAG, String.format("Get profile user id %d", userId));
+
+        String[] selectionArgs = new String[] {Integer.toString(userId)};
+        String selection = IslndContract.ProfileEntry.TABLE_NAME + "." +
+                IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.UserEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getCommentsByPostAuthorIdAndPostId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.CommentEntry.getUserIdFromUri(uri);
         String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
@@ -133,6 +166,9 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_USER, USER);
         matcher.addURI(authority, IslndContract.PATH_USER + "/#", USER_WITH_ID);
+
+        matcher.addURI(authority, IslndContract.PATH_PROFILE, PROFILE);
+        matcher.addURI(authority, IslndContract.PATH_PROFILE + "/#", PROFILE_WITH_USER_ID);
 
         return matcher;
     }
@@ -175,6 +211,27 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getCommentsByPostAuthorIdAndPostId(uri, projection, sortOrder);
                 break;
             }
+            case PROFILE: {
+                retCursor = sProfileQueryBuilder.query(
+                            mOpenHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
+                break;
+            }
+            case PROFILE_WITH_USER_ID: {
+                if (selection != null
+                        || selectionArgs != null) {
+                    throw new UnsupportedOperationException(
+                            String.format("uri %s does not support selection or selection args")
+                    );
+                }
+                retCursor = getProfilesByUserId(uri, projection, sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -198,6 +255,14 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.UserEntry.CONTENT_TYPE;
             case USER_WITH_ID:
                 return IslndContract.UserEntry.CONTENT_ITEM_TYPE;
+            case COMMENT:
+                return IslndContract.CommentEntry.CONTENT_TYPE;
+            case COMMENT_WITH_POST_USER_ID_AND_POST_ID:
+                return IslndContract.CommentEntry.CONTENT_TYPE;
+            case PROFILE:
+                return IslndContract.ProfileEntry.CONTENT_TYPE;
+            case PROFILE_WITH_USER_ID:
+                return IslndContract.ProfileEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -247,6 +312,23 @@ public class IslndProvider extends ContentProvider {
 
                 break;
             }
+            case PROFILE: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.ProfileEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE);
+                if ( _id > 0 ) {
+                    Log.v(TAG, "inserted profile");
+                    returnUri = IslndContract.ProfileEntry.buildProfileUri(_id);
+                }
+                else {
+                    Log.v(TAG, "insert profile failed");
+                    return null;
+                }
+
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -261,7 +343,7 @@ public class IslndProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case POST:
+            case POST: {
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -270,6 +352,7 @@ public class IslndProvider extends ContentProvider {
                         if (_id != -1) {
                             returnCount++;
                         }
+
                     }
                     db.setTransactionSuccessful();
                 } finally {
@@ -278,8 +361,28 @@ public class IslndProvider extends ContentProvider {
 
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
+            }
+            case COMMENT: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(IslndContract.CommentEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
             default:
-                return super.bulkInsert(uri, values);
+                throw new UnsupportedOperationException("Bulk insert not supported for uri: " + uri);
         }
     }
 
@@ -310,6 +413,11 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.UserEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case PROFILE: {
+                rowsDeleted = db.delete(
+                        IslndContract.ProfileEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -324,6 +432,25 @@ public class IslndProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new UnsupportedOperationException("update operation is not supported");
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated = 0;
+
+        switch (match) {
+            case PROFILE: {
+                db.update(
+                        IslndContract.ProfileEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("update operation not supported for uri " + uri);
+            }
+        }
+
+        return rowsUpdated;
     }
 }
