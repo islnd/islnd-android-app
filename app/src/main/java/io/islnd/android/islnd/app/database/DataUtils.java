@@ -205,6 +205,10 @@ public class DataUtils {
     }
 
     public static Profile getProfile(Context context, String username) {
+        return getProfile(context, getUserId(context, username));
+    }
+
+    public static Profile getProfile(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_USERNAME,
                 IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
@@ -216,10 +220,10 @@ public class DataUtils {
 
         try {
             cursor = context.getContentResolver().query(
-                    IslndContract.ProfileEntry.CONTENT_URI,
+                    IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
                     projection,
-                    IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                    new String[] {username},
+                    null,
+                    null,
                     null);
             if (cursor.moveToFirst()) {
                 return new Profile(
@@ -227,8 +231,9 @@ public class DataUtils {
                         cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME)),
                         Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))),
                         Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))),
-                        1   //--Our database only holds one profile per user, so the version doesn't matter
-                            //  The version is part of the profile when retrieving profiles from the network,
+                        1   //--The content provider only returns one profile per user id,
+                            //  so version number doesn't matter.
+                            //  The version matters when retrieving profiles from the network,
                             //  and we have to figure out which one is the most recent
                 );
             }

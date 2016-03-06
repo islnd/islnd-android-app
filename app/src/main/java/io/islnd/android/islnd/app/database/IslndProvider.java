@@ -124,8 +124,8 @@ public class IslndProvider extends ContentProvider {
         String selection = IslndContract.ProfileEntry.TABLE_NAME + "." +
                 IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
 
-        return mOpenHelper.getReadableDatabase().query(
-                IslndContract.UserEntry.TABLE_NAME,
+        return sProfileQueryBuilder.query(
+                mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -262,7 +262,7 @@ public class IslndProvider extends ContentProvider {
             case PROFILE:
                 return IslndContract.ProfileEntry.CONTENT_TYPE;
             case PROFILE_WITH_USER_ID:
-                return IslndContract.ProfileEntry.CONTENT_TYPE;
+                return IslndContract.ProfileEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
