@@ -41,11 +41,15 @@ public class DataUtils {
                 new String[] {Integer.toString(userId)},
                 null);
 
-        if (cursor.moveToFirst()) {
-            return cursor.getString(0);
-        }
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
 
-        return null;
+            return null;
+        } finally {
+            cursor.close();
+        }
     }
 
     public static int getUserId(Context context, String username) {
@@ -95,11 +99,15 @@ public class DataUtils {
                 new String[] {Integer.toString(userId)},
                 null);
 
-        if (cursor.moveToFirst()) {
-            return CryptoUtil.decodeSymmetricKey(cursor.getString(0));
-        }
+        try {
+            if (cursor.moveToFirst()) {
+                return CryptoUtil.decodeSymmetricKey(cursor.getString(0));
+            }
 
-        return null;
+            return null;
+        } finally {
+            cursor.close();
+        }
     }
 
     public static String getUsernameFromPseudonym(Context context, String pseudonym) {
@@ -114,11 +122,15 @@ public class DataUtils {
                 new String[] {pseudonym},
                 null);
 
-        if (cursor.moveToFirst()) {
-            return cursor.getString(0);
-        }
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
 
-        return null;
+            return null;
+        } finally {
+            cursor.close();
+        }
     }
 
     public static void deletePost(Context context, PostKey postKey) {
