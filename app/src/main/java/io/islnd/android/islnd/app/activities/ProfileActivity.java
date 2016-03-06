@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,7 +45,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -56,10 +54,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         Intent profileIntent = getIntent();
         mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        Log.v(TAG, "username " + mProfileUsername);
         mProfile = DataUtils.getProfile(mContext, mProfileUsername);
         int profileUserId = DataUtils.getUserId(mContext, mProfileUsername);
-        Log.v(TAG, "before show profile text is: " + mProfile.getAboutMe());
         showProfile();
         new GetProfileTask().execute();
 
@@ -115,8 +111,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         aboutMe.setText(mProfile.getAboutMe());
-        Log.v(TAG, "inside show profile set text: " + mProfile.getAboutMe());
-
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mProfileUsername);

@@ -247,7 +247,7 @@ public class MessageLayer {
         //--TODO only add if not already friends
         long userId = DataUtils.insertUser(context, pk);
 
-        Profile profile = io.islnd.android.islnd.messaging.Util.buildDefaultProfile(context, pk.getUsername());
+        Profile profile = Util.buildDefaultProfile(context, pk.getUsername());
         DataUtils.insertProfile(context, profile, userId);
 
         return true;

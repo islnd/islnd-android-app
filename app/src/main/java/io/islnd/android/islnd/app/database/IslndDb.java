@@ -91,7 +91,7 @@ public class IslndDb
 
                 DataUtils.insertProfile(
                         context,
-                        io.islnd.android.islnd.messaging.Util.buildDefaultProfile(context, Util.getUser(context)),
+                        Util.buildDefaultProfile(context, Util.getUser(context)),
                         userId);
             }
         }.execute(seed);

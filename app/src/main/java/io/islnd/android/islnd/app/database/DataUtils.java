@@ -263,26 +263,10 @@ public class DataUtils {
 
     public static void deleteAll(Context context) {
         final ContentResolver contentResolver = context.getContentResolver();
-        contentResolver.delete(
-                IslndContract.UserEntry.CONTENT_URI,
-                null,
-                null
-        );
-        contentResolver.delete(
-                IslndContract.ProfileEntry.CONTENT_URI,
-                null,
-                null
-        );
-        contentResolver.delete(
-                IslndContract.PostEntry.CONTENT_URI,
-                null,
-                null
-        );
-        contentResolver.delete(
-                IslndContract.CommentEntry.CONTENT_URI,
-                null,
-                null
-        );
+        contentResolver.delete(IslndContract.UserEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.ProfileEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.PostEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {
@@ -295,8 +279,7 @@ public class DataUtils {
         values.put(
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
                 profile.getProfileImageUri().toString());
-        context.getContentResolver().insert(
-                IslndContract.ProfileEntry.CONTENT_URI,
-                values);
+
+        context.getContentResolver().insert(IslndContract.ProfileEntry.CONTENT_URI, values);
     }
 }
