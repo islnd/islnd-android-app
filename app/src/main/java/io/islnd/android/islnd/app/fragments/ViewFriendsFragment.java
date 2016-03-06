@@ -146,6 +146,7 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
             }
 
             refreshLayout.setRefreshing(false);
+            cursor.close();
         }
     }
 }

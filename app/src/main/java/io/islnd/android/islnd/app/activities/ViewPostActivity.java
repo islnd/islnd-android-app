@@ -60,7 +60,7 @@ public class ViewPostActivity extends AppCompatActivity {
                 this,
                 mAdapter);
 
-        getLoaderManager().initLoader(0, args, localCommentLoader);
+        getSupportLoaderManager().initLoader(0, args, localCommentLoader);
 
         // Swipe to refresh
         AsyncTaskLoader networkCommentsLoader = new NetworkCommentLoader(

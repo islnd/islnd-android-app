@@ -39,6 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private String mProfileUsername;
     private Profile mProfile;
+    private Cursor mPostCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,14 +63,14 @@ public class ProfileActivity extends AppCompatActivity {
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
         };
-        Cursor postCursor = getContentResolver().query(
+        mPostCursor = getContentResolver().query(
                 IslndContract.PostEntry.CONTENT_URI,
                 projection,
                 IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
                 new String[] {Util.getUser(getApplicationContext())},
                 null
         );
-        mAdapter = new PostAdapter(this, postCursor);
+        mAdapter = new PostAdapter(this, mPostCursor);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
@@ -78,6 +79,12 @@ public class ProfileActivity extends AppCompatActivity {
         mProfile = IslndDb.getProfile(getApplicationContext(), mProfileUsername);
         showProfile();
         new GetProfileTask().execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPostCursor.close();
     }
 
     private void showProfile() {
