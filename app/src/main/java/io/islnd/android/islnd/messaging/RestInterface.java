@@ -8,6 +8,7 @@ import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
 import io.islnd.android.islnd.messaging.server.ProfileResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
+import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 
 import java.util.List;
 
@@ -68,5 +69,9 @@ public interface RestInterface {
     Call<Object> postProfile(
             @Path("pseudonymSeed") String pseudonymSeed,
             @Body EncryptedProfile encryptedProfile,
+            @Query("apiKey") String apiKey);
+
+    @GET("/serverTime/")
+    Call<ServerTimeResponse> getServerTime(
             @Query("apiKey") String apiKey);
 }

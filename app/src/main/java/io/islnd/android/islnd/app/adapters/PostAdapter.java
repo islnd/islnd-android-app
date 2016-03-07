@@ -24,6 +24,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.GlancePostViewHolder;
+import io.islnd.android.islnd.messaging.ServerTime;
 
 import java.util.ArrayList;
 
@@ -55,7 +56,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         );
 
         holder.postUserName.setText(post.getUserName());
-        holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(post.getTimestamp()));
+        holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(ServerTime.toLocalTimeMillis(post.getTimestamp())));
         holder.postContent.setText(post.getContent());
         holder.postCommentCount.setText(Util.numberOfCommentsString(post.getComments().size()));
 

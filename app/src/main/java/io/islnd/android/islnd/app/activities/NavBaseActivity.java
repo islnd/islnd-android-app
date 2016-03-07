@@ -43,6 +43,7 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -63,6 +64,11 @@ public class NavBaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+
+        // Synchronize server time
+        if (!ServerTime.isInSync()) {
+            IslndDb.syncServerTime(this, false);
+        }
 
         // Set launching fragment
         Fragment fragment = new FeedFragment();
@@ -151,6 +157,8 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.edit_api_key:
                 editApiKey();
                 break;
+            case R.id.sync_server_time:
+                IslndDb.syncServerTime(this, true);
         }
 
         if (isFragment) {

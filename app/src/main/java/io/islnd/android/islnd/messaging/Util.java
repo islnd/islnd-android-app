@@ -12,10 +12,6 @@ import java.util.List;
 public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
-    public static long getContentTimestamp() {
-        return System.currentTimeMillis();
-    }
-
     public static <T extends VersionedContent> T getNewest(List<T> versionedContent) {
         T newestItem = null;
         int newestVersion = Integer.MIN_VALUE;

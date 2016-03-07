@@ -10,6 +10,7 @@ import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
 import io.islnd.android.islnd.messaging.server.ProfileResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
+import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -193,5 +194,75 @@ public class Rest {
         }
 
         return null;
+    }
+
+    public static long getServerTimeOffsetMillis(int repetitions, String apiKey) throws IOException {
+        // account for network delay by using OkHttpClient's Interceptor
+        class DelayInterceptor implements okhttp3.Interceptor {
+            private long requestTimeMillis;
+            private long networkDelayNanos;
+            public long getRequestTimeMillis() {
+                return requestTimeMillis;
+            }
+            public long getNetworkDelayNanos() {
+                return networkDelayNanos;
+            }
+
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                networkDelayNanos = 0;
+                requestTimeMillis = System.currentTimeMillis();
+
+                // perform request, and get delay
+                long t1 = System.nanoTime();
+                okhttp3.Response response = chain.proceed(chain.request());
+                long t2 = System.nanoTime();
+
+                // assume half of round trip
+                networkDelayNanos = (t2 - t1) / 2;
+
+                return response;
+            }
+        }
+        DelayInterceptor delayInterceptor = new DelayInterceptor();
+        okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
+                .addNetworkInterceptor(delayInterceptor)
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        // record lowest delay for all attempts
+        long minNetworkDelayNanos = Long.MAX_VALUE;
+        long mostAccurateOffsetMillis = 0;
+
+        for (int i = 0; i < repetitions; i++) {
+            try {
+                // make call, which will update delayInterceptor
+                Response<ServerTimeResponse> response = service.getServerTime(apiKey).execute();
+
+                long networkDelayNanos = delayInterceptor.getNetworkDelayNanos();
+                if (response.code() == HTTP_OK && networkDelayNanos < minNetworkDelayNanos) {
+                    minNetworkDelayNanos = networkDelayNanos;
+
+                    long serverTimeMillis = Long.parseLong(response.body().getServerTime());
+                    long networkDelayMillis = networkDelayNanos / 1000000;
+                    mostAccurateOffsetMillis = (serverTimeMillis - networkDelayMillis) - delayInterceptor.getRequestTimeMillis();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // if unchanged, we never made a successful connection
+        if (minNetworkDelayNanos == Long.MAX_VALUE) {
+            throw new IOException("Unable to make a successful connection to server.");
+        }
+
+        return mostAccurateOffsetMillis;
     }
 }

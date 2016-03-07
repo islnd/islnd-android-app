@@ -30,6 +30,7 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
 import io.islnd.android.islnd.messaging.crypto.ObjectEncrypter;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
@@ -338,5 +339,9 @@ public class MessageLayer {
         }
 
         return commentCollection;
+    }
+
+    public static long getServerTimeOffsetMillis(Context context, int repetitions) throws IOException {
+        return Rest.getServerTimeOffsetMillis(repetitions, Util.getApiKey(context));
     }
 }
