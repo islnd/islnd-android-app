@@ -11,25 +11,29 @@ import java.io.Serializable;
 
 public class ProfileWithImageData implements Serializable, ProtoSerializable, VersionedContent {
 
-    private String username = "";
-    private String aboutMe = "";
-    private byte[] profileImageByteArray;
-    private byte[] headerImageByteArray;
-    private int version;
+    private final String displayName;
+    private final String aboutMe;
+    private final byte[] profileImageByteArray;
+    private final byte[] headerImageByteArray;
+    private final int version;
 
-    public ProfileWithImageData(String username, String aboutMe, byte[] profileImageByteArray,
-                                byte[] headerImageByteArray, int version)
+    public ProfileWithImageData(
+            String displayName,
+            String aboutMe,
+            byte[] profileImageByteArray,
+            byte[] headerImageByteArray,
+            int version)
     {
-        this.username = username;
+        this.displayName = displayName;
         this.aboutMe = aboutMe;
         this.profileImageByteArray = profileImageByteArray;
         this.headerImageByteArray = headerImageByteArray;
         this.version = version;
     }
 
-    public String getUsername()
+    public String getDisplayName()
     {
-        return username;
+        return displayName;
     }
 
     public String getAboutMe()
@@ -52,7 +56,7 @@ public class ProfileWithImageData implements Serializable, ProtoSerializable, Ve
     @Override
     public byte[] toByteArray() {
         return IslandProto.Profile.newBuilder()
-                .setUsername(this.username)
+                .setDisplayName(this.displayName)
                 .setAboutMe(this.aboutMe)
                 .setProfileImage(ByteString.copyFrom(this.profileImageByteArray))
                 .setHeaderImage(ByteString.copyFrom(this.headerImageByteArray))
@@ -75,7 +79,7 @@ public class ProfileWithImageData implements Serializable, ProtoSerializable, Ve
         }
 
         return new ProfileWithImageData(
-                profile.getUsername(),
+                profile.getDisplayName(),
                 profile.getAboutMe(),
                 profile.getProfileImage().toByteArray(),
                 profile.getHeaderImage().toByteArray(),

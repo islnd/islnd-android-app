@@ -31,14 +31,14 @@ import io.islnd.android.islnd.app.util.Util;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
-    public static String USER_NAME_EXTRA = "USER_NAME";
+    public static String USER_ID_EXTRA = "USER_ID";
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout refreshLayout;
 
-    private String mProfileUsername;
+    private int mProfileUserId;
     private Profile mProfile;
     private Cursor mPostCursor;
     private Context mContext;
@@ -53,9 +53,8 @@ public class ProfileActivity extends AppCompatActivity {
         mContext = getApplicationContext();
 
         Intent profileIntent = getIntent();
-        mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        mProfile = DataUtils.getProfile(mContext, mProfileUsername);
-        int profileUserId = DataUtils.getUserId(mContext, mProfileUsername);
+        mProfileUserId = profileIntent.getIntExtra(USER_ID_EXTRA, -1);
+        mProfile = DataUtils.getProfile(mContext, mProfileUserId);
         showProfile();
         new GetProfileTask().execute();
 
@@ -66,16 +65,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         //--TODO this should use a loader
         String[] projection = new String[]{
-                IslndContract.UserEntry.COLUMN_USERNAME,
-                IslndContract.UserEntry.COLUMN_PSEUDONYM,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
-                IslndContract.PostEntry.COLUMN_USER_ID,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
         };
         mPostCursor = getContentResolver().query(
-                IslndContract.PostEntry.buildPostUriWithUserId(profileUserId),
+                IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),
                 projection,
                 null,
                 null,
@@ -103,7 +101,7 @@ public class ProfileActivity extends AppCompatActivity {
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
 
-        if(Util.isUser(this, mProfileUsername)) {
+        if(Util.isUser(this, mProfileUserId)) {
             editProfile.setVisibility(View.VISIBLE);
             editProfile.setOnClickListener((View v) -> {
                 startActivity(new Intent(this, EditProfileActivity.class));
@@ -113,7 +111,7 @@ public class ProfileActivity extends AppCompatActivity {
         aboutMe.setText(mProfile.getAboutMe());
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(mProfileUsername);
+        collapsingToolbar.setTitle(mProfile.getDisplayName());
         ImageUtil.setProfileImageSampled(mContext, profileImage, mProfile.getProfileImageUri());
         ImageUtil.setHeaderImageSampled(mContext, headerImage, mProfile.getHeaderImageUri());
 
@@ -132,7 +130,7 @@ public class ProfileActivity extends AppCompatActivity {
         inflater.inflate(R.menu.profile_menu, menu);
 
         // If this is the client user's profile, don't show menu
-        return !Util.isUser(this, mProfileUsername);
+        return !Util.isUser(this, mProfileUserId);
     }
 
     @Override
@@ -140,7 +138,7 @@ public class ProfileActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.remove_friend) {
-            Dialogs.removeFriendDialog(this, mProfileUsername);
+            Dialogs.removeFriendDialog(this, mProfileUserId, mProfile.getDisplayName());
             // TODO: What behavior do we want after removing friend?
             // Probably go back to feed.
         }
@@ -171,7 +169,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private class GetProfileTask extends AsyncTask<Void, Void, Void> {
         protected Void doInBackground(Void... params) {
-            mProfile = IslndDb.getMostRecentProfile(mContext, mProfileUsername);
+            mProfile = IslndDb.getMostRecentProfile(mContext, mProfileUserId);
 
             return null;
         }

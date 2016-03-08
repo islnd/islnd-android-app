@@ -137,4 +137,10 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
     public String getCommentId() {
         return commentId;
     }
+
+    @Override
+    public String toString() {
+        return String.format("postAuthorPseudonym: %d commentAuthorPseudonym: %d content %s",
+                this.postAuthorPseudonym, this.commentAuthorPseudonym, this.content);
+    }
 }

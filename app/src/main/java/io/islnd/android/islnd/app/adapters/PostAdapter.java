@@ -47,7 +47,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
     @Override
     public void onBindViewHolder(GlancePostViewHolder holder, Cursor cursor) {
         Post post = new Post(
-                cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
                 cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_POST_ID)),
                 cursor.getLong(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_TIMESTAMP)),
@@ -63,11 +63,11 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         // Go to profile on picture click
         holder.postProfileImage.setOnClickListener((View v) -> {
             Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
+            profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, post.getUserId());
             mContext.startActivity(profileIntent);
         });
 
-        Profile profile = DataUtils.getProfile(mContext, post.getUserName());
+        Profile profile = DataUtils.getProfile(mContext, post.getUserId());
         Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
@@ -78,7 +78,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             ((Activity)mContext).startActivityForResult(viewPostIntent, FeedFragment.DELETE_POST_RESULT);
         });
 
-        if(Util.isUser(mContext, post.getUserName())) {
+        if(Util.isUser(mContext, post.getUserId())) {
             holder.postOverflow.setVisibility(View.VISIBLE);
 
             holder.postOverflow.setOnClickListener((View v) -> {

@@ -29,7 +29,7 @@ public class ObjectSigner {
             byte[] decryptedDigest = CryptoUtil.decryptAsymmetric(decoder.decode(signature), key);
             return Arrays.equals(digest, decryptedDigest);
         } catch (DecryptionErrorException e) {
-            //--If we can't decrypt, the data may have been modified, or the key may be incorrect
+            //--If we can't decryptAndVerify, the data may have been modified, or the key may be incorrect
             return false;
         }
     }

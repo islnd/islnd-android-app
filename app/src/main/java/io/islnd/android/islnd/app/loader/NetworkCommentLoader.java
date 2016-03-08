@@ -39,12 +39,15 @@ public class NetworkCommentLoader extends AsyncTaskLoader<Void> {
                 postId);
 
         final PostKey postKey = new PostKey(postUserId, postId);
-        ContentValues[] values =
-                convertCommentsToContentValues(
-                        commentCollection.getCommentsGroupedByPostKey().get(
-                                postKey),
-                        postUserId,
-                        postId);
+        final List<Comment> commentUpdates = commentCollection.getCommentsGroupedByPostKey().get(postKey);
+        if (commentUpdates == null) {
+            return null;
+        }
+
+        ContentValues[] values = convertCommentsToContentValues(
+                commentUpdates,
+                postUserId,
+                postId);
 
         mContentResolver.bulkInsert(
                 IslndContract.CommentEntry.CONTENT_URI,

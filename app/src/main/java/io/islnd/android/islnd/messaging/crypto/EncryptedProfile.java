@@ -10,8 +10,8 @@ public class EncryptedProfile extends SymmetricEncryptedData {
     }
 
     @Override
-    public ProfileWithImageData decrypt(Key groupKey) {
-        SignedObject signedObject = this.getSignedObject(groupKey);
+    public ProfileWithImageData decryptAndVerify(Key groupKey, Key publicKey) throws InvalidSignatureException {
+        SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, publicKey);
         return ProfileWithImageData.fromProto(signedObject.getObject());
     }
 }

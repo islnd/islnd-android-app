@@ -1,13 +1,11 @@
 package io.islnd.android.islnd.app.util;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.zxing.BarcodeFormat;
@@ -79,23 +77,24 @@ public class Util
         return numberOfComments + " comments";
     }
 
-    public static boolean isUser(Context context, String userName)
+    public static boolean isUser(Context context, int userId)
     {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        String setUser = sharedPref.getString(context.getString(R.string.user_name), "");
-
-        return userName.equals(setUser);
+        return getUserId(context) == userId;
     }
 
-    public static String getUser(Context context)
-    {
+    public static int getUserId(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.user_name), "");
+        return sharedPref.getInt(context.getString(R.string.user_id), -1);
     }
 
-    public static String getPseudonym(Context context) {
+    public static String getDisplayName(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.pseudonym), "");
+        return sharedPref.getString(context.getString(R.string.display_name), "no display name in shared pref");
+    }
+
+    public static String getAlias(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.alias), "");
     }
 
     public static String getPseudonymSeed(Context context) {
@@ -109,29 +108,28 @@ public class Util
                 sharedPref.getString(context.getString(R.string.group_key), ""));
     }
 
+    public static Key getPublicKey(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return CryptoUtil.decodePublicKey(
+                sharedPref.getString(context.getString(R.string.public_key), ""));
+    }
+
     public static Key getPrivateKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePrivateKey(
                 sharedPref.getString(context.getString(R.string.private_key), ""));
     }
 
-    public static void setUser(Context context, String userName)
-    {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(context.getString(R.string.user_name), userName);
-        editor.commit();
-    }
-
     public static Profile saveProfileWithImageData(Context context, ProfileWithImageData profile) {
-        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromByteArray(context,
+        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
+                context,
                 profile.getProfileImageByteArray());
         Uri savedHeaderImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
                 context,
                 profile.getHeaderImageByteArray());
 
         return new Profile(
-                profile.getUsername(),
+                profile.getDisplayName(),
                 profile.getAboutMe(),
                 savedProfileImageUri,
                 savedHeaderImageUri,
@@ -201,10 +199,10 @@ public class Util
         qrImageView.setImageBitmap(bmp);
     }
 
-    public static Profile buildDefaultProfile(Context context, String username) {
+    public static Profile buildDefaultProfile(Context context, String displayName) {
         // TODO: default image Uris will probably be assets...
         return new Profile(
-                username,
+                displayName,
                 context.getString(R.string.profile_default_about_me),
                 ImageUtil.getDefaultProfileImageUri(context),
                 ImageUtil.getDefaultHeaderImageUri(context),

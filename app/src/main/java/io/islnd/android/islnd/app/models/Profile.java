@@ -11,25 +11,29 @@ import java.io.Serializable;
  */
 public class Profile implements Serializable, VersionedContent {
 
-    private String username = "";
-    private String aboutMe = "";
-    private Uri profileImageUri;
-    private Uri headerImageUri;
-    private int version;
+    private final String displayName;
+    private final String aboutMe;
+    private final Uri profileImageUri;
+    private final Uri headerImageUri;
+    private final int version;
 
-    public Profile(String username, String aboutMe, Uri profileImageUri, Uri headerImageUri,
-                   int version)
+    public Profile(
+            String displayName,
+            String aboutMe,
+            Uri profileImageUri,
+            Uri headerImageUri,
+            int version)
     {
-        this.username = username;
+        this.displayName = displayName;
         this.aboutMe = aboutMe;
         this.profileImageUri = profileImageUri;
         this.headerImageUri = headerImageUri;
         this.version = version;
     }
 
-    public String getUsername()
+    public String getDisplayName()
     {
-        return username;
+        return displayName;
     }
 
     public String getAboutMe()

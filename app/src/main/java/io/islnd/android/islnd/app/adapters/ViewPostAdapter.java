@@ -56,7 +56,7 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
         final CommentViewModel comment = new CommentViewModel(
-                cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
                 cursor.getInt(cursor.getColumnIndex(IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.CommentEntry.COLUMN_COMMENT_ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.CommentEntry.COLUMN_CONTENT)),
@@ -73,15 +73,15 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
                 (View v) ->
                 {
                     Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, comment.getUsername());
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, comment.getUserId());
                     mContext.startActivity(profileIntent);
                 });
 
-        Profile profile = DataUtils.getProfile(mContext, comment.getUsername());
+        Profile profile = DataUtils.getProfile(mContext, comment.getUserId());
         Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
 
-        if (Util.isUser(mContext, comment.getUsername())) {
+        if (Util.isUser(mContext, comment.getUserId())) {
             holder.overflow.setVisibility(View.VISIBLE);
 
             holder.overflow.setOnClickListener(

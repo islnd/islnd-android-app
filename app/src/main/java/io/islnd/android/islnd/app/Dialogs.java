@@ -10,14 +10,13 @@ public class Dialogs
 {
     private static final String TAG = Dialogs.class.getSimpleName();
 
-    public static void removeFriendDialog(Context context, String userName)
+    public static void removeFriendDialog(Context context, int userId, String displayName)
     {
-        final String removeFriend = userName;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("Remove " + userName + " as a friend?")
+        builder.setMessage("Remove " + displayName + " as a friend?")
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    IslndDb.removeReader(removeFriend);
+                    IslndDb.removeReader(userId);
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
