@@ -65,13 +65,13 @@ public class FeedFragment extends Fragment {
                     mRefreshLayout.setRefreshing(false);
                 });
 
-//        Account account = createSyncAccount(getContext());
-//        mResolver = getContext().getContentResolver();
-//        mResolver.setSyncAutomatically(
-//                account,
-//                getString(R.string.content_authority),
-//                true);
-//        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
+        Account account = createSyncAccount(getContext());
+        mResolver = getContext().getContentResolver();
+        mResolver.setSyncAutomatically(
+                account,
+                getString(R.string.content_authority),
+                true);
+        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
 
         // TODO: handle onclicks more betterer
         // Fab

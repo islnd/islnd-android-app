@@ -61,8 +61,8 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
 
         //--Get the posts
         String[] projection = {
-//                IslndContract.UserEntry.COLUMN_PSEUDONYM,
-//                IslndContract.UserEntry.COLUMN_GROUP_KEY,
+                IslndContract.AliasEntry.COLUMN_ALIAS,
+                IslndContract.AliasEntry.COLUMN_GROUP_KEY,
                 IslndContract.PostEntry.COLUMN_POST_ID,
         };
         Cursor cursor = mContentResolver.query(
@@ -74,7 +74,7 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
 
         List<CommentQuery> commentQueries = buildCommentQueries(cursor);
         for (CommentQuery commentQuery : commentQueries) {
-            Log.v(TAG, commentQuery.toString());
+            Log.v(TAG, "comment query" + commentQuery.toString());
         }
 
         //--Run query
@@ -94,21 +94,21 @@ public class CommentsSyncAdapter extends AbstractThreadedSyncAdapter {
                     mContext,
                     encryptedComment.getPostAuthorPseudonym());
             Key groupKey = DataUtils.getGroupKey(mContext, postAuthorId);
-            Key publicKey = DataUtils.getPublicKey(mContext, postAuthorId);
 
-            CommentUpdate commentUpdate = null;
-            try {
-                commentUpdate = encryptedComment.decryptAndVerify(
-                        groupKey,
-                        publicKey);
-            } catch (InvalidSignatureException e) {
-                Log.d(TAG, "could not verify comment " + commentUpdate);
-                e.printStackTrace();
-            }
-
+            CommentUpdate commentUpdate = encryptedComment.decrypt(groupKey);
             int commentAuthorId = DataUtils.getUserIdFromAlias(
                     mContext,
                     commentUpdate.getCommentAuthorPseudonym());
+            Key publicKey = DataUtils.getPublicKey(mContext, commentAuthorId);
+
+            try {
+                encryptedComment.decryptAndVerify(
+                        groupKey,
+                        publicKey);
+            } catch (InvalidSignatureException e) {
+                Log.d(TAG, "could not verify comment + " + commentUpdate);
+                e.printStackTrace();
+            }
 
             commentCollection.add(
                     postAuthorId,
