@@ -22,9 +22,11 @@ import io.islnd.android.islnd.app.models.User;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 
+import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.MessageLayer;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +80,7 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
 
         final List<User> filteredList = new ArrayList<>();
         for (User friend : friends) {
-            final String text = friend.getUserName().toLowerCase();
+            final String text = friend.getDisplayName().toLowerCase();
             if (text.contains(query)) {
                 filteredList.add(friend);
             }
@@ -104,26 +106,22 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
 
         private final String TAG = GetFriendsTask.class.getSimpleName();
 
-        SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(getContext());
-        String username = preferences.getString(getContext().getString(R.string.user_name), "");
-        String privateKey = preferences.getString(getContext().getString(R.string.private_key), "");
-
-        @Override
+        Key privateKey = Util.getPrivateKey(getContext());
         protected Void doInBackground(Void... params) {
-            MessageLayer.getReaders(getContext(), username, CryptoUtil.decodePrivateKey(
-                            privateKey));
+            //--Current all friends are added through QR codes
+            //  and texts, so we don't need to get readers from network
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             String[] projection = new String[] {
-                    IslndContract.UserEntry.COLUMN_USERNAME
+                    IslndContract.DisplayNameEntry.COLUMN_USER_ID,
+                    IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
             };
 
             Cursor cursor = getContext().getContentResolver().query(
-                    IslndContract.UserEntry.CONTENT_URI,
+                    IslndContract.DisplayNameEntry.CONTENT_URI,
                     projection,
                     null,
                     null,
@@ -136,8 +134,13 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
             List<User> allFriends = new ArrayList<>();
 
             do {
-                String username = cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME));
-                allFriends.add(new User(username));
+                int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_USER_ID));
+                if (Util.isUser(getContext(), userId)) {
+                    continue;
+                }
+
+                String displayName = cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
+                allFriends.add(new User(userId, displayName));
             } while (cursor.moveToNext());
 
             if (allFriends.size() > 0) {

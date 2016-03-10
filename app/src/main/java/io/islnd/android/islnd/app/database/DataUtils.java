@@ -7,44 +7,71 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostKey;
 
 import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.messaging.PseudonymKey;
+import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
 
 public class DataUtils {
-    public static long insertUser(Context context, PseudonymKey pk) {
-        return insertUser(context, pk.getUsername(), pk.getPseudonym(), pk.getKey());
+    public static long insertUser(Context context, Identity identity) {
+        return insertUser(
+                context,
+                identity.getDisplayName(),
+                identity.getAlias(),
+                identity.getGroupKey(),
+                identity.getPublicKey());
     }
 
-    public static long insertUser(Context context, String username, String pseudonym, Key groupKey) {
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.UserEntry.COLUMN_PSEUDONYM, pseudonym);
-        values.put(IslndContract.UserEntry.COLUMN_USERNAME, username);
-        values.put(IslndContract.UserEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(groupKey));
+    public static long insertUser(
+            Context context,
+            String displayName,
+            String alias,
+            Key groupKey,
+            Key publicKey) {
+        ContentValues userValues = new ContentValues();
+        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
 
-        Uri result = context.getContentResolver().insert(
+        final ContentResolver contentResolver = context.getContentResolver();
+        Uri result = contentResolver.insert(
                 IslndContract.UserEntry.CONTENT_URI,
-                values);
-        return ContentUris.parseId(result);
+                userValues);
+        long userId = ContentUris.parseId(result);
+
+        ContentValues displayNameValues = new ContentValues();
+        displayNameValues.put(IslndContract.DisplayNameEntry.COLUMN_USER_ID, userId);
+        displayNameValues.put(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME, displayName);
+        contentResolver.insert(
+                IslndContract.DisplayNameEntry.CONTENT_URI,
+                displayNameValues);
+
+        ContentValues aliasValues = new ContentValues();
+        aliasValues.put(IslndContract.AliasEntry.COLUMN_USER_ID, userId);
+        aliasValues.put(IslndContract.AliasEntry.COLUMN_ALIAS, alias);
+        aliasValues.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(groupKey));
+        aliasValues.put(IslndContract.AliasEntry.COLUMN_ALIAS_ID, -1);
+        contentResolver.insert(
+                IslndContract.AliasEntry.CONTENT_URI,
+                aliasValues);
+
+        return userId;
     }
 
-    public static String getPseudonym(Context context, int userId) {
+    public static String getMostRecentAlias(Context context, int userId) {
         String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_PSEUDONYM,
+                IslndContract.AliasEntry.COLUMN_ALIAS,
+                IslndContract.AliasEntry.COLUMN_ALIAS_ID
         };
 
         Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.AliasEntry.buildAliasWithUserId(userId),
                 projection,
-                IslndContract.UserEntry._ID + " = ?",
-                new String[]{Integer.toString(userId)},
-                null);
+                null,
+                null,
+                IslndContract.AliasEntry.COLUMN_ALIAS_ID + " DESC");
 
         try {
             if (cursor.moveToFirst()) {
@@ -54,69 +81,19 @@ public class DataUtils {
             return null;
         } finally {
             cursor.close();
-        }
-    }
-
-    public static String getPseudonym(Context context, String username) {
-        String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_PSEUDONYM,
-        };
-
-        Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
-                projection,
-                IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                new String[]{username},
-                null);
-
-        try {
-            if (cursor.moveToFirst()) {
-                return cursor.getString(0);
-            }
-
-            return null;
-        } finally {
-            cursor.close();
-        }
-    }
-
-    public static int getUserId(Context context, String username) {
-        String[] projection = new String[] {
-                IslndContract.UserEntry._ID,
-        };
-
-        Cursor cursor = null;
-
-        try {
-            cursor = context.getContentResolver().query(
-                    IslndContract.UserEntry.CONTENT_URI,
-                    projection,
-                    IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                    new String[] {username},
-                    null);
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(0);
-            }
-            else {
-                return -1;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
     public static Key getGroupKey(Context context, int userId) {
         String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_GROUP_KEY,
+                IslndContract.AliasEntry.COLUMN_GROUP_KEY,
         };
 
         Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.AliasEntry.buildAliasWithUserId(userId),
                 projection,
-                IslndContract.UserEntry._ID + " = ?",
-                new String[] {Integer.toString(userId)},
+                null,
+                null,
                 null);
 
         try {
@@ -130,21 +107,21 @@ public class DataUtils {
         }
     }
 
-    public static Key getGroupKey(Context context, String username) {
+    public static Key getPublicKey(Context context, int userId) {
         String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_GROUP_KEY,
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY
         };
 
         Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.UserEntry.buildUserWithUserId(userId),
                 projection,
-                IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                new String[] {username},
+                null,
+                null,
                 null);
 
         try {
             if (cursor.moveToFirst()) {
-                return CryptoUtil.decodeSymmetricKey(cursor.getString(0));
+                return CryptoUtil.decodePublicKey(cursor.getString(0));
             }
 
             return null;
@@ -153,24 +130,24 @@ public class DataUtils {
         }
     }
 
-    public static String getUsernameFromPseudonym(Context context, String pseudonym) {
+    public static int getUserIdFromAlias(Context context, String alias) {
         String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_USERNAME,
+                IslndContract.UserEntry._ID,
         };
 
         Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.AliasEntry.CONTENT_URI,
                 projection,
-                IslndContract.UserEntry.COLUMN_PSEUDONYM + " = ?",
-                new String[] {pseudonym},
+                IslndContract.AliasEntry.COLUMN_ALIAS + " = ?",
+                new String[] {alias},
                 null);
 
         try {
             if (cursor.moveToFirst()) {
-                return cursor.getString(0);
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException("database has no entry for alias: " + alias);
             }
-
-            return null;
         } finally {
             cursor.close();
         }
@@ -204,13 +181,9 @@ public class DataUtils {
         deleteComment(context.getContentResolver(), commentKey);
     }
 
-    public static Profile getProfile(Context context, String username) {
-        return getProfile(context, getUserId(context, username));
-    }
-
     public static Profile getProfile(Context context, int userId) {
         String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_USERNAME,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
                 IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
@@ -227,7 +200,7 @@ public class DataUtils {
                     null);
             if (cursor.moveToFirst()) {
                 return new Profile(
-                        cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME)),
+                        cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
                         cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME)),
                         Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))),
                         Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))),
@@ -272,6 +245,8 @@ public class DataUtils {
         contentResolver.delete(IslndContract.ProfileEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.PostEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {
@@ -286,5 +261,28 @@ public class DataUtils {
                 profile.getProfileImageUri().toString());
 
         context.getContentResolver().insert(IslndContract.ProfileEntry.CONTENT_URI, values);
+    }
+
+    public static int getUserIdFromPublicKey(Context context, Key publicKey) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry._ID,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.UserEntry.CONTENT_URI,
+                projection,
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?",
+                new String[] {CryptoUtil.encodeKey(publicKey)},
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException("database has no entry for public key: " + publicKey);
+            }
+        } finally {
+            cursor.close();
+        }
     }
 }

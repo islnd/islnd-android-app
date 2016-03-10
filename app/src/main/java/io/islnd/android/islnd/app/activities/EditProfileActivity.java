@@ -1,5 +1,6 @@
 package io.islnd.android.islnd.app.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final int SELECT_HEADER_IMAGE = 2;
     private static final int CROP_PROFILE_IMAGE = 3;
     private static final int CROP_HEADER_IMAGE = 4;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +48,11 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mContext = getApplicationContext();
 
-        Profile profile = DataUtils.getProfile(getApplicationContext(), Util.getUser(getApplicationContext()));
+        Profile profile = DataUtils.getProfile(
+                getApplicationContext(),
+                Util.getUserId(getApplicationContext()));
 
         TextView userName = (TextView) findViewById(R.id.profile_user_name);
         profileImage = (ImageView) findViewById(R.id.profile_profile_image);
@@ -57,7 +62,7 @@ public class EditProfileActivity extends AppCompatActivity {
         prevProfileImageUri = profile.getProfileImageUri();
         prevHeaderImageUri = profile.getHeaderImageUri();
 
-        userName.setText(profile.getUsername());
+        userName.setText(profile.getDisplayName());
         aboutMe.setText(profile.getAboutMe());
 
         ImageUtil.setProfileImageSampled(getApplicationContext(), profileImage,
@@ -92,36 +97,38 @@ public class EditProfileActivity extends AppCompatActivity {
 
     public void saveProfile(View view) {
         String newAboutMeText = aboutMe.getText().toString();
-        String myUsername = Util.getUser(getApplicationContext());
+        String myDisplayName = Util.getDisplayName(mContext);
 
         // TODO: Implement separate REST calls for profile/header images
         Uri newProfileUri = profileImageUri == null ? prevProfileImageUri : profileImageUri;
         Uri newHeaderUri = headerImageUri == null ? prevHeaderImageUri : headerImageUri;
 
         ProfileWithImageData newProfileWithImageData = VersionedContentBuilder.buildProfile(
-                getApplicationContext(),
-                myUsername,
+                mContext,
+                myDisplayName,
                 newAboutMeText,
                 ImageUtil.getByteArrayFromUri(getApplicationContext(), newProfileUri),
                 ImageUtil.getByteArrayFromUri(getApplicationContext(), newHeaderUri)
         );
 
         // TODO: This saves a new image every time. Will change with new REST calls.
-        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromUri(getApplicationContext(),
+        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromUri(
+                mContext,
                 newProfileUri);
-        Uri savedHeaderImageUri = ImageUtil.saveBitmapToInternalFromUri(getApplicationContext(),
+        Uri savedHeaderImageUri = ImageUtil.saveBitmapToInternalFromUri(
+                mContext,
                 newHeaderUri);
 
         Profile newProfile = new Profile(
-                myUsername,
+                myDisplayName,
                 newAboutMeText,
                 savedProfileImageUri,
                 savedHeaderImageUri,
                 newProfileWithImageData.getVersion()
         );
 
-        int userId = DataUtils.getUserId(getApplicationContext(), myUsername);
-        DataUtils.updateProfile(getApplicationContext(), newProfile, userId);
+        int myUserId = Util.getUserId(mContext);
+        DataUtils.updateProfile(getApplicationContext(), newProfile, myUserId);
         IslndDb.postProfile(getApplicationContext(), newProfileWithImageData);
 
         Snackbar.make(view, getString(R.string.profile_saved), Snackbar.LENGTH_SHORT).show();

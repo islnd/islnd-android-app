@@ -11,9 +11,18 @@ public abstract class SymmetricEncryptedData<T extends ProtoSerializable> extend
         blob = ObjectEncrypter.encryptSymmetric(signedObject, groupKey);
     }
 
-    public abstract T decrypt(Key groupKey);
+    public abstract T decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException;
 
     protected SignedObject getSignedObject(Key groupKey) {
         return SignedObject.fromProto(ObjectEncrypter.decryptSymmetric(this.getBlob(), groupKey));
+    }
+
+    protected SignedObject getSignedAndVerifiedObject(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
+        SignedObject signedObject = SignedObject.fromProto(ObjectEncrypter.decryptSymmetric(this.getBlob(), groupKey));
+        if (!ObjectSigner.verify(signedObject, authorPublicKey)) {
+            throw new InvalidSignatureException();
+        }
+
+        return signedObject;
     }
 }

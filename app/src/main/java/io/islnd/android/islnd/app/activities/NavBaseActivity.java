@@ -1,8 +1,11 @@
 package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,8 +36,8 @@ import android.widget.TextView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
@@ -57,6 +60,7 @@ public class NavBaseActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
     private View mDialogView = null;
+    private ContentResolver mResolver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,15 @@ public class NavBaseActivity extends AppCompatActivity
         Fragment fragment = new FeedFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+        // Create sync account and force sync
+        Account account = createSyncAccount(this);
+        mResolver = getContentResolver();
+        mResolver.setSyncAutomatically(
+                account,
+                getString(R.string.content_authority),
+                true);
+        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
     private void onCreateDrawer() {
@@ -87,18 +100,19 @@ public class NavBaseActivity extends AppCompatActivity
         ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
         ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        String userName = Util.getUser(NavBaseActivity.this);
+        String myDisplayName = Util.getDisplayName(this);
 
         navProfileImage.setOnClickListener(
                 (View v) -> {
-                    Intent profileIntent = new Intent(NavBaseActivity.this, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
+                    Intent profileIntent = new Intent(this, ProfileActivity.class);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myDisplayName);
                     startActivity(profileIntent);
                 });
-        navUserName.setText(userName);
+        navUserName.setText(myDisplayName);
 
-        Profile profile = DataUtils.getProfile(getApplicationContext(), userName);
-        if (profile != null) {
+        int myUserId = Util.getUserId(this);
+        if (myUserId >= 0) {
+            Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
             Uri profileImageUri = profile.getProfileImageUri();
             Uri headerImageUri = profile.getHeaderImageUri();
             ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
@@ -131,7 +145,7 @@ public class NavBaseActivity extends AppCompatActivity
                 break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Util.getUser(this));
+                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, Util.getUserId(this));
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
@@ -263,7 +277,8 @@ public class NavBaseActivity extends AppCompatActivity
 
         mSmsEditText = (EditText) mDialogView.findViewById(R.id.sms_number_edit_text);
 
-        builder.setPositiveButton(getString(R.string.send), (DialogInterface dialog, int id) -> {
+        builder.setPositiveButton(
+                getString(R.string.send), (DialogInterface dialog, int id) -> {
                     sendSms(mSmsEditText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -343,7 +358,7 @@ public class NavBaseActivity extends AppCompatActivity
         String contactNumber = null;
 
         // getting contacts ID
-        ContentResolver cr = getContentResolver();
+        ContentResolver cr = mResolver;
         Cursor cursorID = cr.query(uriContact,
                 new String[]{ContactsContract.Contacts._ID},
                 null, null, null);
@@ -352,7 +367,7 @@ public class NavBaseActivity extends AppCompatActivity
             String contactId =
                     cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
 
-            Cursor cursorPhone = getContentResolver().query(
+            Cursor cursorPhone = mResolver.query(
                     ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                     new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
 
@@ -405,5 +420,16 @@ public class NavBaseActivity extends AppCompatActivity
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    public static Account createSyncAccount(Context context) {
+        Account newAccount = new Account(
+                context.getString(R.string.sync_account),
+                context.getString(R.string.sync_account_type));
+
+        AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
+        accountManager.addAccountExplicitly(newAccount, null, null);
+
+        return newAccount;
     }
 }

@@ -10,8 +10,8 @@ public class EncryptedPost extends SymmetricEncryptedData {
     }
 
     @Override
-    public PostUpdate decrypt(Key groupKey) {
-        SignedObject signedObject = this.getSignedObject(groupKey);
+    public PostUpdate decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
+        SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);
         return PostUpdate.fromProto(signedObject.getObject());
     }
 }

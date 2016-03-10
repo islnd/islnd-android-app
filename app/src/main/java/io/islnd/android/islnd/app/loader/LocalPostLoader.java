@@ -23,13 +23,12 @@ public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = new String[]{
-                IslndContract.UserEntry.COLUMN_USERNAME,
-                IslndContract.UserEntry.COLUMN_PSEUDONYM,
                 IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
-                IslndContract.PostEntry.COLUMN_USER_ID,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
         };
 
         return new CursorLoader(

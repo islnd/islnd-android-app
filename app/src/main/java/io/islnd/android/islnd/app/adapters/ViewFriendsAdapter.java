@@ -48,17 +48,17 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     {
         User user = mList.get(position);
 
-        holder.userName.setText(user.getUserName());
+        holder.userName.setText(user.getDisplayName());
 
         // Go to profile on view click
         holder.itemView.setOnClickListener((View v) ->
         {
             Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, user.getUserName());
+            profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, user.getUserId());
             mContext.startActivity(profileIntent);
         });
 
-        Profile profile = DataUtils.getProfile(mContext, user.getUserName());
+        Profile profile = DataUtils.getProfile(mContext, user.getUserId());
         Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setViewFriendImageSampled(mContext, holder.profileImage, profileImageUri);
 
@@ -80,7 +80,7 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
                 switch (item.getItemId())
                 {
                     case REMOVE_FRIEND:
-                        Dialogs.removeFriendDialog(mContext, user.getUserName());
+                        Dialogs.removeFriendDialog(mContext, user.getUserId(), user.getDisplayName());
                         // TODO: Update UI to show user was removed
                     case ALLOW_USER:
                         Dialogs.allowUserDialog(mContext);

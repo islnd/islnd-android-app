@@ -3,79 +3,99 @@
 
 package io.islnd.android.islnd.messaging.proto;
 
-import com.google.protobuf.AbstractMessage;
-
 public final class IslandProto {
   private IslandProto() {}
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface PseudonymKeyOrBuilder
+  public interface IdentityOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
-    // required int64 unique_id = 1;
-    boolean hasUniqueId();
-    long getUniqueId();
+    // required string display_name = 1;
+    boolean hasDisplayName();
+    String getDisplayName();
     
-    // required string username = 2;
-    boolean hasUsername();
-    String getUsername();
+    // required string alias = 2;
+    boolean hasAlias();
+    String getAlias();
     
-    // required string pseudonym = 3;
-    boolean hasPseudonym();
-    String getPseudonym();
+    // required string group_key = 3;
+    boolean hasGroupKey();
+    String getGroupKey();
     
-    // required string key = 4;
-    boolean hasKey();
-    String getKey();
+    // required string public_key = 4;
+    boolean hasPublicKey();
+    String getPublicKey();
   }
-  public static final class PseudonymKey extends
+  public static final class Identity extends
       com.google.protobuf.GeneratedMessage
-      implements PseudonymKeyOrBuilder {
-    // Use PseudonymKey.newBuilder() to construct.
-    private PseudonymKey(Builder builder) {
+      implements IdentityOrBuilder {
+    // Use Identity.newBuilder() to construct.
+    private Identity(Builder builder) {
       super(builder);
     }
-    private PseudonymKey(boolean noInit) {}
+    private Identity(boolean noInit) {}
     
-    private static final PseudonymKey defaultInstance;
-    public static PseudonymKey getDefaultInstance() {
+    private static final Identity defaultInstance;
+    public static Identity getDefaultInstance() {
       return defaultInstance;
     }
     
-    public PseudonymKey getDefaultInstanceForType() {
+    public Identity getDefaultInstanceForType() {
       return defaultInstance;
     }
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return IslandProto.internal_static_proto_PseudonymKey_descriptor;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return IslandProto.internal_static_proto_PseudonymKey_fieldAccessorTable;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_fieldAccessorTable;
     }
     
     private int bitField0_;
-    // required int64 unique_id = 1;
-    public static final int UNIQUE_ID_FIELD_NUMBER = 1;
-    private long uniqueId_;
-    public boolean hasUniqueId() {
+    // required string display_name = 1;
+    public static final int DISPLAY_NAME_FIELD_NUMBER = 1;
+    private java.lang.Object displayName_;
+    public boolean hasDisplayName() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-    public long getUniqueId() {
-      return uniqueId_;
+    public String getDisplayName() {
+      java.lang.Object ref = displayName_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          displayName_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getDisplayNameBytes() {
+      java.lang.Object ref = displayName_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        displayName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
     
-    // required string username = 2;
-    public static final int USERNAME_FIELD_NUMBER = 2;
-    private java.lang.Object username_;
-    public boolean hasUsername() {
+    // required string alias = 2;
+    public static final int ALIAS_FIELD_NUMBER = 2;
+    private java.lang.Object alias_;
+    public boolean hasAlias() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-    public String getUsername() {
-      java.lang.Object ref = username_;
+    public String getAlias() {
+      java.lang.Object ref = alias_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -83,31 +103,31 @@ public final class IslandProto {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          username_ = s;
+          alias_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getUsernameBytes() {
-      java.lang.Object ref = username_;
+    private com.google.protobuf.ByteString getAliasBytes() {
+      java.lang.Object ref = alias_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        username_ = b;
+        alias_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     
-    // required string pseudonym = 3;
-    public static final int PSEUDONYM_FIELD_NUMBER = 3;
-    private java.lang.Object pseudonym_;
-    public boolean hasPseudonym() {
+    // required string group_key = 3;
+    public static final int GROUP_KEY_FIELD_NUMBER = 3;
+    private java.lang.Object groupKey_;
+    public boolean hasGroupKey() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-    public String getPseudonym() {
-      java.lang.Object ref = pseudonym_;
+    public String getGroupKey() {
+      java.lang.Object ref = groupKey_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -115,31 +135,31 @@ public final class IslandProto {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          pseudonym_ = s;
+          groupKey_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getPseudonymBytes() {
-      java.lang.Object ref = pseudonym_;
+    private com.google.protobuf.ByteString getGroupKeyBytes() {
+      java.lang.Object ref = groupKey_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        pseudonym_ = b;
+        groupKey_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     
-    // required string key = 4;
-    public static final int KEY_FIELD_NUMBER = 4;
-    private java.lang.Object key_;
-    public boolean hasKey() {
+    // required string public_key = 4;
+    public static final int PUBLIC_KEY_FIELD_NUMBER = 4;
+    private java.lang.Object publicKey_;
+    public boolean hasPublicKey() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
-    public String getKey() {
-      java.lang.Object ref = key_;
+    public String getPublicKey() {
+      java.lang.Object ref = publicKey_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -147,17 +167,17 @@ public final class IslandProto {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          key_ = s;
+          publicKey_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getKeyBytes() {
-      java.lang.Object ref = key_;
+    private com.google.protobuf.ByteString getPublicKeyBytes() {
+      java.lang.Object ref = publicKey_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        key_ = b;
+        publicKey_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -165,29 +185,29 @@ public final class IslandProto {
     }
     
     private void initFields() {
-      uniqueId_ = 0L;
-      username_ = "";
-      pseudonym_ = "";
-      key_ = "";
+      displayName_ = "";
+      alias_ = "";
+      groupKey_ = "";
+      publicKey_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
-      if (!hasUniqueId()) {
+      if (!hasDisplayName()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasUsername()) {
+      if (!hasAlias()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasPseudonym()) {
+      if (!hasGroupKey()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasKey()) {
+      if (!hasPublicKey()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -199,16 +219,16 @@ public final class IslandProto {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt64(1, uniqueId_);
+        output.writeBytes(1, getDisplayNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getUsernameBytes());
+        output.writeBytes(2, getAliasBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getPseudonymBytes());
+        output.writeBytes(3, getGroupKeyBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getKeyBytes());
+        output.writeBytes(4, getPublicKeyBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -221,19 +241,19 @@ public final class IslandProto {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, uniqueId_);
+          .computeBytesSize(1, getDisplayNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getUsernameBytes());
+          .computeBytesSize(2, getAliasBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getPseudonymBytes());
+          .computeBytesSize(3, getGroupKeyBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getKeyBytes());
+          .computeBytesSize(4, getPublicKeyBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -247,41 +267,41 @@ public final class IslandProto {
       return super.writeReplace();
     }
     
-    public static IslandProto.PseudonymKey parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.PseudonymKey parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.PseudonymKey parseFrom(byte[] data)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.PseudonymKey parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.PseudonymKey parseFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.PseudonymKey parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.PseudonymKey parseDelimitedFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -290,7 +310,7 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.PseudonymKey parseDelimitedFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -301,12 +321,12 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.PseudonymKey parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.PseudonymKey parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -316,7 +336,7 @@ public final class IslandProto {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(IslandProto.PseudonymKey prototype) {
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.Identity prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -329,18 +349,18 @@ public final class IslandProto {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements IslandProto.PseudonymKeyOrBuilder {
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.IdentityOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return IslandProto.internal_static_proto_PseudonymKey_descriptor;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return IslandProto.internal_static_proto_PseudonymKey_fieldAccessorTable;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_fieldAccessorTable;
       }
       
-      // Construct using IslandProto.PseudonymKey.newBuilder()
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.Identity.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -359,13 +379,13 @@ public final class IslandProto {
       
       public Builder clear() {
         super.clear();
-        uniqueId_ = 0L;
+        displayName_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        username_ = "";
+        alias_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        pseudonym_ = "";
+        groupKey_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
-        key_ = "";
+        publicKey_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
@@ -376,97 +396,97 @@ public final class IslandProto {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return IslandProto.PseudonymKey.getDescriptor();
+        return io.islnd.android.islnd.messaging.proto.IslandProto.Identity.getDescriptor();
       }
       
-      public IslandProto.PseudonymKey getDefaultInstanceForType() {
-        return IslandProto.PseudonymKey.getDefaultInstance();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.Identity getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.Identity.getDefaultInstance();
       }
       
-      public IslandProto.PseudonymKey build() {
-        IslandProto.PseudonymKey result = buildPartial();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.Identity build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.Identity result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(result);
+          throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private IslandProto.PseudonymKey buildParsed()
+      private io.islnd.android.islnd.messaging.proto.IslandProto.Identity buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        IslandProto.PseudonymKey result = buildPartial();
+        io.islnd.android.islnd.messaging.proto.IslandProto.Identity result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(
-                  result).asInvalidProtocolBufferException();
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
         }
         return result;
       }
       
-      public IslandProto.PseudonymKey buildPartial() {
-        IslandProto.PseudonymKey result = new IslandProto.PseudonymKey(this);
+      public io.islnd.android.islnd.messaging.proto.IslandProto.Identity buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.Identity result = new io.islnd.android.islnd.messaging.proto.IslandProto.Identity(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.uniqueId_ = uniqueId_;
+        result.displayName_ = displayName_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.username_ = username_;
+        result.alias_ = alias_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.pseudonym_ = pseudonym_;
+        result.groupKey_ = groupKey_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.key_ = key_;
+        result.publicKey_ = publicKey_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof IslandProto.PseudonymKey) {
-          return mergeFrom((IslandProto.PseudonymKey)other);
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.Identity) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.Identity)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(IslandProto.PseudonymKey other) {
-        if (other == IslandProto.PseudonymKey.getDefaultInstance()) return this;
-        if (other.hasUniqueId()) {
-          setUniqueId(other.getUniqueId());
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.Identity other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.Identity.getDefaultInstance()) return this;
+        if (other.hasDisplayName()) {
+          setDisplayName(other.getDisplayName());
         }
-        if (other.hasUsername()) {
-          setUsername(other.getUsername());
+        if (other.hasAlias()) {
+          setAlias(other.getAlias());
         }
-        if (other.hasPseudonym()) {
-          setPseudonym(other.getPseudonym());
+        if (other.hasGroupKey()) {
+          setGroupKey(other.getGroupKey());
         }
-        if (other.hasKey()) {
-          setKey(other.getKey());
+        if (other.hasPublicKey()) {
+          setPublicKey(other.getPublicKey());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
       
       public final boolean isInitialized() {
-        if (!hasUniqueId()) {
+        if (!hasDisplayName()) {
           
           return false;
         }
-        if (!hasUsername()) {
+        if (!hasAlias()) {
           
           return false;
         }
-        if (!hasPseudonym()) {
+        if (!hasGroupKey()) {
           
           return false;
         }
-        if (!hasKey()) {
+        if (!hasPublicKey()) {
           
           return false;
         }
@@ -496,24 +516,24 @@ public final class IslandProto {
               }
               break;
             }
-            case 8: {
+            case 10: {
               bitField0_ |= 0x00000001;
-              uniqueId_ = input.readInt64();
+              displayName_ = input.readBytes();
               break;
             }
             case 18: {
               bitField0_ |= 0x00000002;
-              username_ = input.readBytes();
+              alias_ = input.readBytes();
               break;
             }
             case 26: {
               bitField0_ |= 0x00000004;
-              pseudonym_ = input.readBytes();
+              groupKey_ = input.readBytes();
               break;
             }
             case 34: {
               bitField0_ |= 0x00000008;
-              key_ = input.readBytes();
+              publicKey_ = input.readBytes();
               break;
             }
           }
@@ -522,144 +542,159 @@ public final class IslandProto {
       
       private int bitField0_;
       
-      // required int64 unique_id = 1;
-      private long uniqueId_ ;
-      public boolean hasUniqueId() {
+      // required string display_name = 1;
+      private java.lang.Object displayName_ = "";
+      public boolean hasDisplayName() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public long getUniqueId() {
-        return uniqueId_;
-      }
-      public Builder setUniqueId(long value) {
-        bitField0_ |= 0x00000001;
-        uniqueId_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearUniqueId() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        uniqueId_ = 0L;
-        onChanged();
-        return this;
-      }
-      
-      // required string username = 2;
-      private java.lang.Object username_ = "";
-      public boolean hasUsername() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      public String getUsername() {
-        java.lang.Object ref = username_;
+      public String getDisplayName() {
+        java.lang.Object ref = displayName_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          username_ = s;
+          displayName_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setUsername(String value) {
+      public Builder setDisplayName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        displayName_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearDisplayName() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        displayName_ = getDefaultInstance().getDisplayName();
+        onChanged();
+        return this;
+      }
+      void setDisplayName(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000001;
+        displayName_ = value;
+        onChanged();
+      }
+      
+      // required string alias = 2;
+      private java.lang.Object alias_ = "";
+      public boolean hasAlias() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getAlias() {
+        java.lang.Object ref = alias_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          alias_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setAlias(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        username_ = value;
+        alias_ = value;
         onChanged();
         return this;
       }
-      public Builder clearUsername() {
+      public Builder clearAlias() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        username_ = getDefaultInstance().getUsername();
+        alias_ = getDefaultInstance().getAlias();
         onChanged();
         return this;
       }
-      void setUsername(com.google.protobuf.ByteString value) {
+      void setAlias(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000002;
-        username_ = value;
+        alias_ = value;
         onChanged();
       }
       
-      // required string pseudonym = 3;
-      private java.lang.Object pseudonym_ = "";
-      public boolean hasPseudonym() {
+      // required string group_key = 3;
+      private java.lang.Object groupKey_ = "";
+      public boolean hasGroupKey() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public String getPseudonym() {
-        java.lang.Object ref = pseudonym_;
+      public String getGroupKey() {
+        java.lang.Object ref = groupKey_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          pseudonym_ = s;
+          groupKey_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setPseudonym(String value) {
+      public Builder setGroupKey(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000004;
-        pseudonym_ = value;
+        groupKey_ = value;
         onChanged();
         return this;
       }
-      public Builder clearPseudonym() {
+      public Builder clearGroupKey() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        pseudonym_ = getDefaultInstance().getPseudonym();
+        groupKey_ = getDefaultInstance().getGroupKey();
         onChanged();
         return this;
       }
-      void setPseudonym(com.google.protobuf.ByteString value) {
+      void setGroupKey(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000004;
-        pseudonym_ = value;
+        groupKey_ = value;
         onChanged();
       }
       
-      // required string key = 4;
-      private java.lang.Object key_ = "";
-      public boolean hasKey() {
+      // required string public_key = 4;
+      private java.lang.Object publicKey_ = "";
+      public boolean hasPublicKey() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
-      public String getKey() {
-        java.lang.Object ref = key_;
+      public String getPublicKey() {
+        java.lang.Object ref = publicKey_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          key_ = s;
+          publicKey_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setKey(String value) {
+      public Builder setPublicKey(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000008;
-        key_ = value;
+        publicKey_ = value;
         onChanged();
         return this;
       }
-      public Builder clearKey() {
+      public Builder clearPublicKey() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        key_ = getDefaultInstance().getKey();
+        publicKey_ = getDefaultInstance().getPublicKey();
         onChanged();
         return this;
       }
-      void setKey(com.google.protobuf.ByteString value) {
+      void setPublicKey(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000008;
-        key_ = value;
+        publicKey_ = value;
         onChanged();
       }
       
-      // @@protoc_insertion_point(builder_scope:proto.PseudonymKey)
+      // @@protoc_insertion_point(builder_scope:proto.Identity)
     }
     
     static {
-      defaultInstance = new PseudonymKey(true);
+      defaultInstance = new Identity(true);
       defaultInstance.initFields();
     }
     
-    // @@protoc_insertion_point(class_scope:proto.PseudonymKey)
+    // @@protoc_insertion_point(class_scope:proto.Identity)
   }
   
   public interface SignedObjectOrBuilder
@@ -693,12 +728,12 @@ public final class IslandProto {
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return IslandProto.internal_static_proto_SignedObject_descriptor;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SignedObject_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return IslandProto.internal_static_proto_SignedObject_fieldAccessorTable;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SignedObject_fieldAccessorTable;
     }
     
     private int bitField0_;
@@ -825,41 +860,41 @@ public final class IslandProto {
       return super.writeReplace();
     }
     
-    public static IslandProto.SignedObject parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.SignedObject parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.SignedObject parseFrom(byte[] data)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.SignedObject parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.SignedObject parseFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.SignedObject parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.SignedObject parseDelimitedFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -868,7 +903,7 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.SignedObject parseDelimitedFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -879,12 +914,12 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.SignedObject parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.SignedObject parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -894,7 +929,7 @@ public final class IslandProto {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(IslandProto.SignedObject prototype) {
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -907,18 +942,18 @@ public final class IslandProto {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements IslandProto.SignedObjectOrBuilder {
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.SignedObjectOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return IslandProto.internal_static_proto_SignedObject_descriptor;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SignedObject_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return IslandProto.internal_static_proto_SignedObject_fieldAccessorTable;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SignedObject_fieldAccessorTable;
       }
       
-      // Construct using IslandProto.SignedObject.newBuilder()
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -950,33 +985,33 @@ public final class IslandProto {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return IslandProto.SignedObject.getDescriptor();
+        return io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.getDescriptor();
       }
       
-      public IslandProto.SignedObject getDefaultInstanceForType() {
-        return IslandProto.SignedObject.getDefaultInstance();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.getDefaultInstance();
       }
       
-      public IslandProto.SignedObject build() {
-        IslandProto.SignedObject result = buildPartial();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(result);
+          throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private IslandProto.SignedObject buildParsed()
+      private io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        IslandProto.SignedObject result = buildPartial();
+        io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(
-                  result).asInvalidProtocolBufferException();
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
         }
         return result;
       }
       
-      public IslandProto.SignedObject buildPartial() {
-        IslandProto.SignedObject result = new IslandProto.SignedObject(this);
+      public io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject result = new io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -993,16 +1028,16 @@ public final class IslandProto {
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof IslandProto.SignedObject) {
-          return mergeFrom((IslandProto.SignedObject)other);
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(IslandProto.SignedObject other) {
-        if (other == IslandProto.SignedObject.getDefaultInstance()) return this;
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.getDefaultInstance()) return this;
         if (other.hasObject()) {
           setObject(other.getObject());
         }
@@ -1186,12 +1221,12 @@ public final class IslandProto {
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return IslandProto.internal_static_proto_PostUpdate_descriptor;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PostUpdate_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return IslandProto.internal_static_proto_PostUpdate_fieldAccessorTable;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PostUpdate_fieldAccessorTable;
     }
     
     private int bitField0_;
@@ -1362,41 +1397,41 @@ public final class IslandProto {
       return super.writeReplace();
     }
     
-    public static IslandProto.PostUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.PostUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.PostUpdate parseFrom(byte[] data)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.PostUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.PostUpdate parseFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.PostUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.PostUpdate parseDelimitedFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -1405,7 +1440,7 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.PostUpdate parseDelimitedFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1416,12 +1451,12 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.PostUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.PostUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1431,7 +1466,7 @@ public final class IslandProto {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(IslandProto.PostUpdate prototype) {
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -1444,18 +1479,18 @@ public final class IslandProto {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements IslandProto.PostUpdateOrBuilder {
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdateOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return IslandProto.internal_static_proto_PostUpdate_descriptor;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PostUpdate_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return IslandProto.internal_static_proto_PostUpdate_fieldAccessorTable;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PostUpdate_fieldAccessorTable;
       }
       
-      // Construct using IslandProto.PostUpdate.newBuilder()
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -1491,33 +1526,33 @@ public final class IslandProto {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return IslandProto.PostUpdate.getDescriptor();
+        return io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate.getDescriptor();
       }
       
-      public IslandProto.PostUpdate getDefaultInstanceForType() {
-        return IslandProto.PostUpdate.getDefaultInstance();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate.getDefaultInstance();
       }
       
-      public IslandProto.PostUpdate build() {
-        IslandProto.PostUpdate result = buildPartial();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(result);
+          throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private IslandProto.PostUpdate buildParsed()
+      private io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        IslandProto.PostUpdate result = buildPartial();
+        io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(
-                  result).asInvalidProtocolBufferException();
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
         }
         return result;
       }
       
-      public IslandProto.PostUpdate buildPartial() {
-        IslandProto.PostUpdate result = new IslandProto.PostUpdate(this);
+      public io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate result = new io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -1542,16 +1577,16 @@ public final class IslandProto {
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof IslandProto.PostUpdate) {
-          return mergeFrom((IslandProto.PostUpdate)other);
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(IslandProto.PostUpdate other) {
-        if (other == IslandProto.PostUpdate.getDefaultInstance()) return this;
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate.getDefaultInstance()) return this;
         if (other.hasIsDelete()) {
           setIsDelete(other.getIsDelete());
         }
@@ -1813,12 +1848,12 @@ public final class IslandProto {
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return IslandProto.internal_static_proto_CommentUpdate_descriptor;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_CommentUpdate_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return IslandProto.internal_static_proto_CommentUpdate_fieldAccessorTable;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_CommentUpdate_fieldAccessorTable;
     }
     
     private int bitField0_;
@@ -2121,41 +2156,41 @@ public final class IslandProto {
       return super.writeReplace();
     }
     
-    public static IslandProto.CommentUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.CommentUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.CommentUpdate parseFrom(byte[] data)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.CommentUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.CommentUpdate parseFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.CommentUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.CommentUpdate parseDelimitedFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -2164,7 +2199,7 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.CommentUpdate parseDelimitedFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -2175,12 +2210,12 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.CommentUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.CommentUpdate parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -2190,7 +2225,7 @@ public final class IslandProto {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(IslandProto.CommentUpdate prototype) {
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -2203,18 +2238,18 @@ public final class IslandProto {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements IslandProto.CommentUpdateOrBuilder {
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdateOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return IslandProto.internal_static_proto_CommentUpdate_descriptor;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_CommentUpdate_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return IslandProto.internal_static_proto_CommentUpdate_fieldAccessorTable;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_CommentUpdate_fieldAccessorTable;
       }
       
-      // Construct using IslandProto.CommentUpdate.newBuilder()
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -2256,33 +2291,33 @@ public final class IslandProto {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return IslandProto.CommentUpdate.getDescriptor();
+        return io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate.getDescriptor();
       }
       
-      public IslandProto.CommentUpdate getDefaultInstanceForType() {
-        return IslandProto.CommentUpdate.getDefaultInstance();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate.getDefaultInstance();
       }
       
-      public IslandProto.CommentUpdate build() {
-        IslandProto.CommentUpdate result = buildPartial();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(result);
+          throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private IslandProto.CommentUpdate buildParsed()
+      private io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        IslandProto.CommentUpdate result = buildPartial();
+        io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(
-                  result).asInvalidProtocolBufferException();
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
         }
         return result;
       }
       
-      public IslandProto.CommentUpdate buildPartial() {
-        IslandProto.CommentUpdate result = new IslandProto.CommentUpdate(this);
+      public io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate result = new io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -2319,16 +2354,16 @@ public final class IslandProto {
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof IslandProto.CommentUpdate) {
-          return mergeFrom((IslandProto.CommentUpdate)other);
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(IslandProto.CommentUpdate other) {
-        if (other == IslandProto.CommentUpdate.getDefaultInstance()) return this;
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate.getDefaultInstance()) return this;
         if (other.hasIsDelete()) {
           setIsDelete(other.getIsDelete());
         }
@@ -2686,9 +2721,9 @@ public final class IslandProto {
   public interface ProfileOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
-    // required string username = 1;
-    boolean hasUsername();
-    String getUsername();
+    // required string display_name = 1;
+    boolean hasDisplayName();
+    String getDisplayName();
     
     // required string about_me = 2;
     boolean hasAboutMe();
@@ -2726,23 +2761,23 @@ public final class IslandProto {
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return IslandProto.internal_static_proto_Profile_descriptor;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Profile_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return IslandProto.internal_static_proto_Profile_fieldAccessorTable;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Profile_fieldAccessorTable;
     }
     
     private int bitField0_;
-    // required string username = 1;
-    public static final int USERNAME_FIELD_NUMBER = 1;
-    private java.lang.Object username_;
-    public boolean hasUsername() {
+    // required string display_name = 1;
+    public static final int DISPLAY_NAME_FIELD_NUMBER = 1;
+    private java.lang.Object displayName_;
+    public boolean hasDisplayName() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-    public String getUsername() {
-      java.lang.Object ref = username_;
+    public String getDisplayName() {
+      java.lang.Object ref = displayName_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -2750,17 +2785,17 @@ public final class IslandProto {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          username_ = s;
+          displayName_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getUsernameBytes() {
-      java.lang.Object ref = username_;
+    private com.google.protobuf.ByteString getDisplayNameBytes() {
+      java.lang.Object ref = displayName_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        username_ = b;
+        displayName_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -2830,7 +2865,7 @@ public final class IslandProto {
     }
     
     private void initFields() {
-      username_ = "";
+      displayName_ = "";
       aboutMe_ = "";
       profileImage_ = com.google.protobuf.ByteString.EMPTY;
       headerImage_ = com.google.protobuf.ByteString.EMPTY;
@@ -2841,7 +2876,7 @@ public final class IslandProto {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
-      if (!hasUsername()) {
+      if (!hasDisplayName()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -2869,7 +2904,7 @@ public final class IslandProto {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getUsernameBytes());
+        output.writeBytes(1, getDisplayNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, getAboutMeBytes());
@@ -2894,7 +2929,7 @@ public final class IslandProto {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getUsernameBytes());
+          .computeBytesSize(1, getDisplayNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2924,41 +2959,41 @@ public final class IslandProto {
       return super.writeReplace();
     }
     
-    public static IslandProto.Profile parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.Profile parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.Profile parseFrom(byte[] data)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static IslandProto.Profile parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.Profile parseFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.Profile parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static IslandProto.Profile parseDelimitedFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -2967,7 +3002,7 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.Profile parseDelimitedFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -2978,12 +3013,12 @@ public final class IslandProto {
         return null;
       }
     }
-    public static IslandProto.Profile parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static IslandProto.Profile parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.Profile parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -2993,7 +3028,7 @@ public final class IslandProto {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(IslandProto.Profile prototype) {
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.Profile prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -3006,18 +3041,18 @@ public final class IslandProto {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements IslandProto.ProfileOrBuilder {
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.ProfileOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return IslandProto.internal_static_proto_Profile_descriptor;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Profile_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return IslandProto.internal_static_proto_Profile_fieldAccessorTable;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Profile_fieldAccessorTable;
       }
       
-      // Construct using IslandProto.Profile.newBuilder()
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.Profile.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -3036,7 +3071,7 @@ public final class IslandProto {
       
       public Builder clear() {
         super.clear();
-        username_ = "";
+        displayName_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         aboutMe_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -3055,39 +3090,39 @@ public final class IslandProto {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return IslandProto.Profile.getDescriptor();
+        return io.islnd.android.islnd.messaging.proto.IslandProto.Profile.getDescriptor();
       }
       
-      public IslandProto.Profile getDefaultInstanceForType() {
-        return IslandProto.Profile.getDefaultInstance();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.Profile getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.Profile.getDefaultInstance();
       }
       
-      public IslandProto.Profile build() {
-        IslandProto.Profile result = buildPartial();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.Profile build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.Profile result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(result);
+          throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private IslandProto.Profile buildParsed()
+      private io.islnd.android.islnd.messaging.proto.IslandProto.Profile buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        IslandProto.Profile result = buildPartial();
+        io.islnd.android.islnd.messaging.proto.IslandProto.Profile result = buildPartial();
         if (!result.isInitialized()) {
-          throw AbstractMessage.Builder.newUninitializedMessageException(
-                  result).asInvalidProtocolBufferException();
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
         }
         return result;
       }
       
-      public IslandProto.Profile buildPartial() {
-        IslandProto.Profile result = new IslandProto.Profile(this);
+      public io.islnd.android.islnd.messaging.proto.IslandProto.Profile buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.Profile result = new io.islnd.android.islnd.messaging.proto.IslandProto.Profile(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.username_ = username_;
+        result.displayName_ = displayName_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
@@ -3110,18 +3145,18 @@ public final class IslandProto {
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof IslandProto.Profile) {
-          return mergeFrom((IslandProto.Profile)other);
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.Profile) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.Profile)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(IslandProto.Profile other) {
-        if (other == IslandProto.Profile.getDefaultInstance()) return this;
-        if (other.hasUsername()) {
-          setUsername(other.getUsername());
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.Profile other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.Profile.getDefaultInstance()) return this;
+        if (other.hasDisplayName()) {
+          setDisplayName(other.getDisplayName());
         }
         if (other.hasAboutMe()) {
           setAboutMe(other.getAboutMe());
@@ -3140,7 +3175,7 @@ public final class IslandProto {
       }
       
       public final boolean isInitialized() {
-        if (!hasUsername()) {
+        if (!hasDisplayName()) {
           
           return false;
         }
@@ -3188,7 +3223,7 @@ public final class IslandProto {
             }
             case 10: {
               bitField0_ |= 0x00000001;
-              username_ = input.readBytes();
+              displayName_ = input.readBytes();
               break;
             }
             case 18: {
@@ -3217,39 +3252,39 @@ public final class IslandProto {
       
       private int bitField0_;
       
-      // required string username = 1;
-      private java.lang.Object username_ = "";
-      public boolean hasUsername() {
+      // required string display_name = 1;
+      private java.lang.Object displayName_ = "";
+      public boolean hasDisplayName() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public String getUsername() {
-        java.lang.Object ref = username_;
+      public String getDisplayName() {
+        java.lang.Object ref = displayName_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          username_ = s;
+          displayName_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setUsername(String value) {
+      public Builder setDisplayName(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        username_ = value;
+        displayName_ = value;
         onChanged();
         return this;
       }
-      public Builder clearUsername() {
+      public Builder clearDisplayName() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        username_ = getDefaultInstance().getUsername();
+        displayName_ = getDefaultInstance().getDisplayName();
         onChanged();
         return this;
       }
-      void setUsername(com.google.protobuf.ByteString value) {
+      void setDisplayName(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000001;
-        username_ = value;
+        displayName_ = value;
         onChanged();
       }
       
@@ -3370,10 +3405,10 @@ public final class IslandProto {
   }
   
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_proto_PseudonymKey_descriptor;
+    internal_static_proto_Identity_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_proto_PseudonymKey_fieldAccessorTable;
+      internal_static_proto_Identity_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_SignedObject_descriptor;
   private static
@@ -3403,67 +3438,67 @@ public final class IslandProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\030proto/island_proto.proto\022\005proto\"S\n\014Pse" +
-      "udonymKey\022\021\n\tunique_id\030\001 \002(\003\022\020\n\010username" +
-      "\030\002 \002(\t\022\021\n\tpseudonym\030\003 \002(\t\022\013\n\003key\030\004 \002(\t\"1" +
-      "\n\014SignedObject\022\016\n\006object\030\001 \002(\t\022\021\n\tsignat" +
-      "ure\030\002 \002(\t\"O\n\nPostUpdate\022\021\n\tis_delete\030\001 \002" +
-      "(\010\022\n\n\002id\030\002 \002(\t\022\017\n\007content\030\003 \002(\t\022\021\n\ttimes" +
-      "tamp\030\004 \002(\003\"\254\001\n\rCommentUpdate\022\021\n\tis_delet" +
-      "e\030\001 \002(\010\022\035\n\025post_author_pseudonym\030\002 \002(\t\022 " +
-      "\n\030comment_author_pseudonym\030\003 \002(\t\022\017\n\007post" +
-      "_id\030\004 \002(\t\022\022\n\ncomment_id\030\005 \002(\t\022\017\n\007content",
-      "\030\006 \002(\t\022\021\n\ttimestamp\030\007 \002(\003\"k\n\007Profile\022\020\n\010" +
-      "username\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\t\022\025\n\rprof" +
-      "ile_image\030\003 \002(\014\022\024\n\014header_image\030\004 \002(\014\022\017\n" +
-      "\007version\030\005 \002(\005B\034\n\032org.island.messaging.p" +
-      "roto"
+      "\n\030proto/island_proto.proto\022\005proto\"V\n\010Ide" +
+      "ntity\022\024\n\014display_name\030\001 \002(\t\022\r\n\005alias\030\002 \002" +
+      "(\t\022\021\n\tgroup_key\030\003 \002(\t\022\022\n\npublic_key\030\004 \002(" +
+      "\t\"1\n\014SignedObject\022\016\n\006object\030\001 \002(\t\022\021\n\tsig" +
+      "nature\030\002 \002(\t\"O\n\nPostUpdate\022\021\n\tis_delete\030" +
+      "\001 \002(\010\022\n\n\002id\030\002 \002(\t\022\017\n\007content\030\003 \002(\t\022\021\n\tti" +
+      "mestamp\030\004 \002(\003\"\254\001\n\rCommentUpdate\022\021\n\tis_de" +
+      "lete\030\001 \002(\010\022\035\n\025post_author_pseudonym\030\002 \002(" +
+      "\t\022 \n\030comment_author_pseudonym\030\003 \002(\t\022\017\n\007p" +
+      "ost_id\030\004 \002(\t\022\022\n\ncomment_id\030\005 \002(\t\022\017\n\007cont",
+      "ent\030\006 \002(\t\022\021\n\ttimestamp\030\007 \002(\003\"o\n\007Profile\022" +
+      "\024\n\014display_name\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\t\022" +
+      "\025\n\rprofile_image\030\003 \002(\014\022\024\n\014header_image\030\004" +
+      " \002(\014\022\017\n\007version\030\005 \002(\005B(\n&io.islnd.androi" +
+      "d.islnd.messaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public com.google.protobuf.ExtensionRegistry assignDescriptors(
             com.google.protobuf.Descriptors.FileDescriptor root) {
           descriptor = root;
-          internal_static_proto_PseudonymKey_descriptor =
+          internal_static_proto_Identity_descriptor =
             getDescriptor().getMessageTypes().get(0);
-          internal_static_proto_PseudonymKey_fieldAccessorTable = new
+          internal_static_proto_Identity_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_proto_PseudonymKey_descriptor,
-              new java.lang.String[] { "UniqueId", "Username", "Pseudonym", "Key", },
-              IslandProto.PseudonymKey.class,
-              IslandProto.PseudonymKey.Builder.class);
+              internal_static_proto_Identity_descriptor,
+              new java.lang.String[] { "DisplayName", "Alias", "GroupKey", "PublicKey", },
+              io.islnd.android.islnd.messaging.proto.IslandProto.Identity.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.Identity.Builder.class);
           internal_static_proto_SignedObject_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_proto_SignedObject_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_SignedObject_descriptor,
               new java.lang.String[] { "Object", "Signature", },
-              IslandProto.SignedObject.class,
-              IslandProto.SignedObject.Builder.class);
+              io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.Builder.class);
           internal_static_proto_PostUpdate_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_proto_PostUpdate_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_PostUpdate_descriptor,
               new java.lang.String[] { "IsDelete", "Id", "Content", "Timestamp", },
-              IslandProto.PostUpdate.class,
-              IslandProto.PostUpdate.Builder.class);
+              io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.PostUpdate.Builder.class);
           internal_static_proto_CommentUpdate_descriptor =
             getDescriptor().getMessageTypes().get(3);
           internal_static_proto_CommentUpdate_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_CommentUpdate_descriptor,
               new java.lang.String[] { "IsDelete", "PostAuthorPseudonym", "CommentAuthorPseudonym", "PostId", "CommentId", "Content", "Timestamp", },
-              IslandProto.CommentUpdate.class,
-              IslandProto.CommentUpdate.Builder.class);
+              io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.CommentUpdate.Builder.class);
           internal_static_proto_Profile_descriptor =
             getDescriptor().getMessageTypes().get(4);
           internal_static_proto_Profile_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_Profile_descriptor,
-              new java.lang.String[] { "Username", "AboutMe", "ProfileImage", "HeaderImage", "Version", },
-              IslandProto.Profile.class,
-              IslandProto.Profile.Builder.class);
+              new java.lang.String[] { "DisplayName", "AboutMe", "ProfileImage", "HeaderImage", "Version", },
+              io.islnd.android.islnd.messaging.proto.IslandProto.Profile.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.Profile.Builder.class);
           return null;
         }
       };

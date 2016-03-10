@@ -9,10 +9,13 @@ public class IslndContract {
 
     public static final String CONTENT_AUTHORITY = "io.islnd.android.islnd.app.database";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-    public static final String PATH_POST = "post";
     public static final String PATH_USER = "user";
+    public static final String PATH_ALIAS = "alias";
+    public static final String PATH_DISPLAY_NAME = "display_name";
+    public static final String PATH_POST = "post";
     public static final String PATH_COMMENT = "comment";
     public static final String PATH_PROFILE = "profile";
+    public static final String PATH_IDENTITY = "identity";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -56,16 +59,82 @@ public class IslndContract {
 
         public static final String TABLE_NAME = "user";
 
-        public static final String COLUMN_USERNAME = "username";
-        public static final String COLUMN_PSEUDONYM = "pseudonym";
-        public static final String COLUMN_GROUP_KEY = "group_key";
+        public static final String COLUMN_PUBLIC_KEY = "public_key";
 
         public static int getUserIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(2));
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
 
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildUserWithUserId(int userId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
+                    .build();
+        }
+    }
+
+    public static final class DisplayNameEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DISPLAY_NAME).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAY_NAME;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAY_NAME;
+
+        public static final String TABLE_NAME = "display_name";
+
+        public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_DISPLAY_NAME = "display_name";
+
+        public static int getUserIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
+
+        public static Uri buildDisplayNameUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildDisplayNameWithUserId(int userId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
+                    .build();
+        }
+    }
+
+    public static final class AliasEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_ALIAS).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ALIAS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ALIAS;
+
+        public static final String TABLE_NAME = "alias";
+
+        public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_ALIAS = "alias";
+        public static final String COLUMN_GROUP_KEY = "group_key";
+        public static final String COLUMN_ALIAS_ID = "alias_id";
+
+        public static int getUserIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
+
+        public static Uri buildAliasUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildAliasWithUserId(int userId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
+                    .build();
         }
     }
 
@@ -139,6 +208,22 @@ public class IslndContract {
             return CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(userId))
                     .build();
+        }
+    }
+
+    public static final class IdentityEntry {
+        private static final String TAG = IdentityEntry.class.getSimpleName();
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_IDENTITY).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IDENTITY;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IDENTITY;
+
+        public static Uri buildProfileUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
 }

@@ -1,9 +1,6 @@
 package io.islnd.android.islnd.app.fragments;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,7 +16,6 @@ import android.view.ViewGroup;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.NewPostActivity;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.PostCollection;
 import io.islnd.android.islnd.app.loader.LocalPostLoader;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
@@ -65,14 +61,6 @@ public class FeedFragment extends Fragment {
                     mRefreshLayout.setRefreshing(false);
                 });
 
-        Account account = createSyncAccount(getContext());
-        mResolver = getContext().getContentResolver();
-        mResolver.setSyncAutomatically(
-                account,
-                getString(R.string.content_authority),
-                true);
-        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
-
         // TODO: handle onclicks more betterer
         // Fab
         FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
@@ -95,16 +83,5 @@ public class FeedFragment extends Fragment {
         protected PostCollection doInBackground(Void... params) {
             return MessageLayer.getPosts(getContext());
         }
-    }
-
-    public static Account createSyncAccount(Context context) {
-        Account newAccount = new Account(
-                context.getString(R.string.sync_account),
-                context.getString(R.string.sync_account_type));
-
-        AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
-        accountManager.addAccountExplicitly(newAccount, null, null);
-
-        return newAccount;
     }
 }

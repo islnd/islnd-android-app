@@ -33,8 +33,6 @@
     <string name="remove_friend">Remove Friend</string>
     <string name="allow_user">Allow User</string>
 
-    <string name="user_name">USER_NAME</string>
-
     <string name="edit_profile">Edit profile</string>
 
     <string name="delete_post">Delete post</string>
@@ -46,7 +44,7 @@
     <string name="public_key">PUBLIC_KEY</string>
     <string name="group_key">group_key</string>
     <string name="pseudonym_seed">pseudonym_seed</string>
-    <string name="pseudonym">pseudonym</string>
+    <string name="alias">alias</string>
 
     <string name="view_friend_status">Not Allowed</string>
 
@@ -89,6 +87,8 @@
     <string name="nav_sms_title">SMS Allow User</string>
     <string name="nav_settings_title">Settings</string>
     <string name="nav_add_friend">Add Friend</string>
+    <string name="user_id">user_id</string>
+    <string name="display_name">display_name</string>
 
 
 </resources>
