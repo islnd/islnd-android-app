@@ -13,14 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.GlancePostViewHolder;
@@ -66,8 +67,8 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             mContext.startActivity(profileIntent);
         });
 
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
+        Profile profile = DataUtils.getProfile(mContext, post.getUserName());
+        Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
         // View post on post click

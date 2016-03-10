@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.Dialogs;
 import io.islnd.android.islnd.app.database.IslndDb;
@@ -40,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String mProfileUsername;
     private Profile mProfile;
     private Cursor mPostCursor;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,15 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mContext = getApplicationContext();
+
+        Intent profileIntent = getIntent();
+        mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
+        mProfile = DataUtils.getProfile(mContext, mProfileUsername);
+        int profileUserId = DataUtils.getUserId(mContext, mProfileUsername);
+        showProfile();
+        new GetProfileTask().execute();
 
         // Post list stuff
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
@@ -64,21 +75,16 @@ public class ProfileActivity extends AppCompatActivity {
                 IslndContract.PostEntry.COLUMN_CONTENT,
         };
         mPostCursor = getContentResolver().query(
-                IslndContract.PostEntry.CONTENT_URI,
+                IslndContract.PostEntry.buildPostUriWithUserId(profileUserId),
                 projection,
-                IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                new String[] {Util.getUser(getApplicationContext())},
+                null,
+                null,
                 null
         );
+
         mAdapter = new PostAdapter(this, mPostCursor);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-
-        Intent profileIntent = getIntent();
-        mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        mProfile = IslndDb.getProfile(getApplicationContext(), mProfileUsername);
-        showProfile();
-        new GetProfileTask().execute();
     }
 
     @Override
@@ -91,6 +97,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (mProfile == null) {
             return;
         }
+
         ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
@@ -107,9 +114,8 @@ public class ProfileActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mProfileUsername);
-        Context context = getApplicationContext();
-        ImageUtil.setProfileImageSampled(context, profileImage, mProfile.getProfileImageUri());
-        ImageUtil.setHeaderImageSampled(context, headerImage, mProfile.getHeaderImageUri());
+        ImageUtil.setProfileImageSampled(mContext, profileImage, mProfile.getProfileImageUri());
+        ImageUtil.setHeaderImageSampled(mContext, headerImage, mProfile.getHeaderImageUri());
 
         // Swipe to refresh
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -165,7 +171,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private class GetProfileTask extends AsyncTask<Void, Void, Void> {
         protected Void doInBackground(Void... params) {
-            mProfile = IslndDb.getMostRecentProfile(getApplicationContext(), mProfileUsername);
+            mProfile = IslndDb.getMostRecentProfile(mContext, mProfileUsername);
 
             return null;
         }

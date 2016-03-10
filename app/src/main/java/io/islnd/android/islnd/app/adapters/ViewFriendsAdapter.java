@@ -11,8 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.activities.ProfileActivity;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.Dialogs;
+import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.User;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.ImageUtil;
@@ -57,8 +58,8 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
             mContext.startActivity(profileIntent);
         });
 
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(user.getUserName()));
+        Profile profile = DataUtils.getProfile(mContext, user.getUserName());
+        Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setViewFriendImageSampled(mContext, holder.profileImage, profileImageUri);
 
         holder.overflow.setOnClickListener((View v) ->

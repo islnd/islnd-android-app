@@ -12,6 +12,7 @@ public class IslndContract {
     public static final String PATH_POST = "post";
     public static final String PATH_USER = "user";
     public static final String PATH_COMMENT = "comment";
+    public static final String PATH_PROFILE = "profile";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -36,6 +37,10 @@ public class IslndContract {
 
         public static Uri buildPostUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildPostUriWithUserId(int userId) {
+            return CONTENT_URI.buildUpon().appendPath(Integer.toString(userId)).build();
         }
     }
 
@@ -100,6 +105,39 @@ public class IslndContract {
             return CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(postAuthorId))
                     .appendPath(postId)
+                    .build();
+        }
+    }
+
+    public static final class ProfileEntry implements BaseColumns {
+        private static final String TAG = ProfileEntry.class.getSimpleName();
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PROFILE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PROFILE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PROFILE;
+
+        public static final String TABLE_NAME = "profile";
+
+        public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_ABOUT_ME = "about_me";
+        public static final String COLUMN_PROFILE_IMAGE_URI = "profile_image_uri";
+        public static final String COLUMN_HEADER_IMAGE_URI = "header_image_uri";
+
+        public static Uri buildProfileUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static int getUserIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
+
+        public static Uri buildProfileUriWithUserId(int userId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
                     .build();
         }
     }

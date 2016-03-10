@@ -60,10 +60,6 @@ public class IslndDb
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
         setPseudonym(context);
-
-        //--Add a default profile
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
-        profileDatabase.insert(io.islnd.android.islnd.messaging.Util.buildDefaultProfile(context, username));
     }
 
     private static void setPseudonym(Context context) {
@@ -87,11 +83,16 @@ public class IslndDb
                 Log.v(TAG, "pseudonym " + pseudonym);
                 Log.v(TAG, "pseudonym seed " + seed);
 
-                DataUtils.insertUser(
+                long userId = DataUtils.insertUser(
                         context,
                         Util.getUser(context),
                         Util.getPseudonym(context),
                         Util.getGroupKey(context));
+
+                DataUtils.insertProfile(
+                        context,
+                        Util.buildDefaultProfile(context, Util.getUser(context)),
+                        userId);
             }
         }.execute(seed);
     }
@@ -233,10 +234,6 @@ public class IslndDb
         }.execute();
     }
 
-    public static Profile getProfile(Context context, String username) {
-        return ProfileDatabase.getInstance(context).get(username);
-    }
-
     public static Profile getMostRecentProfile(Context context, String username) {
         Profile profile;
 
@@ -249,16 +246,12 @@ public class IslndDb
                 return null;
             }
 
-            ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
             profile = Util.saveProfileWithImageData(context, profileWithImageData);
+            int userId = DataUtils.getUserId(context, username);
+            DataUtils.insertProfile(context, profile, userId);
 
-            if (profileDatabase.hasProfile(username)) {
-                profileDatabase.update(profile);
-            } else {
-                profileDatabase.insert(profile);
-            }
         } else {
-            profile = ProfileDatabase.getInstance(context).get(username);
+            profile = DataUtils.getProfile(context, username);
         }
 
         return profile;

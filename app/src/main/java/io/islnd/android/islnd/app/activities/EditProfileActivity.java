@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.models.ProfileWithImageData;
@@ -47,8 +47,7 @@ public class EditProfileActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Profile profile = ProfileDatabase.getInstance(
-                getApplicationContext()).get(Util.getUser(this));
+        Profile profile = DataUtils.getProfile(getApplicationContext(), Util.getUser(getApplicationContext()));
 
         TextView userName = (TextView) findViewById(R.id.profile_user_name);
         profileImage = (ImageView) findViewById(R.id.profile_profile_image);
@@ -121,7 +120,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 newProfileWithImageData.getVersion()
         );
 
-        ProfileDatabase.getInstance(getApplicationContext()).update(newProfile);
+        int userId = DataUtils.getUserId(getApplicationContext(), myUsername);
+        DataUtils.updateProfile(getApplicationContext(), newProfile, userId);
         IslndDb.postProfile(getApplicationContext(), newProfileWithImageData);
 
         Snackbar.make(view, getString(R.string.profile_saved), Snackbar.LENGTH_SHORT).show();
