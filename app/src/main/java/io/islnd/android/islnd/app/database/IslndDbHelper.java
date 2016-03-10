@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 7;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -40,8 +40,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + IslndContract.DisplayNameEntry.COLUMN_USER_ID + ") REFERENCES " +
                 IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "), " +
 
-                " UNIQUE (" + IslndContract.DisplayNameEntry.COLUMN_USER_ID + ", " +
-                IslndContract.DisplayNameEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
+                " UNIQUE (" + IslndContract.DisplayNameEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_POST_TABLE = "CREATE TABLE " + IslndContract.PostEntry.TABLE_NAME + " (" +
                 IslndContract.PostEntry._ID + " INTEGER PRIMARY KEY, " +

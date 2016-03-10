@@ -68,6 +68,12 @@ public class IslndContract {
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static Uri buildUserWithUserId(int userId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
+                    .build();
+        }
     }
 
     public static final class DisplayNameEntry implements BaseColumns {
@@ -78,7 +84,7 @@ public class IslndContract {
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAY_NAME;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAY_NAME;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAY_NAME;
 
         public static final String TABLE_NAME = "display_name";
 

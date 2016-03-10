@@ -113,10 +113,10 @@ public class DataUtils {
         };
 
         Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.UserEntry.buildUserWithUserId(userId),
                 projection,
-                IslndContract.UserEntry._ID + " = ?",
-                new String[] {Integer.toString(userId)},
+                null,
+                null,
                 null);
 
         try {

@@ -60,14 +60,12 @@ public class NavBaseActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
     private View mDialogView = null;
-    private Context mContext;
     private ContentResolver mResolver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
-        mContext = this;
         onCreateDrawer();
 
         // Set launching fragment
@@ -102,17 +100,17 @@ public class NavBaseActivity extends AppCompatActivity
         ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
         ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        String myDisplayName = Util.getDisplayName(mContext);
+        String myDisplayName = Util.getDisplayName(this);
 
         navProfileImage.setOnClickListener(
                 (View v) -> {
-                    Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+                    Intent profileIntent = new Intent(this, ProfileActivity.class);
                     profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myDisplayName);
                     startActivity(profileIntent);
                 });
         navUserName.setText(myDisplayName);
 
-        int myUserId = Util.getUserId(mContext);
+        int myUserId = Util.getUserId(this);
         if (myUserId >= 0) {
             Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
             Uri profileImageUri = profile.getProfileImageUri();
@@ -147,7 +145,7 @@ public class NavBaseActivity extends AppCompatActivity
                 break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, Util.getUserId(mContext));
+                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, Util.getUserId(this));
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
