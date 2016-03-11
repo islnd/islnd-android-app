@@ -35,10 +35,13 @@ import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.util.List;
+
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.models.Profile;
@@ -46,6 +49,10 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
+import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -229,16 +236,17 @@ public class NavBaseActivity extends AppCompatActivity
     private void addFriendActionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.add_friend_dialog)
-                .setItems(R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
-                    switch (which) {
-                        case 0: // QR
-                            qrCodeActionDialog();
-                            break;
-                        case 1: // SMS
-                            smsAllowDialog();
-                            break;
-                    }
-                })
+                .setItems(
+                        R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
+                            switch (which) {
+                                case 0: // QR
+                                    qrCodeActionDialog();
+                                    break;
+                                case 1: // SMS
+                                    smsAllowDialog();
+                                    break;
+                            }
+                        })
                 .show();
     }
 
@@ -247,12 +255,13 @@ public class NavBaseActivity extends AppCompatActivity
         View dialogView = getLayoutInflater().inflate(R.layout.qr_dialog, null);
 
         Button getQrButton = (Button) dialogView.findViewById(R.id.get_qr_button);
-        getQrButton.setOnClickListener((View v) -> {
-            IntentIntegrator integrator = new IntentIntegrator(this);
-            integrator.setCaptureActivity(VerticalCaptureActivity.class);
-            integrator.setOrientationLocked(false);
-            integrator.initiateScan();
-        });
+        getQrButton.setOnClickListener(
+                (View v) -> {
+                    IntentIntegrator integrator = new IntentIntegrator(this);
+                    integrator.setCaptureActivity(VerticalCaptureActivity.class);
+                    integrator.setOrientationLocked(false);
+                    integrator.initiateScan();
+                });
 
         ImageView qrImageView = (ImageView) dialogView.findViewById(R.id.qr_image_view);
         Util.buildQrCode(qrImageView,
@@ -335,7 +344,8 @@ public class NavBaseActivity extends AppCompatActivity
                     .show();
         } else {
             // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.READ_CONTACTS},
                     REQUEST_CONTACT);
         }
@@ -349,9 +359,10 @@ public class NavBaseActivity extends AppCompatActivity
             return;
         }
 
-        startActivityForResult(new Intent(
-                Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
+        startActivityForResult(
+                new Intent(
+                        Intent.ACTION_PICK,
+                        ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
     }
 
     private String retrieveContactNumber(Uri uriContact) {
@@ -400,8 +411,16 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-                    DataUtils.deleteAll(this);
-                    IslndDb.createIdentity(getApplicationContext(), editText.getText().toString());
+//                    DataUtils.deleteAll(this);
+//                    IslndDb.createIdentity(getApplicationContext(), editText.getText().toString());
+                    List<Event> eventList = new EventListBuilder(this)
+                            .changeDisplayName(editText.getText().toString())
+                            .build();
+                    for (Event event : eventList) {
+                        Intent pushEvent = new Intent(this, EventPushService.class);
+                        pushEvent.putExtra(EventPushService.EVENT_EXTRA, event);
+                        startService(pushEvent);
+                    }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

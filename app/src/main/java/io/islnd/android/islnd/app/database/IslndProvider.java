@@ -562,11 +562,27 @@ public class IslndProvider extends ContentProvider {
                 );
                 break;
             }
+            case DISPLAY_NAME_WITH_USER_ID: {
+                String[] args = new String[] {
+                        Integer.toString(IslndContract.DisplayNameEntry.getUserIdFromUri(uri))
+                };
+
+                db.update(
+                        IslndContract.DisplayNameEntry.TABLE_NAME,
+                        values,
+                        IslndContract.DisplayNameEntry.COLUMN_USER_ID + " = ?",
+                        args);
+                getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
+                break;
+            }
             default: {
                 throw new UnsupportedOperationException("update operation not supported for uri " + uri);
             }
         }
 
+        getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
         return rowsUpdated;
     }
 }

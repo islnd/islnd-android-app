@@ -38,3 +38,8 @@ message Profile {
   required bytes header_image = 4;
   required int32 version = 5;
 }
+
+message ChangeDisplayNameEvent {
+  required string alias = 1;
+  required string display_name = 2;
+}
