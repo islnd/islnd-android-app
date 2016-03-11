@@ -1,13 +1,10 @@
 package io.islnd.android.islnd.app.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +21,9 @@ import android.widget.TextView;
 
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.adapters.ViewPostAdapter;
+import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.loader.LocalCommentLoader;
 import io.islnd.android.islnd.app.loader.NetworkCommentLoader;
 import io.islnd.android.islnd.app.models.Post;
@@ -41,7 +37,7 @@ public class ViewPostActivity extends AppCompatActivity {
     private Post mPost = null;
 
     private RecyclerView mRecyclerView;
-    private ViewPostAdapter mAdapter;
+    private CommentAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
     private Context mContext;
@@ -64,7 +60,7 @@ public class ViewPostActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ViewPostAdapter(this, null, mPost.getKey());
+        mAdapter = new CommentAdapter(this, null, mPost.getKey());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         mRecyclerView.setNestedScrollingEnabled(false);

@@ -26,15 +26,15 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.CommentViewHolder;
 
-public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>
+public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>
 {
-    private static final String TAG = ViewPostAdapter.class.getSimpleName();
+    private static final String TAG = CommentAdapter.class.getSimpleName();
 
     private Context mContext = null;
     private final int mPostUserId;
     private final String mPostId;
 
-    public ViewPostAdapter(Context context, Cursor cursor, PostKey key)
+    public CommentAdapter(Context context, Cursor cursor, PostKey key)
     {
         super(context, cursor);
         mContext = context;
