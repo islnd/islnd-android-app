@@ -7,7 +7,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-import io.islnd.android.islnd.app.adapters.ViewPostAdapter;
+import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 
 public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -16,9 +16,9 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
     public static final String POST_ID_BUNDLE_KEY = "post_id_bundle_key";
 
     private final Context mContext;
-    private final ViewPostAdapter mAdapter;
+    private final CommentAdapter mAdapter;
 
-    public LocalCommentLoader(Context context, ViewPostAdapter adapter) {
+    public LocalCommentLoader(Context context, CommentAdapter adapter) {
         mContext = context;
         mAdapter = adapter;
     }
