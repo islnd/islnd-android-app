@@ -50,10 +50,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/edit_text_box_horizontal_padding"
-        android:paddingRight="@dimen/edit_text_box_horizontal_padding"
         android:paddingTop="@dimen/edit_text_box_vertical_padding"
         android:paddingBottom="@dimen/edit_text_box_vertical_padding"
-        android:background="?android:colorBackground">
+        android:background="@android:color/white">
 
         <EditText
             android:id="@+id/post_comment_edit_text"
@@ -63,14 +62,25 @@
             android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/add_comment"/>
 
-        <ImageView
-            android:id="@+id/post_submit_comment"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_send_black_24dp"
+            android:paddingLeft="@dimen/image_button_padding"
+            android:paddingRight="@dimen/image_button_padding"
+            android:paddingTop="@dimen/edit_text_box_vertical_padding"
+            android:paddingBottom="@dimen/edit_text_box_vertical_padding"
+            android:layout_marginRight="@dimen/post_submit_comment_margin"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/post_submit_comment_margin"
-            android:onClick="addCommentToPost"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="addCommentToPost">
+
+            <ImageView
+                android:id="@+id/post_submit_comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_send_black_24dp"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </LinearLayout>

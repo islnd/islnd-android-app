@@ -58,7 +58,8 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(post.getTimestamp()));
         holder.postContent.setText(post.getContent());
-        holder.postCommentCount.setText(Util.numberOfCommentsString(post.getComments().size()));
+        //TODO: Get actual comment count
+        holder.postCommentCount.setText(Util.numberOfCommentsString(0));
 
         // Go to profile on picture click
         holder.postProfileImage.setOnClickListener((View v) -> {
@@ -79,10 +80,10 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         });
 
         if(Util.isUser(mContext, post.getUserId())) {
-            holder.postOverflow.setVisibility(View.VISIBLE);
+            holder.postOverflowLayout.setVisibility(View.VISIBLE);
 
-            holder.postOverflow.setOnClickListener((View v) -> {
-                PopupMenu popup = new PopupMenu(mContext, holder.postOverflow);
+            holder.postOverflowLayout.setOnClickListener((View v) -> {
+                PopupMenu popup = new PopupMenu(mContext, holder.postOverflowLayout);
                 popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
                 popup.setOnMenuItemClickListener((MenuItem item) -> {
                     switch (item.getItemId()) {
@@ -100,7 +101,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
                 popup.show();
             });
         } else {
-            holder.postOverflow.setVisibility(View.GONE);
+            holder.postOverflowLayout.setVisibility(View.GONE);
         }
     }
 }

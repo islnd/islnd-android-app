@@ -60,7 +60,6 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
                 cursor.getLong(cursor.getColumnIndex(IslndContract.CommentEntry.COLUMN_TIMESTAMP)));
 
         CommentViewHolder holder = (CommentViewHolder) viewHolder;
-        final ImageView overflow = holder.overflow;
 
         holder.userName.setText(comment.getUsername());
         holder.comment.setText(comment.getComment());
@@ -84,7 +83,7 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
             holder.overflow.setOnClickListener(
                     (View v) ->
                     {
-                        PopupMenu popup = new PopupMenu(mContext, overflow);
+                        PopupMenu popup = new PopupMenu(mContext, holder.overflow);
                         popup.getMenuInflater().inflate(R.menu.comment_menu, popup.getMenu());
                         popup.setOnMenuItemClickListener(
                                 (MenuItem item) ->

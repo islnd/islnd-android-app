@@ -3,30 +3,45 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/comment_padding">
-    <ImageView
+                android:paddingBottom="@dimen/comment_vertical_padding">
+
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/comment_profile_image"
         android:layout_width="@dimen/comment_profile_image"
         android:layout_height="@dimen/comment_profile_image"
         android:layout_marginRight="@dimen/comment_profile_image_margin"
+        android:layout_marginTop="@dimen/comment_vertical_padding"
+        android:layout_marginLeft="@dimen/comment_horizontal_padding"
         android:background="?android:colorBackground"
         android:src="@drawable/ic_person_black_24dp"/>
 
-    <ImageView
-        android:id="@+id/comment_overflow"
+    <RelativeLayout
+        android:id="@+id/comment_overflow_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_more_vert_black_18dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_centerVertical="true"
-        android:visibility="gone"/>
+        android:paddingTop="@dimen/comment_vertical_padding"
+        android:paddingBottom="@dimen/comment_vertical_padding"
+        android:paddingLeft="@dimen/comment_horizontal_padding"
+        android:paddingRight="@dimen/comment_horizontal_padding"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_more_vert_black_18dp"
+            android:alpha="@dimen/active_opacity_light"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/comment_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="@dimen/comment_vertical_padding"
+        android:layout_marginRight="@dimen/comment_horizontal_padding"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/comment_profile_image"
         android:layout_toEndOf="@+id/comment_profile_image">

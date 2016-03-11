@@ -74,7 +74,8 @@ public class Util
 
     public static String numberOfCommentsString(int numberOfComments)
     {
-        return numberOfComments + " comments";
+        String comments = numberOfComments == 1 ? " Comment" : " Comments";
+        return numberOfComments + comments;
     }
 
     public static boolean isUser(Context context, int userId)
