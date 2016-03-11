@@ -16,6 +16,8 @@ public class DeletePostDialog extends DialogFragment {
     public static final String USER_ID_BUNDLE_KEY = "USER_PARAM";
     public static final String POST_ID_BUNDLE_KEY = "POST_PARAM";
 
+    private boolean mFinishActivity;
+
     public static DeletePostDialog buildWithArgs(int userId, String postId) {
         DeletePostDialog deletePostDialog = new DeletePostDialog();
         Bundle args = new Bundle();
@@ -42,8 +44,16 @@ public class DeletePostDialog extends DialogFragment {
                                     return null;
                                 }
                             }.execute();
+
+                            if (mFinishActivity) {
+                                getActivity().finish();
+                            }
                         })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
+    }
+
+    public void setFinishActivityIfSuccess(boolean finishActivity) {
+        mFinishActivity = finishActivity;
     }
 }
