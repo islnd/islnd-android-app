@@ -14,14 +14,34 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_to_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1.0">
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/view_post_recycler_view"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/post"
+                    layout="@layout/interact_post"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/view_post_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    android:layout_below="@id/post"/>
+
+            </RelativeLayout>
+        </android.support.v4.widget.NestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
@@ -32,16 +52,15 @@
         android:paddingRight="@dimen/edit_text_box_horizontal_padding"
         android:paddingTop="@dimen/edit_text_box_vertical_padding"
         android:paddingBottom="@dimen/edit_text_box_vertical_padding"
-        android:background="?android:colorBackground"
-        android:elevation="8dp">
+        android:background="?android:colorBackground">
 
         <EditText
             android:id="@+id/post_comment_edit_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:inputType="textMultiLine|textCapSentences"
-            android:hint="Add comment"/>
+            android:hint="@string/add_comment"/>
 
         <ImageView
             android:id="@+id/post_submit_comment"

@@ -51,6 +51,7 @@ public class ViewPostActivity extends AppCompatActivity {
         mAdapter = new ViewPostAdapter(this, null, mPost.getKey());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        mRecyclerView.setNestedScrollingEnabled(false);
 
         // Load the local comments
         Bundle args = new Bundle();

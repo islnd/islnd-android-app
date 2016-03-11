@@ -34,9 +34,6 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
     private final int mPostUserId;
     private final String mPostId;
 
-
-    private static final int COMMENT = 1;
-
     public ViewPostAdapter(Context context, Cursor cursor, PostKey key)
     {
         super(context, cursor);
@@ -113,11 +110,5 @@ public class ViewPostAdapter extends CursorRecyclerViewAdapter<RecyclerView.View
         } else {
             holder.overflow.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position)
-    {
-        return COMMENT;
     }
 }
