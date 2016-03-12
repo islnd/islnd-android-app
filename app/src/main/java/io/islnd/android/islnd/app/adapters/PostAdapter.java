@@ -86,7 +86,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
                 final String DELETE_POST = mContext.getString(R.string.delete_post);
                 final String[] items = {DELETE_POST};
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
                 builder.setItems(items, (DialogInterface dialog, int item) -> {
                     String itemStr = items[item];
                     if (itemStr.equals(DELETE_POST)) {

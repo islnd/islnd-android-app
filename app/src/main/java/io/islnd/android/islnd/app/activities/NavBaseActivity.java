@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -40,6 +42,7 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
@@ -64,6 +67,7 @@ public class NavBaseActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+       //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
@@ -227,7 +231,7 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void addFriendActionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
         builder.setTitle(R.string.add_friend_dialog)
                 .setItems(R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
                     switch (which) {
@@ -243,24 +247,9 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void qrCodeActionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.qr_dialog, null);
-
-        Button getQrButton = (Button) dialogView.findViewById(R.id.get_qr_button);
-        getQrButton.setOnClickListener((View v) -> {
-            IntentIntegrator integrator = new IntentIntegrator(this);
-            integrator.setCaptureActivity(VerticalCaptureActivity.class);
-            integrator.setOrientationLocked(false);
-            integrator.initiateScan();
-        });
-
-        ImageView qrImageView = (ImageView) dialogView.findViewById(R.id.qr_image_view);
-        Util.buildQrCode(qrImageView,
-                MessageLayer.getEncodedIdentityString(getApplicationContext()));
-
-        builder.setView(dialogView)
-                .setTitle(getString(R.string.qr_dialog_title))
-                .show();
+        Fragment fragment = new ShowQrFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     }
 
     private void smsAllowDialog() {
@@ -271,7 +260,7 @@ public class NavBaseActivity extends AppCompatActivity
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
         mDialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
         builder.setView(mDialogView);
 
