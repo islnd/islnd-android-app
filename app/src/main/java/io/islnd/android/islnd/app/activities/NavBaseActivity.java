@@ -67,7 +67,7 @@ public class NavBaseActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-       //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        Util.applyAppTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
@@ -160,6 +160,7 @@ public class NavBaseActivity extends AppCompatActivity
                 addFriendActionDialog();
                 break;
             case R.id.nav_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.delete_database:
                 DataUtils.deleteAll(this);

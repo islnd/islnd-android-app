@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatDelegate;
 import android.widget.ImageView;
 
 import com.google.zxing.BarcodeFormat;
@@ -19,6 +20,7 @@ import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.models.Comment;
 
+import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
@@ -81,6 +83,23 @@ public class Util
     public static boolean isUser(Context context, int userId)
     {
         return getUserId(context) == userId;
+    }
+
+    public static void applyAppTheme(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String value = sharedPref.getString(ThemePreferenceFragment.PREFERENCE_THEME_KEY, "1");
+
+        switch (value) {
+            case "1": // Light
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "2": // Dark
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "3": // DayNight Auto
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+                break;
+        }
     }
 
     public static int getUserId(Context context) {
