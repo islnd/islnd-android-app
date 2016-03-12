@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/comment_vertical_padding"
+                android:paddingBottom="@dimen/comment_vertical_padding"
+                android:paddingLeft="@dimen/comment_horizontal_padding"
+                android:paddingRight="@dimen/comment_horizontal_padding">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/post_header_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glance_post_padding"
-        android:layout_marginLeft="@dimen/glance_post_padding"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/post_profile_image"
             android:layout_width="@dimen/glance_post_profile_image"
             android:layout_height="@dimen/glance_post_profile_image"
             android:layout_marginRight="@dimen/post_profile_image_margin"
-            android:layout_marginBottom="@dimen/post_profile_image_margin"/>
+            android:layout_alignParentLeft="true"/>
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/post_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/glance_post_padding"
-            android:orientation="vertical">
+            android:layout_marginBottom="@dimen/comment_horizontal_padding"
+            android:layout_toRightOf="@id/post_profile_image">
 
             <TextView
                 android:id="@+id/post_user_name"
@@ -32,42 +34,30 @@
                 android:textSize="16sp"/>
 
             <TextView
-                android:id="@+id/post_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Base.TextAppearance.AppCompat.Caption"/>
-
-            <TextView
                 android:id="@+id/post_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/glance_post_padding"
-                style="@style/Base.TextAppearance.AppCompat.Body1"/>
+                android:layout_below="@id/post_user_name"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"/>
 
-            <TextView
-                android:id="@+id/post_comment_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/comment_icon_count_top_margin"
-                android:layout_gravity="center_vertical"/>
-        </LinearLayout>
-    </LinearLayout>
+        </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/post_overflow_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:padding="@dimen/glance_post_padding"
-        android:visibility="gone">
-
-        <ImageView
+        <TextView
+            android:id="@+id/post_comment_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_more_vert_black_18dp"
-            android:alpha="@dimen/active_opacity_light"/>
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            android:layout_alignLeft="@+id/post_info_layout"
+            android:layout_below="@id/post_info_layout"
+            android:layout_alignParentBottom="true"/>
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/post_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        style="@style/Base.TextAppearance.AppCompat.Caption"/>
 
 </RelativeLayout>

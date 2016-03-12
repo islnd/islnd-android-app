@@ -14,7 +14,8 @@ public class CommentViewHolder extends RecyclerView.ViewHolder
     public ImageView profileImage;
     public TextView userName;
     public TextView comment;
-    public RelativeLayout overflow;
+    public TextView timestamp;
+    public View view;
 
     public CommentViewHolder(View itemView)
     {
@@ -22,6 +23,7 @@ public class CommentViewHolder extends RecyclerView.ViewHolder
         profileImage = (ImageView) itemView.findViewById(R.id.comment_profile_image);
         userName = (TextView) itemView.findViewById(R.id.comment_user_name);
         comment = (TextView) itemView.findViewById(R.id.comment);
-        overflow = (RelativeLayout) itemView.findViewById(R.id.comment_overflow_layout);
+        timestamp = (TextView) itemView.findViewById(R.id.comment_timestamp);
+        view = itemView;
     }
 }

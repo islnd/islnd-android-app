@@ -5,10 +5,11 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <!-- Post -->
-    <dimen name="glance_post_profile_image">56dp</dimen>
+    <dimen name="glance_post_profile_image">64dp</dimen>
     <dimen name="post_profile_image">64dp</dimen>
     <dimen name="post_profile_image_margin">8dp</dimen>
-    <dimen name="glance_post_padding">8dp</dimen>
+    <dimen name="glance_post_horizontal_padding">8dp</dimen>
+    <dimen name="glance_post_vertical_padding">8dp</dimen>
     <dimen name="interact_post_padding">16dp</dimen>
     <dimen name="post_submit_comment_margin">8dp</dimen>
     <dimen name="edit_text_box_horizontal_padding">16dp</dimen>
@@ -35,7 +36,7 @@
 
     <!-- Friend Glance -->
     <dimen name="friend_glance_padding">16dp</dimen>
-    <dimen name="friend_profile_image">56dp</dimen>
+    <dimen name="friend_profile_image">64dp</dimen>
     <dimen name="friend_profile_image_name_margin">16dp</dimen>
 
     <!-- Default screen margins, per the Android Design guidelines. -->

@@ -48,4 +48,8 @@ public class CommentViewModel implements Serializable
     public int getUserId() {
         return userId;
     }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 }

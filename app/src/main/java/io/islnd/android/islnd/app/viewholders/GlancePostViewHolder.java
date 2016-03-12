@@ -19,7 +19,7 @@ public class GlancePostViewHolder extends RecyclerView.ViewHolder
     public TextView postTimestamp;
     public TextView postContent;
     public TextView postCommentCount;
-    public RelativeLayout postOverflowLayout;
+    public View view;
 
     public GlancePostViewHolder(View itemView)
     {
@@ -29,6 +29,6 @@ public class GlancePostViewHolder extends RecyclerView.ViewHolder
         postTimestamp = (TextView) itemView.findViewById(R.id.post_timestamp);
         postContent = (TextView) itemView.findViewById(R.id.post_content);
         postCommentCount = (TextView) itemView.findViewById(R.id.post_comment_count);
-        postOverflowLayout  = (RelativeLayout) itemView.findViewById(R.id.post_overflow_layout);
+        view = itemView;
     }
 }
