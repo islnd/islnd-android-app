@@ -80,7 +80,7 @@
                 android:id="@+id/post_submit_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_send_24dp"/>
+                app:srcCompat="@drawable/ic_send_24dp"/>
         </RelativeLayout>
 
     </LinearLayout>

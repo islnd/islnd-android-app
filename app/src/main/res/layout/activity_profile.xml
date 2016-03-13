@@ -98,7 +98,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:layout_behavior="io.islnd.android.islnd.app.FabScrollBehavior"
-        android:src="@drawable/ic_add_white_24dp"
+        app:srcCompat="@drawable/ic_add_white_24dp"
         android:onClick="startNewPostActivity"/>
 
 </android.support.design.widget.CoordinatorLayout>
