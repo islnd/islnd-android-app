@@ -6,7 +6,6 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.activities.SettingsActivity;
 
 public class AppPreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener {

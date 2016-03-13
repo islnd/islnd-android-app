@@ -14,8 +14,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.activities.NavBaseActivity;
-import io.islnd.android.islnd.app.activities.SettingsActivity;
 
 public class ThemePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener {

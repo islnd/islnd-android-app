@@ -19,8 +19,7 @@ import java.io.InputStream;
 
 import io.islnd.android.islnd.app.R;
 
-public class ImageUtil
-{
+public class ImageUtil {
     private static String TAG = ImageUtil.class.getSimpleName();
     private static String IMAGE_DIR = "images";
     private static String JPG_EXT = ".jpg";
@@ -32,68 +31,50 @@ public class ImageUtil
 
     private static int COMPRESSION = 65;
 
-    public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath)
-    {
+    public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
         File bitmapPath = new File (directory, filePath);
 
-        try
-        {
+        try {
             FileOutputStream outputStream = new FileOutputStream(bitmapPath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, outputStream);
-            try
-            {
+            try {
                 outputStream.close();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static Uri saveBitmapToInternalStorage(Context context, Bitmap bitmap)
-    {
+    public static Uri saveBitmapToInternalStorage(Context context, Bitmap bitmap) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
         File bitmapPath = new File (directory, getCurrentTimeJpgString());
 
-        try
-        {
+        try {
             FileOutputStream outputStream = new FileOutputStream(bitmapPath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, outputStream);
-            try
-            {
+            try {
                 outputStream.close();
                 return Uri.fromFile(bitmapPath);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static Bitmap getBitmapFromInternalStorage(Context context, String filePath)
-    {
+    public static Bitmap getBitmapFromInternalStorage(Context context, String filePath) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
         File bitmapPath = new File (directory, filePath);
         Bitmap bitmap = null;
 
-        try
-        {
+        try {
             bitmap = BitmapFactory.decodeStream(new FileInputStream(bitmapPath));
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -155,20 +136,16 @@ public class ImageUtil
         return System.currentTimeMillis() + JPG_EXT;
     }
 
-    public static Bitmap getBitmapFromAssets(Context context, String filePath)
-    {
+    public static Bitmap getBitmapFromAssets(Context context, String filePath) {
         AssetManager assetManager = context.getAssets();
 
         InputStream inputStream;
         Bitmap bitmap = null;
-        try
-        {
+        try {
             inputStream = assetManager.open(filePath);
             bitmap = BitmapFactory.decodeStream(inputStream);
             inputStream.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
