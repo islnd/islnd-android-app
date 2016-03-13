@@ -52,7 +52,7 @@
         android:paddingLeft="@dimen/edit_text_box_horizontal_padding"
         android:paddingTop="@dimen/edit_text_box_vertical_padding"
         android:paddingBottom="@dimen/edit_text_box_vertical_padding"
-        android:background="@color/background_top">
+        android:background="@color/background_core">
 
         <EditText
             android:id="@+id/post_comment_edit_text"

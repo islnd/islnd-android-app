@@ -9,8 +9,9 @@
     <color name="disabled_text">#80FFFFFF</color>
     <color name="hint_text">#80FFFFFF</color>
     <color name="divider">#1FFFFFFF</color>
-    <color name="background">#303030</color>
-    <color name="background_top">#424242</color>
+    <color name="background">#000000</color>
+    <color name="background_core">#000000</color>
+    <color name="background_mat">#303030</color>
 
     <color name="active_icon">#FFFFFF</color>
     <color name="inactive_icon">#FFFFFF</color>
