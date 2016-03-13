@@ -5,14 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.islnd.android.islnd.app.activities.ProfileActivity">
+    tools:context="io.islnd.android.islnd.app.activities.ProfileActivity"
+    android:background="@color/background">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
-        android:background="@android:color/white"
+        android:background="@color/background"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -38,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@android:color/white"
+                android:background="@color/background_core"
                 android:layout_marginTop="@dimen/profile_header_height"
                 android:paddingTop="@dimen/profile_info_padding"
                 android:paddingBottom="@dimen/profile_bottom_padding"
@@ -50,7 +51,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/primary_text"
                     android:paddingTop="@dimen/profile_user_name_padding"
                     style="@style/Base.TextAppearance.AppCompat.Title"/>
 
@@ -59,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/primary_text"
                     style="@style/Base.TextAppearance.AppCompat.Subhead"/>
             </LinearLayout>
 
@@ -97,7 +98,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:layout_behavior="io.islnd.android.islnd.app.FabScrollBehavior"
-        android:src="@drawable/ic_add_white_24dp"
+        app:srcCompat="@drawable/ic_add_white_24dp"
         android:onClick="startNewPostActivity"/>
 
 </android.support.design.widget.CoordinatorLayout>

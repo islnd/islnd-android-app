@@ -31,14 +31,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Base.TextAppearance.AppCompat.Title"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/primary_text"/>
 
             <TextView
                 android:id="@+id/post_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_user_name"
-                style="@style/Base.TextAppearance.AppCompat.Subhead"/>
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:textColor="@color/primary_text"/>
 
         </RelativeLayout>
 
@@ -49,7 +51,8 @@
             style="@style/Base.TextAppearance.AppCompat.Caption"
             android:layout_alignLeft="@+id/post_info_layout"
             android:layout_below="@id/post_info_layout"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"
+            android:textColor="@color/secondary_text"/>
     </RelativeLayout>
 
     <TextView
@@ -58,6 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        style="@style/Base.TextAppearance.AppCompat.Caption"/>
+        style="@style/Base.TextAppearance.AppCompat.Caption"
+        android:textColor="@color/secondary_text"/>
 
 </RelativeLayout>

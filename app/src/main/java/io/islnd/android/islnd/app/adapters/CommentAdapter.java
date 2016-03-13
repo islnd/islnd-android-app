@@ -81,7 +81,7 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
                 final String DELETE_COMMENT = mContext.getString(R.string.delete_comment);
                 final String[] items = {DELETE_COMMENT};
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
                 builder.setItems(items, (DialogInterface dialog, int item) -> {
                     String itemStr = items[item];
                     if (itemStr.equals(DELETE_COMMENT)) {

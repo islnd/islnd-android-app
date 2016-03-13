@@ -12,9 +12,7 @@
         android:id="@+id/comment_profile_image"
         android:layout_width="@dimen/comment_profile_image"
         android:layout_height="@dimen/comment_profile_image"
-        android:layout_marginRight="@dimen/comment_profile_image_margin"
-        android:background="?android:colorBackground"
-        android:src="@drawable/ic_person_black_24dp"/>
+        android:layout_marginRight="@dimen/comment_profile_image_margin"/>
 
     <LinearLayout
         android:id="@+id/comment_linear_layout"
@@ -28,13 +26,15 @@
             android:id="@+id/comment_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Base.TextAppearance.AppCompat.Body2"/>
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:textColor="@color/primary_text"/>
 
         <TextView
             android:id="@+id/comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Base.TextAppearance.AppCompat.Body1"/>
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:textColor="@color/primary_text"/>
 
     </LinearLayout>
 
@@ -44,5 +44,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        style="@style/Base.TextAppearance.AppCompat.Caption"/>
+        style="@style/Base.TextAppearance.AppCompat.Caption"
+        android:textColor="@color/secondary_text"/>
 </RelativeLayout>

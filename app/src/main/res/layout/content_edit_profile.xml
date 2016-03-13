@@ -25,8 +25,7 @@
                 android:id="@+id/profile_header_image"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_header_height"
-                android:scaleType="centerCrop"
-                android:src="@drawable/side_nav_bar"/>
+                android:scaleType="centerCrop"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -39,7 +38,7 @@
                 android:layout_gravity="bottom|right"
                 android:paddingBottom="@dimen/edit_profile_header_image_icon_padding"
                 android:paddingRight="@dimen/edit_profile_header_image_icon_padding"
-                android:src="@drawable/ic_photo_camera_white_24dp"/>
+                app:srcCompat="@drawable/ic_insert_photo_white_24dp"/>
         </FrameLayout>
 
         <FrameLayout
@@ -63,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_photo_camera_white_24dp"/>
+                app:srcCompat="@drawable/ic_insert_photo_white_24dp"/>
         </FrameLayout>
     </FrameLayout>
 
@@ -74,7 +73,8 @@
         android:layout_below="@+id/profile_header_frame"
         android:layout_centerHorizontal="true"
         android:paddingTop="@dimen/profile_user_name_padding"
-        style="@style/Base.TextAppearance.AppCompat.Title"/>
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="@color/primary_text"/>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -89,6 +89,8 @@
             android:layout_marginRight="@dimen/about_me_edit_text_padding"
             android:layout_marginTop="@dimen/about_me_padding"
             android:inputType="textMultiLine|textCapSentences"
-            android:hint="@string/about_me"/>
+            android:hint="@string/about_me"
+            android:textColor="@color/primary_text"
+            android:textColorHint="@color/hint_text"/>
     </android.support.design.widget.TextInputLayout>
 </RelativeLayout>
