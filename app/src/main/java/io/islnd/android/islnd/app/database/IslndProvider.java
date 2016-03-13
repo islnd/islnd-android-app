@@ -28,6 +28,8 @@ public class IslndProvider extends ContentProvider {
     static final int DISPLAY_NAME = 600;
     static final int DISPLAY_NAME_WITH_USER_ID = 601;
     static final int IDENTITY = 700;
+    static final int EVENT = 800;
+    static final int EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -193,6 +195,27 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getEventByAliasAndUserId(Uri uri, String[] projection, String sortOrder) {
+        String alias = IslndContract.EventEntry.getAliasFromUri(uri);
+        int eventId = IslndContract.EventEntry.getEventIdFromUri(uri);
+
+        String selection = IslndContract.EventEntry.COLUMN_ALIAS + " = ? AND " +
+                IslndContract.EventEntry.COLUMN_EVENT_ID + " = ?";
+        String[] selectionArgs = {
+                alias,
+                Integer.toString(eventId)
+        };
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.EventEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+    }
+
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = IslndContract.CONTENT_AUTHORITY;
@@ -216,6 +239,9 @@ public class IslndProvider extends ContentProvider {
         matcher.addURI(authority, IslndContract.PATH_DISPLAY_NAME + "/#", DISPLAY_NAME_WITH_USER_ID);
 
         matcher.addURI(authority, IslndContract.PATH_IDENTITY, IDENTITY);
+
+        matcher.addURI(authority, IslndContract.PATH_EVENT, EVENT);
+        matcher.addURI(authority, IslndContract.PATH_EVENT + "/*/#", EVENT_WITH_ALIAS_AND_EVENT_ID);
 
         return matcher;
     }
@@ -316,6 +342,10 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getAliasesByUserId(uri, projection, sortOrder);
                 break;
             }
+            case EVENT_WITH_ALIAS_AND_EVENT_ID: {
+                retCursor = getEventByAliasAndUserId(uri, projection, sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -347,6 +377,10 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.ProfileEntry.CONTENT_TYPE;
             case PROFILE_WITH_USER_ID:
                 return IslndContract.ProfileEntry.CONTENT_ITEM_TYPE;
+            case EVENT:
+                return IslndContract.EventEntry.CONTENT_TYPE;
+            case EVENT_WITH_ALIAS_AND_EVENT_ID:
+                return IslndContract.EventEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -435,6 +469,22 @@ public class IslndProvider extends ContentProvider {
 
                 break;
             }
+            case EVENT: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.EventEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if ( _id > 0 )
+                    returnUri = IslndContract.EventEntry.buildEventUri(_id);
+                else
+                    return null;
+                break;
+            }
+            case EVENT_WITH_ALIAS_AND_EVENT_ID: {
+                returnUri = insertEventWithAliasAndUri(db, uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -442,6 +492,25 @@ public class IslndProvider extends ContentProvider {
         Log.v(TAG, "inserted uri " + uri);
         getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
         return returnUri;
+    }
+
+    private Uri insertEventWithAliasAndUri(SQLiteDatabase db, Uri uri) {
+        ContentValues values = new ContentValues();
+        values.put(
+                IslndContract.EventEntry.COLUMN_ALIAS,
+                IslndContract.EventEntry.getAliasFromUri(uri));
+        values.put(
+                IslndContract.EventEntry.COLUMN_EVENT_ID,
+                IslndContract.EventEntry.getEventIdFromUri(uri));
+        long _id = db.insertWithOnConflict(
+                IslndContract.EventEntry.TABLE_NAME,
+                null,
+                values,
+                SQLiteDatabase.CONFLICT_IGNORE);
+        if ( _id > 0 )
+            return IslndContract.EventEntry.buildEventUri(_id);
+        else
+            return null;
     }
 
     @Override
@@ -532,6 +601,11 @@ public class IslndProvider extends ContentProvider {
             case DISPLAY_NAME: {
                 rowsDeleted = db.delete(
                         IslndContract.DisplayNameEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case EVENT: {
+                rowsDeleted = db.delete(
+                        IslndContract.EventEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:

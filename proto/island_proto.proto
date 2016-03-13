@@ -41,5 +41,6 @@ message Profile {
 
 message ChangeDisplayNameEvent {
   required string alias = 1;
-  required string display_name = 2;
+  required int32 event_id = 2;
+  required string display_name = 3;
 }

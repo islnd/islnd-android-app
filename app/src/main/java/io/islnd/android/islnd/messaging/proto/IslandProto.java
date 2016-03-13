@@ -3411,7 +3411,11 @@ public final class IslandProto {
     boolean hasAlias();
     String getAlias();
     
-    // required string display_name = 2;
+    // required int32 event_id = 2;
+    boolean hasEventId();
+    int getEventId();
+    
+    // required string display_name = 3;
     boolean hasDisplayName();
     String getDisplayName();
   }
@@ -3476,11 +3480,21 @@ public final class IslandProto {
       }
     }
     
-    // required string display_name = 2;
-    public static final int DISPLAY_NAME_FIELD_NUMBER = 2;
+    // required int32 event_id = 2;
+    public static final int EVENT_ID_FIELD_NUMBER = 2;
+    private int eventId_;
+    public boolean hasEventId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getEventId() {
+      return eventId_;
+    }
+    
+    // required string display_name = 3;
+    public static final int DISPLAY_NAME_FIELD_NUMBER = 3;
     private java.lang.Object displayName_;
     public boolean hasDisplayName() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public String getDisplayName() {
       java.lang.Object ref = displayName_;
@@ -3510,6 +3524,7 @@ public final class IslandProto {
     
     private void initFields() {
       alias_ = "";
+      eventId_ = 0;
       displayName_ = "";
     }
     private byte memoizedIsInitialized = -1;
@@ -3518,6 +3533,10 @@ public final class IslandProto {
       if (isInitialized != -1) return isInitialized == 1;
       
       if (!hasAlias()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasEventId()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -3536,7 +3555,10 @@ public final class IslandProto {
         output.writeBytes(1, getAliasBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getDisplayNameBytes());
+        output.writeInt32(2, eventId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getDisplayNameBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3553,7 +3575,11 @@ public final class IslandProto {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getDisplayNameBytes());
+          .computeInt32Size(2, eventId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getDisplayNameBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3681,8 +3707,10 @@ public final class IslandProto {
         super.clear();
         alias_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        displayName_ = "";
+        eventId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
+        displayName_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       
@@ -3728,6 +3756,10 @@ public final class IslandProto {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
+        result.eventId_ = eventId_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
         result.displayName_ = displayName_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -3748,6 +3780,9 @@ public final class IslandProto {
         if (other.hasAlias()) {
           setAlias(other.getAlias());
         }
+        if (other.hasEventId()) {
+          setEventId(other.getEventId());
+        }
         if (other.hasDisplayName()) {
           setDisplayName(other.getDisplayName());
         }
@@ -3757,6 +3792,10 @@ public final class IslandProto {
       
       public final boolean isInitialized() {
         if (!hasAlias()) {
+          
+          return false;
+        }
+        if (!hasEventId()) {
           
           return false;
         }
@@ -3795,8 +3834,13 @@ public final class IslandProto {
               alias_ = input.readBytes();
               break;
             }
-            case 18: {
+            case 16: {
               bitField0_ |= 0x00000002;
+              eventId_ = input.readInt32();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
               displayName_ = input.readBytes();
               break;
             }
@@ -3842,10 +3886,31 @@ public final class IslandProto {
         onChanged();
       }
       
-      // required string display_name = 2;
+      // required int32 event_id = 2;
+      private int eventId_ ;
+      public boolean hasEventId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getEventId() {
+        return eventId_;
+      }
+      public Builder setEventId(int value) {
+        bitField0_ |= 0x00000002;
+        eventId_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearEventId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        eventId_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // required string display_name = 3;
       private java.lang.Object displayName_ = "";
       public boolean hasDisplayName() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       public String getDisplayName() {
         java.lang.Object ref = displayName_;
@@ -3861,19 +3926,19 @@ public final class IslandProto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000004;
         displayName_ = value;
         onChanged();
         return this;
       }
       public Builder clearDisplayName() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         displayName_ = getDefaultInstance().getDisplayName();
         onChanged();
         return this;
       }
       void setDisplayName(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         displayName_ = value;
         onChanged();
       }
@@ -3941,10 +4006,10 @@ public final class IslandProto {
       "ent\030\006 \002(\t\022\021\n\ttimestamp\030\007 \002(\003\"o\n\007Profile\022" +
       "\024\n\014display_name\030\001 \002(\t\022\020\n\010about_me\030\002 \002(\t\022" +
       "\025\n\rprofile_image\030\003 \002(\014\022\024\n\014header_image\030\004" +
-      " \002(\014\022\017\n\007version\030\005 \002(\005\"=\n\026ChangeDisplayNa" +
-      "meEvent\022\r\n\005alias\030\001 \002(\t\022\024\n\014display_name\030\002" +
-      " \002(\tB(\n&io.islnd.android.islnd.messaging" +
-      ".proto"
+      " \002(\014\022\017\n\007version\030\005 \002(\005\"O\n\026ChangeDisplayNa" +
+      "meEvent\022\r\n\005alias\030\001 \002(\t\022\020\n\010event_id\030\002 \002(\005" +
+      "\022\024\n\014display_name\030\003 \002(\tB(\n&io.islnd.andro" +
+      "id.islnd.messaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3996,7 +4061,7 @@ public final class IslandProto {
           internal_static_proto_ChangeDisplayNameEvent_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_ChangeDisplayNameEvent_descriptor,
-              new java.lang.String[] { "Alias", "DisplayName", },
+              new java.lang.String[] { "Alias", "EventId", "DisplayName", },
               io.islnd.android.islnd.messaging.proto.IslandProto.ChangeDisplayNameEvent.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.ChangeDisplayNameEvent.Builder.class);
           return null;

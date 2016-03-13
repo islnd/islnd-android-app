@@ -87,9 +87,19 @@ public class Util
         return sharedPref.getInt(context.getString(R.string.user_id), -1);
     }
 
+    public static void setDisplayName(Context context, String displayName) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putString(context.getString(R.string.display_name), displayName);
+        editor.commit();
+    }
+
     public static String getDisplayName(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.display_name), "no display name in shared pref");
+        return sharedPref.getString(
+                context.getString(R.string.display_name),
+                "no display name in shared pref");
     }
 
     public static String getAlias(Context context) {
@@ -135,6 +145,18 @@ public class Util
                 savedHeaderImageUri,
                 profile.getVersion()
         );
+    }
+
+    public static int getEventId(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getInt(context.getString(R.string.event_id), 0);
+    }
+
+    public static void setEventId(Context context, int eventId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(context.getString(R.string.event_id), eventId);
+        editor.commit();
     }
 
     public static String getApiKey(Context context) {

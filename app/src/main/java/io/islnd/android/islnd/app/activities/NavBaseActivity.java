@@ -87,6 +87,7 @@ public class NavBaseActivity extends AppCompatActivity
                 account,
                 getString(R.string.content_authority),
                 true);
+        Log.v(TAG, "requesting sync...");
         mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
@@ -120,12 +121,16 @@ public class NavBaseActivity extends AppCompatActivity
         int myUserId = Util.getUserId(this);
         if (myUserId >= 0) {
             Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
-            Uri profileImageUri = profile.getProfileImageUri();
-            Uri headerImageUri = profile.getHeaderImageUri();
-            ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
-                    profileImageUri);
-            ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
-                    headerImageUri);
+            if (profile == null) {
+                Log.d(TAG, String.format("my id is %d and I have no profile", myUserId));
+            } else {
+                Uri profileImageUri = profile.getProfileImageUri();
+                Uri headerImageUri = profile.getHeaderImageUri();
+                ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
+                        profileImageUri);
+                ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
+                        headerImageUri);
+            }
         }
     }
 
@@ -324,7 +329,8 @@ public class NavBaseActivity extends AppCompatActivity
                     .show();
         } else {
             // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.SEND_SMS},
                     REQUEST_SMS);
         }
@@ -411,15 +417,24 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-//                    DataUtils.deleteAll(this);
-//                    IslndDb.createIdentity(getApplicationContext(), editText.getText().toString());
-                    List<Event> eventList = new EventListBuilder(this)
-                            .changeDisplayName(editText.getText().toString())
-                            .build();
-                    for (Event event : eventList) {
-                        Intent pushEvent = new Intent(this, EventPushService.class);
-                        pushEvent.putExtra(EventPushService.EVENT_EXTRA, event);
-                        startService(pushEvent);
+                    final String newDisplayName = editText.getText().toString();
+                    if (Util.getUserId(this) >= 0) {
+                        //--update locally
+                        DataUtils.updateMyDisplayName(this, newDisplayName);
+                        //--push event
+                        List<Event> eventList = new EventListBuilder(this)
+                                .changeDisplayName(newDisplayName)
+                                .build();
+                        for (Event event : eventList) {
+                            Intent pushEvent = new Intent(this, EventPushService.class);
+                            pushEvent.putExtra(EventPushService.EVENT_EXTRA, event);
+                            startService(pushEvent);
+                        }
+                    }
+                    else {
+                        DataUtils.deleteAll(this);
+                        IslndDb.createIdentity(getApplicationContext(),
+                                newDisplayName);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)

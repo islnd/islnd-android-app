@@ -14,6 +14,7 @@ import android.util.Log;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -22,6 +23,7 @@ import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
+import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 
@@ -54,11 +56,16 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 IslndContract.AliasEntry.COLUMN_ALIAS,
                 IslndContract.AliasEntry.COLUMN_GROUP_KEY,
         };
+
+        String[] args = new String[] {
+                Integer.toString(Util.getUserId(mContext)),
+        };
+
         Cursor cursor = mContentResolver.query(
                 IslndContract.AliasEntry.CONTENT_URI,
                 projection,
-                null,
-                null,
+                IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
+                args,
                 null);
 
         EventQuery eventQuery = buildEventQuery(cursor);
@@ -74,22 +81,27 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
         Log.v(TAG, String.format("event service returned %d events", encryptedEvents.size()));
 
-        //--Decrypt and process the events
+        //--Decrypt the events and add to queue
+        PriorityQueue<Event> events = new PriorityQueue<>();
         for (EncryptedEvent encryptedEvent : encryptedEvents) {
             String alias = encryptedEvent.getAlias();
 
             //--TODO need to handle multiple users having same alias
             int userId = DataUtils.getUserIdFromAlias(mContext, alias);
 
-            //--TODO these need to be a keystore or in-memory cache service
+            //--TODO keys need to be a keystore or in-memory cache service
             Key groupKey = DataUtils.getGroupKey(mContext, userId);
             Key publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
-                ChangeDisplayNameEvent event = encryptedEvent.decryptAndVerify(groupKey, publicKey);
-                EventProcessor.process(mContext, event);
+                events.add(encryptedEvent.decryptAndVerify(groupKey, publicKey));
             } catch (InvalidSignatureException e) {
                 e.printStackTrace();
             }
+        }
+
+        //--Process events in order
+        while (!events.isEmpty()) {
+            EventProcessor.process(mContext, events.poll());
         }
 
         Log.v(TAG, "completed on perform sync");

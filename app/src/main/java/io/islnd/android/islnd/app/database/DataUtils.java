@@ -7,10 +7,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostKey;
 
 import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
@@ -247,6 +249,7 @@ public class DataUtils {
         contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.EventEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {
@@ -284,5 +287,18 @@ public class DataUtils {
         } finally {
             cursor.close();
         }
+    }
+
+    public static void updateMyDisplayName(Context context, String newDisplayName) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME, newDisplayName);
+        context.getContentResolver().update(
+                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(Util.getUserId(context)),
+                values,
+                null,
+                null
+        );
+
+        Util.setDisplayName(context, newDisplayName);
     }
 }

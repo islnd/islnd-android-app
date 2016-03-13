@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -84,12 +84,21 @@ public class IslndDbHelper extends SQLiteOpenHelper {
 
                 " UNIQUE (" + IslndContract.ProfileEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
+        final String SQL_CREATE_EVENT_TABLE = "CREATE TABLE " + IslndContract.EventEntry.TABLE_NAME + " (" +
+                IslndContract.EventEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.EventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
+                IslndContract.EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, " +
+
+                " UNIQUE (" + IslndContract.EventEntry.COLUMN_ALIAS +", " +
+                IslndContract.EventEntry.COLUMN_EVENT_ID + ") ON CONFLICT IGNORE);";
+
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_ALIAS_TABLE);
         db.execSQL(SQL_CREATE_DISPLAY_NAME_TABLE);
         db.execSQL(SQL_CREATE_POST_TABLE);
         db.execSQL(SQL_CREATE_COMMENT_TABLE);
         db.execSQL(SQL_CREATE_PROFILE_TABLE);
+        db.execSQL(SQL_CREATE_EVENT_TABLE);
     }
 
     @Override
@@ -100,6 +109,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.PostEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.CommentEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ProfileEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.EventEntry.TABLE_NAME);
         onCreate(db);
     }
 }

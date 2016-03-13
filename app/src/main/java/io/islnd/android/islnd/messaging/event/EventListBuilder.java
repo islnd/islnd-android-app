@@ -13,19 +13,25 @@ public class EventListBuilder {
     private final Context mContext;
     private final List<Event> eventList;
     private final int mUserId;
+    private int eventId;
 
     public EventListBuilder(Context context) {
         mContext = context;
-        mUserId = Util.getUserId(context);
+        mUserId = Util.getUserId(mContext);
         this.eventList = new ArrayList<>();
+        eventId = Util.getEventId(mContext);
     }
 
     public EventListBuilder changeDisplayName(String displayName) {
-        this.eventList.add(new ChangeDisplayNameEvent(getCurrentAlias(), displayName));
+        this.eventList.add(new ChangeDisplayNameEvent(
+                        getCurrentAlias(),
+                        ++eventId,
+                        displayName));
         return this;
     }
 
     public List<Event> build() {
+        Util.setEventId(mContext, eventId);
         return this.eventList;
     }
 

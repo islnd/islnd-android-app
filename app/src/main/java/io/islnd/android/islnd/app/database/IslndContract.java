@@ -5,6 +5,8 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import io.islnd.android.islnd.messaging.event.Event;
+
 public class IslndContract {
 
     public static final String CONTENT_AUTHORITY = "io.islnd.android.islnd.app.database";
@@ -16,6 +18,7 @@ public class IslndContract {
     public static final String PATH_COMMENT = "comment";
     public static final String PATH_PROFILE = "profile";
     public static final String PATH_IDENTITY = "identity";
+    public static final String PATH_EVENT = "event";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -23,7 +26,7 @@ public class IslndContract {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_POST).build();
 
         public static final String CONTENT_TYPE =
-            ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POST;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POST;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POST;
 
@@ -223,6 +226,41 @@ public class IslndContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IDENTITY;
 
         public static Uri buildProfileUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class EventEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENT).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENT;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENT;
+
+        public static final String TABLE_NAME = "event";
+
+        public static final String COLUMN_ALIAS = "alias";
+        public static final String COLUMN_EVENT_ID = "event_id";
+
+        public static String getAliasFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static int getEventIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(2));
+        }
+
+        public static Uri buildEventUriWithPseudonymAndEventId(Event event) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(event.getAlias())
+                    .appendPath(Integer.toString(event.getEventId()))
+                    .build();
+        }
+
+        public static Uri buildEventUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

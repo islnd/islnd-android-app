@@ -3,15 +3,14 @@ package io.islnd.android.islnd.messaging.event;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import io.islnd.android.islnd.messaging.Decoder;
-import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class ChangeDisplayNameEvent extends Event {
 
     private final String newDisplayName;
 
-    protected ChangeDisplayNameEvent(String alias, String newDisplayName) {
-        super(alias);
+    protected ChangeDisplayNameEvent(String alias, int id, String newDisplayName) {
+        super(alias, id);
         this.newDisplayName = newDisplayName;
     }
 
@@ -24,6 +23,7 @@ public class ChangeDisplayNameEvent extends Event {
     public byte[] toByteArray() {
         return IslandProto.ChangeDisplayNameEvent.newBuilder()
                 .setDisplayName(this.newDisplayName)
+                .setEventId(this.eventId)
                 .setAlias(this.alias)
                 .build()
                 .toByteArray();
@@ -44,6 +44,7 @@ public class ChangeDisplayNameEvent extends Event {
 
         return new ChangeDisplayNameEvent(
                 changeDisplayNameEvent.getAlias(),
+                changeDisplayNameEvent.getEventId(),
                 changeDisplayNameEvent.getDisplayName());
     }
 }
