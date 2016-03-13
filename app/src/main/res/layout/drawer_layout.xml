@@ -42,8 +42,8 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:itemBackground="@color/background"
-        app:itemTextColor="@color/primary_text"
-        app:itemIconTint="@color/black_active"
+        app:itemTextColor="@color/active_icon"
+        app:itemIconTint="@color/active_icon"
         app:headerLayout="@layout/nav_header_navigation_drawer"
         app:menu="@menu/activity_navigation_drawer_drawer"
         android:background="@color/background"/>

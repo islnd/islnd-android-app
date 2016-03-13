@@ -55,10 +55,5 @@
 
     <dimen name="sms_allow_dialog_margin">8dp</dimen>
 
-    <item name="active_opacity_light" format="float" type="dimen">0.54</item>
-    <item name="disabled_opacity_light" format="float" type="dimen">0.26</item>
-    <item name="active_opacity_dark" format="float" type="dimen">1.0</item>
-    <item name="disabled_opacity_dark" format="float" type="dimen">0.30</item>
-
     <dimen name="image_button_padding">8dp</dimen>
 </resources>

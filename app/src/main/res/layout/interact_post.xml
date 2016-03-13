@@ -66,8 +66,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_more_vert_black_24dp"
-            android:alpha="@dimen/active_opacity_light"/>
+            android:src="@drawable/ic_more_vert_24dp"/>
     </RelativeLayout>
 
     <TextView

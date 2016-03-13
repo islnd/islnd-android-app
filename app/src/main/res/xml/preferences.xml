@@ -3,5 +3,6 @@
     <Preference
         android:key="pref_appearance_key"
         android:title="@string/pref_appearance_title"
+        android:icon="@drawable/ic_palette_24dp"
         android:summary="@string/pref_appearance_summary"/>
 </PreferenceScreen>
