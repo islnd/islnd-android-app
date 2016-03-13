@@ -27,8 +27,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/sms_allow_dialog_margin">
+            android:layout_weight="1">
 
             <EditText
                 android:id="@+id/sms_number_edit_text"
@@ -39,12 +38,21 @@
                 android:maxLines="1"/>
         </android.support.design.widget.TextInputLayout>
 
-        <ImageView
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_contacts_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_gravity="center_vertical"
-            android:onClick="importContact"/>
+            android:padding="@dimen/image_button_padding"
+            android:onClick="importContact">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_contacts_black_24dp"
+                android:alpha="@dimen/active_opacity_light"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </LinearLayout>

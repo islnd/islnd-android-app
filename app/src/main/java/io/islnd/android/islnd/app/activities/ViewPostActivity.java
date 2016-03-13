@@ -15,8 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.DeletePostDialog;
@@ -122,11 +125,14 @@ public class ViewPostActivity extends AppCompatActivity {
         TextView postUserName = (TextView) findViewById(R.id.post_user_name);
         TextView postTimestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) findViewById(R.id.post_content);
-        ImageView postOverflow  = (ImageView) findViewById(R.id.post_overflow);
+        RelativeLayout postOverflow  = (RelativeLayout) findViewById(R.id.post_overflow_layout);
+        TextView commentCount = (TextView) findViewById(R.id.post_comment_count);
         
         postUserName.setText(mPost.getUserName());
         postTimestamp.setText(Util.smartTimestampFromUnixTime(mPost.getTimestamp()));
         postContent.setText(mPost.getContent());
+        //TODO: Get actual comment count
+        commentCount.setText(Util.numberOfCommentsString(0));
 
         // Go to profile on picture click
         postProfileImage.setOnClickListener((View v) -> {

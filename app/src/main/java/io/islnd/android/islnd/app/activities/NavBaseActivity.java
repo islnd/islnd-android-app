@@ -101,16 +101,16 @@ public class NavBaseActivity extends AppCompatActivity
         ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
         String myDisplayName = Util.getDisplayName(this);
+        int myUserId = Util.getUserId(this);
 
         navProfileImage.setOnClickListener(
                 (View v) -> {
                     Intent profileIntent = new Intent(this, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myDisplayName);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myUserId);
                     startActivity(profileIntent);
                 });
         navUserName.setText(myDisplayName);
 
-        int myUserId = Util.getUserId(this);
         if (myUserId >= 0) {
             Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
             Uri profileImageUri = profile.getProfileImageUri();

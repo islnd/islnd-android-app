@@ -2,11 +2,13 @@ package io.islnd.android.islnd.app.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -58,7 +60,8 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(post.getTimestamp()));
         holder.postContent.setText(post.getContent());
-        holder.postCommentCount.setText(Util.numberOfCommentsString(post.getComments().size()));
+        //TODO: Get actual comment count
+        holder.postCommentCount.setText(Util.numberOfCommentsString(0));
 
         // Go to profile on picture click
         holder.postProfileImage.setOnClickListener((View v) -> {
@@ -79,28 +82,24 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         });
 
         if(Util.isUser(mContext, post.getUserId())) {
-            holder.postOverflow.setVisibility(View.VISIBLE);
+            holder.view.setOnLongClickListener((View v) -> {
+                final String DELETE_POST = mContext.getString(R.string.delete_post);
+                final String[] items = {DELETE_POST};
 
-            holder.postOverflow.setOnClickListener((View v) -> {
-                PopupMenu popup = new PopupMenu(mContext, holder.postOverflow);
-                popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener((MenuItem item) -> {
-                    switch (item.getItemId()) {
-                        case R.id.delete_post:
-                            DialogFragment deletePostFragment =
-                                    DeletePostDialog.buildWithArgs(post.getUserId(), post.getPostId());
-                            deletePostFragment.show(
-                                    ((FragmentActivity) mContext).getSupportFragmentManager(),
-                                    mContext.getString(R.string.fragment_delete_post));
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setItems(items, (DialogInterface dialog, int item) -> {
+                    String itemStr = items[item];
+                    if (itemStr.equals(DELETE_POST)) {
+                        DialogFragment deletePostFragment =
+                                DeletePostDialog.buildWithArgs(post.getUserId(), post.getPostId());
+                        deletePostFragment.show(
+                                ((FragmentActivity) mContext).getSupportFragmentManager(),
+                                mContext.getString(R.string.fragment_delete_post));
                     }
+                }).show();
 
-                    return true;
-                });
-
-                popup.show();
+                return true;
             });
-        } else {
-            holder.postOverflow.setVisibility(View.GONE);
         }
     }
 }
