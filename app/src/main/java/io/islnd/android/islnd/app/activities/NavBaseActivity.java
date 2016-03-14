@@ -252,9 +252,10 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void qrCodeActionDialog() {
-        Fragment fragment = new ShowQrFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new ShowQrFragment())
+                .addToBackStack("")
+                .commit();
     }
 
     private void smsAllowDialog() {
