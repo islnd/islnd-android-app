@@ -1,12 +1,16 @@
 package io.islnd.android.islnd.app.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -42,6 +46,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final int CROP_PROFILE_IMAGE = 3;
     private static final int CROP_HEADER_IMAGE = 4;
     private Context mContext;
+    private Profile mProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,7 @@ public class EditProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mContext = getApplicationContext();
 
-        Profile profile = DataUtils.getProfile(
+        mProfile = DataUtils.getProfile(
                 getApplicationContext(),
                 Util.getUserId(getApplicationContext()));
 
@@ -61,38 +66,43 @@ public class EditProfileActivity extends AppCompatActivity {
         headerImage = (ImageView) findViewById(R.id.profile_header_image);
         aboutMe = (EditText) findViewById(R.id.edit_profile_about_me);
 
-        prevProfileImageUri = profile.getProfileImageUri();
-        prevHeaderImageUri = profile.getHeaderImageUri();
+        prevProfileImageUri = mProfile.getProfileImageUri();
+        prevHeaderImageUri = mProfile.getHeaderImageUri();
 
-        userName.setText(profile.getDisplayName());
-        aboutMe.setText(profile.getAboutMe());
+        userName.setText(mProfile.getDisplayName());
+        aboutMe.setText(mProfile.getAboutMe());
 
         ImageUtil.setProfileImageSampled(getApplicationContext(), profileImage,
-                profile.getProfileImageUri());
+                mProfile.getProfileImageUri());
         ImageUtil.setHeaderImageSampled(getApplicationContext(), headerImage,
-                profile.getHeaderImageUri());
+                mProfile.getHeaderImageUri());
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            if (requestCode == SELECT_PROFILE_IMAGE) {
-                Uri destination = Uri.fromFile(new File(getCacheDir(), "croppedProfile"));
-                Crop.of(data.getData(), destination).asSquare().start(this, CROP_PROFILE_IMAGE);
-            } else if (requestCode == SELECT_HEADER_IMAGE) {
-                Uri destination = Uri.fromFile(new File(getCacheDir(), "croppedHeader"));
-                Crop.of(data.getData(), destination).withAspect(
-                        headerImage.getWidth(),
-                        headerImage.getHeight()
-                ).start(this, CROP_HEADER_IMAGE);
-            } else if (requestCode == CROP_PROFILE_IMAGE) {
-                profileImageUri = Crop.getOutput(data);
-                ImageUtil.setProfileImageSampled(getApplicationContext(), profileImage,
-                        profileImageUri);
-            } else if (requestCode == CROP_HEADER_IMAGE) {
-                headerImageUri = Crop.getOutput(data);
-                ImageUtil.setHeaderImageSampled(getApplicationContext(), headerImage,
-                        headerImageUri);
+            switch (requestCode) {
+                case SELECT_PROFILE_IMAGE:
+                    Uri destination = Uri.fromFile(new File(getCacheDir(), "croppedProfile"));
+                    Crop.of(data.getData(), destination).asSquare().start(this, CROP_PROFILE_IMAGE);
+                    break;
+                case SELECT_HEADER_IMAGE:
+                    destination = Uri.fromFile(new File(getCacheDir(), "croppedHeader"));
+                    Crop.of(data.getData(), destination).withAspect(
+                            headerImage.getWidth(),
+                            headerImage.getHeight()
+                    ).start(this, CROP_HEADER_IMAGE);
+                    break;
+                case CROP_PROFILE_IMAGE:
+                    profileImageUri = Crop.getOutput(data);
+                    ImageUtil.setProfileImageSampled(getApplicationContext(), profileImage,
+                            profileImageUri);
+                    break;
+                case CROP_HEADER_IMAGE:
+                    headerImageUri = Crop.getOutput(data);
+                    ImageUtil.setHeaderImageSampled(getApplicationContext(), headerImage,
+                            headerImageUri);
+                    break;
             }
         }
     }
@@ -101,15 +111,34 @@ public class EditProfileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                if (hasProfileChanged()) {
+                    showDiscardChangesDialog();
+                } else {
+                    finish();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (hasProfileChanged()) {
+            showDiscardChangesDialog();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     public void saveProfile(View view) {
         String newAboutMeText = aboutMe.getText().toString();
         String myDisplayName = Util.getDisplayName(mContext);
+
+        if (!hasProfileChanged()) {
+            Log.v(TAG, "profile was not changed");
+            finish();
+            return;
+        }
 
         // TODO: Implement separate REST calls for profile/header images
         Uri newProfileUri = profileImageUri == null ? prevProfileImageUri : profileImageUri;
@@ -143,7 +172,16 @@ public class EditProfileActivity extends AppCompatActivity {
         DataUtils.updateProfile(getApplicationContext(), newProfile, myUserId);
         IslndDb.postProfile(getApplicationContext(), newProfileWithImageData);
 
-        Snackbar.make(view, getString(R.string.profile_saved), Snackbar.LENGTH_SHORT).show();
+        // TODO: Saving profile needs to go into its own thread so UI doesn't hang
+        finish();
+    }
+
+    private boolean hasProfileChanged() {
+        String newAboutMeText = aboutMe.getText().toString();
+
+        return !newAboutMeText.equals(mProfile.getAboutMe())
+                || profileImageUri != null
+                || headerImageUri != null;
     }
 
     public void chooseProfileImage(View view) {
@@ -152,5 +190,16 @@ public class EditProfileActivity extends AppCompatActivity {
 
     public void chooseHeaderImage(View view) {
         Crop.pickImage(this, SELECT_HEADER_IMAGE);
+    }
+
+    private void showDiscardChangesDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
+        builder.setMessage(getString(R.string.discard_profile_changes_dialog))
+                .setPositiveButton(R.string.discard, (DialogInterface dialog, int id) ->
+                {
+                    finish();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 }

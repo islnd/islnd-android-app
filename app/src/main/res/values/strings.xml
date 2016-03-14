@@ -113,4 +113,6 @@
     <string name="pref_appearance_summary">Application Theme</string>
     <string name="restart_app_message">A restart is necassary to load theme. Would you like to restart now?</string>
     <string name="view_friends_fragment">Friends</string>
+    <string name="discard_profile_changes_dialog">Discard changes?</string>
+    <string name="discard">Discard</string>
 </resources>
