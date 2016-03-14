@@ -173,6 +173,7 @@ public class EditProfileActivity extends AppCompatActivity {
         IslndDb.postProfile(getApplicationContext(), newProfileWithImageData);
 
         // TODO: Saving profile needs to go into its own thread so UI doesn't hang
+        setResult(RESULT_OK, null);
         finish();
     }
 

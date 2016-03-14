@@ -36,6 +36,7 @@ import io.islnd.android.islnd.app.util.Util;
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
     public static String USER_ID_EXTRA = "USER_ID";
+    private static final int EDIT_PROFILE_REQUEST = 0;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -112,6 +113,16 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_PROFILE_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                mProfile = DataUtils.getProfile(mContext, mProfileUserId);
+                showProfile();
+            }
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -123,7 +134,10 @@ public class ProfileActivity extends AppCompatActivity {
                 // Probably go back to feed.
                 break;
             case R.id.edit_profile:
-                startActivity(new Intent(this, EditProfileActivity.class));
+                startActivityForResult(
+                        new Intent(this, EditProfileActivity.class),
+                        EDIT_PROFILE_REQUEST
+                );
                 break;
         }
 
@@ -152,6 +166,8 @@ public class ProfileActivity extends AppCompatActivity {
         ImageUtil.setHeaderImageSampled(mContext, headerImage, mProfile.getHeaderImageUri());
 
         appBar.addOnOffsetChangedListener((AppBarLayout appBarLayout, int verticalOffset) -> {
+            mRefreshLayout.setEnabled(verticalOffset == 0);
+
             verticalOffset = Math.abs(verticalOffset);
             int scrollRange = appBarLayout.getTotalScrollRange();
             float threshold = (int) (scrollRange * 0.70f);
