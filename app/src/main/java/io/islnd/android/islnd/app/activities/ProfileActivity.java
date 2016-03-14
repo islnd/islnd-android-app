@@ -53,7 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mContext = getApplicationContext();
 
@@ -94,6 +94,40 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mPostCursor.close();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.profile_menu, menu);
+
+        if (Util.isUser(this, mProfileUserId)) {
+            MenuItem removeFriend = menu.findItem(R.id.remove_friend);
+            removeFriend.setVisible(false);
+        } else {
+            MenuItem editProfile = menu.findItem(R.id.edit_profile);
+            editProfile.setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.remove_friend:
+                Dialogs.removeFriendDialog(this, mProfileUserId, mProfile.getDisplayName());
+                // TODO: What behavior do we want after removing friend?
+                // Probably go back to feed.
+                break;
+            case R.id.edit_profile:
+                startActivity(new Intent(this, EditProfileActivity.class));
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void showProfile() {
@@ -144,36 +178,6 @@ public class ProfileActivity extends AppCompatActivity {
             // TODO: Run async task again
             mRefreshLayout.setRefreshing(false);
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.profile_menu, menu);
-
-        if (Util.isUser(this, mProfileUserId)) {
-            MenuItem removeFriend = menu.findItem(R.id.remove_friend);
-            removeFriend.setVisible(false);
-        } else {
-            MenuItem editProfile = menu.findItem(R.id.edit_profile);
-            editProfile.setVisible(false);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.remove_friend) {
-            Dialogs.removeFriendDialog(this, mProfileUserId, mProfile.getDisplayName());
-            // TODO: What behavior do we want after removing friend?
-            // Probably go back to feed.
-        } else if(id == R.id.edit_profile) {
-            startActivity(new Intent(this, EditProfileActivity.class));
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void startNewPostActivity(View view) {

@@ -9,14 +9,25 @@
     tools:context="io.islnd.android.islnd.app.activities.EditProfileActivity"
     android:background="@color/background">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        app:popupTheme="@style/AppTheme.PopupOverlay"/>
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:background="@android:color/transparent">
 
-    <include layout="@layout/content_edit_profile"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include
+        layout="@layout/content_edit_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

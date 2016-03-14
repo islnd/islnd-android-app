@@ -112,4 +112,5 @@
     <string name="pref_appearance_title">Appearance</string>
     <string name="pref_appearance_summary">Application Theme</string>
     <string name="restart_app_message">A restart is necassary to load theme. Would you like to restart now?</string>
+    <string name="view_friends_fragment">Friends</string>
 </resources>
