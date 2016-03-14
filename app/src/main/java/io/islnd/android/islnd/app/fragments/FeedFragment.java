@@ -1,6 +1,5 @@
 package io.islnd.android.islnd.app.fragments;
 
-import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,13 +10,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.activities.NewPostActivity;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.PostCollection;

@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:padding="@dimen/activity_horizontal_margin">
+              android:padding="@dimen/activity_horizontal_margin"
+              android:background="@color/background_mat">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/sms_allow_dialog_margin"
         android:text="@string/sms_allow_dialog_title"
-        style="@style/Base.TextAppearance.AppCompat.Title"/>
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="@color/primary_text"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -27,8 +30,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/sms_allow_dialog_margin">
+            android:layout_weight="1">
 
             <EditText
                 android:id="@+id/sms_number_edit_text"
@@ -36,15 +38,25 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/phone_number"
                 android:inputType="phone"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:textColor="@color/primary_text"
+                android:textColorHint="@color/hint_text"/>
         </android.support.design.widget.TextInputLayout>
 
-        <ImageView
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_contacts_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_gravity="center_vertical"
-            android:onClick="importContact"/>
+            android:padding="@dimen/image_button_padding"
+            android:onClick="importContact">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_contacts_24dp"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </LinearLayout>

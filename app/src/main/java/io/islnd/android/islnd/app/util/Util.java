@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatDelegate;
 import android.widget.ImageView;
 
 import com.google.zxing.BarcodeFormat;
@@ -20,6 +21,7 @@ import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.models.Comment;
 
+import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
@@ -29,12 +31,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-public class Util
-{
+public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
-    public static String smartTimestampFromUnixTime(long unixTimeMillis)
-    {
+    public static String smartTimestampFromUnixTime(long unixTimeMillis) {
         // currentTimeMillis is already in UTC!
         long currentTime = System.currentTimeMillis() / 1000;
         long timeDiff = currentTime - unixTimeMillis / 1000;
@@ -42,25 +42,21 @@ public class Util
         String timestamp = "";
 
         // Under 1 minute
-        if(timeDiff < 60)
-        {
+        if(timeDiff < 60) {
             timestamp = timeDiff + (timeDiff == 1 ? " sec" : " secs");
         }
         // Under one hour
-        else if(timeDiff >= 60 && timeDiff < 3600)
-        {
+        else if(timeDiff >= 60 && timeDiff < 3600) {
             long minutes = timeDiff / 60;
             timestamp = minutes + (minutes == 1 ? " min" : " mins");
         }
         // Under 24 hours
-        else if(timeDiff >= 3600 && timeDiff < 86400)
-        {
+        else if(timeDiff >= 3600 && timeDiff < 86400) {
             long hours = timeDiff / 3600;
             timestamp = hours + (hours == 1 ? " hr" : " hrs");
         }
         // Display date of post
-        else
-        {
+        else {
             TimeZone timeZone = TimeZone.getDefault();
 
             SimpleDateFormat dateFormat = new SimpleDateFormat();
@@ -73,14 +69,30 @@ public class Util
         return timestamp;
     }
 
-    public static String numberOfCommentsString(int numberOfComments)
-    {
-        return numberOfComments + " comments";
+    public static String numberOfCommentsString(int numberOfComments) {
+        String comments = numberOfComments == 1 ? " Comment" : " Comments";
+        return numberOfComments + comments;
     }
 
-    public static boolean isUser(Context context, int userId)
-    {
+    public static boolean isUser(Context context, int userId) {
         return getUserId(context) == userId;
+    }
+
+    public static void applyAppTheme(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String value = sharedPref.getString(ThemePreferenceFragment.PREFERENCE_THEME_KEY, "1");
+
+        switch (value) {
+            case "1": // Light
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "2": // Dark
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "3": // DayNight Auto
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+                break;
+        }
     }
 
     public static int getUserId(Context context) {
