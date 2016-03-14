@@ -70,7 +70,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
         EventQuery eventQuery = buildEventQuery(cursor);
 
-        //--Run query
+        //--Post event query to server and get result
         List<EncryptedEvent> encryptedEvents = Rest.postEventQuery(
                 eventQuery,
                 Util.getApiKey(getContext()));

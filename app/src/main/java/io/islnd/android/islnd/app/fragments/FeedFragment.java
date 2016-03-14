@@ -65,7 +65,6 @@ public class FeedFragment extends Fragment {
 
         mRefreshLayout.setOnRefreshListener(
                 () -> {
-                    Log.v(TAG, "getting posts from sever...");
                     new GetPostsFromServerTask().execute();
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),

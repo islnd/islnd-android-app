@@ -418,23 +418,21 @@ public class NavBaseActivity extends AppCompatActivity
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
                     final String newDisplayName = editText.getText().toString();
-                    if (Util.getUserId(this) >= 0) {
-                        //--update locally
+                    if (Util.getUserId(this) < 0) { //--user never created
+                        IslndDb.createIdentity(getApplicationContext(),
+                                newDisplayName);
+                    } else { //--only update display name
                         DataUtils.updateMyDisplayName(this, newDisplayName);
-                        //--push event
+
+                        //--push update to server
                         List<Event> eventList = new EventListBuilder(this)
                                 .changeDisplayName(newDisplayName)
                                 .build();
                         for (Event event : eventList) {
-                            Intent pushEvent = new Intent(this, EventPushService.class);
-                            pushEvent.putExtra(EventPushService.EVENT_EXTRA, event);
-                            startService(pushEvent);
+                            Intent pushEventService = new Intent(this, EventPushService.class);
+                            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                            startService(pushEventService);
                         }
-                    }
-                    else {
-                        DataUtils.deleteAll(this);
-                        IslndDb.createIdentity(getApplicationContext(),
-                                newDisplayName);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
