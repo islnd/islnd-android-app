@@ -42,15 +42,25 @@ public class EventProcessor {
         String[] projection = new String[] {
                 IslndContract.EventEntry._ID
         };
-        Cursor cursor = mContentResolver.query(
-                IslndContract.EventEntry.buildEventUriWithPseudonymAndEventId(event),
-                projection,
-                null,
-                null,
-                null
-        );
 
-        boolean alreadyProcessed = cursor.moveToFirst();
+        Cursor cursor = null;
+        boolean alreadyProcessed;
+        try {
+            cursor = mContentResolver.query(
+                    IslndContract.EventEntry.buildEventUriWithPseudonymAndEventId(event),
+                    projection,
+                    null,
+                    null,
+                    null
+            );
+
+            alreadyProcessed = cursor.moveToFirst();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
         if (alreadyProcessed) {
             Log.v(TAG, "already processed " + event);
         }
