@@ -1,5 +1,6 @@
 package io.islnd.android.islnd.app.util;
 
+import android.accounts.Account;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -229,5 +230,11 @@ public class Util
                 ImageUtil.getDefaultProfileImageUri(context),
                 ImageUtil.getDefaultHeaderImageUri(context),
                 Integer.MIN_VALUE);
+    }
+
+    public static Account getSyncAccount(Context context) {
+        return new Account(
+                context.getString(R.string.sync_account),
+                context.getString(R.string.sync_account_type));
     }
 }

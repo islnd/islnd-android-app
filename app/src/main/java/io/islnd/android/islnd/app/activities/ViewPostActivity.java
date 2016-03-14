@@ -16,11 +16,13 @@ import android.widget.EditText;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.adapters.ViewPostAdapter;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.loader.LocalCommentLoader;
 import io.islnd.android.islnd.app.loader.NetworkCommentLoader;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
+import io.islnd.android.islnd.app.util.Util;
 
 public class ViewPostActivity extends AppCompatActivity {
 
@@ -72,6 +74,12 @@ public class ViewPostActivity extends AppCompatActivity {
         refreshLayout.setOnRefreshListener(() ->
         {
             networkCommentsLoader.forceLoad();
+            getApplicationContext().getContentResolver().requestSync(
+                    Util.getSyncAccount(getApplicationContext()),
+                    IslndContract.CONTENT_AUTHORITY,
+                    new Bundle()
+            );
+
             refreshLayout.setRefreshing(false);
         });
     }

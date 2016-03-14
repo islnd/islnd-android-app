@@ -1,5 +1,6 @@
 package io.islnd.android.islnd.app.activities;
 
+import android.accounts.Account;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,6 +32,7 @@ import io.islnd.android.islnd.app.util.Util;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
+
     public static String USER_ID_EXTRA = "USER_ID";
 
     private RecyclerView mRecyclerView;
@@ -119,7 +121,10 @@ public class ProfileActivity extends AppCompatActivity {
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
         refreshLayout.setOnRefreshListener(() -> {
-                    // TODO: Run async task again
+                    mContext.getContentResolver().requestSync(
+                            Util.getSyncAccount(mContext),
+                            IslndContract.CONTENT_AUTHORITY,
+                            new Bundle());
                     refreshLayout.setRefreshing(false);
                 });
     }

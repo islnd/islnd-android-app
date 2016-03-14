@@ -1,5 +1,8 @@
 package io.islnd.android.islnd.app.fragments;
 
+import android.accounts.Account;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -16,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.adapters.ViewFriendsAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.User;
@@ -38,6 +42,9 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
     private List<User> adapterList;
     private SwipeRefreshLayout refreshLayout;
 
+    private Context mContext;
+    private ContentResolver mResolver;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,15 +52,18 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
         View v = inflater.inflate(R.layout.content_view_friends, container, false);
         setHasOptionsMenu(true);
 
+        mContext = getContext();
+        mResolver = mContext.getContentResolver();
+
         // Feed posts setup
         friendsList = new ArrayList<>();
         adapterList = new ArrayList<>();
         mRecyclerView = (RecyclerView) v.findViewById(R.id.view_friends_recycler_view);
-        mLayoutManager = new LinearLayoutManager(getContext());
+        mLayoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ViewFriendsAdapter(adapterList, getContext());
+        mAdapter = new ViewFriendsAdapter(adapterList, mContext);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mContext));
 
         new GetFriendsTask().execute();
 
@@ -61,9 +71,15 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
 
         refreshLayout.setOnRefreshListener(() -> {
-            // TODO: This will addPost duplicates, okay for now
-            new GetFriendsTask().execute();
+                    // TODO: This will addPost duplicates, okay for now
+                    new GetFriendsTask().execute();
+                    mResolver.requestSync(
+                            Util.getSyncAccount(mContext),
+                            IslndContract.CONTENT_AUTHORITY,
+                            new Bundle());
+                    refreshLayout.setRefreshing(false);
         });
+
         return v;
     }
 
@@ -106,7 +122,7 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
 
         private final String TAG = GetFriendsTask.class.getSimpleName();
 
-        Key privateKey = Util.getPrivateKey(getContext());
+        Key privateKey = Util.getPrivateKey(mContext);
         protected Void doInBackground(Void... params) {
             //--Current all friends are added through QR codes
             //  and texts, so we don't need to get readers from network
@@ -120,7 +136,7 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
                     IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
             };
 
-            Cursor cursor = getContext().getContentResolver().query(
+            Cursor cursor = mResolver.query(
                     IslndContract.DisplayNameEntry.CONTENT_URI,
                     projection,
                     null,
@@ -135,7 +151,7 @@ public class ViewFriendsFragment extends Fragment implements SearchView.OnQueryT
 
             do {
                 int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_USER_ID));
-                if (Util.isUser(getContext(), userId)) {
+                if (Util.isUser(mContext, userId)) {
                     continue;
                 }
 

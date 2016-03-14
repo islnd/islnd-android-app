@@ -49,7 +49,6 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
 import io.islnd.android.islnd.messaging.MessageLayer;
-import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
@@ -68,6 +67,7 @@ public class NavBaseActivity extends AppCompatActivity
     private EditText mSmsEditText = null;
     private View mDialogView = null;
     private ContentResolver mResolver;
+    private Account mSyncAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +81,14 @@ public class NavBaseActivity extends AppCompatActivity
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         // Create sync account and force sync
-        Account account = createSyncAccount(this);
+        mSyncAccount = createAndRegisterSyncAccount(this);
         mResolver = getContentResolver();
         mResolver.setSyncAutomatically(
-                account,
+                mSyncAccount,
                 getString(R.string.content_authority),
                 true);
         Log.v(TAG, "requesting sync...");
-        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
+        mResolver.requestSync(mSyncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
     private void onCreateDrawer() {
@@ -456,11 +456,10 @@ public class NavBaseActivity extends AppCompatActivity
                 .show();
     }
 
-    public static Account createSyncAccount(Context context) {
-        Account newAccount = new Account(
-                context.getString(R.string.sync_account),
-                context.getString(R.string.sync_account_type));
+    public static Account createAndRegisterSyncAccount(Context context) {
+        Account newAccount = Util.getSyncAccount(context);
 
+        //--Register account
         AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
         accountManager.addAccountExplicitly(newAccount, null, null);
 
