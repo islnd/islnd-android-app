@@ -118,6 +118,8 @@ public class ProfileActivity extends AppCompatActivity {
         ImageUtil.setHeaderImageSampled(mContext, headerImage, mProfile.getHeaderImageUri());
 
         appBar.addOnOffsetChangedListener((AppBarLayout appBarLayout, int verticalOffset) -> {
+            mRefreshLayout.setEnabled(verticalOffset == 0);
+
             verticalOffset = Math.abs(verticalOffset);
             int scrollRange = appBarLayout.getTotalScrollRange();
             float threshold = (int) (scrollRange * 0.70f);
