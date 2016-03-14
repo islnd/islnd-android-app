@@ -137,21 +137,23 @@ public class DataUtils {
                 IslndContract.UserEntry._ID,
         };
 
-        Cursor cursor = context.getContentResolver().query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_ALIAS + " = ?",
-                new String[] {alias},
-                null);
-
+        Cursor cursor = null;
         try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.AliasEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.AliasEntry.COLUMN_ALIAS + " = ?",
+                    new String[] {alias},
+                    null);
             if (cursor.moveToFirst()) {
                 return cursor.getInt(0);
             } else {
                 throw new IllegalArgumentException("database has no entry for alias: " + alias);
             }
         } finally {
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
