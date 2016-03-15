@@ -33,7 +33,7 @@ public class IslndDb
     private static final String TAG = "IslndDb";
 
     public static void createIdentity(Context context, String displayName) {
-        setDisplayName(context, displayName);
+        Util.setDisplayName(context, displayName);
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
         setPseudonym(context);
@@ -88,14 +88,6 @@ public class IslndDb
         editor.commit();
 
         Log.v(TAG, "group key " + groupKey);
-    }
-
-    private static void setDisplayName(Context context, String displayName) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = settings.edit();
-
-        editor.putString(context.getString(R.string.display_name), displayName);
-        editor.commit();
     }
 
     private static void setKeyPairAndPostPublicKey(Context context) {

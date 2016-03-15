@@ -34,10 +34,13 @@ import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.util.List;
+
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
@@ -47,6 +50,9 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,6 +68,7 @@ public class NavBaseActivity extends AppCompatActivity
     private EditText mSmsEditText = null;
     private View mDialogView = null;
     private ContentResolver mResolver;
+    private Account mSyncAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,13 +83,14 @@ public class NavBaseActivity extends AppCompatActivity
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         // Create sync account and force sync
-        Account account = createSyncAccount(this);
+        mSyncAccount = createAndRegisterSyncAccount(this);
         mResolver = getContentResolver();
         mResolver.setSyncAutomatically(
-                account,
+                mSyncAccount,
                 getString(R.string.content_authority),
                 true);
-        mResolver.requestSync(account, IslndContract.CONTENT_AUTHORITY, new Bundle());
+        Log.v(TAG, "requesting sync...");
+        mResolver.requestSync(mSyncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
     private void onCreateDrawer() {
@@ -115,12 +123,16 @@ public class NavBaseActivity extends AppCompatActivity
 
         if (myUserId >= 0) {
             Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
-            Uri profileImageUri = profile.getProfileImageUri();
-            Uri headerImageUri = profile.getHeaderImageUri();
-            ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
-                    profileImageUri);
-            ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
-                    headerImageUri);
+            if (profile == null) {
+                Log.d(TAG, String.format("my id is %d and I have no profile", myUserId));
+            } else {
+                Uri profileImageUri = profile.getProfileImageUri();
+                Uri headerImageUri = profile.getHeaderImageUri();
+                ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
+                        profileImageUri);
+                ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
+                        headerImageUri);
+            }
         }
     }
 
@@ -232,16 +244,18 @@ public class NavBaseActivity extends AppCompatActivity
     private void addFriendActionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
         builder.setTitle(R.string.add_friend_dialog)
-                .setItems(R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
-                    switch (which) {
-                        case 0: // QR
-                            qrCodeActionDialog();
-                            break;
-                        case 1: // SMS
-                            smsAllowDialog();
-                            break;
-                    }
-                })
+                .setItems(
+                        R.array.nav_add_friend_actions,
+                        (DialogInterface dialog, int which) -> {
+                            switch (which) {
+                                case 0: // QR
+                                    qrCodeActionDialog();
+                                    break;
+                                case 1: // SMS
+                                    smsAllowDialog();
+                                    break;
+                            }
+                        })
                 .show();
     }
 
@@ -303,7 +317,8 @@ public class NavBaseActivity extends AppCompatActivity
                     .show();
         } else {
             // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.SEND_SMS},
                     REQUEST_SMS);
         }
@@ -323,7 +338,8 @@ public class NavBaseActivity extends AppCompatActivity
                     .show();
         } else {
             // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.READ_CONTACTS},
                     REQUEST_CONTACT);
         }
@@ -337,9 +353,10 @@ public class NavBaseActivity extends AppCompatActivity
             return;
         }
 
-        startActivityForResult(new Intent(
-                Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
+        startActivityForResult(
+                new Intent(
+                        Intent.ACTION_PICK,
+                        ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
     }
 
     private String retrieveContactNumber(Uri uriContact) {
@@ -388,8 +405,23 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-                    DataUtils.deleteAll(this);
-                    IslndDb.createIdentity(getApplicationContext(), editText.getText().toString());
+                    final String newDisplayName = editText.getText().toString();
+                    if (Util.getUserId(this) < 0) { //--user never created
+                        IslndDb.createIdentity(getApplicationContext(),
+                                newDisplayName);
+                    } else { //--only update display name
+                        DataUtils.updateMyDisplayName(this, newDisplayName);
+
+                        //--push update to server
+                        List<Event> eventList = new EventListBuilder(this)
+                                .changeDisplayName(newDisplayName)
+                                .build();
+                        for (Event event : eventList) {
+                            Intent pushEventService = new Intent(this, EventPushService.class);
+                            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                            startService(pushEventService);
+                        }
+                    }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
@@ -410,11 +442,10 @@ public class NavBaseActivity extends AppCompatActivity
                 .show();
     }
 
-    public static Account createSyncAccount(Context context) {
-        Account newAccount = new Account(
-                context.getString(R.string.sync_account),
-                context.getString(R.string.sync_account_type));
+    public static Account createAndRegisterSyncAccount(Context context) {
+        Account newAccount = Util.getSyncAccount(context);
 
+        //--Register account
         AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
         accountManager.addAccountExplicitly(newAccount, null, null);
 

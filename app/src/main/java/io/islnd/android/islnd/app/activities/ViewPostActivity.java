@@ -12,19 +12,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndDb;
@@ -89,6 +87,12 @@ public class ViewPostActivity extends AppCompatActivity {
         mRefreshLayout.setOnRefreshListener(() ->
         {
             networkCommentsLoader.forceLoad();
+            getApplicationContext().getContentResolver().requestSync(
+                    Util.getSyncAccount(getApplicationContext()),
+                    IslndContract.CONTENT_AUTHORITY,
+                    new Bundle()
+            );
+
             mRefreshLayout.setRefreshing(false);
         });
     }

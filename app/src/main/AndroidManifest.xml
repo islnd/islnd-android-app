@@ -87,27 +87,39 @@
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
-
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator"/>
         </service>
         <service
             android:name=".sync.CommentsSyncService"
-            android:exported="true">
+            android:exported="false" >
             <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
+                <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter"/>
+                android:resource="@xml/syncadapter" />
         </service>
-
+        <service
+            android:name=".sync.EventSyncService"
+            android:exported="false"
+            >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+        <service
+            android:name=".EventPushService"
+            android:exported="false" >
+        </service>
         <activity
             android:name=".preferences.SettingsActivity"
             android:label="@string/title_activity_settings">
         </activity>
-    </application>
 
+    </application>
 </manifest>
