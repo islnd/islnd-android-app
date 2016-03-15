@@ -4,10 +4,13 @@ import android.util.Log;
 
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
+import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
 import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
+import io.islnd.android.islnd.messaging.server.EventQuery;
+import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.ProfileResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
 import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
@@ -146,6 +149,53 @@ public class Rest {
             }
             else {
                 Log.d(TAG, "/profile GET returned code " + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static int postEvent(EncryptedEvent encryptedEvent, String apiKey) throws IOException {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Response<Void> response = service.postEvent(encryptedEvent, apiKey).execute();
+
+            if (response.code() != HTTP_OK) {
+                Log.d(TAG, "post event returned code" + response.code());
+            }
+
+            return response.code();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    public static List<EncryptedEvent> postEventQuery(EventQuery eventQuery, String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Response<EventQueryResponse> response = service.postEventQuery(
+                    eventQuery,
+                    apiKey).execute();
+            if (response.code() == HTTP_OK) {
+                Log.v(TAG, response.body().getEvents().size() + " events");
+                return response.body().getEvents();
+            }
+            else {
+                Log.d(TAG, "post event query returned code" + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

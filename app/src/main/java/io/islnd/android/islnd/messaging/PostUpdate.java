@@ -86,4 +86,9 @@ public class PostUpdate implements ProtoSerializable<PostUpdate> {
                 && otherPost.id.equals(this.id)
                 && otherPost.timestamp == this.timestamp;
     }
+
+    @Override
+    public String toString() {
+        return String.format("content: " + this.content);
+    }
 }

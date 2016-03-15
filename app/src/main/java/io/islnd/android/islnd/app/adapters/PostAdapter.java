@@ -2,25 +2,28 @@ package io.islnd.android.islnd.app.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.GlancePostViewHolder;
@@ -47,7 +50,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
     @Override
     public void onBindViewHolder(GlancePostViewHolder holder, Cursor cursor) {
         Post post = new Post(
-                cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
                 cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_POST_ID)),
                 cursor.getLong(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_TIMESTAMP)),
@@ -58,17 +61,18 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         holder.postUserName.setText(post.getUserName());
         holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(ServerTime.toLocalTimeMillis(post.getTimestamp())));
         holder.postContent.setText(post.getContent());
-        holder.postCommentCount.setText(Util.numberOfCommentsString(post.getComments().size()));
+        //TODO: Get actual comment count
+        holder.postCommentCount.setText(Util.numberOfCommentsString(0));
 
         // Go to profile on picture click
         holder.postProfileImage.setOnClickListener((View v) -> {
             Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, post.getUserName());
+            profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, post.getUserId());
             mContext.startActivity(profileIntent);
         });
 
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(mContext);
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(post.getUserName()));
+        Profile profile = DataUtils.getProfile(mContext, post.getUserId());
+        Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
 
         // View post on post click
@@ -78,29 +82,25 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             ((Activity)mContext).startActivityForResult(viewPostIntent, FeedFragment.DELETE_POST_RESULT);
         });
 
-        if(Util.isUser(mContext, post.getUserName())) {
-            holder.postOverflow.setVisibility(View.VISIBLE);
+        if(Util.isUser(mContext, post.getUserId())) {
+            holder.view.setOnLongClickListener((View v) -> {
+                final String DELETE_POST = mContext.getString(R.string.delete_post);
+                final String[] items = {DELETE_POST};
 
-            holder.postOverflow.setOnClickListener((View v) -> {
-                PopupMenu popup = new PopupMenu(mContext, holder.postOverflow);
-                popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener((MenuItem item) -> {
-                    switch (item.getItemId()) {
-                        case R.id.delete_post:
-                            DialogFragment deletePostFragment =
-                                    DeletePostDialog.buildWithArgs(post.getUserId(), post.getPostId());
-                            deletePostFragment.show(
-                                    ((FragmentActivity) mContext).getSupportFragmentManager(),
-                                    mContext.getString(R.string.fragment_delete_post));
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
+                builder.setItems(items, (DialogInterface dialog, int item) -> {
+                    String itemStr = items[item];
+                    if (itemStr.equals(DELETE_POST)) {
+                        DialogFragment deletePostFragment =
+                                DeletePostDialog.buildWithArgs(post.getUserId(), post.getPostId());
+                        deletePostFragment.show(
+                                ((FragmentActivity) mContext).getSupportFragmentManager(),
+                                mContext.getString(R.string.fragment_delete_post));
                     }
+                }).show();
 
-                    return true;
-                });
-
-                popup.show();
+                return true;
             });
-        } else {
-            holder.postOverflow.setVisibility(View.GONE);
         }
     }
 }

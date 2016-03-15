@@ -34,38 +34,11 @@ public class IslndDb
 {
     private static final String TAG = "IslndDb";
 
-    public static void postPublicKey(Context context)
-    {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String username = preferences.getString(context.getString(R.string.user_name), "");
-        String publicKey = preferences.getString(context.getString(R.string.public_key), "");
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                MessageLayer.postPublicKey(context, username, CryptoUtil.decodePublicKey(publicKey));
-                Log.v(TAG, "post key completed");
-                return new Object();
-            }
-        }.execute();
-    }
-
-    public static void createIdentity(Context context, String username) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        String currentUsername = settings.getString(context.getString(R.string.user_name), "");
-        Log.v(TAG, String.format("previous user %s, current user %s", currentUsername, username));
-        if (currentUsername.equals(username)) {
-            //--The app is already using this user
-            return;
-        }
-
-        setUsername(context, username);
+    public static void createIdentity(Context context, String displayName) {
+        Util.setDisplayName(context, displayName);
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
         setPseudonym(context);
-
-        //--Add a default profile
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
-        profileDatabase.insert(io.islnd.android.islnd.messaging.Util.buildDefaultProfile(context, username));
     }
 
     private static void setPseudonym(Context context) {
@@ -83,17 +56,28 @@ public class IslndDb
 
             @Override
             protected void onPostExecute(String pseudonym) {
-                editor.putString(context.getString(R.string.pseudonym), pseudonym);
-                editor.commit();
 
                 Log.v(TAG, "pseudonym " + pseudonym);
                 Log.v(TAG, "pseudonym seed " + seed);
 
-                DataUtils.insertUser(
+                long userId = DataUtils.insertUser(
                         context,
-                        Util.getUser(context),
-                        Util.getPseudonym(context),
-                        Util.getGroupKey(context));
+                        Util.getDisplayName(context),
+                        pseudonym,
+                        Util.getGroupKey(context),
+                        Util.getPublicKey(context));
+
+                editor.putString(context.getString(R.string.alias), pseudonym);
+                editor.putInt(context.getString(R.string.user_id), (int)userId);
+                editor.commit();
+
+                Profile defaultProfile = Util.buildDefaultProfile(
+                        context,
+                        Util.getDisplayName(context));
+                DataUtils.insertProfile(
+                        context,
+                        defaultProfile,
+                        userId);
             }
         }.execute(seed);
     }
@@ -106,14 +90,6 @@ public class IslndDb
         editor.commit();
 
         Log.v(TAG, "group key " + groupKey);
-    }
-
-    private static void setUsername(Context context, String username) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = settings.edit();
-
-        editor.putString(context.getString(R.string.user_name), username);
-        editor.commit();
     }
 
     private static void setKeyPairAndPostPublicKey(Context context) {
@@ -136,11 +112,6 @@ public class IslndDb
 
                 return null;
             }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                IslndDb.postPublicKey(context);
-            }
         }.execute();
     }
 
@@ -152,7 +123,7 @@ public class IslndDb
      */
     {
         PostUpdate postUpdate = VersionedContentBuilder.buildPost(context, content);
-        int myUserId = DataUtils.getUserId(context, Util.getUser(context));
+        int myUserId = Util.getUserId(context);
         ContentValues values = new ContentValues();
         values.put(IslndContract.PostEntry.COLUMN_USER_ID, myUserId);
         values.put(IslndContract.PostEntry.COLUMN_POST_ID, postUpdate.getId());
@@ -187,7 +158,7 @@ public class IslndDb
 
     }
 
-    public static void removeReader(String username)
+    public static void removeReader(int userId)
     /**
      * Removes user by changing my pseudonym, changing my groupKey, and allowing all users I want to
      * keep.
@@ -235,32 +206,23 @@ public class IslndDb
         }.execute();
     }
 
-    public static Profile getProfile(Context context, String username) {
-        return ProfileDatabase.getInstance(context).get(username);
-    }
-
-    public static Profile getMostRecentProfile(Context context, String username) {
+    public static Profile getMostRecentProfile(Context context, int userId) {
         Profile profile;
 
-        if (!Util.isUser(context, username)) {
+        if (!Util.isUser(context, userId)) {
             ProfileWithImageData profileWithImageData = MessageLayer.getMostRecentProfile(
                     context,
-                    username);
+                    userId);
             if (profileWithImageData == null) {
-                Log.v(TAG, "no profile on network for " + username);
+                Log.v(TAG, "no profile on network for user " + userId);
                 return null;
             }
 
-            ProfileDatabase profileDatabase = ProfileDatabase.getInstance(context);
             profile = Util.saveProfileWithImageData(context, profileWithImageData);
+            DataUtils.insertProfile(context, profile, userId);
 
-            if (profileDatabase.hasProfile(username)) {
-                profileDatabase.update(profile);
-            } else {
-                profileDatabase.insert(profile);
-            }
         } else {
-            profile = ProfileDatabase.getInstance(context).get(username);
+            profile = DataUtils.getProfile(context, userId);
         }
 
         return profile;
@@ -283,8 +245,8 @@ public class IslndDb
             String postId,
             int commentUserId,
             String commentId) {
-        String postAuthorPseudonym = DataUtils.getPseudonym(context, postUserId);
-        String commentAuthorPseudonym = DataUtils.getPseudonym(context, commentUserId);
+        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postUserId);
+        String commentAuthorPseudonym = DataUtils.getMostRecentAlias(context, commentUserId);
         Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
 
         CommentUpdate deleteComment = CommentUpdate.buildDelete(

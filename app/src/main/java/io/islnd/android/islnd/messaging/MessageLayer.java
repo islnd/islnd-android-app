@@ -11,10 +11,10 @@ import android.util.Log;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
+import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.server.CommentQuery;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
@@ -25,9 +25,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.VersionedContentBuilder;
 
-import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
-import io.islnd.android.islnd.messaging.crypto.ObjectEncrypter;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 
 import java.io.IOException;
@@ -38,48 +36,31 @@ import java.util.List;
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
-    public static List<User> getReaders(Context context, String username, Key privateKey) {
-        //call the REST service
-        List<EncryptedData> keys = Rest.getReaders(username, io.islnd.android.islnd.app.util.Util.getApiKey(context));
-        if (keys == null) {
-            Log.d(TAG, "get readers returned null");
-            return new ArrayList<>();
-        }
-
-        //decrypt the friends and addPost to DB
-        List<User> friends = new ArrayList<>();
-        for (EncryptedData encryptedPseudonymKey : keys) {
-            PseudonymKey pseudonymKey = ObjectEncrypter.decryptPseudonymKey(
-                    encryptedPseudonymKey.getBlob(),
-                    privateKey);
-            addFriendToDatabaseAndCreateDefaultProfile(context, pseudonymKey);
-            friends.add(new User(pseudonymKey.getUsername()));
-        }
-
-        return friends;
-    }
-
-    public static void postPublicKey(Context context, String username, Key publicKey){
-        Rest.postPublicKey(username, CryptoUtil.encodeKey(publicKey), io.islnd.android.islnd.app.util.Util.getApiKey(context));
-    }
-
     public static PostCollection getPosts(Context context) {
 
-        List<PseudonymKey> keys = getPseudonymKeys(context);
+        List<Identity> keys = getPseudonymKeys(context);
         PostCollection postCollection = new PostCollection();
         String apiKey = Util.getApiKey(context);
 
-        for (PseudonymKey friendPseudonymKey: keys) {
+        for (Identity friendIdentity : keys) {
             List<EncryptedPost> encryptedPosts = Rest.getPosts(
-                    friendPseudonymKey.getPseudonym(),
+                    friendIdentity.getAlias(),
                     apiKey);
             if (encryptedPosts == null) {
                 continue;
             }
 
-            int friendUserId = DataUtils.getUserId(context, friendPseudonymKey.getUsername());
+            int friendUserId = DataUtils.getUserIdFromPublicKey(
+                    context,
+                    friendIdentity.getPublicKey());
             for (EncryptedPost encryptedPost: encryptedPosts) {
-                PostUpdate postUpdate = encryptedPost.decrypt(friendPseudonymKey.getKey());
+                PostUpdate postUpdate = null;
+                try {
+                    postUpdate = encryptedPost.decryptAndVerify(friendIdentity.getGroupKey(), friendIdentity.getPublicKey());
+                } catch (InvalidSignatureException e) {
+                    Log.d(TAG, "could not verify post " + postUpdate);
+                    e.printStackTrace();
+                }
                 if (postUpdate == null) {
                     continue;
                 }
@@ -87,7 +68,7 @@ public class MessageLayer {
                 //--TODO check that post is signed
                 addPostToCollection(
                         postCollection,
-                        friendPseudonymKey.getUsername(),
+                        friendIdentity.getDisplayName(),
                         friendUserId,
                         postUpdate);
             }
@@ -97,39 +78,43 @@ public class MessageLayer {
         return postCollection;
     }
 
-    private static List<PseudonymKey> getPseudonymKeys(Context context) {
+    private static List<Identity> getPseudonymKeys(Context context) {
         String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_USERNAME,
-                IslndContract.UserEntry.COLUMN_PSEUDONYM,
-                IslndContract.UserEntry.COLUMN_GROUP_KEY,
+                IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID,
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+                IslndContract.AliasEntry.COLUMN_ALIAS,
+                IslndContract.AliasEntry.COLUMN_GROUP_KEY,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
         };
 
         Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.IdentityEntry.CONTENT_URI,
                 projection,
                 null,
                 null,
                 null);
 
-        List<PseudonymKey> pseudonymKeys = new ArrayList<>();
+        List<Identity> identities = new ArrayList<>();
         if (!cursor.moveToFirst()) {
-            return pseudonymKeys;
+            return identities;
         }
 
         do {
-            String username = cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_USERNAME));
-            String pseudonym = cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_PSEUDONYM));
+            String alias = cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_ALIAS));
             Key groupKey = CryptoUtil.decodeSymmetricKey(
-                    cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_GROUP_KEY)));
-            pseudonymKeys.add(new PseudonymKey(
-                            1,
-                            username,
-                            pseudonym,
-                            groupKey
-                    ));
+                    cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_GROUP_KEY)));
+            Key publicKey = CryptoUtil.decodePublicKey(
+                    cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_PUBLIC_KEY)));
+            String displayName =
+                    cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
+            identities.add(new Identity(
+                            displayName,
+                            alias,
+                            groupKey,
+                            publicKey));
         } while (cursor.moveToNext());
 
-        return pseudonymKeys;
+        return identities;
     }
 
     private static void addPostToCollection(PostCollection postCollection, String postAuthorUsername, int postAuthorUserId, PostUpdate postUpdate) {
@@ -177,9 +162,9 @@ public class MessageLayer {
     }
 
     public static void comment(Context context, int postUserId, String postId, String content) {
-        String postAuthorPseudonym = DataUtils.getPseudonym(context, postUserId);
-        String myPseudonym = io.islnd.android.islnd.app.util.Util.getPseudonym(context);
-        int myId = DataUtils.getUserId(context, io.islnd.android.islnd.app.util.Util.getUser(context));
+        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postUserId);
+        String myPseudonym = io.islnd.android.islnd.app.util.Util.getAlias(context);
+        int myId = Util.getUserId(context);
         CommentUpdate commentUpdate = VersionedContentBuilder.buildComment(
                 context,
                 postAuthorPseudonym,
@@ -240,16 +225,16 @@ public class MessageLayer {
                                                              String encodedString) {
         Log.v(TAG, "adding friend from encoded string: " + encodedString);
         byte[] bytes = new Decoder().decode(encodedString);
-        PseudonymKey pk = PseudonymKey.fromProto(bytes);
+        Identity pk = Identity.fromProto(bytes);
         return addFriendToDatabaseAndCreateDefaultProfile(context, pk);
     }
 
-    private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, PseudonymKey pk) {
+    private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity pk) {
         //--TODO only add if not already friends
-        DataUtils.insertUser(context, pk);
+        long userId = DataUtils.insertUser(context, pk);
 
-        Profile profile = io.islnd.android.islnd.messaging.Util.buildDefaultProfile(context, pk.getUsername());
-        ProfileDatabase.getInstance(context).insert(profile);
+        Profile profile = Util.buildDefaultProfile(context, pk.getDisplayName());
+        DataUtils.insertProfile(context, profile, userId);
 
         return true;
     }
@@ -257,47 +242,48 @@ public class MessageLayer {
     public static String getEncodedIdentityString(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
-        String username = sharedPreferences.getString(context.getString(R.string.user_name), "");
-        String pseudonym = sharedPreferences.getString(context.getString(R.string.pseudonym), "");
-        Log.v(TAG, String.format("pseudonym is %s", pseudonym));
+        String displayName = sharedPreferences.getString(context.getString(R.string.display_name), "");
+        String alias = sharedPreferences.getString(context.getString(R.string.alias), "");
+        Log.v(TAG, String.format("alias is %s", alias));
         Key groupKey = CryptoUtil.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
+        Key publicKey = CryptoUtil.decodePublicKey(
+                sharedPreferences.getString(context.getString(R.string.public_key), ""));
 
-        PseudonymKey pk = new PseudonymKey(uniqueId, username, pseudonym, groupKey);
+        Identity pk = new Identity(displayName, alias, groupKey, publicKey);
         String encodeString = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated encoded string: " + encodeString);
         return encodeString;
     }
 
-    public static ProfileWithImageData getMostRecentProfile(Context context, String username) {
-//        PseudonymKey friendPK = FriendDatabase.getInstance(context).getKey(username);
-//        String apiKey = Util.getApiKey(context);
-//        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(friendPK.getPseudonym(), apiKey);
-//        if (encryptedProfiles == null) {
-//            Log.d(TAG, "profile response was null");
-//            return null;
-//        }
-//
-//        List<ProfileWithImageData> profiles = new ArrayList<>();
-//        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
-//            //--TODO check signature
-//            profiles.add(encryptedProfile.decrypt(friendPK.getKey()));
-//        }
-//
-//        return Util.getNewest(profiles);
-        return new ProfileWithImageData(
-                "default",
-                "default",
-                null,
-                null,
-                0
-        );
+    public static ProfileWithImageData getMostRecentProfile(Context context, int userId) {
+        String pseudonym = DataUtils.getMostRecentAlias(context, userId);
+        Key groupKey = DataUtils.getGroupKey(context, userId);
+        Key publicKey = DataUtils.getPublicKey(context, userId);
+
+        String apiKey = Util.getApiKey(context);
+        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(pseudonym, apiKey);
+        if (encryptedProfiles == null) {
+            Log.d(TAG, "profile response was null");
+            return null;
+        }
+
+        List<ProfileWithImageData> profiles = new ArrayList<>();
+        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
+            try {
+                profiles.add(encryptedProfile.decryptAndVerify(groupKey, publicKey));
+            } catch (InvalidSignatureException e) {
+                Log.d(TAG, "could not verify profile for user id " + userId);
+            }
+        }
+
+        return io.islnd.android.islnd.messaging.Util.getNewest(profiles);
     }
 
     public static CommentCollection getCommentCollection(Context context, int postAuthorId, String postId) {
         Log.v(TAG, String.format("getting comments user id %d post id %s", postAuthorId, postId));
         List<CommentQuery> queries = new ArrayList<>();
-        String postAuthorPseudonym = DataUtils.getPseudonym(context, postAuthorId);
+        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postAuthorId);
         queries.add(new CommentQuery(postAuthorPseudonym, postId));
         return getCommentCollection(context, queries, postAuthorId);
     }
@@ -316,20 +302,21 @@ public class MessageLayer {
             return new CommentCollection();
         }
 
+        Log.v(TAG, encryptedComments.size() + " comments");
         for (EncryptedComment ec : encryptedComments) {
-
-            CommentUpdate commentUpdate = ec.decrypt(DataUtils.getGroupKey(context, postAuthorId));
-            final String commentAuthorPseudonym = commentUpdate.getCommentAuthorPseudonym();
-            String commentAuthorUsername = DataUtils.getUsernameFromPseudonym(
-                    context,
-                    commentAuthorPseudonym);
-
-            if (commentAuthorUsername == null) {
-                Log.d(TAG, "could not find a username for pseudonym " + commentAuthorPseudonym);
-                throw new UnsupportedOperationException("Friend relations must be symmetric!");
+            final Key groupKey = DataUtils.getGroupKey(context, postAuthorId);
+            CommentUpdate commentUpdate = ec.decrypt(groupKey);
+            try {
+                final int commentAuthorId = DataUtils.getUserIdFromAlias(context, commentUpdate.getCommentAuthorPseudonym());
+                final Key publicKey = DataUtils.getPublicKey(context, commentAuthorId);
+                ec.decryptAndVerify(groupKey, publicKey);
+            } catch (InvalidSignatureException e) {
+                Log.d(TAG, "could not verify comment: " + commentUpdate);
+                e.printStackTrace();
             }
+            final String commentAuthorPseudonym = commentUpdate.getCommentAuthorPseudonym();
 
-            int commentAuthorId = DataUtils.getUserId(context, commentAuthorUsername);
+            int commentAuthorId = DataUtils.getUserIdFromAlias(context, commentAuthorPseudonym);
             if (commentUpdate.isDeletion()
                     && commentAuthorId == -1) {
                 Log.v(TAG, "adding commment for unknown user");

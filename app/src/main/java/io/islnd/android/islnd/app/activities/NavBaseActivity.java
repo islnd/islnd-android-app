@@ -1,8 +1,11 @@
 package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,24 +28,31 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.util.List;
+
 import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.ProfileDatabase;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
+import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity
@@ -58,9 +68,12 @@ public class NavBaseActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
     private View mDialogView = null;
+    private ContentResolver mResolver;
+    private Account mSyncAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.applyAppTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
@@ -74,6 +87,16 @@ public class NavBaseActivity extends AppCompatActivity
         Fragment fragment = new FeedFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+        // Create sync account and force sync
+        mSyncAccount = createAndRegisterSyncAccount(this);
+        mResolver = getContentResolver();
+        mResolver.setSyncAutomatically(
+                mSyncAccount,
+                getString(R.string.content_authority),
+                true);
+        Log.v(TAG, "requesting sync...");
+        mResolver.requestSync(mSyncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
     private void onCreateDrawer() {
@@ -93,22 +116,30 @@ public class NavBaseActivity extends AppCompatActivity
         ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
         ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        String userName = Util.getUser(NavBaseActivity.this);
+        String myDisplayName = Util.getDisplayName(this);
+        int myUserId = Util.getUserId(this);
 
-        navProfileImage.setOnClickListener((View v) -> {
-                    Intent profileIntent = new Intent(NavBaseActivity.this, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, userName);
+        navProfileImage.setOnClickListener(
+                (View v) -> {
+                    Intent profileIntent = new Intent(this, ProfileActivity.class);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myUserId);
                     startActivity(profileIntent);
                 });
-        navUserName.setText(userName);
+        navUserName.setText(myDisplayName);
 
-        ProfileDatabase profileDatabase = ProfileDatabase.getInstance(getApplicationContext());
-        Uri profileImageUri = Uri.parse(profileDatabase.getProfileImageUri(userName));
-        Uri headerImageUri = Uri.parse(profileDatabase.getHeaderImageUri(userName));
-        ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
-                profileImageUri);
-        ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
-                headerImageUri);
+        if (myUserId >= 0) {
+            Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
+            if (profile == null) {
+                Log.d(TAG, String.format("my id is %d and I have no profile", myUserId));
+            } else {
+                Uri profileImageUri = profile.getProfileImageUri();
+                Uri headerImageUri = profile.getHeaderImageUri();
+                ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
+                        profileImageUri);
+                ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
+                        headerImageUri);
+            }
+        }
     }
 
     @Override
@@ -134,7 +165,7 @@ public class NavBaseActivity extends AppCompatActivity
                 break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_NAME_EXTRA, Util.getUser(this));
+                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, Util.getUserId(this));
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
@@ -145,11 +176,10 @@ public class NavBaseActivity extends AppCompatActivity
                 addFriendActionDialog();
                 break;
             case R.id.nav_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.delete_database:
-                int deleted = DataUtils.deleteUsers(this);
-                Log.v(TAG, String.format("removed %d users", deleted));
-                ProfileDatabase.getInstance(this).deleteAll();
+                DataUtils.deleteAll(this);
                 break;
             case R.id.edit_username:
                 editUsernameDialog();
@@ -220,40 +250,27 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void addFriendActionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
         builder.setTitle(R.string.add_friend_dialog)
-                .setItems(R.array.nav_add_friend_actions, (DialogInterface dialog, int which) -> {
-                    switch (which) {
-                        case 0: // QR
-                            qrCodeActionDialog();
-                            break;
-                        case 1: // SMS
-                            smsAllowDialog();
-                            break;
-                    }
-                })
+                .setItems(
+                        R.array.nav_add_friend_actions,
+                        (DialogInterface dialog, int which) -> {
+                            switch (which) {
+                                case 0: // QR
+                                    qrCodeActionDialog();
+                                    break;
+                                case 1: // SMS
+                                    smsAllowDialog();
+                                    break;
+                            }
+                        })
                 .show();
     }
 
     private void qrCodeActionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.qr_dialog, null);
-
-        Button getQrButton = (Button) dialogView.findViewById(R.id.get_qr_button);
-        getQrButton.setOnClickListener((View v) -> {
-            IntentIntegrator integrator = new IntentIntegrator(this);
-            integrator.setCaptureActivity(VerticalCaptureActivity.class);
-            integrator.setOrientationLocked(false);
-            integrator.initiateScan();
-        });
-
-        ImageView qrImageView = (ImageView) dialogView.findViewById(R.id.qr_image_view);
-        Util.buildQrCode(qrImageView,
-                MessageLayer.getEncodedIdentityString(getApplicationContext()));
-
-        builder.setView(dialogView)
-                .setTitle(getString(R.string.qr_dialog_title))
-                .show();
+        Fragment fragment = new ShowQrFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     }
 
     private void smsAllowDialog() {
@@ -264,13 +281,14 @@ public class NavBaseActivity extends AppCompatActivity
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
         mDialogView = getLayoutInflater().inflate(R.layout.sms_allow_dialog, null);
         builder.setView(mDialogView);
 
         mSmsEditText = (EditText) mDialogView.findViewById(R.id.sms_number_edit_text);
 
-        builder.setPositiveButton(getString(R.string.send), (DialogInterface dialog, int id) -> {
+        builder.setPositiveButton(
+                getString(R.string.send), (DialogInterface dialog, int id) -> {
                     sendSms(mSmsEditText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -307,7 +325,8 @@ public class NavBaseActivity extends AppCompatActivity
                     .show();
         } else {
             // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.SEND_SMS},
                     REQUEST_SMS);
         }
@@ -327,7 +346,8 @@ public class NavBaseActivity extends AppCompatActivity
                     .show();
         } else {
             // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.READ_CONTACTS},
                     REQUEST_CONTACT);
         }
@@ -341,16 +361,17 @@ public class NavBaseActivity extends AppCompatActivity
             return;
         }
 
-        startActivityForResult(new Intent(
-                Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
+        startActivityForResult(
+                new Intent(
+                        Intent.ACTION_PICK,
+                        ContactsContract.Contacts.CONTENT_URI), CONTACT_RESULT);
     }
 
     private String retrieveContactNumber(Uri uriContact) {
         String contactNumber = null;
 
         // getting contacts ID
-        ContentResolver cr = getContentResolver();
+        ContentResolver cr = mResolver;
         Cursor cursorID = cr.query(uriContact,
                 new String[]{ContactsContract.Contacts._ID},
                 null, null, null);
@@ -359,7 +380,7 @@ public class NavBaseActivity extends AppCompatActivity
             String contactId =
                     cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
 
-            Cursor cursorPhone = getContentResolver().query(
+            Cursor cursorPhone = mResolver.query(
                     ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                     new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
 
@@ -392,14 +413,23 @@ public class NavBaseActivity extends AppCompatActivity
 
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
-                    int deleted = DataUtils.deleteUsers(this);
-                    Log.v(TAG, String.format("removed %d users", deleted));
-                    ProfileDatabase.getInstance(getApplicationContext()).deleteAll();
-                    getContentResolver().delete(
-                            IslndContract.PostEntry.CONTENT_URI,
-                            null,
-                            null);
-                    IslndDb.createIdentity(getApplicationContext(), editText.getText().toString());
+                    final String newDisplayName = editText.getText().toString();
+                    if (Util.getUserId(this) < 0) { //--user never created
+                        IslndDb.createIdentity(getApplicationContext(),
+                                newDisplayName);
+                    } else { //--only update display name
+                        DataUtils.updateMyDisplayName(this, newDisplayName);
+
+                        //--push update to server
+                        List<Event> eventList = new EventListBuilder(this)
+                                .changeDisplayName(newDisplayName)
+                                .build();
+                        for (Event event : eventList) {
+                            Intent pushEventService = new Intent(this, EventPushService.class);
+                            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                            startService(pushEventService);
+                        }
+                    }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
@@ -418,5 +448,15 @@ public class NavBaseActivity extends AppCompatActivity
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    public static Account createAndRegisterSyncAccount(Context context) {
+        Account newAccount = Util.getSyncAccount(context);
+
+        //--Register account
+        AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
+        accountManager.addAccountExplicitly(newAccount, null, null);
+
+        return newAccount;
     }
 }

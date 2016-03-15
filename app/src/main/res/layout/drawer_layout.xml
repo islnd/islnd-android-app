@@ -7,7 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="start"
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,9 +41,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:itemBackground="?android:colorBackground"
-        app:itemTextAppearance="@android:color/black"
-        app:itemIconTint="@android:color/black"
+        app:itemBackground="@color/background_mat"
+        app:itemTextColor="@color/primary_text"
+        app:itemIconTint="@color/primary_text"
         app:headerLayout="@layout/nav_header_navigation_drawer"
-        app:menu="@menu/activity_navigation_drawer_drawer"/>
+        app:menu="@menu/activity_navigation_drawer_drawer"
+        android:background="@color/background_mat"/>
 </android.support.v4.widget.DrawerLayout>

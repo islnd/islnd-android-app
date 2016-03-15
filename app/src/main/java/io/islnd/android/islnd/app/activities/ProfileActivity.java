@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.Dialogs;
 import io.islnd.android.islnd.app.database.IslndDb;
@@ -30,16 +33,18 @@ import io.islnd.android.islnd.app.util.Util;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
-    public static String USER_NAME_EXTRA = "USER_NAME";
+
+    public static String USER_ID_EXTRA = "USER_ID";
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private SwipeRefreshLayout refreshLayout;
+    private SwipeRefreshLayout mRefreshLayout;
 
-    private String mProfileUsername;
+    private int mProfileUserId;
     private Profile mProfile;
     private Cursor mPostCursor;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,15 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
+        mContext = getApplicationContext();
+
+        Intent profileIntent = getIntent();
+        mProfileUserId = profileIntent.getIntExtra(USER_ID_EXTRA, -1);
+        mProfile = DataUtils.getProfile(mContext, mProfileUserId);
+        showProfile();
+        new GetProfileTask().execute();
 
         // Post list stuff
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
@@ -55,30 +69,24 @@ public class ProfileActivity extends AppCompatActivity {
 
         //--TODO this should use a loader
         String[] projection = new String[]{
-                IslndContract.UserEntry.COLUMN_USERNAME,
-                IslndContract.UserEntry.COLUMN_PSEUDONYM,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
-                IslndContract.PostEntry.COLUMN_USER_ID,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
         };
         mPostCursor = getContentResolver().query(
-                IslndContract.PostEntry.CONTENT_URI,
+                IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),
                 projection,
-                IslndContract.UserEntry.COLUMN_USERNAME + " = ?",
-                new String[] {Util.getUser(getApplicationContext())},
+                null,
+                null,
                 null
         );
+
         mAdapter = new PostAdapter(this, mPostCursor);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-
-        Intent profileIntent = getIntent();
-        mProfileUsername = profileIntent.getStringExtra(USER_NAME_EXTRA);
-        mProfile = IslndDb.getProfile(getApplicationContext(), mProfileUsername);
-        showProfile();
-        new GetProfileTask().execute();
     }
 
     @Override
@@ -91,33 +99,52 @@ public class ProfileActivity extends AppCompatActivity {
         if (mProfile == null) {
             return;
         }
+
         ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
         ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
+        TextView displayName = (TextView) findViewById(R.id.profile_display_name);
         TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
-        ImageView editProfile = (ImageView) findViewById(R.id.edit_profile_button);
-
-        if(Util.isUser(this, mProfileUsername)) {
-            editProfile.setVisibility(View.VISIBLE);
-            editProfile.setOnClickListener((View v) -> {
-                startActivity(new Intent(this, EditProfileActivity.class));
-            });
-        }
-
-        aboutMe.setText(mProfile.getAboutMe());
+        View toolbarOverlay = findViewById(R.id.toolbar_overlay);
+        AppBarLayout appBar= (AppBarLayout) findViewById(R.id.app_bar_layout);
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(mProfileUsername);
-        Context context = getApplicationContext();
-        ImageUtil.setProfileImageSampled(context, profileImage, mProfile.getProfileImageUri());
-        ImageUtil.setHeaderImageSampled(context, headerImage, mProfile.getHeaderImageUri());
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
-        // Swipe to refresh
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+        displayName.setText(mProfile.getDisplayName());
+        aboutMe.setText(mProfile.getAboutMe());
+        collapsingToolbar.setTitle(" ");
+        ImageUtil.setProfileImageSampled(mContext, profileImage, mProfile.getProfileImageUri());
+        ImageUtil.setHeaderImageSampled(mContext, headerImage, mProfile.getHeaderImageUri());
 
-        refreshLayout.setOnRefreshListener(() -> {
-                    // TODO: Run async task again
-                    refreshLayout.setRefreshing(false);
-                });
+        appBar.addOnOffsetChangedListener((AppBarLayout appBarLayout, int verticalOffset) -> {
+            mRefreshLayout.setEnabled(verticalOffset == 0);
+
+            verticalOffset = Math.abs(verticalOffset);
+            int scrollRange = appBarLayout.getTotalScrollRange();
+            float threshold = (int) (scrollRange * 0.70f);
+            float ratio = (float) verticalOffset / threshold;
+            ratio = Math.max(0f, Math.min(1f, ratio));
+
+            ViewCompat.setAlpha(profileImage, 1 - ratio);
+            ViewCompat.setAlpha(displayName, 1 - ratio);
+            ViewCompat.setAlpha(aboutMe, 1 - ratio);
+            ViewCompat.setAlpha(toolbarOverlay, 1 - ratio);
+
+            if (scrollRange - verticalOffset == 0) {
+                collapsingToolbar.setTitle(mProfile.getDisplayName());
+            } else {
+                collapsingToolbar.setTitle(" ");
+            }
+        });
+
+        profileImage.setOnClickListener((View view) -> {
+            viewProfileImage();
+        });
+
+        mRefreshLayout.setOnRefreshListener(() -> {
+            // TODO: Run async task again
+            mRefreshLayout.setRefreshing(false);
+        });
     }
 
     @Override
@@ -125,8 +152,14 @@ public class ProfileActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile_menu, menu);
 
-        // If this is the client user's profile, don't show menu
-        return !Util.isUser(this, mProfileUsername);
+        if (Util.isUser(this, mProfileUserId)) {
+            MenuItem removeFriend = menu.findItem(R.id.remove_friend);
+            removeFriend.setVisible(false);
+        } else {
+            MenuItem editProfile = menu.findItem(R.id.edit_profile);
+            editProfile.setVisible(false);
+        }
+        return true;
     }
 
     @Override
@@ -134,9 +167,11 @@ public class ProfileActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.remove_friend) {
-            Dialogs.removeFriendDialog(this, mProfileUsername);
+            Dialogs.removeFriendDialog(this, mProfileUserId, mProfile.getDisplayName());
             // TODO: What behavior do we want after removing friend?
             // Probably go back to feed.
+        } else if(id == R.id.edit_profile) {
+            startActivity(new Intent(this, EditProfileActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -147,7 +182,7 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(newPostIntent);
     }
 
-    public void viewProfileImage(View view) {
+    private void viewProfileImage() {
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
         intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
@@ -165,7 +200,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private class GetProfileTask extends AsyncTask<Void, Void, Void> {
         protected Void doInBackground(Void... params) {
-            mProfile = IslndDb.getMostRecentProfile(getApplicationContext(), mProfileUsername);
+            mProfile = IslndDb.getMostRecentProfile(mContext, mProfileUserId);
 
             return null;
         }

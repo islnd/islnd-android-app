@@ -3,47 +3,56 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/friend_glance_padding">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/friend_glance_padding"
+        android:paddingTop="@dimen/friend_glance_padding"
+        android:paddingBottom="@dimen/friend_glance_padding">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/friend_profile_image"
             android:layout_width="@dimen/friend_profile_image"
             android:layout_height="@dimen/friend_profile_image"
-            android:src="@drawable/ic_person_black_24dp"
-            android:background="?android:colorBackground"
             android:layout_marginRight="@dimen/friend_profile_image_name_margin"/>
 
         <TextView
             android:id="@+id/friend_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
-            android:layout_gravity="center_vertical"
-            android:text="Test Name"/>
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:textSize="16sp"
+            android:layout_gravity="center_vertical"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/black_inactive"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center_vertical"
-            android:paddingRight="@dimen/view_friend_status_padding"
-            android:paddingLeft="@dimen/view_friend_status_padding"
-            android:layout_marginLeft="@dimen/view_friend_status_padding"
-            android:text="@string/view_friend_status"/>
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/black_inactive"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:paddingRight="@dimen/view_friend_status_padding"-->
+            <!--android:paddingLeft="@dimen/view_friend_status_padding"-->
+            <!--android:layout_marginLeft="@dimen/view_friend_status_padding"-->
+            <!--android:text="@string/view_friend_status"/>-->
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/view_friend_overflow"
+    <RelativeLayout
+        android:id="@+id/view_friend_overflow_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_more_vert_black_24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:padding="@dimen/friend_glance_padding">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_more_vert_24dp"/>
+    </RelativeLayout>
+
 
 </RelativeLayout>

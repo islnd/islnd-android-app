@@ -21,6 +21,15 @@ public class IslndProvider extends ContentProvider {
     static final int USER_WITH_ID = 201;
     static final int COMMENT = 300;
     static final int COMMENT_WITH_POST_USER_ID_AND_POST_ID = 301;
+    static final int PROFILE = 400;
+    static final int PROFILE_WITH_USER_ID = 401;
+    static final int ALIAS = 500;
+    static final int ALIAS_WITH_USER_ID = 501;
+    static final int DISPLAY_NAME = 600;
+    static final int DISPLAY_NAME_WITH_USER_ID = 601;
+    static final int IDENTITY = 700;
+    static final int EVENT = 800;
+    static final int EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -36,11 +45,12 @@ public class IslndProvider extends ContentProvider {
         sPostQueryBuilder = new SQLiteQueryBuilder();
 
         sPostQueryBuilder.setTables(
-                IslndContract.PostEntry.TABLE_NAME + " INNER JOIN " +
-                        IslndContract.UserEntry.TABLE_NAME +
-                        " ON " + IslndContract.PostEntry.TABLE_NAME + "."
-                + IslndContract.PostEntry.COLUMN_USER_ID + " = " + IslndContract.UserEntry.TABLE_NAME
-                + "." + IslndContract.UserEntry._ID
+                IslndContract.PostEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                        " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.AliasEntry.TABLE_NAME +
+                        " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.AliasEntry.TABLE_NAME + "." + IslndContract.AliasEntry.COLUMN_USER_ID
         );
     }
 
@@ -50,9 +60,37 @@ public class IslndProvider extends ContentProvider {
         sCommentQueryBuilder = new SQLiteQueryBuilder();
 
         sCommentQueryBuilder.setTables(
-                IslndContract.CommentEntry.TABLE_NAME + " INNER JOIN " + IslndContract.UserEntry.TABLE_NAME +
+                IslndContract.CommentEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID +
-                        " = " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
+        );
+    }
+
+    private static final SQLiteQueryBuilder sProfileQueryBuilder;
+
+    static {
+        sProfileQueryBuilder = new SQLiteQueryBuilder();
+
+        sProfileQueryBuilder.setTables(
+                IslndContract.ProfileEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                        " ON " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
+        );
+    }
+
+    private static final SQLiteQueryBuilder sIdentityQueryBuilder;
+
+    static {
+        //--TODO this will not handle when users have multiple aliases
+        sIdentityQueryBuilder = new SQLiteQueryBuilder();
+
+        sIdentityQueryBuilder.setTables(
+                IslndContract.UserEntry.TABLE_NAME + " INNER JOIN " + IslndContract.AliasEntry.TABLE_NAME +
+                        " ON " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID +
+                        " = " + IslndContract.AliasEntry.TABLE_NAME + "." + IslndContract.AliasEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                        " ON " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID +
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
         );
     }
 
@@ -85,6 +123,23 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getAliasesByUserId(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.AliasEntry.getUserIdFromUri(uri);
+
+        String[] selectionArgs = new String[] {Integer.toString(userId)};
+        String selection = IslndContract.AliasEntry.COLUMN_USER_ID + " = ?";
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.AliasEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getUserByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.UserEntry.getUserIdFromUri(uri);
 
@@ -93,6 +148,25 @@ public class IslndProvider extends ContentProvider {
 
         return mOpenHelper.getReadableDatabase().query(
                 IslndContract.UserEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getProfilesByUserId(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.ProfileEntry.getUserIdFromUri(uri);
+        Log.v(TAG, String.format("Get profile user id %d", userId));
+
+        String[] selectionArgs = new String[] {Integer.toString(userId)};
+        String selection = IslndContract.ProfileEntry.TABLE_NAME + "." +
+                IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
+
+        return sProfileQueryBuilder.query(
+                mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -121,6 +195,27 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getEventByAliasAndUserId(Uri uri, String[] projection, String sortOrder) {
+        String alias = IslndContract.EventEntry.getAliasFromUri(uri);
+        int eventId = IslndContract.EventEntry.getEventIdFromUri(uri);
+
+        String selection = IslndContract.EventEntry.COLUMN_ALIAS + " = ? AND " +
+                IslndContract.EventEntry.COLUMN_EVENT_ID + " = ?";
+        String[] selectionArgs = {
+                alias,
+                Integer.toString(eventId)
+        };
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.EventEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+    }
+
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = IslndContract.CONTENT_AUTHORITY;
@@ -133,6 +228,20 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_USER, USER);
         matcher.addURI(authority, IslndContract.PATH_USER + "/#", USER_WITH_ID);
+
+        matcher.addURI(authority, IslndContract.PATH_PROFILE, PROFILE);
+        matcher.addURI(authority, IslndContract.PATH_PROFILE + "/#", PROFILE_WITH_USER_ID);
+
+        matcher.addURI(authority, IslndContract.PATH_ALIAS, ALIAS);
+        matcher.addURI(authority, IslndContract.PATH_ALIAS + "/#", ALIAS_WITH_USER_ID);
+
+        matcher.addURI(authority, IslndContract.PATH_DISPLAY_NAME, DISPLAY_NAME);
+        matcher.addURI(authority, IslndContract.PATH_DISPLAY_NAME + "/#", DISPLAY_NAME_WITH_USER_ID);
+
+        matcher.addURI(authority, IslndContract.PATH_IDENTITY, IDENTITY);
+
+        matcher.addURI(authority, IslndContract.PATH_EVENT, EVENT);
+        matcher.addURI(authority, IslndContract.PATH_EVENT + "/*/#", EVENT_WITH_ALIAS_AND_EVENT_ID);
 
         return matcher;
     }
@@ -175,6 +284,68 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getCommentsByPostAuthorIdAndPostId(uri, projection, sortOrder);
                 break;
             }
+            case PROFILE: {
+                retCursor = sProfileQueryBuilder.query(
+                            mOpenHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
+                break;
+            }
+            case PROFILE_WITH_USER_ID: {
+                if (selection != null
+                        || selectionArgs != null) {
+                    throw new UnsupportedOperationException(
+                            String.format("uri %s does not support selection or selection args")
+                    );
+                }
+                retCursor = getProfilesByUserId(uri, projection, sortOrder);
+                break;
+            }
+            case DISPLAY_NAME: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.DisplayNameEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case IDENTITY: {
+                retCursor = sIdentityQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case ALIAS: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.AliasEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case ALIAS_WITH_USER_ID: {
+                retCursor = getAliasesByUserId(uri, projection, sortOrder);
+                break;
+            }
+            case EVENT_WITH_ALIAS_AND_EVENT_ID: {
+                retCursor = getEventByAliasAndUserId(uri, projection, sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -198,6 +369,18 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.UserEntry.CONTENT_TYPE;
             case USER_WITH_ID:
                 return IslndContract.UserEntry.CONTENT_ITEM_TYPE;
+            case COMMENT:
+                return IslndContract.CommentEntry.CONTENT_TYPE;
+            case COMMENT_WITH_POST_USER_ID_AND_POST_ID:
+                return IslndContract.CommentEntry.CONTENT_TYPE;
+            case PROFILE:
+                return IslndContract.ProfileEntry.CONTENT_TYPE;
+            case PROFILE_WITH_USER_ID:
+                return IslndContract.ProfileEntry.CONTENT_ITEM_TYPE;
+            case EVENT:
+                return IslndContract.EventEntry.CONTENT_TYPE;
+            case EVENT_WITH_ALIAS_AND_EVENT_ID:
+                return IslndContract.EventEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -224,10 +407,36 @@ public class IslndProvider extends ContentProvider {
             }
             case USER: {
                 long _id = db.insert(IslndContract.UserEntry.TABLE_NAME, null, values);
-                if ( _id > 0 )
+                if ( _id > 0 ) {
                     returnUri = IslndContract.UserEntry.buildUserUri(_id);
-                else
+                } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+
+                break;
+            }
+            case ALIAS: {
+                long _id = db.insert(IslndContract.AliasEntry.TABLE_NAME, null, values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.AliasEntry.buildAliasUri(_id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+
+                break;
+            }
+            case DISPLAY_NAME: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.DisplayNameEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.DisplayNameEntry.buildDisplayNameUri(_id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+
                 break;
             }
             case COMMENT: {
@@ -237,23 +446,71 @@ public class IslndProvider extends ContentProvider {
                         values,
                         SQLiteDatabase.CONFLICT_IGNORE);
                 if ( _id > 0 ) {
-                    Log.v(TAG, "inserted comment");
                     returnUri = IslndContract.CommentEntry.buildCommentUri(_id);
-                }
-                else {
+                } else {
                     Log.v(TAG, "insert comment failed");
                     return null;
                 }
 
                 break;
             }
+            case PROFILE: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.ProfileEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.ProfileEntry.buildProfileUri(_id);
+                } else {
+                    Log.v(TAG, "insert profile failed");
+                    return null;
+                }
+
+                break;
+            }
+            case EVENT: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.EventEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if ( _id > 0 )
+                    returnUri = IslndContract.EventEntry.buildEventUri(_id);
+                else
+                    return null;
+                break;
+            }
+            case EVENT_WITH_ALIAS_AND_EVENT_ID: {
+                returnUri = insertEventWithAliasAndUri(db, uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        Log.v(TAG, "insert");
+        Log.v(TAG, "inserted uri " + uri);
         getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
         return returnUri;
+    }
+
+    private Uri insertEventWithAliasAndUri(SQLiteDatabase db, Uri uri) {
+        ContentValues values = new ContentValues();
+        values.put(
+                IslndContract.EventEntry.COLUMN_ALIAS,
+                IslndContract.EventEntry.getAliasFromUri(uri));
+        values.put(
+                IslndContract.EventEntry.COLUMN_EVENT_ID,
+                IslndContract.EventEntry.getEventIdFromUri(uri));
+        long _id = db.insertWithOnConflict(
+                IslndContract.EventEntry.TABLE_NAME,
+                null,
+                values,
+                SQLiteDatabase.CONFLICT_IGNORE);
+        if ( _id > 0 )
+            return IslndContract.EventEntry.buildEventUri(_id);
+        else
+            return null;
     }
 
     @Override
@@ -261,7 +518,7 @@ public class IslndProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case POST:
+            case POST: {
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -270,6 +527,7 @@ public class IslndProvider extends ContentProvider {
                         if (_id != -1) {
                             returnCount++;
                         }
+
                     }
                     db.setTransactionSuccessful();
                 } finally {
@@ -278,8 +536,28 @@ public class IslndProvider extends ContentProvider {
 
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
+            }
+            case COMMENT: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(IslndContract.CommentEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
             default:
-                return super.bulkInsert(uri, values);
+                throw new UnsupportedOperationException("Bulk insert not supported for uri: " + uri);
         }
     }
 
@@ -310,6 +588,26 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.UserEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case PROFILE: {
+                rowsDeleted = db.delete(
+                        IslndContract.ProfileEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case ALIAS: {
+                rowsDeleted = db.delete(
+                        IslndContract.AliasEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case DISPLAY_NAME: {
+                rowsDeleted = db.delete(
+                        IslndContract.DisplayNameEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case EVENT: {
+                rowsDeleted = db.delete(
+                        IslndContract.EventEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -324,6 +622,41 @@ public class IslndProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new UnsupportedOperationException("update operation is not supported");
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated = 0;
+
+        switch (match) {
+            case PROFILE: {
+                db.update(
+                        IslndContract.ProfileEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+                break;
+            }
+            case DISPLAY_NAME_WITH_USER_ID: {
+                String[] args = new String[] {
+                        Integer.toString(IslndContract.DisplayNameEntry.getUserIdFromUri(uri))
+                };
+
+                db.update(
+                        IslndContract.DisplayNameEntry.TABLE_NAME,
+                        values,
+                        IslndContract.DisplayNameEntry.COLUMN_USER_ID + " = ?",
+                        args);
+                getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("update operation not supported for uri " + uri);
+            }
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null); // notify with base uri
+        return rowsUpdated;
     }
 }

@@ -14,14 +14,35 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_to_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1.0">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/view_post_recycler_view"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/post"
+                    layout="@layout/interact_post"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/view_post_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
@@ -29,28 +50,39 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/edit_text_box_horizontal_padding"
-        android:paddingRight="@dimen/edit_text_box_horizontal_padding"
         android:paddingTop="@dimen/edit_text_box_vertical_padding"
         android:paddingBottom="@dimen/edit_text_box_vertical_padding"
-        android:background="?android:colorBackground"
-        android:elevation="8dp">
+        android:background="@color/background_core">
 
         <EditText
             android:id="@+id/post_comment_edit_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:inputType="textMultiLine|textCapSentences"
-            android:hint="Add comment"/>
+            android:hint="@string/add_comment"
+            android:textColor="@color/primary_text"
+            android:textColorHint="@color/hint_text"/>
 
-        <ImageView
-            android:id="@+id/post_submit_comment"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_send_black_24dp"
+            android:paddingLeft="@dimen/image_button_padding"
+            android:paddingRight="@dimen/image_button_padding"
+            android:paddingTop="@dimen/edit_text_box_vertical_padding"
+            android:paddingBottom="@dimen/edit_text_box_vertical_padding"
+            android:layout_marginRight="@dimen/post_submit_comment_margin"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/post_submit_comment_margin"
-            android:onClick="addCommentToPost"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="addCommentToPost">
+
+            <ImageView
+                android:id="@+id/post_submit_comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_send_24dp"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </LinearLayout>

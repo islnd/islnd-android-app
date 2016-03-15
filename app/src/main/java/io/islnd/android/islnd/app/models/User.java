@@ -9,28 +9,27 @@ import java.io.Serializable;
  */
 public class User implements Serializable, Comparable<User>
 {
-    private String userName = "";
+    private final int userId;
+    private final String displayName;
 
-    public void User(){}
-
-    public User(String userName)
+    public User(int userId, String displayName)
     {
-        this.userName = userName;
+        this.userId = userId;
+        this.displayName = displayName;
     }
 
-    public String getUserName()
+    public String getDisplayName()
     {
-        return userName;
-    }
-
-    public void setUserName(String username)
-    {
-        this.userName = username;
+        return displayName;
     }
 
     @Override
     public int compareTo(User another)
     {
-        return userName.compareTo(another.getUserName());
+        return displayName.compareTo(another.getDisplayName());
+    }
+
+    public int getUserId() {
+        return userId;
     }
 }

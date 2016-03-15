@@ -15,12 +15,17 @@ public class EncryptedComment extends SymmetricEncryptedData {
     }
 
     @Override
-    public CommentUpdate decrypt(Key groupKey) {
-        SignedObject signedObject = this.getSignedObject(groupKey);
+    public CommentUpdate decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
+        SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);
         return CommentUpdate.fromProto(signedObject.getObject());
     }
 
     public String getPostAuthorPseudonym() {
         return postAuthorPseudonym;
+    }
+
+    public CommentUpdate decrypt(Key groupKey) {
+        SignedObject signedObject = this.getSignedObject(groupKey);
+        return CommentUpdate.fromProto(signedObject.getObject());
     }
 }
