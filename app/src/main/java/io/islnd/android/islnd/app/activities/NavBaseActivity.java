@@ -21,6 +21,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -78,9 +79,9 @@ public class NavBaseActivity extends AppCompatActivity
         onCreateDrawer();
 
         // Set launching fragment
-        Fragment fragment = new FeedFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new FeedFragment())
+                .commit();
 
         // Create sync account and force sync
         mSyncAccount = createAndRegisterSyncAccount(this);
@@ -138,11 +139,9 @@ public class NavBaseActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        }
-        else {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
             super.onBackPressed();
         }
     }
@@ -152,8 +151,14 @@ public class NavBaseActivity extends AppCompatActivity
         Fragment fragment = null;
         boolean isFragment = false;
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.content_frame);
+
         switch (item.getItemId()) {
             case R.id.nav_feed:
+                if(currentFragment instanceof FeedFragment) {
+                    break;
+                }
                 fragment = new FeedFragment();
                 isFragment = true;
                 break;
@@ -163,6 +168,9 @@ public class NavBaseActivity extends AppCompatActivity
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
+                if(currentFragment instanceof ViewFriendsFragment) {
+                    break;
+                }
                 fragment = new ViewFriendsFragment();
                 isFragment = true;
                 break;
@@ -184,12 +192,13 @@ public class NavBaseActivity extends AppCompatActivity
         }
 
         if (isFragment) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .addToBackStack("")
+                    .commit();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -204,7 +213,6 @@ public class NavBaseActivity extends AppCompatActivity
                 Log.d(TAG, "Contents: " + contents);
                 MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
             }
-            return;
         // Not QR result
         } else {
             if (requestCode == CONTACT_RESULT && resultCode == RESULT_OK) {
@@ -222,22 +230,20 @@ public class NavBaseActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_SMS: {
+            case REQUEST_SMS:
                 // Permission granted
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     smsAllowDialog();
                 }
-                return;
-            }
-            case REQUEST_CONTACT: {
+                break;
+            case REQUEST_CONTACT:
                 // Permission granted
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     importContact(null);
                 }
-                return;
-            }
+                break;
         }
     }
 
@@ -260,9 +266,10 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void qrCodeActionDialog() {
-        Fragment fragment = new ShowQrFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new ShowQrFragment())
+                .addToBackStack("")
+                .commit();
     }
 
     private void smsAllowDialog() {

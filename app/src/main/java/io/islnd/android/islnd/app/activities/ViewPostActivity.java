@@ -51,6 +51,7 @@ public class ViewPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_post);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mContext = getApplicationContext();
 
         // Get intent with post info
@@ -95,6 +96,16 @@ public class ViewPostActivity extends AppCompatActivity {
 
             mRefreshLayout.setRefreshing(false);
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void addCommentToPost(View view)
