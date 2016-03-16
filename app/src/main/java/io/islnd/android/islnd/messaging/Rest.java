@@ -291,6 +291,7 @@ public class Rest {
         long mostAccurateOffsetMillis = 0;
 
         for (int i = 0; i < repetitions; i++) {
+            Log.d(TAG, "testing network delay for server time");
             try {
                 // make call, which will update delayInterceptor
                 Response<ServerTimeResponse> response = service.getServerTime(apiKey).execute();
