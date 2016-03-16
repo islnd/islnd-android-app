@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.Dialogs;
 import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.User;
 import io.islnd.android.islnd.app.R;
@@ -22,15 +24,13 @@ import io.islnd.android.islnd.app.viewholders.FriendGlanceViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHolder>
+public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceViewHolder>
 {
-    private List<User> mList = new ArrayList<>();
     private Context mContext = null;
 
-    public ViewFriendsAdapter(List<User> list, Context context)
-    {
-        mList = list;
-        mContext = context;
+    public ViewFriendsAdapter(Context context, Cursor cursor) {
+        super(context, cursor);
+        this.mContext = context;
     }
 
     @Override
@@ -44,21 +44,27 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
     }
 
     @Override
-    public void onBindViewHolder(FriendGlanceViewHolder holder, final int position)
-    {
-        User user = mList.get(position);
+    public void onBindViewHolder(FriendGlanceViewHolder holder, Cursor cursor) {
+        final User user = new User(
+                cursor.getInt(cursor.getColumnIndex(IslndContract.UserEntry._ID)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME))
+        );
+        
+        Profile profile = DataUtils.getProfile(mContext, user.getUserId());
+        if (profile == null) {
+            return;
+        }
 
         holder.userName.setText(user.getDisplayName());
 
         // Go to profile on view click
         holder.itemView.setOnClickListener((View v) ->
-        {
-            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, user.getUserId());
-            mContext.startActivity(profileIntent);
-        });
+                {
+                    Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, user.getUserId());
+                    mContext.startActivity(profileIntent);
+                });
 
-        Profile profile = DataUtils.getProfile(mContext, user.getUserId());
         Uri profileImageUri = profile.getProfileImageUri();
         ImageUtil.setViewFriendImageSampled(mContext, holder.profileImage, profileImageUri);
 
@@ -92,75 +98,5 @@ public class ViewFriendsAdapter extends RecyclerView.Adapter<FriendGlanceViewHol
 
             popup.show();
         });
-    }
-
-    @Override
-    public int getItemCount()
-    {
-        return mList.size();
-    }
-
-    public User removeItem(int position)
-    {
-        final User user = mList.remove(position);
-        notifyItemRemoved(position);
-        return user;
-    }
-
-    public void addItem(int position, User user)
-    {
-        mList.add(position, user);
-        notifyItemInserted(position);
-    }
-
-    public void moveItem(int fromPosition, int toPosition)
-    {
-        final User user = mList.remove(fromPosition);
-        mList.add(toPosition, user);
-        notifyItemMoved(fromPosition, toPosition);
-    }
-
-    public void animateTo(List<User> users)
-    {
-        applyAndAnimateRemovals(users);
-        applyAndAnimateAdditions(users);
-        applyAndAnimateMovedItems(users);
-    }
-
-    private void applyAndAnimateRemovals(List<User> users)
-    {
-        for (int i = mList.size() - 1; i >= 0; i--)
-        {
-            final User user = mList.get(i);
-            if (!users.contains(user))
-            {
-                removeItem(i);
-            }
-        }
-    }
-
-    private void applyAndAnimateAdditions(List<User> users)
-    {
-        for (int i = 0, count = users.size(); i < count; i++)
-        {
-            final User user = users.get(i);
-            if (!mList.contains(user))
-            {
-                addItem(i, user);
-            }
-        }
-    }
-
-    private void applyAndAnimateMovedItems(List<User> users)
-    {
-        for (int toPosition = users.size() - 1; toPosition >= 0; toPosition--)
-        {
-            final User user = users.get(toPosition);
-            final int fromPosition = users.indexOf(user);
-            if (fromPosition >= 0 && fromPosition != toPosition)
-            {
-                moveItem(fromPosition, toPosition);
-            }
-        }
     }
 }

@@ -7,10 +7,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostKey;
 
 import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
@@ -135,21 +137,23 @@ public class DataUtils {
                 IslndContract.UserEntry._ID,
         };
 
-        Cursor cursor = context.getContentResolver().query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_ALIAS + " = ?",
-                new String[] {alias},
-                null);
-
+        Cursor cursor = null;
         try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.AliasEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.AliasEntry.COLUMN_ALIAS + " = ?",
+                    new String[] {alias},
+                    null);
             if (cursor.moveToFirst()) {
                 return cursor.getInt(0);
             } else {
                 throw new IllegalArgumentException("database has no entry for alias: " + alias);
             }
         } finally {
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -247,6 +251,7 @@ public class DataUtils {
         contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.EventEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {
@@ -284,5 +289,18 @@ public class DataUtils {
         } finally {
             cursor.close();
         }
+    }
+
+    public static void updateMyDisplayName(Context context, String newDisplayName) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME, newDisplayName);
+        context.getContentResolver().update(
+                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(Util.getUserId(context)),
+                values,
+                null,
+                null
+        );
+
+        Util.setDisplayName(context, newDisplayName);
     }
 }

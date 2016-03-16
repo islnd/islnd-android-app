@@ -2,10 +2,13 @@ package io.islnd.android.islnd.messaging;
 
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
+import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
 import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
+import io.islnd.android.islnd.messaging.server.EventQuery;
+import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.ProfileResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
 
@@ -68,5 +71,15 @@ public interface RestInterface {
     Call<Object> postProfile(
             @Path("pseudonymSeed") String pseudonymSeed,
             @Body EncryptedProfile encryptedProfile,
+            @Query("apiKey") String apiKey);
+
+    @POST("/event")
+    Call<Void> postEvent(
+            @Body EncryptedEvent encryptedEvent,
+            @Query("apiKey") String apiKey);
+
+    @POST("/eventQuery")
+    Call<EventQueryResponse> postEventQuery(
+            @Body EventQuery eventQuery,
             @Query("apiKey") String apiKey);
 }

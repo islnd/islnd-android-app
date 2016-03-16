@@ -13,13 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.R;
@@ -35,6 +33,7 @@ import io.islnd.android.islnd.app.util.Util;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
+
     public static String USER_ID_EXTRA = "USER_ID";
     private static final int EDIT_PROFILE_REQUEST = 0;
 
