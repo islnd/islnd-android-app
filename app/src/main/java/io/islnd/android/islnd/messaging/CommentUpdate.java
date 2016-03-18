@@ -41,7 +41,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 postId,
                 commentId,
                 content,
-                Util.getContentTimestamp());
+                ContentUtil.getContentTimestamp());
     }
 
     public static CommentUpdate buildDelete(
@@ -56,7 +56,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 postId,
                 commentId,
                 "",
-                Util.getContentTimestamp());
+                ContentUtil.getContentTimestamp());
     }
 
     public boolean isDeletion() {

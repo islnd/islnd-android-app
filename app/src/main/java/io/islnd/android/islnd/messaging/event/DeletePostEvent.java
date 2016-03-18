@@ -5,13 +5,18 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
-public class ChangeDisplayNameEvent extends Event {
+public class DeletePostEvent extends Event {
 
-    private final String newDisplayName;
+    private final String postId;
 
-    protected ChangeDisplayNameEvent(String alias, int id, String newDisplayName) {
-        super(alias, id, EventType.CHANGE_DISPLAY_NAME);
-        this.newDisplayName = newDisplayName;
+    protected DeletePostEvent(String alias, int eventId, String postId) {
+        super(alias, eventId, EventType.DELETE_POST);
+
+        this.postId = postId;
+    }
+
+    public String getPostId() {
+        return postId;
     }
 
     @Override
@@ -20,12 +25,8 @@ public class ChangeDisplayNameEvent extends Event {
                 .setAlias(this.alias)
                 .setEventId(this.eventId)
                 .setEventType(this.eventType)
-                .setContent(this.newDisplayName)
+                .setContentId(this.postId)
                 .build()
                 .toByteArray();
-    }
-
-    public String getNewDisplayName() {
-        return newDisplayName;
     }
 }

@@ -3,24 +3,19 @@ package io.islnd.android.islnd.messaging;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
-import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.server.CommentQuery;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.ProfileWithImageData;
-import io.islnd.android.islnd.app.models.User;
-import io.islnd.android.islnd.app.PostCollection;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.VersionedContentBuilder;
@@ -34,131 +29,6 @@ import java.util.List;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
-
-    public static PostCollection getPosts(Context context) {
-
-        List<Identity> keys = getPseudonymKeys(context);
-        PostCollection postCollection = new PostCollection();
-        String apiKey = Util.getApiKey(context);
-
-        for (Identity friendIdentity : keys) {
-            List<EncryptedPost> encryptedPosts = Rest.getPosts(
-                    friendIdentity.getAlias(),
-                    apiKey);
-            if (encryptedPosts == null) {
-                continue;
-            }
-
-            int friendUserId = DataUtils.getUserIdFromPublicKey(
-                    context,
-                    friendIdentity.getPublicKey());
-            for (EncryptedPost encryptedPost: encryptedPosts) {
-                PostUpdate postUpdate = null;
-                try {
-                    postUpdate = encryptedPost.decryptAndVerify(friendIdentity.getGroupKey(), friendIdentity.getPublicKey());
-                } catch (InvalidSignatureException e) {
-                    Log.d(TAG, "could not verify post " + postUpdate);
-                    e.printStackTrace();
-                }
-                if (postUpdate == null) {
-                    continue;
-                }
-
-                //--TODO check that post is signed
-                addPostToCollection(
-                        postCollection,
-                        friendIdentity.getDisplayName(),
-                        friendUserId,
-                        postUpdate);
-            }
-        }
-
-        addPostsToContentProvider(context, postCollection);
-        return postCollection;
-    }
-
-    private static List<Identity> getPseudonymKeys(Context context) {
-        String[] projection = new String[] {
-                IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID,
-                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
-                IslndContract.AliasEntry.COLUMN_ALIAS,
-                IslndContract.AliasEntry.COLUMN_GROUP_KEY,
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
-        };
-
-        Cursor cursor = context.getContentResolver().query(
-                IslndContract.IdentityEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-
-        List<Identity> identities = new ArrayList<>();
-        if (!cursor.moveToFirst()) {
-            return identities;
-        }
-
-        do {
-            String alias = cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_ALIAS));
-            Key groupKey = CryptoUtil.decodeSymmetricKey(
-                    cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_GROUP_KEY)));
-            Key publicKey = CryptoUtil.decodePublicKey(
-                    cursor.getString(cursor.getColumnIndex(IslndContract.UserEntry.COLUMN_PUBLIC_KEY)));
-            String displayName =
-                    cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
-            identities.add(new Identity(
-                            displayName,
-                            alias,
-                            groupKey,
-                            publicKey));
-        } while (cursor.moveToNext());
-
-        return identities;
-    }
-
-    private static void addPostToCollection(PostCollection postCollection, String postAuthorUsername, int postAuthorUserId, PostUpdate postUpdate) {
-        if (postUpdate.isDeletion()) {
-            postCollection.addDelete(postAuthorUserId, postUpdate.getId());
-        }
-        else {
-            final Post post = new Post(
-                    postAuthorUsername,
-                    postAuthorUserId,
-                    postUpdate.getId(),
-                    postUpdate.getTimestamp(),
-                    postUpdate.getContent(),
-                    new ArrayList<>());
-            postCollection.addPost(post);
-        }
-    }
-
-    private static void addPostsToContentProvider(Context context, PostCollection postCollection) {
-        for (Post post : postCollection.getPosts()) {
-            //--TODO use batch insert
-            ContentValues values = new ContentValues();
-            values.put(IslndContract.PostEntry.COLUMN_USER_ID, post.getUserId());
-            values.put(IslndContract.PostEntry.COLUMN_POST_ID, post.getPostId());
-            values.put(IslndContract.PostEntry.COLUMN_CONTENT, post.getContent());
-            values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, post.getTimestamp());
-            context.getContentResolver().insert(
-                    IslndContract.PostEntry.CONTENT_URI,
-                    values
-            );
-        }
-
-        for (PostKey postKey : postCollection.getDeletedKeys()) {
-            DataUtils.deletePost(context, postKey);
-        }
-    }
-
-    public static void post(Context context, PostUpdate postUpdate) {
-        EncryptedPost encryptedPost = new EncryptedPost(
-                postUpdate,
-                Util.getPrivateKey(context),
-                Util.getGroupKey(context));
-
-        Rest.post(io.islnd.android.islnd.app.util.Util.getPseudonymSeed(context), encryptedPost, Util.getApiKey(context));
-    }
 
     public static void comment(Context context, int postUserId, String postId, String content) {
         String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postUserId);
@@ -240,7 +110,6 @@ public class MessageLayer {
 
     public static String getEncodedIdentityString(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        long uniqueId = sharedPreferences.getLong(context.getString(R.string.pseudonym_key_id), 0);
         String displayName = sharedPreferences.getString(context.getString(R.string.display_name), "");
         String alias = sharedPreferences.getString(context.getString(R.string.alias), "");
         Log.v(TAG, String.format("alias is %s", alias));
@@ -276,7 +145,7 @@ public class MessageLayer {
             }
         }
 
-        return io.islnd.android.islnd.messaging.Util.getNewest(profiles);
+        return ContentUtil.getNewest(profiles);
     }
 
     public static CommentCollection getCommentCollection(Context context, int postAuthorId, String postId) {

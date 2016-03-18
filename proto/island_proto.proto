@@ -14,13 +14,6 @@ message SignedObject {
   required string signature = 2;
 }
 
-message PostUpdate {
-  required bool is_delete = 1;
-  required string id = 2;
-  required string content = 3;
-  required int64 timestamp = 4;
-}
-
 message CommentUpdate {
   required bool is_delete = 1;
   required string post_author_pseudonym = 2;
@@ -39,8 +32,11 @@ message Profile {
   required int32 version = 5;
 }
 
-message ChangeDisplayNameEvent {
+message Event {
   required string alias = 1;
   required int32 event_id = 2;
-  required string display_name = 3;
+  required int32 event_type = 3;
+  optional string content_id = 4;
+  optional string content = 5;
+  optional int64 timestamp = 6;
 }

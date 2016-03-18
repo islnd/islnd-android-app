@@ -3,7 +3,6 @@ package io.islnd.android.islnd.messaging;
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
-import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
 import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
@@ -26,19 +25,6 @@ public interface RestInterface {
     Call<List<EncryptedData>> readers(
             @Path("username") String username,
             @Query("apiKey") String apiKey);
-
-
-    @GET("/posts/{pseudonym}")
-    Call<List<EncryptedPost>> posts(
-            @Path("pseudonym") String pseudonym,
-            @Query("apiKey") String apiKey);
-
-    @POST("/post/{pseudonymSeed}")
-    Call<Object> post(
-            @Path("pseudonymSeed") String pseudonymSeed,
-            @Body EncryptedPost encryptedPost,
-            @Query("apiKey") String apiKey);
-
 
     @POST("/getComments/") // TODO rename to /commentQuery/
     Call<CommentQueryResponse> getComments(
