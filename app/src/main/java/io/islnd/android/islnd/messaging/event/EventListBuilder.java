@@ -3,6 +3,7 @@ package io.islnd.android.islnd.messaging.event;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.support.v7.preference.PreferenceManager;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.ContentUtil;
 
@@ -53,9 +55,33 @@ public class EventListBuilder {
     public EventListBuilder deletePost(int postUserId, String postId) {
         this.eventList.add(new DeletePostEvent(
                         getCurrentAlias(),
-                        this.eventId + getNewEventId(),
+                        getNewEventId(),
                         postId));
 
+        return this;
+    }
+
+    public EventListBuilder changeAboutMe(String newAboutMeText) {
+        this.eventList.add(new ChangeAboutMeEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        newAboutMeText));
+        return this;
+    }
+
+    public EventListBuilder changeProfileImage(Uri profileImageUri) {
+        this.eventList.add(new ChangeProfilePictureEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        ImageUtil.getByteArrayFromUri(mContext, profileImageUri)));
+        return this;
+    }
+
+    public EventListBuilder changeHeaderImage(Uri headerImageUri) {
+        this.eventList.add(new ChangeHeaderPictureEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        ImageUtil.getByteArrayFromUri(mContext, headerImageUri)));
         return this;
     }
 

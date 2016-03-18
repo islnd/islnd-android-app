@@ -109,6 +109,29 @@ public class DataUtils {
         }
     }
 
+    public static String getDisplayName(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(userId),
+                projection,
+                null,
+                null,
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
+
+            return null;
+        } finally {
+            cursor.close();
+        }
+    }
+
     public static Key getPublicKey(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY
@@ -222,25 +245,6 @@ public class DataUtils {
                 cursor.close();
             }
         }
-    }
-
-    public static void updateProfile(Context applicationContext, Profile newProfile, int userId) {
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.ProfileEntry.COLUMN_ABOUT_ME, newProfile.getAboutMe());
-        values.put(
-                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
-                newProfile.getHeaderImageUri().toString());
-        values.put(
-                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
-                newProfile.getProfileImageUri().toString());
-        final String selection = IslndContract.ProfileEntry.TABLE_NAME + "." +
-                IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
-        applicationContext.getContentResolver().update(
-                IslndContract.ProfileEntry.CONTENT_URI,
-                values,
-                selection,
-                new String[]{Integer.toString(userId)}
-        );
     }
 
     public static void deleteAll(Context context) {

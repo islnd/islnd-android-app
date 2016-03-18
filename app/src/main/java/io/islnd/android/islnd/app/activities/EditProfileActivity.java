@@ -17,17 +17,22 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.VersionedContentBuilder;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
+
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.util.List;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static String TAG = EditProfileActivity.class.getSimpleName();
@@ -132,47 +137,28 @@ public class EditProfileActivity extends AppCompatActivity {
 
     public void saveProfile(View view) {
         String newAboutMeText = aboutMe.getText().toString();
-        String myDisplayName = Util.getDisplayName(mContext);
 
-        if (!hasProfileChanged()) {
-            Log.v(TAG, "profile was not changed");
-            finish();
-            return;
+        EventListBuilder profileEventList = new EventListBuilder(mContext);
+        if (!newAboutMeText.equals(mProfile.getAboutMe())) {
+            profileEventList.changeAboutMe(newAboutMeText);
         }
 
-        // TODO: Implement separate REST calls for profile/header images
-        Uri newProfileUri = profileImageUri == null ? prevProfileImageUri : profileImageUri;
-        Uri newHeaderUri = headerImageUri == null ? prevHeaderImageUri : headerImageUri;
+        if (profileImageUri != null) {
+            profileEventList.changeProfileImage(profileImageUri);
+        }
 
-        ProfileWithImageData newProfileWithImageData = VersionedContentBuilder.buildProfile(
-                mContext,
-                myDisplayName,
-                newAboutMeText,
-                ImageUtil.getByteArrayFromUri(getApplicationContext(), newProfileUri),
-                ImageUtil.getByteArrayFromUri(getApplicationContext(), newHeaderUri)
-        );
+        if (headerImageUri != null) {
+            profileEventList.changeHeaderImage(headerImageUri);
+        }
 
-        // TODO: This saves a new image every time. Will change with new REST calls.
-        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromUri(
-                mContext,
-                newProfileUri);
-        Uri savedHeaderImageUri = ImageUtil.saveBitmapToInternalFromUri(
-                mContext,
-                newHeaderUri);
+        for (Event event : profileEventList.build()) {
+            EventProcessor.process(mContext, event);
 
-        Profile newProfile = new Profile(
-                myDisplayName,
-                newAboutMeText,
-                savedProfileImageUri,
-                savedHeaderImageUri,
-                newProfileWithImageData.getVersion()
-        );
+            Intent pushEventService = new Intent(mContext, EventPushService.class);
+            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+            mContext.startService(pushEventService);
+        }
 
-        int myUserId = Util.getUserId(mContext);
-        DataUtils.updateProfile(getApplicationContext(), newProfile, myUserId);
-        IslndDb.postProfile(getApplicationContext(), newProfileWithImageData);
-
-        // TODO: Saving profile needs to go into its own thread so UI doesn't hang
         setResult(RESULT_OK, null);
         finish();
     }

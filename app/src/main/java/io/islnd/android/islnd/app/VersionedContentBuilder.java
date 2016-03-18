@@ -4,21 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import io.islnd.android.islnd.app.models.ProfileWithImageData;
-
 import io.islnd.android.islnd.messaging.CommentUpdate;
 
 public class VersionedContentBuilder {
     private static final String TAG = VersionedContentBuilder.class.getSimpleName();
-
-    public static ProfileWithImageData buildProfile(Context context, String username, String aboutMe,
-                                       byte[] profileImageByteArray, byte[] headerImageByteArray) {
-        int newVersion = getNewVersionAndUpdate(
-                context,
-                context.getString(R.string.previous_profile_version_key));
-        return new ProfileWithImageData(username, aboutMe, profileImageByteArray,
-                headerImageByteArray, newVersion);
-    }
 
     public static CommentUpdate buildComment(
             Context context,

@@ -112,7 +112,7 @@ public class NavBaseActivity extends AppCompatActivity
         ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
         ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        String myDisplayName = Util.getDisplayName(this);
+        String myDisplayName = DataUtils.getDisplayName(this, Util.getUserId(this));
         int myUserId = Util.getUserId(this);
 
         navProfileImage.setOnClickListener(
@@ -415,10 +415,10 @@ public class NavBaseActivity extends AppCompatActivity
                 (DialogInterface dialog, int id) -> {
                     final String newDisplayName = editText.getText().toString();
                     if (Util.getUserId(this) < 0) { //--create user for this device
-                        IslndDb.createIdentity(getApplicationContext(),
+                        IslndDb.createIdentity(
+                                getApplicationContext(),
                                 newDisplayName);
                     } else { //--only update display name
-                        Util.setDisplayName(this, newDisplayName);
                         List<Event> eventList = new EventListBuilder(this)
                                 .changeDisplayName(newDisplayName)
                                 .build();

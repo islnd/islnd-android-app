@@ -61,7 +61,6 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileUserId = profileIntent.getIntExtra(USER_ID_EXTRA, -1);
         mProfile = DataUtils.getProfile(mContext, mProfileUserId);
         showProfile();
-        new GetProfileTask().execute();
 
         // Post list stuff
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
@@ -214,18 +213,5 @@ public class ProfileActivity extends AppCompatActivity {
         intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
                 mProfile.getHeaderImageUri().toString());
         startActivity(intent);
-    }
-
-    private class GetProfileTask extends AsyncTask<Void, Void, Void> {
-        protected Void doInBackground(Void... params) {
-            mProfile = IslndDb.getMostRecentProfile(mContext, mProfileUserId);
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            showProfile();
-        }
     }
 }

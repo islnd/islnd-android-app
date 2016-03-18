@@ -123,6 +123,23 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getDisplayNameById(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.DisplayNameEntry.getUserIdFromUri(uri);
+
+        String[] selectionArgs = new String[] {Integer.toString(userId)};
+        String selection = IslndContract.DisplayNameEntry.COLUMN_USER_ID + " = ?";
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.DisplayNameEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getAliasesByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.AliasEntry.getUserIdFromUri(uri);
 
@@ -214,6 +231,19 @@ public class IslndProvider extends ContentProvider {
                 null,
                 null,
                 sortOrder);
+    }
+
+    private void updateProfileWithUserId(Uri uri, ContentValues values) {
+        int userId = IslndContract.ProfileEntry.getUserIdFromUri(uri);
+
+        String whereClause = IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
+        String[] whereArgs = { Integer.toString(userId) };
+
+        mOpenHelper.getWritableDatabase().update(
+                IslndContract.ProfileEntry.TABLE_NAME,
+                values,
+                whereClause,
+                whereArgs);
     }
 
     private static UriMatcher buildUriMatcher() {
@@ -314,6 +344,10 @@ public class IslndProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
+                break;
+            }
+            case DISPLAY_NAME_WITH_USER_ID: {
+                retCursor = getDisplayNameById(uri, projection, sortOrder);
                 break;
             }
             case IDENTITY: {
@@ -626,6 +660,9 @@ public class IslndProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsUpdated = 0;
 
+        Log.v(TAG, "updating uri: " + uri);
+        Log.v(TAG, "match is + " + match);
+
         switch (match) {
             case PROFILE: {
                 db.update(
@@ -634,6 +671,10 @@ public class IslndProvider extends ContentProvider {
                         selection,
                         selectionArgs
                 );
+                break;
+            }
+            case PROFILE_WITH_USER_ID: {
+                updateProfileWithUserId(uri, values);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {
