@@ -75,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity {
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
         mPostCursor = getContentResolver().query(
                 IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),

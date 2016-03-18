@@ -28,7 +28,8 @@ public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
 
         return new CursorLoader(

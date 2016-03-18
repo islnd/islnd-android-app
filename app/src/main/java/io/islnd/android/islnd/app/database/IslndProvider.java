@@ -50,7 +50,10 @@ public class IslndProvider extends ContentProvider {
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
                         " INNER JOIN " + IslndContract.AliasEntry.TABLE_NAME +
                         " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
-                        " = " + IslndContract.AliasEntry.TABLE_NAME + "." + IslndContract.AliasEntry.COLUMN_USER_ID
+                        " = " + IslndContract.AliasEntry.TABLE_NAME + "." + IslndContract.AliasEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
         );
     }
 
@@ -675,6 +678,8 @@ public class IslndProvider extends ContentProvider {
             }
             case PROFILE_WITH_USER_ID: {
                 updateProfileWithUserId(uri, values);
+                getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {

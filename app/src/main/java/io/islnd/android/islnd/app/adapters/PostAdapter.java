@@ -72,9 +72,10 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             mContext.startActivity(profileIntent);
         });
 
-        Profile profile = DataUtils.getProfile(mContext, post.getUserId());
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
+        ImageUtil.setPostProfileImageSampled(
+                mContext,
+                holder.postProfileImage,
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
         // View post on post click
         holder.itemView.setOnClickListener((View v) -> {
