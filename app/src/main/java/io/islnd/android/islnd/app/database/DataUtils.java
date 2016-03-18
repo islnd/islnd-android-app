@@ -290,17 +290,4 @@ public class DataUtils {
             cursor.close();
         }
     }
-
-    public static void updateMyDisplayName(Context context, String newDisplayName) {
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME, newDisplayName);
-        context.getContentResolver().update(
-                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(Util.getUserId(context)),
-                values,
-                null,
-                null
-        );
-
-        Util.setDisplayName(context, newDisplayName);
-    }
 }

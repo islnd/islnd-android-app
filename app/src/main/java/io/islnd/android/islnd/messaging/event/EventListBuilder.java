@@ -30,7 +30,7 @@ public class EventListBuilder {
     public EventListBuilder changeDisplayName(String displayName) {
         this.eventList.add(new ChangeDisplayNameEvent(
                         getCurrentAlias(),
-                        ++this.eventId,
+                        getNewEventId(),
                         displayName));
         return this;
     }
@@ -42,7 +42,7 @@ public class EventListBuilder {
         );
         this.eventList.add(new NewPostEvent(
                         getCurrentAlias(),
-                        ++this.eventId,
+                        getNewEventId(),
                         postId,
                         postText,
                         ContentUtil.getContentTimestamp()));
@@ -53,10 +53,15 @@ public class EventListBuilder {
     public EventListBuilder deletePost(int postUserId, String postId) {
         this.eventList.add(new DeletePostEvent(
                         getCurrentAlias(),
-                        ++this.eventId,
+                        this.eventId + getNewEventId(),
                         postId));
 
         return this;
+    }
+
+    private int getNewEventId() {
+        ++this.eventId;
+        return this.eventId;
     }
 
     public List<Event> build() {
