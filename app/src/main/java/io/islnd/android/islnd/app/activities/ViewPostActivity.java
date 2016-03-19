@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,7 +29,9 @@ import java.util.List;
 
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
@@ -55,6 +58,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     private Context mContext;
 
     private ImageView mPostProfileImageView;
+    private StopRefreshReceiver mStopRefreshReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -100,9 +104,8 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
                     IslndContract.CONTENT_AUTHORITY,
                     new Bundle()
             );
-
-            mRefreshLayout.setRefreshing(false);
         });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
     }
 
     @Override
@@ -235,5 +238,18 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        this.registerReceiver(mStopRefreshReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mStopRefreshReceiver);
     }
 }
