@@ -21,10 +21,6 @@ public abstract class Event implements
     protected final int eventId;
     protected final int eventType;
 
-    protected String contentId;
-    protected String content;
-    protected long timestamp;
-
     protected Event(String alias, int eventId, int eventType) {
         this.alias = alias;
         this.eventId = eventId;
@@ -71,14 +67,14 @@ public abstract class Event implements
                 return new ChangeDisplayNameEvent(
                         event.getAlias(),
                         event.getEventId(),
-                        event.getContent());
+                        event.getTextContent());
             }
             case EventType.NEW_POST: {
                 return new NewPostEvent(
                         event.getAlias(),
                         event.getEventId(),
                         event.getContentId(),
-                        event.getContent(),
+                        event.getTextContent(),
                         event.getTimestamp());
             }
             case EventType.DELETE_POST: {
@@ -86,6 +82,24 @@ public abstract class Event implements
                         event.getAlias(),
                         event.getEventId(),
                         event.getContentId());
+            }
+            case EventType.CHANGE_PROFILE_PICTURE: {
+                return new ChangeProfilePictureEvent(
+                        event.getAlias(),
+                        event.getEventId(),
+                        event.getDataContent().toByteArray());
+            }
+            case EventType.CHANGE_HEADER_PICTURE: {
+                return new ChangeHeaderPictureEvent(
+                        event.getAlias(),
+                        event.getEventId(),
+                        event.getDataContent().toByteArray());
+            }
+            case EventType.CHANGE_ABOUT_ME: {
+                return new ChangeAboutMeEvent(
+                        event.getAlias(),
+                        event.getEventId(),
+                        event.getTextContent());
             }
             default: {
                 Log.d(TAG, "Cannot recognize event of type " + event.getEventType());

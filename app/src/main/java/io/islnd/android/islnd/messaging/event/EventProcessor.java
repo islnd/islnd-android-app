@@ -4,11 +4,13 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.PostKey;
+import io.islnd.android.islnd.app.util.ImageUtil;
 
 public class EventProcessor {
     private static final String TAG = EventProcessor.class.getSimpleName();
@@ -35,9 +37,96 @@ public class EventProcessor {
                 deletePost(context, (DeletePostEvent) event);
                 break;
             }
+            case EventType.CHANGE_PROFILE_PICTURE: {
+                changeProfilePicture(context, (ChangeProfilePictureEvent) event);
+                break;
+            }
+            case EventType.CHANGE_HEADER_PICTURE: {
+                changeHeaderPicture(context, (ChangeHeaderPictureEvent) event);
+                break;
+            }
+            case EventType.CHANGE_ABOUT_ME: {
+                changeAboutMe(context, (ChangeAboutMeEvent) event);
+                break;
+            }
         }
 
         recordEventProcessed(event);
+    }
+
+    private static void changeHeaderPicture(Context context, ChangeHeaderPictureEvent event) {
+        int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
+        Uri headerPictureUri = ImageUtil.saveBitmapToInternalFromByteArray(
+                context,
+                event.getHeaderPicture());
+        ContentValues values = new ContentValues();
+        values.put(
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+                headerPictureUri.toString());
+        mContentResolver.update(
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
+                values,
+                null,
+                null
+        );
+    }
+
+    private static void changeAboutMe(Context context, ChangeAboutMeEvent event) {
+        int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.ProfileEntry.COLUMN_ABOUT_ME, event.getAboutMe());
+        mContentResolver.update(
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
+                values,
+                null,
+                null
+        );
+    }
+
+    private static void changeProfilePicture(Context context, ChangeProfilePictureEvent event) {
+        int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
+        Uri profilePictureUri = ImageUtil.saveBitmapToInternalFromByteArray(context, event.getProfilePicture());
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI, profilePictureUri.toString());
+        mContentResolver.update(
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
+                values,
+                null,
+                null
+        );
+    }
+
+    private static void changeDisplayName(Context context, ChangeDisplayNameEvent event) {
+        int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
+        ContentValues values = new ContentValues();
+        values.put(
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                event.getNewDisplayName());
+
+        mContentResolver.update(
+                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(userId),
+                values,
+                null,
+                null
+        );
+    }
+
+    private static void addPost(Context context, NewPostEvent newPostEvent) {
+        int postUserId = DataUtils.getUserIdFromAlias(context, newPostEvent.getAlias());
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.PostEntry.COLUMN_USER_ID, postUserId);
+        values.put(IslndContract.PostEntry.COLUMN_POST_ID, newPostEvent.getPostId());
+        values.put(IslndContract.PostEntry.COLUMN_CONTENT, newPostEvent.getContent());
+        values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, newPostEvent.getTimestamp());
+        context.getContentResolver().insert(
+                IslndContract.PostEntry.CONTENT_URI,
+                values);
+    }
+
+    private static void deletePost(Context context, DeletePostEvent deletePostEvent) {
+        int postUserId = DataUtils.getUserIdFromAlias(context, deletePostEvent.getAlias());
+        PostKey postToDelete = new PostKey(postUserId, deletePostEvent.getPostId());
+        DataUtils.deletePost(context, postToDelete);
     }
 
     private static void recordEventProcessed(Event event) {
@@ -75,38 +164,5 @@ public class EventProcessor {
         }
 
         return alreadyProcessed;
-    }
-
-    private static void changeDisplayName(Context context, ChangeDisplayNameEvent event) {
-        int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
-        ContentValues values = new ContentValues();
-        values.put(
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
-                event.getNewDisplayName());
-
-        mContentResolver.update(
-                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(userId),
-                values,
-                null,
-                null
-        );
-    }
-
-    private static void addPost(Context context, NewPostEvent newPostEvent) {
-        int postUserId = DataUtils.getUserIdFromAlias(context, newPostEvent.getAlias());
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.PostEntry.COLUMN_USER_ID, postUserId);
-        values.put(IslndContract.PostEntry.COLUMN_POST_ID, newPostEvent.getPostId());
-        values.put(IslndContract.PostEntry.COLUMN_CONTENT, newPostEvent.getContent());
-        values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, newPostEvent.getTimestamp());
-        context.getContentResolver().insert(
-                IslndContract.PostEntry.CONTENT_URI,
-                values);
-    }
-
-    private static void deletePost(Context context, DeletePostEvent deletePostEvent) {
-        int postUserId = DataUtils.getUserIdFromAlias(context, deletePostEvent.getAlias());
-        PostKey postToDelete = new PostKey(postUserId, deletePostEvent.getPostId());
-        DataUtils.deletePost(context, postToDelete);
     }
 }

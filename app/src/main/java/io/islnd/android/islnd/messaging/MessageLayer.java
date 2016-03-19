@@ -13,14 +13,11 @@ import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.server.CommentQuery;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.VersionedContentBuilder;
 
-import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 
 import java.security.Key;
@@ -72,20 +69,6 @@ public class MessageLayer {
         }.execute();
     }
 
-    public static void postProfile(Context context, ProfileWithImageData profile) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String privateKey = preferences.getString(context.getString(R.string.private_key), "");
-        String myGroupKey = preferences.getString(context.getString(R.string.group_key), "");
-
-        EncryptedProfile profilePost = new EncryptedProfile(
-                profile,
-                CryptoUtil.decodePrivateKey(privateKey),
-                CryptoUtil.decodeSymmetricKey(myGroupKey));
-
-        String pseudonymSeed = preferences.getString(context.getString(R.string.pseudonym_seed), "");
-        Rest.postProfile(pseudonymSeed, profilePost, Util.getApiKey(context));
-    }
-
     public static String getPseudonym(Context context, String seed) {
         return Rest.getPseudonym(seed, Util.getApiKey(context));
     }
@@ -110,7 +93,9 @@ public class MessageLayer {
 
     public static String getEncodedIdentityString(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String displayName = sharedPreferences.getString(context.getString(R.string.display_name), "");
+
+        //--TODO get display name without a cursor
+        String displayName = DataUtils.getDisplayName(context, Util.getUserId(context));
         String alias = sharedPreferences.getString(context.getString(R.string.alias), "");
         Log.v(TAG, String.format("alias is %s", alias));
         Key groupKey = CryptoUtil.decodeSymmetricKey(
@@ -122,30 +107,6 @@ public class MessageLayer {
         String encodeString = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated encoded string: " + encodeString);
         return encodeString;
-    }
-
-    public static ProfileWithImageData getMostRecentProfile(Context context, int userId) {
-        String pseudonym = DataUtils.getMostRecentAlias(context, userId);
-        Key groupKey = DataUtils.getGroupKey(context, userId);
-        Key publicKey = DataUtils.getPublicKey(context, userId);
-
-        String apiKey = Util.getApiKey(context);
-        List<EncryptedProfile> encryptedProfiles = Rest.getProfiles(pseudonym, apiKey);
-        if (encryptedProfiles == null) {
-            Log.d(TAG, "profile response was null");
-            return null;
-        }
-
-        List<ProfileWithImageData> profiles = new ArrayList<>();
-        for (EncryptedProfile encryptedProfile : encryptedProfiles) {
-            try {
-                profiles.add(encryptedProfile.decryptAndVerify(groupKey, publicKey));
-            } catch (InvalidSignatureException e) {
-                Log.d(TAG, "could not verify profile for user id " + userId);
-            }
-        }
-
-        return ContentUtil.getNewest(profiles);
     }
 
     public static CommentCollection getCommentCollection(Context context, int postAuthorId, String postId) {

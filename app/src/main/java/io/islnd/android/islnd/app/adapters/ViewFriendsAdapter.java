@@ -49,11 +49,6 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
                 cursor.getInt(cursor.getColumnIndex(IslndContract.UserEntry._ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME))
         );
-        
-        Profile profile = DataUtils.getProfile(mContext, user.getUserId());
-        if (profile == null) {
-            return;
-        }
 
         holder.userName.setText(user.getDisplayName());
 
@@ -65,8 +60,10 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
                     mContext.startActivity(profileIntent);
                 });
 
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setViewFriendImageSampled(mContext, holder.profileImage, profileImageUri);
+        ImageUtil.setViewFriendImageSampled(
+                mContext,
+                holder.profileImage,
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
         holder.overflow.setOnClickListener((View v) ->
         {

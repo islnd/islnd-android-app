@@ -20,7 +20,7 @@ public class ChangeDisplayNameEvent extends Event {
                 .setAlias(this.alias)
                 .setEventId(this.eventId)
                 .setEventType(this.eventType)
-                .setContent(this.newDisplayName)
+                .setTextContent(this.newDisplayName)
                 .build()
                 .toByteArray();
     }

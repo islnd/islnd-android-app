@@ -53,7 +53,14 @@ public class FeedFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new PostAdapter(mContext, null);
-        getLoaderManager().initLoader(0, null, new LocalPostLoader(mContext, mAdapter));
+        final LocalPostLoader postLoader = new LocalPostLoader(
+                mContext,
+                IslndContract.PostEntry.CONTENT_URI,
+                mAdapter);
+        getLoaderManager().initLoader(
+                0,
+                null,
+                postLoader);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mContext));
