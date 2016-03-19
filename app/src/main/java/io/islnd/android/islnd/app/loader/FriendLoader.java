@@ -27,18 +27,20 @@ public class FriendLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         String[] projection = new String[]{
                 IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry._ID,
                 IslndContract.DisplayNameEntry.COLUMN_USER_ID,
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
 
         int myUserId = args.getInt(USER_ID_BUNDLE_KEY);
-        String selection = IslndContract.DisplayNameEntry.COLUMN_USER_ID + " != ?";
+        String selection = IslndContract.DisplayNameEntry.TABLE_NAME + "." +
+                IslndContract.DisplayNameEntry.COLUMN_USER_ID + " != ?";
         String[] selectionArgs = new String[]{
                 Integer.toString(myUserId)
         };
 
         return new CursorLoader(
                 mContext,
-                IslndContract.DisplayNameEntry.CONTENT_URI,
+                IslndContract.ProfileEntry.CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,

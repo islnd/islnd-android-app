@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -13,11 +14,13 @@ import io.islnd.android.islnd.app.database.IslndContract;
 public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final Context mContext;
+    private final Uri mContentUri;
     private final PostAdapter mAdapter;
 
-    public LocalPostLoader(Context context, PostAdapter postAdapter) {
+    public LocalPostLoader(Context context, Uri contentUri, PostAdapter postAdapter) {
         mContext = context;
         mAdapter = postAdapter;
+        mContentUri = contentUri;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
         return new CursorLoader(
                 mContext,
-                IslndContract.PostEntry.CONTENT_URI,
+                mContentUri,
                 projection,
                 null,
                 null,
