@@ -50,8 +50,6 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
     private TextView mDisplayNameTextView;
     private TextView mAboutMeTextView;
 
-    private CollapsingToolbarLayout mCollapsingToolbar;
-
     private String mProfileImageUriString;
     private String mHeaderImageUriString;
 
@@ -134,10 +132,10 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
 
         View toolbarOverlay = findViewById(R.id.toolbar_overlay);
         AppBarLayout appBar= (AppBarLayout) findViewById(R.id.app_bar_layout);
-        mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
-        mCollapsingToolbar.setTitle(" ");
+        collapsingToolbar.setTitle(" ");
 
 
         appBar.addOnOffsetChangedListener((AppBarLayout appBarLayout, int verticalOffset) -> {
@@ -155,9 +153,9 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
             ViewCompat.setAlpha(toolbarOverlay, 1 - ratio);
 
             if (scrollRange - verticalOffset == 0) {
-                mCollapsingToolbar.setTitle(mDisplayName);
+                collapsingToolbar.setTitle(mDisplayName);
             } else {
-                mCollapsingToolbar.setTitle(" ");
+                collapsingToolbar.setTitle(" ");
             }
         });
 

@@ -44,6 +44,8 @@ public class IslndProvider extends ContentProvider {
     static {
         sPostQueryBuilder = new SQLiteQueryBuilder();
 
+        //--TODO this is probably too many inner joins
+        //  Let's show that it is hurting performance and then let's fix it
         sPostQueryBuilder.setTables(
                 IslndContract.PostEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
@@ -665,9 +667,6 @@ public class IslndProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsUpdated = 0;
-
-        Log.v(TAG, "updating uri: " + uri);
-        Log.v(TAG, "match is + " + match);
 
         switch (match) {
             case PROFILE: {

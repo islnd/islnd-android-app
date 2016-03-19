@@ -29,6 +29,10 @@ public class IslndDb
     public static void createIdentity(Context context, String displayName) {
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
+
+        //--TODO passing display name here is a hack
+        //  We will be moving create identity stuff into a service
+        //  instead of nested async tasks
         setPseudonym(context, displayName);
     }
 

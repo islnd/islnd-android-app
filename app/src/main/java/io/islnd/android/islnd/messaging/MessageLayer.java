@@ -93,6 +93,8 @@ public class MessageLayer {
 
     public static String getEncodedIdentityString(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        //--TODO get display name without a cursor
         String displayName = DataUtils.getDisplayName(context, Util.getUserId(context));
         String alias = sharedPreferences.getString(context.getString(R.string.alias), "");
         Log.v(TAG, String.format("alias is %s", alias));
