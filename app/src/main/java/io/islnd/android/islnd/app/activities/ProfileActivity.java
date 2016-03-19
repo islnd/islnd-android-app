@@ -29,7 +29,7 @@ import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.Dialogs;
-import io.islnd.android.islnd.app.loader.LocalPostLoader;
+import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -74,7 +74,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new PostAdapter(this, null);
-        final LocalPostLoader postLoader = new LocalPostLoader(
+        final PostLoader postLoader = new PostLoader(
                 this,
                 IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),
                 mAdapter);

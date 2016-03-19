@@ -35,8 +35,7 @@ import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
-import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.loader.LocalCommentLoader;
+import io.islnd.android.islnd.app.loader.CommentLoader;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
@@ -86,9 +85,9 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
 
         // Load the local comments
         Bundle args = new Bundle();
-        args.putInt(LocalCommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
-        args.putString(LocalCommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
-        LocalCommentLoader localCommentLoader = new LocalCommentLoader(
+        args.putInt(CommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
+        args.putString(CommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
+        CommentLoader localCommentLoader = new CommentLoader(
                 this,
                 mAdapter);
 

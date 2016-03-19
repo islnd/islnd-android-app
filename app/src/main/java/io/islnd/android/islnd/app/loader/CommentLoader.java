@@ -10,7 +10,7 @@ import android.support.v4.content.Loader;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 
-public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String POST_AUTHOR_ID_BUNDLE_KEY = "post_author_bundle_key";
     public static final String POST_ID_BUNDLE_KEY = "post_id_bundle_key";
@@ -18,7 +18,7 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
     private final Context mContext;
     private final CommentAdapter mAdapter;
 
-    public LocalCommentLoader(Context context, CommentAdapter adapter) {
+    public CommentLoader(Context context, CommentAdapter adapter) {
         mContext = context;
         mAdapter = adapter;
     }

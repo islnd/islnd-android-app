@@ -11,13 +11,13 @@ import android.support.v4.content.Loader;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 
-public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final Context mContext;
     private final Uri mContentUri;
     private final PostAdapter mAdapter;
 
-    public LocalPostLoader(Context context, Uri contentUri, PostAdapter postAdapter) {
+    public PostLoader(Context context, Uri contentUri, PostAdapter postAdapter) {
         mContext = context;
         mAdapter = postAdapter;
         mContentUri = contentUri;
