@@ -54,6 +54,7 @@ import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -413,17 +414,16 @@ public class NavBaseActivity extends AppCompatActivity
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
                     final String newDisplayName = editText.getText().toString();
-                    if (Util.getUserId(this) < 0) { //--user never created
+                    if (Util.getUserId(this) < 0) { //--create user for this device
                         IslndDb.createIdentity(getApplicationContext(),
                                 newDisplayName);
                     } else { //--only update display name
-                        DataUtils.updateMyDisplayName(this, newDisplayName);
-
-                        //--push update to server
+                        Util.setDisplayName(this, newDisplayName);
                         List<Event> eventList = new EventListBuilder(this)
                                 .changeDisplayName(newDisplayName)
                                 .build();
                         for (Event event : eventList) {
+                            EventProcessor.process(this, event);
                             Intent pushEventService = new Intent(this, EventPushService.class);
                             pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
                             startService(pushEventService);

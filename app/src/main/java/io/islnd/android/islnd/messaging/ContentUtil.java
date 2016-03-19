@@ -1,16 +1,11 @@
 package io.islnd.android.islnd.messaging;
 
-import android.content.Context;
-
-import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.VersionedContent;
-import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.util.ImageUtil;
 
 import java.util.List;
 
-public class Util {
-    private static final String TAG = Util.class.getSimpleName();
+public class ContentUtil {
+    private static final String TAG = ContentUtil.class.getSimpleName();
 
     public static long getContentTimestamp() {
         return System.currentTimeMillis();

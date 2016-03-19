@@ -5,7 +5,6 @@ import android.util.Log;
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
-import io.islnd.android.islnd.messaging.crypto.EncryptedPost;
 import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
 import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
@@ -58,39 +57,6 @@ public class Rest {
             if (response.code() != HTTP_OK) {
                 Log.v(TAG, "/publicKey POST returned code " + response.code());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static List<EncryptedPost> getPosts(String pseudonym, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            return service.posts(pseudonym, apiKey).execute().body();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static void post(String pseudonymSeed, EncryptedPost encryptedPost, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            //--TODO check that post was successful
-            service.post(pseudonymSeed, encryptedPost, apiKey).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }

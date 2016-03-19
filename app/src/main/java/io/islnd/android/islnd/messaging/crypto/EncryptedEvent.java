@@ -2,8 +2,6 @@ package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.Key;
 
-import io.islnd.android.islnd.messaging.PostUpdate;
-import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
 import io.islnd.android.islnd.messaging.event.Event;
 
@@ -17,7 +15,7 @@ public class EncryptedEvent extends SymmetricEncryptedData {
     }
 
     @Override
-    public ChangeDisplayNameEvent decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
+    public Event decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
         SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);
         return ChangeDisplayNameEvent.fromProto(signedObject.getObject());
     }

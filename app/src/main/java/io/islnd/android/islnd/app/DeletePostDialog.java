@@ -1,14 +1,21 @@
 package io.islnd.android.islnd.app;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
+import java.util.List;
+
 import io.islnd.android.islnd.app.database.IslndDb;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class DeletePostDialog extends DialogFragment {
     private static final String TAG = DeletePostDialog.class.getSimpleName();
@@ -36,14 +43,18 @@ public class DeletePostDialog extends DialogFragment {
                         {
                             String postId = getArguments().getString(POST_ID_BUNDLE_KEY);
                             int postUserId = getArguments().getInt(USER_ID_BUNDLE_KEY);
+                            final Context context = getContext();
+                            List<Event> deletePostEvents = new EventListBuilder(context)
+                                    .deletePost(postUserId, postId)
+                                    .build();
 
-                            new AsyncTask<Void, Void, Void>() {
-                                @Override
-                                protected Void doInBackground(Void... params) {
-                                    IslndDb.deletePost(getActivity(), postUserId, postId);
-                                    return null;
-                                }
-                            }.execute();
+                            for (Event event : deletePostEvents) {
+                                EventProcessor.process(context, event);
+
+                                Intent pushEventService = new Intent(context, EventPushService.class);
+                                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                                context.startService(pushEventService);
+                            }
 
                             if (mFinishActivity) {
                                 getActivity().finish();

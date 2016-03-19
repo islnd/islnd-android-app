@@ -63,7 +63,6 @@ public class FeedFragment extends Fragment {
 
         mRefreshLayout.setOnRefreshListener(
                 () -> {
-                    new GetPostsFromServerTask().execute();
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,
@@ -91,14 +90,5 @@ public class FeedFragment extends Fragment {
     public void startNewPostActivity() {
         Intent newPostIntent = new Intent(mContext, NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
-    }
-
-    private class GetPostsFromServerTask extends AsyncTask<Void, Void, PostCollection> {
-        private final String TAG = GetPostsFromServerTask.class.getSimpleName();
-
-        @Override
-        protected PostCollection doInBackground(Void... params) {
-            return MessageLayer.getPosts(mContext);
-        }
     }
 }
