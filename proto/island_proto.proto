@@ -14,16 +14,6 @@ message SignedObject {
   required string signature = 2;
 }
 
-message CommentUpdate {
-  required bool is_delete = 1;
-  required string post_author_pseudonym = 2;
-  required string comment_author_pseudonym = 3;
-  required string post_id = 4;
-  required string comment_id = 5;
-  required string content = 6;
-  required int64 timestamp = 7;
-}
-
 message Event {
   required string alias = 1;
   required int32 event_id = 2;
@@ -32,4 +22,6 @@ message Event {
   optional string text_content = 5;
   optional bytes data_content = 6;
   optional int64 timestamp = 7;
+  optional string parent_alias = 8;
+  optional string parent_content_id = 9;
 }

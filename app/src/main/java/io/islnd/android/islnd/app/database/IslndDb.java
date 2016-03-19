@@ -7,18 +7,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.Util;
 
-import io.islnd.android.islnd.messaging.CommentUpdate;
-import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.MessageLayer;
-import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 
@@ -108,52 +103,5 @@ public class IslndDb
                 return null;
             }
         }.execute();
-    }
-
-    public static void addCommentToPost(Context context, Post post, String commentText)
-    /**
-     * Adds comment to existing post
-     *
-     * @param post Post I am adding comment to.
-     * @param comment Comment that I'm adding.
-     */
-    {
-        MessageLayer.comment(
-                context,
-                post.getUserId(),
-                post.getPostId(),
-                commentText);
-    }
-
-    public static void deleteComment(
-            Context context,
-            int postUserId,
-            String postId,
-            int commentUserId,
-            String commentId) {
-        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postUserId);
-        String commentAuthorPseudonym = DataUtils.getMostRecentAlias(context, commentUserId);
-        Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
-
-        CommentUpdate deleteComment = CommentUpdate.buildDelete(
-                postAuthorPseudonym,
-                commentAuthorPseudonym,
-                postId,
-                commentId);
-
-        EncryptedComment encryptedComment = new EncryptedComment(
-                deleteComment,
-                Util.getPrivateKey(context),
-                postAuthorGroupKey,
-                postAuthorPseudonym,
-                postId);
-
-        // Delete local
-        DataUtils.deleteComment(
-                context,
-                new CommentKey(commentUserId, commentId));
-
-        // Delete from network
-        Rest.postComment(encryptedComment, Util.getApiKey(context));
     }
 }

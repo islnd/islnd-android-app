@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,17 +24,23 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.islnd.android.islnd.app.DeletePostDialog;
+import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.loader.LocalCommentLoader;
-import io.islnd.android.islnd.app.loader.NetworkCommentLoader;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class ViewPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -59,7 +64,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mContext = getApplicationContext();
+        mContext = this;
 
         // Get intent with post info
         Intent intent = getIntent();
@@ -87,15 +92,9 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         getSupportLoaderManager().initLoader(1, new Bundle(), this);
 
         // Swipe to refresh
-        AsyncTaskLoader networkCommentsLoader = new NetworkCommentLoader(
-                this,
-                mPost.getUserId(),
-                mPost.getPostId());
-
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(() ->
         {
-            networkCommentsLoader.forceLoad();
             getApplicationContext().getContentResolver().requestSync(
                     Util.getSyncAccount(getApplicationContext()),
                     IslndContract.CONTENT_AUTHORITY,
@@ -129,10 +128,19 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         }
         else
         {
-            IslndDb.addCommentToPost(
-                    this,
-                    mPost,
-                    commentText);
+            List<Event> makeCommentEvents = new EventListBuilder(mContext)
+                    .makeComment(
+                            mPost.getPostId(),
+                            DataUtils.getMostRecentAlias(mContext, mPost.getUserId()),
+                            commentText )
+                    .build();
+
+            for (Event event : makeCommentEvents) {
+                EventProcessor.process(mContext, event);
+                Intent pushEventService = new Intent(mContext, EventPushService.class);
+                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                mContext.startService(pushEventService);
+            }
 
             //--Clear edit text
             addCommentEditText.setText("");
