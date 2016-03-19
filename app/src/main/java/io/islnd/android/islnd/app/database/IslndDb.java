@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.Util;
 

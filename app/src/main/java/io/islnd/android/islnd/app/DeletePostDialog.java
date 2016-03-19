@@ -42,10 +42,6 @@ public class DeletePostDialog extends DialogFragment {
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                         {
                             String postId = getArguments().getString(POST_ID_BUNDLE_KEY);
-
-                            //--TODO remove unused arguments
-                            int postUserId = getArguments().getInt(USER_ID_BUNDLE_KEY);
-
                             final Context context = getContext();
                             List<Event> deletePostEvents = new EventListBuilder(context)
                                     .deletePost(postId)

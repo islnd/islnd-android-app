@@ -44,12 +44,6 @@ public class DeleteCommentDialog extends DialogFragment {
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                         {
                             String commentId = getArguments().getString(COMMENT_ID_BUNDLE_KEY);
-
-                            //--TODO delete unused keys
-                            String postId = getArguments().getString(POST_ID_BUNDLE_KEY);
-                            int postUserId = getArguments().getInt(POST_USER_ID_BUNDLE_KEY);
-                            int commentUserId = getArguments().getInt(COMMENT_USER_ID_BUNDLE_KEY);
-
                             final Context context = getContext();
                             List<Event> deleteCommentEvents = new EventListBuilder(context)
                                     .deleteComment(commentId)
