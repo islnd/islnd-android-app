@@ -189,7 +189,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
                     switch (item.getItemId()) {
                         case R.id.delete_post:
                             DeletePostDialog deletePostFragment =
-                                    DeletePostDialog.buildWithArgs(mPost.getUserId(), mPost.getPostId());
+                                    DeletePostDialog.buildWithArgs(mPost.getPostId());
                             deletePostFragment.show(
                                     getSupportFragmentManager(),
                                     mContext.getString(R.string.fragment_delete_post));

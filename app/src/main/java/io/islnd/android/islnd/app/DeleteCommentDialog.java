@@ -16,21 +16,11 @@ import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class DeleteCommentDialog extends DialogFragment {
-    private static final String POST_USER_ID_BUNDLE_KEY = "POST_USER_ID_PARAM";
-    private static final String POST_ID_BUNDLE_KEY = "POST_ID_PARAM";
-    public static final String COMMENT_USER_ID_BUNDLE_KEY = "COMMENT_USER_ID_PARAM";
     public static final String COMMENT_ID_BUNDLE_KEY = "COMMENT_ID_PARAM";
 
-    public static DialogFragment buildWithArgs(
-            int postAuthorUserId,
-            String postId,
-            int commentAuthorUserId,
-            String commentId) {
+    public static DialogFragment buildWithArgs(String commentId) {
         DeleteCommentDialog deleteCommentDialog = new DeleteCommentDialog();
         Bundle args = new Bundle();
-        args.putInt(DeleteCommentDialog.POST_USER_ID_BUNDLE_KEY, postAuthorUserId);
-        args.putString(DeleteCommentDialog.POST_ID_BUNDLE_KEY, postId);
-        args.putInt(DeleteCommentDialog.COMMENT_USER_ID_BUNDLE_KEY, commentAuthorUserId);
         args.putString(DeleteCommentDialog.COMMENT_ID_BUNDLE_KEY, commentId);
         deleteCommentDialog.setArguments(args);
         return deleteCommentDialog;
