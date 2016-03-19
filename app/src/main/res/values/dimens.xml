@@ -56,4 +56,6 @@
     <dimen name="sms_allow_dialog_margin">8dp</dimen>
 
     <dimen name="image_button_padding">8dp</dimen>
+    <dimen name="splash_screen_padding">64dp</dimen>
+    <dimen name="splash_screen_icon">128dp</dimen>
 </resources>

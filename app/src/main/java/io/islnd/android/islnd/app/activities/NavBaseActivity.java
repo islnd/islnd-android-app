@@ -69,12 +69,9 @@ public class NavBaseActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
     private View mDialogView = null;
-    private ContentResolver mResolver;
-    private Account mSyncAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.applyAppTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
@@ -83,16 +80,6 @@ public class NavBaseActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, new FeedFragment())
                 .commit();
-
-        // Create sync account and force sync
-        mSyncAccount = createAndRegisterSyncAccount(this);
-        mResolver = getContentResolver();
-        mResolver.setSyncAutomatically(
-                mSyncAccount,
-                getString(R.string.content_authority),
-                true);
-        Log.v(TAG, "requesting sync...");
-        mResolver.requestSync(mSyncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
     }
 
     private void onCreateDrawer() {
@@ -371,7 +358,7 @@ public class NavBaseActivity extends AppCompatActivity
         String contactNumber = null;
 
         // getting contacts ID
-        ContentResolver cr = mResolver;
+        ContentResolver cr = getContentResolver();
         Cursor cursorID = cr.query(uriContact,
                 new String[]{ContactsContract.Contacts._ID},
                 null, null, null);
@@ -380,7 +367,7 @@ public class NavBaseActivity extends AppCompatActivity
             String contactId =
                     cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
 
-            Cursor cursorPhone = mResolver.query(
+            Cursor cursorPhone = cr.query(
                     ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                     new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
 
@@ -447,15 +434,5 @@ public class NavBaseActivity extends AppCompatActivity
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
-    }
-
-    public static Account createAndRegisterSyncAccount(Context context) {
-        Account newAccount = Util.getSyncAccount(context);
-
-        //--Register account
-        AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
-        accountManager.addAccountExplicitly(newAccount, null, null);
-
-        return newAccount;
     }
 }
