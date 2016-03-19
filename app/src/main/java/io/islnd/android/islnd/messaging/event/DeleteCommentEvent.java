@@ -7,7 +7,7 @@ public class DeleteCommentEvent extends Event {
     private final String commentId;
 
     protected DeleteCommentEvent(String alias, int eventId, String commentId) {
-        super(alias, eventId, EventType.DELETE_POST);
+        super(alias, eventId, EventType.DELETE_COMMENT);
 
         this.commentId = commentId;
     }

@@ -36,7 +36,7 @@ public class NewCommentEvent extends Event {
     }
 
     public String getCommentId() {
-        return this.getCommentId();
+        return this.commentId;
     }
 
     public String getContent() {
@@ -44,7 +44,7 @@ public class NewCommentEvent extends Event {
     }
 
     public long getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
                 projection,
                 null,
                 null,
-                IslndContract.CommentEntry.COLUMN_TIMESTAMP + " DESC"
+                IslndContract.CommentEntry.COLUMN_TIMESTAMP + " ASC"
         );
     }
 

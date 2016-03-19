@@ -141,10 +141,8 @@ public class EventProcessor {
     }
 
     private static void addComment(Context context, NewCommentEvent newCommentEvent) {
-//        int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
-//        int postUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getPostAuthorAlias());
-        int commentUserId = 100;
-        int postUserId = 100;
+        int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
+        int postUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getPostAuthorAlias());
 
         ContentValues values = new ContentValues();
         values.put(IslndContract.CommentEntry.COLUMN_POST_USER_ID, postUserId);
@@ -153,9 +151,9 @@ public class EventProcessor {
         values.put(IslndContract.CommentEntry.COLUMN_COMMENT_ID, newCommentEvent.getCommentId());
         values.put(IslndContract.CommentEntry.COLUMN_CONTENT, newCommentEvent.getContent());
         values.put(IslndContract.CommentEntry.COLUMN_TIMESTAMP, newCommentEvent.getTimestamp());
-//        context.getContentResolver().insert(
-//                IslndContract.CommentEntry.CONTENT_URI,
-//                values);
+        context.getContentResolver().insert(
+                IslndContract.CommentEntry.CONTENT_URI,
+                values);
     }
 
     private static void deleteComment(Context context, DeleteCommentEvent deleteCommentEvent) {
