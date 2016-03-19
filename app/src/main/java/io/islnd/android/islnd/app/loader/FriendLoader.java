@@ -26,7 +26,7 @@ public class FriendLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = new String[]{
                 IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry._ID,
-                IslndContract.DisplayNameEntry.COLUMN_USER_ID,
+                IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID,
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
