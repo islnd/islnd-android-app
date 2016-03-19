@@ -24,6 +24,9 @@
     <color name="translucent_scrim_bottom">#2A000000</color>
     <color name="translucent_scrim_bottom_center">#0D000000</color>
 
+    <color name="splash_background">#FAFAFA</color>
+    <color name="splash_text">#8A000000</color>
+
     <color name="active_icon">#8a000000</color>
     <color name="inactive_icon">#42000000</color>
     <color name="black_tint">#61000000</color>

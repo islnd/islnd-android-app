@@ -112,7 +112,7 @@
     <string name="pref_theme_default_value">1</string>
     <string name="pref_appearance_title">Appearance</string>
     <string name="pref_appearance_summary">Application Theme</string>
-    <string name="restart_app_message">A restart is necassary to load theme. Would you like to restart now?</string>
+    <string name="restart_settings_message">Settings must restart to apply change. Restart now?</string>
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>
     <string name="discard">Discard</string>
