@@ -74,6 +74,32 @@ public class Util {
         return numberOfComments + comments;
     }
 
+    public static boolean getUsesApiKey(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.uses_api_key), false);
+    }
+
+    public static void setUsesApiKey(Context context, boolean usesApiKey) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean(context.getString(R.string.uses_api_key), usesApiKey);
+        editor.commit();
+    }
+
+    public static boolean getHasCreatedAccount(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.has_created_account), false);
+    }
+
+    public static void setHasCreatedAccount(Context context, boolean hasCreatedAccount) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean(context.getString(R.string.has_created_account), hasCreatedAccount);
+        editor.apply();
+    }
+
     public static boolean isUser(Context context, int userId) {
         return getUserId(context) == userId;
     }
