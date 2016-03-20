@@ -62,7 +62,6 @@
     <string name="add_friend_dialog">Pick Add Friend Action</string>
 
     <string name="title_activity_show_qr">ShowQRActivity</string>
-    <string name="pseudonym_key_id">pseudonym_key_id</string>
     <string name="sms_prefix">ISLAND-#-#-</string>
     <string name="sms_allow_dialog_title">Allow user with SMS</string>
     <string name="sms_disclaimer">Disclaimer: Standard text messaging rates may apply</string>
@@ -73,7 +72,6 @@
     <string name="request_contact_explanation">Contact permissions are needed to get contact number</string>
     <string name="profile_default_about_me"></string>
     <string name="previous_profile_version_key">previous_profile_version</string>
-    <string name="post_version_key">post_version</string>
     <string name="api_key">api_key</string>
     <string name="fragment_delete_post">fragment_delete_post</string>
     <string name="comment_version_key">comment_version_key</string>
@@ -89,7 +87,6 @@
     <string name="nav_settings_title">Settings</string>
     <string name="nav_add_friend">Add Friend</string>
     <string name="user_id">user_id</string>
-    <string name="display_name">display_name</string>
     <string name="event_id">event_id</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -113,5 +110,8 @@
     <string name="pref_theme_default_value">1</string>
     <string name="pref_appearance_title">Appearance</string>
     <string name="pref_appearance_summary">Application Theme</string>
-    <string name="restart_app_message">A restart is necassary to load theme. Would you like to restart now?</string>
+    <string name="restart_settings_message">Settings must restart to apply change. Restart now?</string>
+    <string name="view_friends_fragment">Friends</string>
+    <string name="discard_profile_changes_dialog">Discard changes?</string>
+    <string name="discard">Discard</string>
 </resources>

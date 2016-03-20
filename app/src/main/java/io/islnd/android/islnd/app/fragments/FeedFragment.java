@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,7 +53,14 @@ public class FeedFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new PostAdapter(mContext, null);
-        getLoaderManager().initLoader(0, null, new LocalPostLoader(mContext, mAdapter));
+        final LocalPostLoader postLoader = new LocalPostLoader(
+                mContext,
+                IslndContract.PostEntry.CONTENT_URI,
+                mAdapter);
+        getLoaderManager().initLoader(
+                0,
+                null,
+                postLoader);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mContext));
@@ -62,7 +70,6 @@ public class FeedFragment extends Fragment {
 
         mRefreshLayout.setOnRefreshListener(
                 () -> {
-                    new GetPostsFromServerTask().execute();
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,
@@ -80,17 +87,15 @@ public class FeedFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setTitle(R.string.app_name);
+    }
+
     public void startNewPostActivity() {
         Intent newPostIntent = new Intent(mContext, NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
-    }
-
-    private class GetPostsFromServerTask extends AsyncTask<Void, Void, PostCollection> {
-        private final String TAG = GetPostsFromServerTask.class.getSimpleName();
-
-        @Override
-        protected PostCollection doInBackground(Void... params) {
-            return MessageLayer.getPosts(mContext);
-        }
     }
 }

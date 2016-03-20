@@ -18,7 +18,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -44,7 +47,6 @@ import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
-import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -53,10 +55,12 @@ import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
 import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
@@ -68,12 +72,13 @@ public class NavBaseActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
     private View mDialogView = null;
-    private ContentResolver mResolver;
-    private Account mSyncAccount;
+
+    private ImageView mNavProfileImage;
+    private ImageView mNavHeaderImage;
+    private TextView mNavUserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.applyAppTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
@@ -84,19 +89,10 @@ public class NavBaseActivity extends AppCompatActivity
         }
 
         // Set launching fragment
-        Fragment fragment = new FeedFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-        // Create sync account and force sync
-        mSyncAccount = createAndRegisterSyncAccount(this);
-        mResolver = getContentResolver();
-        mResolver.setSyncAutomatically(
-                mSyncAccount,
-                getString(R.string.content_authority),
-                true);
-        Log.v(TAG, "requesting sync...");
-        mResolver.requestSync(mSyncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new FeedFragment())
+                .commit();
+        getSupportLoaderManager().initLoader(0, new Bundle(), this);
     }
 
     private void onCreateDrawer() {
@@ -113,42 +109,24 @@ public class NavBaseActivity extends AppCompatActivity
 
         // Set user in nav drawer
         View header = navigationView.getHeaderView(0);
-        ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
-        ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
-        TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        String myDisplayName = Util.getDisplayName(this);
-        int myUserId = Util.getUserId(this);
+        mNavProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
+        mNavHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
+        mNavUserName = (TextView) header.findViewById(R.id.nav_user_name);
 
-        navProfileImage.setOnClickListener(
+        int myUserId = Util.getUserId(this);
+        mNavProfileImage.setOnClickListener(
                 (View v) -> {
                     Intent profileIntent = new Intent(this, ProfileActivity.class);
                     profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myUserId);
                     startActivity(profileIntent);
                 });
-        navUserName.setText(myDisplayName);
-
-        if (myUserId >= 0) {
-            Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
-            if (profile == null) {
-                Log.d(TAG, String.format("my id is %d and I have no profile", myUserId));
-            } else {
-                Uri profileImageUri = profile.getProfileImageUri();
-                Uri headerImageUri = profile.getHeaderImageUri();
-                ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
-                        profileImageUri);
-                ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
-                        headerImageUri);
-            }
-        }
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        }
-        else {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
             super.onBackPressed();
         }
     }
@@ -158,8 +136,14 @@ public class NavBaseActivity extends AppCompatActivity
         Fragment fragment = null;
         boolean isFragment = false;
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.content_frame);
+
         switch (item.getItemId()) {
             case R.id.nav_feed:
+                if(currentFragment instanceof FeedFragment) {
+                    break;
+                }
                 fragment = new FeedFragment();
                 isFragment = true;
                 break;
@@ -169,6 +153,9 @@ public class NavBaseActivity extends AppCompatActivity
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
+                if(currentFragment instanceof ViewFriendsFragment) {
+                    break;
+                }
                 fragment = new ViewFriendsFragment();
                 isFragment = true;
                 break;
@@ -192,12 +179,13 @@ public class NavBaseActivity extends AppCompatActivity
         }
 
         if (isFragment) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .addToBackStack("")
+                    .commit();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -212,7 +200,6 @@ public class NavBaseActivity extends AppCompatActivity
                 Log.d(TAG, "Contents: " + contents);
                 MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
             }
-            return;
         // Not QR result
         } else {
             if (requestCode == CONTACT_RESULT && resultCode == RESULT_OK) {
@@ -230,22 +217,20 @@ public class NavBaseActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_SMS: {
+            case REQUEST_SMS:
                 // Permission granted
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     smsAllowDialog();
                 }
-                return;
-            }
-            case REQUEST_CONTACT: {
+                break;
+            case REQUEST_CONTACT:
                 // Permission granted
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     importContact(null);
                 }
-                return;
-            }
+                break;
         }
     }
 
@@ -268,9 +253,10 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void qrCodeActionDialog() {
-        Fragment fragment = new ShowQrFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new ShowQrFragment())
+                .addToBackStack("")
+                .commit();
     }
 
     private void smsAllowDialog() {
@@ -371,7 +357,7 @@ public class NavBaseActivity extends AppCompatActivity
         String contactNumber = null;
 
         // getting contacts ID
-        ContentResolver cr = mResolver;
+        ContentResolver cr = getContentResolver();
         Cursor cursorID = cr.query(uriContact,
                 new String[]{ContactsContract.Contacts._ID},
                 null, null, null);
@@ -380,7 +366,7 @@ public class NavBaseActivity extends AppCompatActivity
             String contactId =
                     cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
 
-            Cursor cursorPhone = mResolver.query(
+            Cursor cursorPhone = cr.query(
                     ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                     new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
 
@@ -414,17 +400,16 @@ public class NavBaseActivity extends AppCompatActivity
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
                     final String newDisplayName = editText.getText().toString();
-                    if (Util.getUserId(this) < 0) { //--user never created
-                        IslndDb.createIdentity(getApplicationContext(),
+                    if (Util.getUserId(this) < 0) { //--create user for this device
+                        IslndDb.createIdentity(
+                                getApplicationContext(),
                                 newDisplayName);
                     } else { //--only update display name
-                        DataUtils.updateMyDisplayName(this, newDisplayName);
-
-                        //--push update to server
                         List<Event> eventList = new EventListBuilder(this)
                                 .changeDisplayName(newDisplayName)
                                 .build();
                         for (Event event : eventList) {
+                            EventProcessor.process(this, event);
                             Intent pushEventService = new Intent(this, EventPushService.class);
                             pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
                             startService(pushEventService);
@@ -450,13 +435,46 @@ public class NavBaseActivity extends AppCompatActivity
                 .show();
     }
 
-    public static Account createAndRegisterSyncAccount(Context context) {
-        Account newAccount = Util.getSyncAccount(context);
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = new String[]{
+                IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+        };
 
-        //--Register account
-        AccountManager accountManager = (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
-        accountManager.addAccountExplicitly(newAccount, null, null);
+        return new CursorLoader(
+                this,
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(IslndContract.UserEntry.MY_USER_ID),
+                projection,
+                null,
+                null,
+                null
+        );
+    }
 
-        return newAccount;
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            return;
+        }
+
+        ImageUtil.setNavProfileImageSampled(
+                this,
+                mNavProfileImage,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+        ImageUtil.setNavProfileImageSampled(
+                this,
+                mNavHeaderImage,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))));
+        mNavUserName.setText(
+                data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME))
+        );
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

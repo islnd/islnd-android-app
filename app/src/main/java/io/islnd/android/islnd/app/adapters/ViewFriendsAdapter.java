@@ -60,9 +60,10 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
                     mContext.startActivity(profileIntent);
                 });
 
-        Profile profile = DataUtils.getProfile(mContext, user.getUserId());
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setViewFriendImageSampled(mContext, holder.profileImage, profileImageUri);
+        ImageUtil.setViewFriendImageSampled(
+                mContext,
+                holder.profileImage,
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
         holder.overflow.setOnClickListener((View v) ->
         {

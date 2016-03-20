@@ -7,12 +7,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostKey;
 
 import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
@@ -109,6 +107,29 @@ public class DataUtils {
         }
     }
 
+    public static String getDisplayName(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(userId),
+                projection,
+                null,
+                null,
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
+
+            return null;
+        } finally {
+            cursor.close();
+        }
+    }
+
     public static Key getPublicKey(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY
@@ -185,64 +206,6 @@ public class DataUtils {
         deleteComment(context.getContentResolver(), commentKey);
     }
 
-    public static Profile getProfile(Context context, int userId) {
-        String[] projection = new String[] {
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
-                IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
-                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
-                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
-        };
-
-        Cursor cursor = null;
-
-        try {
-            cursor = context.getContentResolver().query(
-                    IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
-                    projection,
-                    null,
-                    null,
-                    null);
-            if (cursor.moveToFirst()) {
-                return new Profile(
-                        cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
-                        cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME)),
-                        Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))),
-                        Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))),
-                        1   //--The content provider only returns one profile per user id,
-                            //  so version number doesn't matter.
-                            //  The version matters when retrieving profiles from the network,
-                            //  and we have to figure out which one is the most recent
-                );
-            }
-            else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    public static void updateProfile(Context applicationContext, Profile newProfile, int userId) {
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.ProfileEntry.COLUMN_ABOUT_ME, newProfile.getAboutMe());
-        values.put(
-                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
-                newProfile.getHeaderImageUri().toString());
-        values.put(
-                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
-                newProfile.getProfileImageUri().toString());
-        final String selection = IslndContract.ProfileEntry.TABLE_NAME + "." +
-                IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
-        applicationContext.getContentResolver().update(
-                IslndContract.ProfileEntry.CONTENT_URI,
-                values,
-                selection,
-                new String[]{Integer.toString(userId)}
-        );
-    }
-
     public static void deleteAll(Context context) {
         final ContentResolver contentResolver = context.getContentResolver();
         contentResolver.delete(IslndContract.UserEntry.CONTENT_URI, null, null);
@@ -289,18 +252,5 @@ public class DataUtils {
         } finally {
             cursor.close();
         }
-    }
-
-    public static void updateMyDisplayName(Context context, String newDisplayName) {
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME, newDisplayName);
-        context.getContentResolver().update(
-                IslndContract.DisplayNameEntry.buildDisplayNameWithUserId(Util.getUserId(context)),
-                values,
-                null,
-                null
-        );
-
-        Util.setDisplayName(context, newDisplayName);
     }
 }

@@ -1,12 +1,9 @@
 package io.islnd.android.islnd.app.preferences;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -33,10 +30,18 @@ public class ThemePreferenceFragment extends PreferenceFragmentCompat
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object o) {
+        String oldValue = PreferenceManager
+                .getDefaultSharedPreferences(getContext())
+                .getString(PREFERENCE_THEME_KEY, "1");
         String value = o.toString();
         String key = preference.getKey();
         Log.v(TAG, "pref key: " + key);
-        Log.v(TAG, "pref value: " + value);
+        Log.v(TAG, "pref old value: " + oldValue);
+        Log.v(TAG, "pref new value: " + value);
+
+        if (oldValue.equals(value)) {
+            return false;
+        }
 
         switch (key) {
             case PREFERENCE_THEME_KEY:
@@ -44,19 +49,17 @@ public class ThemePreferenceFragment extends PreferenceFragmentCompat
                     case "1": // Light
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                         preference.setSummary(getString(R.string.light_theme));
-                        showRestartAppDialog();
                         break;
                     case "2": // Dark
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                         preference.setSummary(getString(R.string.dark_theme));
-                        showRestartAppDialog();
                         break;
                     case "3": // DayNight Auto
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
                         preference.setSummary(getString(R.string.day_night_theme));
-                        showRestartAppDialog();
                         break;
                 }
+                showRestartActivityDialog();
                 break;
         }
         return true;
@@ -80,26 +83,20 @@ public class ThemePreferenceFragment extends PreferenceFragmentCompat
         }
     }
 
-    private void showRestartAppDialog() {
+    private void showRestartActivityDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
-        builder.setMessage(getString(R.string.restart_app_message))
-            .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
-            {
-                restartApp();
-            })
-            .setNegativeButton(android.R.string.cancel, null)
-            .show();
+        builder.setMessage(getString(R.string.restart_settings_message))
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
+                {
+                    restartActivity();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
-    private void restartApp() {
-        Context context = getContext();
-        PendingIntent mPendingIntent = PendingIntent.getActivity(
-                context,
-                123456,
-                new Intent(context, SettingsActivity.class),
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-        System.exit(0);
+    private void restartActivity() {
+        AppCompatActivity context = (AppCompatActivity) getContext();
+        context.finish();
+        startActivity(context.getIntent());
     }
 }

@@ -63,17 +63,20 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         holder.postContent.setText(post.getContent());
         //TODO: Get actual comment count
         holder.postCommentCount.setText(Util.numberOfCommentsString(0));
-
-        // Go to profile on picture click
+        
         holder.postProfileImage.setOnClickListener((View v) -> {
+            if (mContext instanceof ProfileActivity) {
+                return;
+            }
             Intent profileIntent = new Intent(mContext, ProfileActivity.class);
             profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, post.getUserId());
             mContext.startActivity(profileIntent);
         });
 
-        Profile profile = DataUtils.getProfile(mContext, post.getUserId());
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
+        ImageUtil.setPostProfileImageSampled(
+                mContext,
+                holder.postProfileImage,
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
         // View post on post click
         holder.itemView.setOnClickListener((View v) -> {

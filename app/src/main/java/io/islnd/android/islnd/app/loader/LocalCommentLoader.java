@@ -27,6 +27,7 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = new String[]{
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
                 IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry._ID,
                 IslndContract.CommentEntry.COLUMN_POST_USER_ID,
                 IslndContract.CommentEntry.COLUMN_POST_ID,

@@ -93,7 +93,10 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             Key groupKey = DataUtils.getGroupKey(mContext, userId);
             Key publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
-                events.add(encryptedEvent.decryptAndVerify(groupKey, publicKey));
+                final Event event = encryptedEvent.decryptAndVerify(groupKey, publicKey);
+                if (event != null) {
+                    events.add(event);
+                }
             } catch (InvalidSignatureException e) {
                 e.printStackTrace();
             }
