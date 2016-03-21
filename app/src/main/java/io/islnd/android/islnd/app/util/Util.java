@@ -99,16 +99,6 @@ public class Util {
         return sharedPref.getInt(context.getString(R.string.user_id), -1);
     }
 
-    public static String getAlias(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.alias), "");
-    }
-
-    public static String getPseudonymSeed(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.pseudonym_seed), "");
-    }
-
     public static Key getGroupKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodeSymmetricKey(

@@ -1,11 +1,8 @@
 package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -40,10 +37,10 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.util.List;
 
+import io.islnd.android.islnd.app.CreateIdentityService;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
@@ -392,10 +389,12 @@ public class NavBaseActivity extends AppCompatActivity
         builder.setPositiveButton(getString(android.R.string.ok),
                 (DialogInterface dialog, int id) -> {
                     final String newDisplayName = editText.getText().toString();
-                    if (Util.getUserId(this) < 0) { //--create user for this device
-                        IslndDb.createIdentity(
-                                getApplicationContext(),
-                                newDisplayName);
+                    final int userId = Util.getUserId(this);
+                    Log.v(TAG, "user id is " + userId);
+                    if (userId < 0) { //--create user for this device
+                        Intent createIdentityIntent = new Intent(this, CreateIdentityService.class);
+                        createIdentityIntent.putExtra(CreateIdentityService.DISPLAY_NAME_EXTRA, newDisplayName);
+                        startService(createIdentityIntent);
                     } else { //--only update display name
                         List<Event> eventList = new EventListBuilder(this)
                                 .changeDisplayName(newDisplayName)

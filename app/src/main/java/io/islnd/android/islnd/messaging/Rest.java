@@ -6,7 +6,6 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
-import io.islnd.android.islnd.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,28 +54,6 @@ public class Rest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static String getPseudonym(String seed, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-        try {
-            Response<PseudonymResponse> result = service.pseduonym(seed, apiKey).execute();
-            if (result.code() == HTTP_OK) {
-                return result.body().getPseudonym();
-            }
-            else {
-                Log.d(TAG, "/pseudonym GET returned code " + result.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     public static int postEvent(EncryptedEvent encryptedEvent, String apiKey) throws IOException {
