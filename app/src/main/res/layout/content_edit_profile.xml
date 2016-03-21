@@ -73,7 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_header_frame">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edit_display_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/edit_display_name_layout">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edit_profile_about_me"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

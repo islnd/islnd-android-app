@@ -162,9 +162,6 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.delete_database:
                 DataUtils.deleteAll(this);
                 break;
-            case R.id.edit_username:
-                editUsernameDialog();
-                break;
             case R.id.edit_api_key:
                 editApiKey();
                 break;
@@ -380,36 +377,6 @@ public class NavBaseActivity extends AppCompatActivity
 
         cursorID.close();
         return contactNumber;
-    }
-
-    private void editUsernameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
-        builder.setView(mDialogView);
-
-        EditText editText = (EditText) mDialogView.findViewById(R.id.edit_username_edit_text);
-
-        builder.setPositiveButton(getString(android.R.string.ok),
-                (DialogInterface dialog, int id) -> {
-                    final String newDisplayName = editText.getText().toString();
-                    if (Util.getUserId(this) < 0) { //--create user for this device
-                        IslndDb.createIdentity(
-                                getApplicationContext(),
-                                newDisplayName);
-                    } else { //--only update display name
-                        List<Event> eventList = new EventListBuilder(this)
-                                .changeDisplayName(newDisplayName)
-                                .build();
-                        for (Event event : eventList) {
-                            EventProcessor.process(this, event);
-                            Intent pushEventService = new Intent(this, EventPushService.class);
-                            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                            startService(pushEventService);
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
     }
 
     private void editApiKey() {

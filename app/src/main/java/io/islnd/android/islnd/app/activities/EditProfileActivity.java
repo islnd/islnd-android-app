@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -38,8 +39,8 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
     private static final int CROP_PROFILE_IMAGE = 3;
     private static final int CROP_HEADER_IMAGE = 4;
 
-    private EditText mDisplayNameEditText;
-    private EditText mAboutMeEditText;
+    private TextInputEditText mDisplayNameEditText;
+    private TextInputEditText mAboutMeEditText;
     private ImageView mProfileImageView;
     private ImageView mHeaderImageView;
     private Uri mNewProfileImageUri = null;
@@ -57,10 +58,10 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mContext = getApplicationContext();
 
-        mDisplayNameEditText = (EditText) findViewById(R.id.edit_display_name);
+        mDisplayNameEditText = (TextInputEditText) findViewById(R.id.edit_display_name);
+        mAboutMeEditText = (TextInputEditText) findViewById(R.id.edit_profile_about_me);
         mProfileImageView = (ImageView) findViewById(R.id.profile_profile_image);
         mHeaderImageView = (ImageView) findViewById(R.id.profile_header_image);
-        mAboutMeEditText = (EditText) findViewById(R.id.edit_profile_about_me);
 
         getSupportLoaderManager().initLoader(0, new Bundle(), this);
     }
