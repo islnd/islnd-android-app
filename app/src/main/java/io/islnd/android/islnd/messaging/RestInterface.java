@@ -53,6 +53,10 @@ public interface RestInterface {
             @Path("pseudonym") String pseudonym,
             @Query("apiKey") String apiKey);
 
+    @GET("/ping/")
+    Call<Void> getPing(
+            @Query("apiKey") String apiKey);
+
     @POST("/profile/{pseudonymSeed}")
     Call<Object> postProfile(
             @Path("pseudonymSeed") String pseudonymSeed,

@@ -2,21 +2,29 @@ package io.islnd.android.islnd.app.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.nfc.Tag;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndDb;
+import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.MessageLayer;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
+    private static final String TAG = CreateAccountActivity.class.getSimpleName();
     private Context mContext;
     private TextInputEditText mApiEditText;
     private TextInputEditText mDisplayNameEditText;
+    private String mApiKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +42,39 @@ public class CreateAccountActivity extends AppCompatActivity {
         }
     }
 
-    public void createAccount(View view) {
-        Util.setApiKey(mContext, mApiEditText.getText().toString());
-        IslndDb.createIdentity(mContext, mDisplayNameEditText.getText().toString());
+    private void createAccount() {
+        String displayName = mDisplayNameEditText.getText().toString();
+
+        Util.setApiKey(mContext, mApiKey);
+        IslndDb.createIdentity(mContext, displayName);
         Util.setHasCreatedAccount(mContext, true);
 
         finish();
         startActivity(new Intent(this, NavBaseActivity.class));
+    }
+
+    public void createAccountClick(View view) {
+        mApiKey = mApiEditText.getText().toString();
+
+        if (Util.getUsesApiKey(mContext)) {
+            new VerifyApiKeyAndCreateAccountTask().execute();
+        } else {
+            createAccount();
+        }
+    }
+
+    private class VerifyApiKeyAndCreateAccountTask extends AsyncTask<Void, Void, Boolean> {
+        protected Boolean doInBackground(Void... params) {
+            return MessageLayer.getPing(mApiKey);
+        }
+
+        protected void onPostExecute(Boolean isApiKeyValid) {
+            if (isApiKeyValid) {
+                Log.v(TAG, "api key is valid");
+                createAccount();
+            } else {
+                Log.v(TAG, "api key is invalid");
+            }
+        }
     }
 }

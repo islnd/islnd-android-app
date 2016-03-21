@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin">
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
     <TextView
         android:id="@+id/welcome_message_text_view"
@@ -59,6 +61,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/create_account_text"
-            android:onClick="createAccount"/>
+            android:onClick="createAccountClick"/>
     </LinearLayout>
 </LinearLayout>
