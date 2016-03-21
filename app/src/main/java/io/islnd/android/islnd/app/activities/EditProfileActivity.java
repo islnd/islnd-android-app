@@ -33,21 +33,20 @@ import java.io.File;
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static String TAG = EditProfileActivity.class.getSimpleName();
 
-    private EditText mAboutMeEditText;
-    private ImageView mProfileImageView;
-    private ImageView mHeaderImageView;
-    private TextView mUserNameTextView;
-
-    private Uri mNewProfileImageUri = null;
-    private Uri mNewHeaderImageUri = null;
-
     private static final int SELECT_PROFILE_IMAGE = 1;
     private static final int SELECT_HEADER_IMAGE = 2;
     private static final int CROP_PROFILE_IMAGE = 3;
     private static final int CROP_HEADER_IMAGE = 4;
 
-    private Context mContext;
+    private EditText mDisplayNameEditText;
+    private EditText mAboutMeEditText;
+    private ImageView mProfileImageView;
+    private ImageView mHeaderImageView;
+    private Uri mNewProfileImageUri = null;
+    private Uri mNewHeaderImageUri = null;
     private String mPreviousAboutMeText;
+    private String mPreviousDisplayNameText;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,7 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mContext = getApplicationContext();
 
-        mUserNameTextView = (TextView) findViewById(R.id.profile_user_name);
+        mDisplayNameEditText = (EditText) findViewById(R.id.edit_display_name);
         mProfileImageView = (ImageView) findViewById(R.id.profile_profile_image);
         mHeaderImageView = (ImageView) findViewById(R.id.profile_header_image);
         mAboutMeEditText = (EditText) findViewById(R.id.edit_profile_about_me);
@@ -119,9 +118,14 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
     }
 
     public void saveProfile(View view) {
+        String newDisplayNameText = mDisplayNameEditText.getText().toString();
         String newAboutMeText = mAboutMeEditText.getText().toString();
 
         EventListBuilder profileEventList = new EventListBuilder(mContext);
+        if (!newDisplayNameText.equals(mPreviousDisplayNameText)) {
+            profileEventList.changeDisplayName(newDisplayNameText);
+        }
+
         if (!newAboutMeText.equals(mPreviousAboutMeText)) {
             profileEventList.changeAboutMe(newAboutMeText);
         }
@@ -147,9 +151,11 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
     }
 
     private boolean hasProfileChanged() {
+        String newDisplayNameText = mDisplayNameEditText.getText().toString();
         String newAboutMeText = mAboutMeEditText.getText().toString();
 
-        return !newAboutMeText.equals(mPreviousAboutMeText)
+        return !newDisplayNameText.equals(mPreviousDisplayNameText)
+                || !newAboutMeText.equals(mPreviousAboutMeText)
                 || mNewProfileImageUri != null
                 || mNewHeaderImageUri != null;
     }
@@ -199,9 +205,11 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
             return;
         }
 
-        mUserNameTextView.setText(data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)));
+        final String displayNameText = data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
         final String aboutMeText = data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME));
+        mDisplayNameEditText.setText(displayNameText);
         mAboutMeEditText.setText(aboutMeText);
+        mPreviousDisplayNameText = displayNameText;
         mPreviousAboutMeText = aboutMeText;
 
         ImageUtil.setProfileImageSampled(

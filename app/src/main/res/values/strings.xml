@@ -113,4 +113,5 @@
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>
     <string name="discard">Discard</string>
+    <string name="display_name">Display Name</string>
 </resources>
