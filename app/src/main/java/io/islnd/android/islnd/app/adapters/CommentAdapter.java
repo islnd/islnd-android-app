@@ -57,7 +57,7 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
 
         holder.userName.setText(comment.getUsername());
         holder.comment.setText(comment.getComment());
-        holder.timestamp.setText(Util.smartTimestampFromUnixTime(comment.getTimestamp()));
+        holder.timestamp.setText(Util.smartTimestampFromUnixTime(mContext, comment.getTimestamp()));
 
         // Go to profile on picture click
         holder.profileImage.setOnClickListener((View v) -> {

@@ -21,6 +21,7 @@ import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.Comment;
 
 import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
+import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
@@ -33,9 +34,9 @@ import java.util.TimeZone;
 public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
-    public static String smartTimestampFromUnixTime(long unixTimeMillis) {
+    public static String smartTimestampFromUnixTime(Context context, long unixTimeMillis) {
         // currentTimeMillis is already in UTC!
-        long currentTime = System.currentTimeMillis() / 1000;
+        long currentTime = ServerTime.getCurrentTimeMillis(context) / 1000;
         long timeDiff = currentTime - unixTimeMillis / 1000;
 
         String timestamp = "";

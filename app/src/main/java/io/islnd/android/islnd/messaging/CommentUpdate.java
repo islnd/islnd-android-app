@@ -1,5 +1,7 @@
 package io.islnd.android.islnd.messaging;
 
+import android.content.Context;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import io.islnd.android.islnd.messaging.proto.IslandProto;
@@ -29,6 +31,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
     }
 
     public static CommentUpdate buildComment(
+            Context context,
             String postAuthorPseudonym,
             String commentAuthorPseudonym,
             String postId,
@@ -41,10 +44,11 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 postId,
                 commentId,
                 content,
-                ServerTime.getCurrentTimeMillis());
+                ServerTime.getCurrentTimeMillis(context));
     }
 
     public static CommentUpdate buildDelete(
+            Context context,
             String postAuthorPseudonym,
             String commentAuthorPseudonym,
             String postId,
@@ -56,7 +60,7 @@ public class CommentUpdate implements ProtoSerializable<CommentUpdate> {
                 postId,
                 commentId,
                 "",
-                ServerTime.getCurrentTimeMillis());
+                ServerTime.getCurrentTimeMillis(context));
     }
 
     public boolean isDeletion() {

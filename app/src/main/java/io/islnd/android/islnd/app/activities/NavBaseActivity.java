@@ -82,11 +82,8 @@ public class NavBaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
-
-        // Synchronize server time
-        if (!ServerTime.isInSync()) {
-            IslndDb.syncServerTime(this, false);
-        }
+        
+        ServerTime.synchronize(this, false);
 
         // Set launching fragment
         getSupportFragmentManager().beginTransaction()
@@ -175,7 +172,7 @@ public class NavBaseActivity extends AppCompatActivity
                 editApiKey();
                 break;
             case R.id.sync_server_time:
-                IslndDb.syncServerTime(this, true);
+                ServerTime.synchronize(this, true);
         }
 
         if (isFragment) {

@@ -19,6 +19,7 @@ public class VersionedContentBuilder {
                 context,
                 context.getString(R.string.comment_version_key));
         return CommentUpdate.buildComment(
+                context,
                 postAuthorPseudonym,
                 commentAuthorPseudonym,
                 postId,

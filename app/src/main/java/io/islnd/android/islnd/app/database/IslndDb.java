@@ -14,12 +14,10 @@ import io.islnd.android.islnd.app.util.Util;
 
 import io.islnd.android.islnd.messaging.CommentUpdate;
 import io.islnd.android.islnd.messaging.Rest;
-import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 
-import java.io.IOException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
@@ -138,6 +136,7 @@ public class IslndDb
         Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
 
         CommentUpdate deleteComment = CommentUpdate.buildDelete(
+                context,
                 postAuthorPseudonym,
                 commentAuthorPseudonym,
                 postId,
@@ -157,34 +156,5 @@ public class IslndDb
 
         // Delete from network
         Rest.postComment(encryptedComment, Util.getApiKey(context));
-    }
-
-    public static void syncServerTime(Context context, boolean force) {
-        final String prefKey = context.getString(R.string.server_time_offset);
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        String savedOffset = settings.getString(prefKey, null);
-
-        if (force || savedOffset == null) {
-            // get from server
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        long serverTimeOffset = ServerTime.synchronize(context);
-                        settings.edit()
-                                .putString(prefKey, Long.toString(serverTimeOffset))
-                                .apply();
-                        Log.d(TAG, "ServerTime: saved new offset to prefs: " + serverTimeOffset);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            }.execute();
-        } else {
-            ServerTime.synchronizeManually(Long.parseLong(savedOffset));
-            Log.d(TAG, "ServerTime: loaded offset from prefs: " + savedOffset);
-        }
     }
 }

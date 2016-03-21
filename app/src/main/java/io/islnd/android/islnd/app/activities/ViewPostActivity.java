@@ -154,7 +154,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         TextView commentCount = (TextView) findViewById(R.id.post_comment_count);
         
         postUserName.setText(mPost.getUserName());
-        postTimestamp.setText(Util.smartTimestampFromUnixTime(mPost.getTimestamp()));
+        postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, mPost.getTimestamp()));
         postContent.setText(mPost.getContent());
         //TODO: Get actual comment count
         commentCount.setText(Util.numberOfCommentsString(0));
