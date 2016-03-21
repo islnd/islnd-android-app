@@ -81,14 +81,6 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".StopRefreshReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter android:priority="1001">
-                <action android:name="io.islnd.app.islnd.EVENT_SYNC_COMPLETE"/>
-            </intent-filter>
-        </receiver>
 
         <provider
             android:name=".database.IslndProvider"
