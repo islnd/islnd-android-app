@@ -121,4 +121,7 @@
     <string name="api_key_string">API Key</string>
     <string name="uses_api_key">uses_api_key</string>
     <string name="create_account_summary_message">Pick your display name and we\'ll generate your keys</string>
+    <string name="please_wait_title">Please wait</string>
+    <string name="verifying_api_key_message">Verifying API Key&#8230;</string>
+    <string name="invalid_api_key">Invalid API Key</string>
 </resources>
