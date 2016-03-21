@@ -49,9 +49,6 @@ public class CreateIdentityService extends IntentService {
         editor.putString(context.getString(R.string.private_key), privateKey);
         editor.putString(context.getString(R.string.public_key), publicKey);
         editor.commit();
-
-        Log.v(TAG, "private key " + privateKey);
-        Log.v(TAG, "public key " + publicKey);
     }
 
     private static void setGroupKey(Context context) {
@@ -60,8 +57,6 @@ public class CreateIdentityService extends IntentService {
         String groupKey = CryptoUtil.encodeKey(CryptoUtil.getKey());
         editor.putString(context.getString(R.string.group_key), groupKey);
         editor.commit();
-
-        Log.v(TAG, "group key " + groupKey);
     }
 
     private int setAlias(Context context, String displayName) {
