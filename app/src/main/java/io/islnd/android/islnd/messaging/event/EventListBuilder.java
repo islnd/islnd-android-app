@@ -113,17 +113,22 @@ public class EventListBuilder {
         return this;
     }
 
+    private EventListBuilder changeAlias() {
+        this.eventList.add(new ChangeAliasEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        CryptoUtil.createAlias()
+                ));
+        return this;
+    }
+
     private int getNewEventId() {
         ++this.eventId;
         return this.eventId;
     }
 
     public List<Event> build() {
-        this.eventList.add(new ChangeAliasEvent(
-                        getCurrentAlias(),
-                        getNewEventId(),
-                        CryptoUtil.createAlias()
-                ));
+        changeAlias();
         Util.setEventId(mContext, eventId);
         return this.eventList;
     }

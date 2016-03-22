@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import java.util.List;
 
+import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.messaging.event.Event;
@@ -49,16 +50,9 @@ public class NewPostActivity extends AppCompatActivity
             Snackbar.make(view, getString(R.string.empty_string_post), Snackbar.LENGTH_LONG).show();
         }
         else {
-            List<Event> postEvents = new EventListBuilder(this)
+            new EventPublisher(this)
                     .makePost(postText)
-                    .build();
-            for (Event event : postEvents) {
-                EventProcessor.process(this, event);
-
-                Intent pushEventService = new Intent(this, EventPushService.class);
-                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                startService(pushEventService);
-            }
+                    .publish();
 
             finish();
         }

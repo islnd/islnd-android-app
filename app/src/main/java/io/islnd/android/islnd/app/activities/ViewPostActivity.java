@@ -28,6 +28,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import io.islnd.android.islnd.app.DeletePostDialog;
+import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
@@ -130,19 +131,12 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         }
         else
         {
-            List<Event> makeCommentEvents = new EventListBuilder(mContext)
+            new EventPublisher(mContext)
                     .makeComment(
                             mPost.getPostId(),
                             DataUtils.getMostRecentAlias(mContext, mPost.getUserId()),
-                            commentText )
-                    .build();
-
-            for (Event event : makeCommentEvents) {
-                EventProcessor.process(mContext, event);
-                Intent pushEventService = new Intent(mContext, EventPushService.class);
-                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                mContext.startService(pushEventService);
-            }
+                            commentText)
+                    .publish();
 
             //--Clear edit text
             addCommentEditText.setText("");
