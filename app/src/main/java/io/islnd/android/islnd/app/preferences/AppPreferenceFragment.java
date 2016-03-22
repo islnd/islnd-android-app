@@ -14,6 +14,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
 
     private static final String PREFERENCE_APPEARANCE_KEY = "pref_appearance_key";
     private static final String PREFERENCE_SERVER_KEY = "pref_server_key";
+    private static final String PREFERENCE_ACCOUNT_KEY = "pref_account_key";
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -21,8 +22,10 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
 
         Preference appearancePreference = findPreference(PREFERENCE_APPEARANCE_KEY);
         Preference serverPreference = findPreference(PREFERENCE_SERVER_KEY);
+        Preference accountPreference = findPreference(PREFERENCE_ACCOUNT_KEY);
         appearancePreference.setOnPreferenceClickListener(this);
         serverPreference.setOnPreferenceClickListener(this);
+        accountPreference.setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -33,11 +36,13 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
 
         switch (key) {
             case PREFERENCE_APPEARANCE_KEY:
-                settingsActivity.onPreferenceFragmentSelected(new ThemePreferenceFragment());
+                settingsActivity.onPreferenceFragmentSelected(new AppearancePreferenceFragment());
                 break;
             case PREFERENCE_SERVER_KEY:
                 settingsActivity.onPreferenceFragmentSelected(new ServerPreferenceFragment());
                 break;
+            case PREFERENCE_ACCOUNT_KEY:
+                settingsActivity.onPreferenceFragmentSelected(new AccountPreferenceFragment());
         }
         return true;
     }

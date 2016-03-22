@@ -162,9 +162,6 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.delete_database:
                 DataUtils.deleteAll(this);
                 break;
-            case R.id.sync_server_time:
-                ServerTime.synchronize(this, true);
-                break;
         }
 
         if (isFragment) {

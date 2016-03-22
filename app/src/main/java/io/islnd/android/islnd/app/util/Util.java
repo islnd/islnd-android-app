@@ -2,12 +2,14 @@ package io.islnd.android.islnd.app.util;
 
 import android.accounts.Account;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.zxing.BarcodeFormat;
@@ -16,12 +18,13 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.Comment;
 
 import io.islnd.android.islnd.app.preferences.ServerPreferenceFragment;
-import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
+import io.islnd.android.islnd.app.preferences.AppearancePreferenceFragment;
 import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
@@ -107,7 +110,7 @@ public class Util {
 
     public static void applyAppTheme(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        String value = sharedPref.getString(ThemePreferenceFragment.PREFERENCE_THEME_KEY, "1");
+        String value = sharedPref.getString(AppearancePreferenceFragment.PREFERENCE_THEME_KEY, "1");
 
         switch (value) {
             case "1": // Light
@@ -167,6 +170,34 @@ public class Util {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(ServerPreferenceFragment.PREFERENCE_API_KEY_KEY, apiKey);
         editor.commit();
+    }
+
+    public static void deleteSharedPreferences(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+    public static void deleteDataAndPreferences(Context context) {
+        Log.v(TAG, "deleting all data and preferences...");
+        DataUtils.deleteAll(context);
+        deleteSharedPreferences(context);
+    }
+
+    public static void restartActivity(AppCompatActivity context) {
+        context.finish();
+        context.startActivity(context.getIntent());
+    }
+
+    public static void restartApp(AppCompatActivity context) {
+        Intent intent = context
+                .getPackageManager()
+                .getLaunchIntentForPackage(context.getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        context.finish();
+        context.startActivity(intent);
     }
 
     public static float dpFromPx(final Context context, final float px) {

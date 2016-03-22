@@ -10,4 +10,9 @@
         android:title="@string/pref_server_title"
         android:icon="@drawable/ic_router_24dp"
         android:summary="@string/pref_server_summary"/>
+    <Preference
+        android:key="pref_account_key"
+        android:title="@string/pref_account_title"
+        android:icon="@drawable/ic_account_circle_24dp"
+        android:summary="@string/pref_account_summary"/>
 </PreferenceScreen>
