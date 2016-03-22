@@ -69,6 +69,7 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         Intent createIdentityIntent = new Intent(this, CreateIdentityService.class);
         createIdentityIntent.putExtra(CreateIdentityService.DISPLAY_NAME_EXTRA, displayName);
+        mProgressDialog.setMessage(getString(R.string.creating_identity_message));
         startService(createIdentityIntent);
     }
 

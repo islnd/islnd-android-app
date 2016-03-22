@@ -123,4 +123,5 @@
     <string name="verifying_api_key_message">Verifying API Key&#8230;</string>
     <string name="invalid_api_key">Invalid API Key</string>
     <string name="comment_id_key">comment_id</string>
+    <string name="creating_identity_message">Creating identity...</string>
 </resources>
