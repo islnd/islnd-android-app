@@ -165,9 +165,6 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.edit_username:
                 editUsernameDialog();
                 break;
-            case R.id.edit_api_key:
-                editApiKey();
-                break;
         }
 
         if (isFragment) {
@@ -407,21 +404,6 @@ public class NavBaseActivity extends AppCompatActivity
                             startService(pushEventService);
                         }
                     }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    private void editApiKey() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialogView = getLayoutInflater().inflate(R.layout.edit_api_key_dialog, null);
-        builder.setView(mDialogView);
-
-        EditText editText = (EditText) mDialogView.findViewById(R.id.edit_api_key_edit_text);
-
-        builder.setPositiveButton(getString(android.R.string.ok),
-                (DialogInterface dialog, int id) -> {
-                    Util.setApiKey(getApplicationContext(), editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
