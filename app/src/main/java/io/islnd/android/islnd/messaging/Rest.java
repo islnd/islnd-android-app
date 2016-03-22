@@ -4,6 +4,7 @@ import android.util.Log;
 
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
+import io.islnd.android.islnd.messaging.interceptor.DelayInterceptor;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
@@ -129,32 +130,6 @@ public class Rest {
 
     public static long getServerTimeOffsetMillis(int repetitions, String apiKey) throws IOException {
         // account for network delay by using OkHttpClient's Interceptor
-        class DelayInterceptor implements okhttp3.Interceptor {
-            private long requestTimeMillis;
-            private long networkDelayNanos;
-            public long getRequestTimeMillis() {
-                return requestTimeMillis;
-            }
-            public long getNetworkDelayNanos() {
-                return networkDelayNanos;
-            }
-
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                networkDelayNanos = 0;
-                requestTimeMillis = System.currentTimeMillis();
-
-                // perform request, and get delay
-                long t1 = System.nanoTime();
-                okhttp3.Response response = chain.proceed(chain.request());
-                long t2 = System.nanoTime();
-
-                // assume half of round trip
-                networkDelayNanos = (t2 - t1) / 2;
-
-                return response;
-            }
-        }
         DelayInterceptor delayInterceptor = new DelayInterceptor();
         okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
                 .addNetworkInterceptor(delayInterceptor)

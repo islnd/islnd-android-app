@@ -18,7 +18,8 @@ public class ServerTime {
         final String prefKey = context.getString(R.string.server_time_offset);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (force || !settings.contains(prefKey)) {
+        if (!settings.contains(prefKey)
+                || force) {
             // get from server
             new AsyncTask<Void, Void, Void>() {
                 @Override
