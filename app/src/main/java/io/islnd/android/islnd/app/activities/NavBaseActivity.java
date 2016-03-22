@@ -194,8 +194,8 @@ public class NavBaseActivity extends AppCompatActivity
                 Log.d(TAG, "Contents: " + contents);
                 boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
                 String message = friendAdded
-                        ? "Added new friend!"
-                        : "We are already friends!";
+                        ? getString(R.string.added_new_friend_message)
+                        : getString(R.string.already_friends_message);
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
             }
         // Not QR result

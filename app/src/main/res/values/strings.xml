@@ -123,4 +123,6 @@
     <string name="invalid_api_key">Invalid API Key</string>
     <string name="comment_id_key">comment_id</string>
     <string name="creating_identity_message">Creating identity…</string>
+    <string name="added_new_friend_message">Added new friend!</string>
+    <string name="already_friends_message">We are already friends!</string>
 </resources>
