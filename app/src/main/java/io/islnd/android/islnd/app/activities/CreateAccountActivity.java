@@ -16,7 +16,6 @@ import android.view.View;
 import io.islnd.android.islnd.app.CreateIdentityService;
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
 
@@ -29,6 +28,7 @@ public class CreateAccountActivity extends AppCompatActivity {
     private TextInputLayout mApiEditTextLayout;
     private String mApiKey;
     private ProgressDialog mProgressDialog;
+    private BroadcastReceiver mAccountCreatedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +36,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_account);
 
         mContext = getApplicationContext();
+        mAccountCreatedListener = new AccountCreatedListener();
         mDisplayNameEditText = (TextInputEditText) findViewById(R.id.display_name_edit_text);
         mApiEditText = (TextInputEditText) findViewById(R.id.api_key_edit_text);
 
@@ -43,6 +44,20 @@ public class CreateAccountActivity extends AppCompatActivity {
             mApiEditTextLayout = (TextInputLayout) findViewById(R.id.api_key_edit_text_layout);
             mApiEditTextLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mContext.registerReceiver(
+                mAccountCreatedListener,
+                new IntentFilter(IslndIntent.CREATE_ACCOUNT_COMPLETED));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mContext.unregisterReceiver(mAccountCreatedListener);
     }
 
     private void createAccount() {
@@ -55,19 +70,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         Intent createIdentityIntent = new Intent(this, CreateIdentityService.class);
         createIdentityIntent.putExtra(CreateIdentityService.DISPLAY_NAME_EXTRA, displayName);
         startService(createIdentityIntent);
-
-        CreateAccountActivity parent = this;
-        mContext.registerReceiver(
-                new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        mProgressDialog.dismiss();
-                        Util.setHasCreatedAccount(mContext, true);
-                        finish();
-                        startActivity(new Intent(parent, NavBaseActivity.class));
-                    }
-                },
-                new IntentFilter(IslndIntent.CREATE_ACCOUNT_COMPLETED));
     }
 
     public void createAccountClick(View view) {
@@ -103,6 +105,16 @@ public class CreateAccountActivity extends AppCompatActivity {
                     mApiEditTextLayout.setError(getString(R.string.invalid_api_key));
                 }
             }
+        }
+    }
+
+    private class AccountCreatedListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mProgressDialog.dismiss();
+            Util.setHasCreatedAccount(mContext, true);
+            finish();
+            startActivity(new Intent(mContext, NavBaseActivity.class));
         }
     }
 }
