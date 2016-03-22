@@ -32,7 +32,11 @@ import com.soundcloud.android.crop.Crop;
 import java.io.File;
 
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private static String TAG = EditProfileActivity.class.getSimpleName();
+
+    private static final String PROFILE_IMAGE_URI_STATE = "PROFILE_IMAGE_URI_STATE";
+    private static final String HEADER_IMAGE_URI_STATE = "HEADER_IMAGE_URI_STATE";
 
     public static final int LOADER_ID = 3;
 
@@ -64,6 +68,23 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         mAboutMeEditText = (TextInputEditText) findViewById(R.id.edit_profile_about_me);
         mProfileImageView = (ImageView) findViewById(R.id.profile_profile_image);
         mHeaderImageView = (ImageView) findViewById(R.id.profile_header_image);
+
+        if (savedInstanceState != null) {
+            String profileImageUriString = savedInstanceState.getString(PROFILE_IMAGE_URI_STATE);
+            String headerImageUriString = savedInstanceState.getString(HEADER_IMAGE_URI_STATE);
+
+            if (profileImageUriString != null) {
+                mNewProfileImageUri = Uri.parse(profileImageUriString);
+                ImageUtil.setProfileImageSampled(mContext, mProfileImageView,
+                        mNewProfileImageUri);
+            }
+
+            if (headerImageUriString != null) {
+                mNewHeaderImageUri = Uri.parse(headerImageUriString);
+                ImageUtil.setHeaderImageSampled(mContext, mHeaderImageView,
+                        mNewHeaderImageUri);
+            }
+        }
 
         getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
     }
@@ -118,6 +139,18 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if (mNewProfileImageUri != null) {
+            savedInstanceState.putString(PROFILE_IMAGE_URI_STATE, mNewProfileImageUri.toString());
+        }
+
+        if (mNewHeaderImageUri != null) {
+            savedInstanceState.putString(HEADER_IMAGE_URI_STATE, mNewHeaderImageUri.toString());
+        }
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     public void saveProfile(View view) {
@@ -215,15 +248,19 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         mPreviousDisplayNameText = displayNameText;
         mPreviousAboutMeText = aboutMeText;
 
-        ImageUtil.setProfileImageSampled(
-                this,
-                mProfileImageView,
-                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+        if (mNewProfileImageUri == null) {
+            ImageUtil.setProfileImageSampled(
+                    this,
+                    mProfileImageView,
+                    Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+        }
 
-        ImageUtil.setHeaderImageSampled(
-                this,
-                mHeaderImageView,
-                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))));
+        if (mNewHeaderImageUri == null) {
+            ImageUtil.setHeaderImageSampled(
+                    this,
+                    mHeaderImageView,
+                    Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))));
+        }
     }
 
     @Override
