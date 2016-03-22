@@ -2,11 +2,8 @@ package io.islnd.android.islnd.messaging;
 
 import android.util.Log;
 
-import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
-import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
-import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
@@ -82,6 +79,28 @@ public class Rest {
         return null;
     }
 
+    public static Boolean getPing(String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+        try {
+            Response<Void> result = service.getPing(apiKey).execute();
+            if (result.code() == HTTP_OK) {
+                return true;
+            }
+            else {
+                Log.d(TAG, "/ping GET returned code " + result.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public static int postEvent(EncryptedEvent encryptedEvent, String apiKey) throws IOException {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
@@ -121,48 +140,6 @@ public class Rest {
             }
             else {
                 Log.d(TAG, "post event query returned code" + response.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static void postComment(EncryptedComment encryptedComment, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            Response<Object> response = service.postComment(encryptedComment, apiKey).execute();
-            if (response.code() != HTTP_OK) {
-                Log.d(TAG, "post comment returned code" + response.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static List<EncryptedComment> getComments(CommentQueryRequest commentQueryPost, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            Response<CommentQueryResponse> response =
-                    service.getComments(commentQueryPost, apiKey).execute();
-            if (response.code() == HTTP_OK) {
-                return response.body().getComments();
-            }
-            else {
-                Log.d(TAG, "post comment returned code" + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

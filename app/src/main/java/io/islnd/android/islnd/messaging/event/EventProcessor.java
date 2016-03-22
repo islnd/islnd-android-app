@@ -9,6 +9,7 @@ import android.util.Log;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.util.ImageUtil;
 
@@ -35,6 +36,14 @@ public class EventProcessor {
             }
             case EventType.DELETE_POST: {
                 deletePost(context, (DeletePostEvent) event);
+                break;
+            }
+            case EventType.NEW_COMMENT: {
+                addComment(context, (NewCommentEvent) event);
+                break;
+            }
+            case EventType.DELETE_COMMENT: {
+                deleteComment(context, (DeleteCommentEvent) event);
                 break;
             }
             case EventType.CHANGE_PROFILE_PICTURE: {
@@ -85,7 +94,9 @@ public class EventProcessor {
 
     private static void changeProfilePicture(Context context, ChangeProfilePictureEvent event) {
         int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
-        Uri profilePictureUri = ImageUtil.saveBitmapToInternalFromByteArray(context, event.getProfilePicture());
+        Uri profilePictureUri = ImageUtil.saveBitmapToInternalFromByteArray(
+                context,
+                event.getProfilePicture());
         ContentValues values = new ContentValues();
         values.put(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI, profilePictureUri.toString());
         mContentResolver.update(
@@ -127,6 +138,28 @@ public class EventProcessor {
         int postUserId = DataUtils.getUserIdFromAlias(context, deletePostEvent.getAlias());
         PostKey postToDelete = new PostKey(postUserId, deletePostEvent.getPostId());
         DataUtils.deletePost(context, postToDelete);
+    }
+
+    private static void addComment(Context context, NewCommentEvent newCommentEvent) {
+        int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
+        int postUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getPostAuthorAlias());
+
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.CommentEntry.COLUMN_POST_USER_ID, postUserId);
+        values.put(IslndContract.CommentEntry.COLUMN_POST_ID, newCommentEvent.getPostId());
+        values.put(IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID, commentUserId);
+        values.put(IslndContract.CommentEntry.COLUMN_COMMENT_ID, newCommentEvent.getCommentId());
+        values.put(IslndContract.CommentEntry.COLUMN_CONTENT, newCommentEvent.getContent());
+        values.put(IslndContract.CommentEntry.COLUMN_TIMESTAMP, newCommentEvent.getTimestamp());
+        context.getContentResolver().insert(
+                IslndContract.CommentEntry.CONTENT_URI,
+                values);
+    }
+
+    private static void deleteComment(Context context, DeleteCommentEvent deleteCommentEvent) {
+        int postUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
+        CommentKey commentToDelete = new CommentKey(postUserId, deleteCommentEvent.getCommentId());
+        DataUtils.deleteComment(context, commentToDelete);
     }
 
     private static void recordEventProcessed(Event event) {

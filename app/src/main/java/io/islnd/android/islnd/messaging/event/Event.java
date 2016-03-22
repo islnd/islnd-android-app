@@ -83,6 +83,22 @@ public abstract class Event implements
                         event.getEventId(),
                         event.getContentId());
             }
+            case EventType.NEW_COMMENT: {
+                return new NewCommentEvent(
+                        event.getAlias(),
+                        event.getEventId(),
+                        event.getParentContentId(),
+                        event.getParentAlias(),
+                        event.getContentId(),
+                        event.getTextContent(),
+                        event.getTimestamp());
+            }
+            case EventType.DELETE_COMMENT: {
+                return new DeleteCommentEvent(
+                        event.getAlias(),
+                        event.getEventId(),
+                        event.getContentId());
+            }
             case EventType.CHANGE_PROFILE_PICTURE: {
                 return new ChangeProfilePictureEvent(
                         event.getAlias(),

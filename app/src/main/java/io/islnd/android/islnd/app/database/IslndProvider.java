@@ -434,6 +434,8 @@ public class IslndProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
 
+        Log.v(TAG, "begin insert uri: " + uri);
+
         switch (match) {
             case POST: {
                 long _id = db.insertWithOnConflict(
@@ -489,6 +491,7 @@ public class IslndProvider extends ContentProvider {
                         SQLiteDatabase.CONFLICT_IGNORE);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.CommentEntry.buildCommentUri(_id);
+                    Log.v(TAG, "inserted comment");
                 } else {
                     Log.v(TAG, "insert comment failed");
                     return null;

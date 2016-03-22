@@ -1,6 +1,7 @@
 package io.islnd.android.islnd.app.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,11 +23,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.Dialogs;
-import io.islnd.android.islnd.app.loader.LocalPostLoader;
+import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -41,6 +44,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
     private PostAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
+    private StopRefreshReceiver mStopRefreshReceiver;
 
     private int mProfileUserId;
     private String mDisplayName;
@@ -70,7 +74,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new PostAdapter(this, null);
-        final LocalPostLoader postLoader = new LocalPostLoader(
+        final PostLoader postLoader = new PostLoader(
                 this,
                 IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),
                 mAdapter);
@@ -138,40 +142,42 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
         collapsingToolbar.setTitle(" ");
 
 
-        appBar.addOnOffsetChangedListener((AppBarLayout appBarLayout, int verticalOffset) -> {
-            mRefreshLayout.setEnabled(verticalOffset == 0);
+        appBar.addOnOffsetChangedListener(
+                (AppBarLayout appBarLayout, int verticalOffset) -> {
+                    mRefreshLayout.setEnabled(verticalOffset == 0);
 
-            verticalOffset = Math.abs(verticalOffset);
-            int scrollRange = appBarLayout.getTotalScrollRange();
-            float threshold = (int) (scrollRange * 0.70f);
-            float ratio = (float) verticalOffset / threshold;
-            ratio = Math.max(0f, Math.min(1f, ratio));
+                    verticalOffset = Math.abs(verticalOffset);
+                    int scrollRange = appBarLayout.getTotalScrollRange();
+                    float threshold = (int) (scrollRange * 0.70f);
+                    float ratio = (float) verticalOffset / threshold;
+                    ratio = Math.max(0f, Math.min(1f, ratio));
 
-            ViewCompat.setAlpha(mProfileImageView, 1 - ratio);
-            ViewCompat.setAlpha(mDisplayNameTextView, 1 - ratio);
-            ViewCompat.setAlpha(mAboutMeTextView, 1 - ratio);
-            ViewCompat.setAlpha(toolbarOverlay, 1 - ratio);
+                    ViewCompat.setAlpha(mProfileImageView, 1 - ratio);
+                    ViewCompat.setAlpha(mDisplayNameTextView, 1 - ratio);
+                    ViewCompat.setAlpha(mAboutMeTextView, 1 - ratio);
+                    ViewCompat.setAlpha(toolbarOverlay, 1 - ratio);
 
-            if (scrollRange - verticalOffset == 0) {
-                collapsingToolbar.setTitle(mDisplayName);
-            } else {
-                collapsingToolbar.setTitle(" ");
-            }
-        });
+                    if (scrollRange - verticalOffset == 0) {
+                        collapsingToolbar.setTitle(mDisplayName);
+                    } else {
+                        collapsingToolbar.setTitle(" ");
+                    }
+                });
 
         mProfileImageView.setOnClickListener(
                 (View view) -> {
                     viewProfileImage();
                 });
 
-        mRefreshLayout.setOnRefreshListener(() -> {
-            getApplicationContext().getContentResolver().requestSync(
-                    Util.getSyncAccount(getApplicationContext()),
-                    IslndContract.CONTENT_AUTHORITY,
-                    new Bundle()
-            );
-            mRefreshLayout.setRefreshing(false);
-        });
+        mRefreshLayout.setOnRefreshListener(
+                () -> {
+                    getApplicationContext().getContentResolver().requestSync(
+                            Util.getSyncAccount(getApplicationContext()),
+                            IslndContract.CONTENT_AUTHORITY,
+                            new Bundle()
+                    );
+                });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
     }
 
     public void startNewPostActivity(View view) {
@@ -193,6 +199,19 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
         intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
                 mHeaderImageUriString);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        this.registerReceiver(mStopRefreshReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mStopRefreshReceiver);
     }
 
     @Override

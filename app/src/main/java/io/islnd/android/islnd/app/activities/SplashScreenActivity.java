@@ -19,10 +19,14 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private static final String TAG = SplashScreenActivity.class.getSimpleName();
 
+    private Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+
+        mContext = getApplicationContext();
 
         // Create sync account and force sync
         Account syncAccount = createAndRegisterSyncAccount(this);
@@ -36,11 +40,18 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         Util.applyAppTheme(this);
 
+        Util.setUsesApiKey(mContext, true);
+
         // Visual pause...
         Handler handler = new Handler();
         Runnable runnable = () -> {
             finish();
-            startActivity(new Intent(SplashScreenActivity.this, NavBaseActivity.class));
+
+            if (Util.getHasCreatedAccount(mContext)) {
+                startActivity(new Intent(SplashScreenActivity.this, NavBaseActivity.class));
+            } else {
+                startActivity(new Intent(SplashScreenActivity.this, CreateAccountActivity.class));
+            }
         };
 
         handler.postDelayed(runnable, 1500);

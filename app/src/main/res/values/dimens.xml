@@ -59,4 +59,5 @@
     <dimen name="splash_screen_padding">64dp</dimen>
     <dimen name="splash_screen_icon">128dp</dimen>
     <dimen name="profile_header_frame_margin">16dp</dimen>
+    <dimen name="create_account_vertical_padding">64dp</dimen>
 </resources>
