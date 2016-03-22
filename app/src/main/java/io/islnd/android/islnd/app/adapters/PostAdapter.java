@@ -94,7 +94,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
                     String itemStr = items[item];
                     if (itemStr.equals(DELETE_POST)) {
                         DialogFragment deletePostFragment =
-                                DeletePostDialog.buildWithArgs(post.getUserId(), post.getPostId());
+                                DeletePostDialog.buildWithArgs(post.getPostId());
                         deletePostFragment.show(
                                 ((FragmentActivity) mContext).getSupportFragmentManager(),
                                 mContext.getString(R.string.fragment_delete_post));

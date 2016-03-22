@@ -2,7 +2,6 @@ package io.islnd.android.islnd.messaging.event;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.SoundPool;
 import android.net.Uri;
 import android.support.v7.preference.PreferenceManager;
 
@@ -52,7 +51,7 @@ public class EventListBuilder {
         return this;
     }
 
-    public EventListBuilder deletePost(int postUserId, String postId) {
+    public EventListBuilder deletePost(String postId) {
         this.eventList.add(new DeletePostEvent(
                         getCurrentAlias(),
                         getNewEventId(),
@@ -61,6 +60,34 @@ public class EventListBuilder {
         return this;
     }
 
+    public EventListBuilder makeComment(
+            String postId,
+            String postAuthorAlias,
+            String commentText) {
+        String commentId = getNewContentIdAndUpdate(
+                mContext,
+                mContext.getString(R.string.comment_id_key)
+        );
+        this.eventList.add(new NewCommentEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        postId,
+                        postAuthorAlias,
+                        commentId,
+                        commentText,
+                        ContentUtil.getContentTimestamp()));
+
+        return this;
+    }
+
+    public EventListBuilder deleteComment(String commentId) {
+        this.eventList.add(new DeleteCommentEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        commentId));
+
+        return this;
+    }
     public EventListBuilder changeAboutMe(String newAboutMeText) {
         this.eventList.add(new ChangeAboutMeEvent(
                         getCurrentAlias(),

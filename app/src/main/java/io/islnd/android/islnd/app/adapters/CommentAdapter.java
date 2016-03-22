@@ -81,11 +81,7 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
                     String itemStr = items[item];
                     if (itemStr.equals(DELETE_COMMENT)) {
                         DialogFragment deleteCommentFragment =
-                                DeleteCommentDialog.buildWithArgs(
-                                        mPostUserId,
-                                        mPostId,
-                                        comment.getUserId(),
-                                        comment.getCommentId());
+                                DeleteCommentDialog.buildWithArgs(comment.getCommentId());
                         deleteCommentFragment.show(
                                 ((FragmentActivity) mContext).getSupportFragmentManager(),
                                 mContext.getString(R.string.fragment_delete_comment));
