@@ -60,6 +60,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             anyNewEventProcessed = false;
             List<EncryptedEvent> encryptedEvents = getEncryptedEvents();
             if (encryptedEvents == null) {
+                mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
                 Log.d(TAG, "event query returned null!");
                 return;
             }
@@ -78,6 +79,14 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
         mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
         Log.v(TAG, "completed on perform sync");
+    }
+
+    @Override
+    public void onSyncCanceled() {
+        super.onSyncCanceled();
+
+        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        Log.d(TAG, "sync cancelled");
     }
 
     @NonNull

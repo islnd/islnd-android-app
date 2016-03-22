@@ -194,7 +194,7 @@ public class Util {
     }
 
     public static void buildQrCode(ImageView qrImageView, String content) {
-        final int DIMEN = 250;
+        final int DIMEN = 500;
 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = null;
