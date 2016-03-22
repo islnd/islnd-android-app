@@ -4,9 +4,11 @@ import android.util.Log;
 
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
+import io.islnd.android.islnd.messaging.interceptor.DelayInterceptor;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
+import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -146,5 +148,53 @@ public class Rest {
         }
 
         return null;
+    }
+
+    public static long getServerTimeOffsetMillis(int repetitions, String apiKey) throws IOException {
+        // account for network delay by using OkHttpClient's Interceptor
+        DelayInterceptor delayInterceptor = new DelayInterceptor();
+        okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
+                .addNetworkInterceptor(delayInterceptor)
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        // record lowest delay for all attempts
+        long minNetworkDelayNanos = Long.MAX_VALUE;
+        long mostAccurateOffsetMillis = 0;
+
+        for (int i = 0; i < repetitions; i++) {
+            Log.d(TAG, "testing network delay for server time");
+            try {
+                // make call, which will update delayInterceptor
+                Response<ServerTimeResponse> response = service.getServerTime(apiKey).execute();
+                if (response.code() != HTTP_OK) {
+                    continue;
+                }
+
+                long networkDelayNanos = delayInterceptor.getNetworkDelayNanos();
+                if (networkDelayNanos < minNetworkDelayNanos) {
+                    minNetworkDelayNanos = networkDelayNanos;
+
+                    long serverTimeMillis = Long.parseLong(response.body().getServerTime());
+                    long networkDelayMillis = networkDelayNanos / 1000000;
+                    mostAccurateOffsetMillis = (serverTimeMillis - networkDelayMillis) - delayInterceptor.getRequestTimeMillis();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // if unchanged, we never made a successful connection
+        if (minNetworkDelayNanos == Long.MAX_VALUE) {
+            throw new IOException("Unable to make a successful connection to server.");
+        }
+
+        return mostAccurateOffsetMillis;
     }
 }

@@ -45,6 +45,7 @@
     <string name="group_key">group_key</string>
     <string name="pseudonym_seed">pseudonym_seed</string>
     <string name="alias">alias</string>
+    <string name="server_time_offset">server_time_offset</string>
 
     <string name="view_friend_status">Not Allowed</string>
 

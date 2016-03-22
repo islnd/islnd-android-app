@@ -56,6 +56,7 @@ import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
+import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -81,6 +82,8 @@ public class NavBaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+        
+        ServerTime.synchronize(this, false);
 
         // Set launching fragment
         getSupportFragmentManager().beginTransaction()
@@ -168,6 +171,8 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.edit_api_key:
                 editApiKey();
                 break;
+            case R.id.sync_server_time:
+                ServerTime.synchronize(this, true);
         }
 
         if (isFragment) {
