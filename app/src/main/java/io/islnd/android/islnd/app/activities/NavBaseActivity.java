@@ -60,14 +60,16 @@ public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static String TAG = NavBaseActivity.class.getSimpleName();
+    private static final String TAG = NavBaseActivity.class.getSimpleName();
+
+    private static final String FRAGMENT_STATE = "FRAGMENT_STATE";
 
     public static final int LOADER_ID = 6;
 
-    private final static int REQUEST_SMS = 0;
-    private final static int REQUEST_CONTACT = 1;
+    private static final int REQUEST_SMS = 0;
+    private static final int REQUEST_CONTACT = 1;
 
-    private final static int CONTACT_RESULT = 0;
+    private static final int CONTACT_RESULT = 0;
 
     private DrawerLayout mDrawerLayout;
     private EditText mSmsEditText = null;
@@ -76,6 +78,8 @@ public class NavBaseActivity extends AppCompatActivity
     private ImageView mNavProfileImage;
     private ImageView mNavHeaderImage;
     private TextView mNavUserName;
+    private int mFragmentId;
+    private Fragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,10 +89,17 @@ public class NavBaseActivity extends AppCompatActivity
         
         ServerTime.synchronize(this, false);
 
-        // Set launching fragment
+        // Set fragment
+        if (savedInstanceState != null) {
+            mFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_STATE);
+        } else {
+            mFragment = new FeedFragment();
+        }
+
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, new FeedFragment())
+                .replace(R.id.content_frame, mFragment)
                 .commit();
+
         getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
     }
 
@@ -125,12 +136,13 @@ public class NavBaseActivity extends AppCompatActivity
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            mFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Fragment fragment = null;
+        //Fragment fragment = null;
         boolean isFragment = false;
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -138,10 +150,10 @@ public class NavBaseActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.nav_feed:
-                if(currentFragment instanceof FeedFragment) {
+                if (currentFragment instanceof FeedFragment) {
                     break;
                 }
-                fragment = new FeedFragment();
+                mFragment = new FeedFragment();
                 isFragment = true;
                 break;
             case R.id.nav_profile:
@@ -150,10 +162,10 @@ public class NavBaseActivity extends AppCompatActivity
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:
-                if(currentFragment instanceof ViewFriendsFragment) {
+                if (currentFragment instanceof ViewFriendsFragment) {
                     break;
                 }
-                fragment = new ViewFriendsFragment();
+                mFragment = new ViewFriendsFragment();
                 isFragment = true;
                 break;
             case R.id.nav_add_friend:
@@ -162,19 +174,11 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case R.id.delete_database:
-                DataUtils.deleteAll(this);
-                break;
-            case R.id.edit_api_key:
-                editApiKey();
-                break;
-            case R.id.sync_server_time:
-                ServerTime.synchronize(this, true);
         }
 
         if (isFragment) {
             fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment)
+                    .replace(R.id.content_frame, mFragment)
                     .addToBackStack("")
                     .commit();
         }
@@ -232,6 +236,12 @@ public class NavBaseActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        getSupportFragmentManager().putFragment(savedInstanceState, FRAGMENT_STATE, mFragment);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     private void addFriendActionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
         builder.setTitle(R.string.add_friend_dialog)
@@ -251,8 +261,9 @@ public class NavBaseActivity extends AppCompatActivity
     }
 
     private void qrCodeActionDialog() {
+        mFragment = new ShowQrFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, new ShowQrFragment())
+                .replace(R.id.content_frame, mFragment)
                 .addToBackStack("")
                 .commit();
     }
@@ -386,21 +397,6 @@ public class NavBaseActivity extends AppCompatActivity
 
         cursorID.close();
         return contactNumber;
-    }
-
-    private void editApiKey() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialogView = getLayoutInflater().inflate(R.layout.edit_api_key_dialog, null);
-        builder.setView(mDialogView);
-
-        EditText editText = (EditText) mDialogView.findViewById(R.id.edit_api_key_edit_text);
-
-        builder.setPositiveButton(getString(android.R.string.ok),
-                (DialogInterface dialog, int id) -> {
-                    Util.setApiKey(getApplicationContext(), editText.getText().toString());
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
     }
 
     @Override

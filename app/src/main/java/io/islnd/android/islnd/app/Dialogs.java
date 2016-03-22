@@ -14,19 +14,7 @@ public class Dialogs
         builder.setMessage("Remove " + displayName + " as a friend?")
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    throw new UnsupportedOperationException("TODO");
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    public static void allowUserDialog(Context context)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-        builder.setMessage(context.getString(R.string.allow_user_dialog))
-                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
-                {
-                    // TODO: Allow user!
+                    //throw new UnsupportedOperationException("TODO");
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

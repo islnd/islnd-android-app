@@ -11,17 +11,18 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.util.Util;
 
-public class ThemePreferenceFragment extends PreferenceFragmentCompat
+public class AppearancePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener {
 
-    private static final String TAG = ThemePreferenceFragment.class.getSimpleName();
+    private static final String TAG = AppearancePreferenceFragment.class.getSimpleName();
 
     public static final String PREFERENCE_THEME_KEY = "pref_theme_key";
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
-        addPreferencesFromResource(R.xml.pref_theme);
+        addPreferencesFromResource(R.xml.pref_appearance);
 
         Preference themePreference = findPreference(PREFERENCE_THEME_KEY);
         themePreference.setOnPreferenceChangeListener(this);
@@ -88,15 +89,9 @@ public class ThemePreferenceFragment extends PreferenceFragmentCompat
         builder.setMessage(getString(R.string.restart_settings_message))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
-                    restartActivity();
+                    Util.restartActivity((AppCompatActivity) getContext());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
-    }
-
-    private void restartActivity() {
-        AppCompatActivity context = (AppCompatActivity) getContext();
-        context.finish();
-        startActivity(context.getIntent());
     }
 }

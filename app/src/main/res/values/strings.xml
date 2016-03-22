@@ -54,7 +54,7 @@
 
     <string-array name="nav_add_friend_actions">
         <item>QR Code</item>
-        <item>SMS</item>
+        <!--<item>SMS</item>-->
     </string-array>
 
     <string name="add_friend_dialog">Pick Add Friend Action</string>
@@ -106,7 +106,15 @@
     <string name="pref_theme_title">Theme</string>
     <string name="pref_theme_default_value">1</string>
     <string name="pref_appearance_title">Appearance</string>
-    <string name="pref_appearance_summary">Application Theme</string>
+    <string name="pref_appearance_summary">Application theme</string>
+    <string name="pref_server_title">Server</string>
+    <string name="pref_server_summary">Configure host settings</string>
+    <string name="pref_account_title">Account</string>
+    <string name="pref_account_summary">Delete account</string>
+    <string name="pref_api_key_title">API Key</string>
+    <string name="pref_api_key_summary">Used with password protected server</string>
+    <string name="pref_delete_account_title">Delete Account</string>
+    <string name="pref_delete_account_summary">Removes all data and settings from device</string>
     <string name="restart_settings_message">Settings must restart to apply change. Restart now?</string>
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>
@@ -125,4 +133,7 @@
     <string name="creating_identity_message">Creating identity…</string>
     <string name="added_new_friend_message">Added new friend!</string>
     <string name="already_friends_message">We are already friends!</string>
+    <string name="delete_account_title">WARNING</string>
+    <string name="delete_account_message">All data will be deleted from device. You will no longer have access to account.</string>
+    <string name="delete_button">Delete</string>
 </resources>
