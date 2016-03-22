@@ -107,7 +107,11 @@
     <string name="pref_theme_title">Theme</string>
     <string name="pref_theme_default_value">1</string>
     <string name="pref_appearance_title">Appearance</string>
-    <string name="pref_appearance_summary">Application Theme</string>
+    <string name="pref_appearance_summary">Application theme</string>
+    <string name="pref_server_title">Server</string>
+    <string name="pref_server_summary">Configure host settings</string>
+    <string name="pref_api_key_title">API Key</string>
+    <string name="pref_api_key_summary">Used password protected server</string>
     <string name="restart_settings_message">Settings must restart to apply change. Restart now?</string>
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>

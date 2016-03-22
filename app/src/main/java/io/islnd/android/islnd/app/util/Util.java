@@ -20,6 +20,7 @@ import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.Comment;
 
+import io.islnd.android.islnd.app.preferences.ServerPreferenceFragment;
 import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
@@ -167,13 +168,13 @@ public class Util {
 
     public static String getApiKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.api_key), "");
+        return sharedPref.getString(ServerPreferenceFragment.PREFERENCE_API_KEY_KEY, "");
     }
 
     public static void setApiKey(Context context, String apiKey) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(context.getString(R.string.api_key), apiKey);
+        editor.putString(ServerPreferenceFragment.PREFERENCE_API_KEY_KEY, apiKey);
         editor.commit();
     }
 

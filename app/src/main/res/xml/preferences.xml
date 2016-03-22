@@ -5,4 +5,9 @@
         android:title="@string/pref_appearance_title"
         android:icon="@drawable/ic_palette_24dp"
         android:summary="@string/pref_appearance_summary"/>
+    <Preference
+        android:key="pref_server_key"
+        android:title="@string/pref_server_title"
+        android:icon="@drawable/ic_router_24dp"
+        android:summary="@string/pref_server_summary"/>
 </PreferenceScreen>
