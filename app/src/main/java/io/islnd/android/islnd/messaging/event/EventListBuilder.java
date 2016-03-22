@@ -12,7 +12,6 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.ContentUtil;
 import io.islnd.android.islnd.messaging.ServerTime;
 
 public class EventListBuilder {

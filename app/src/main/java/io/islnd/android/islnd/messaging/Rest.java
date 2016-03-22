@@ -173,9 +173,12 @@ public class Rest {
             try {
                 // make call, which will update delayInterceptor
                 Response<ServerTimeResponse> response = service.getServerTime(apiKey).execute();
+                if (response.code() != HTTP_OK) {
+                    continue;
+                }
 
                 long networkDelayNanos = delayInterceptor.getNetworkDelayNanos();
-                if (response.code() == HTTP_OK && networkDelayNanos < minNetworkDelayNanos) {
+                if (networkDelayNanos < minNetworkDelayNanos) {
                     minNetworkDelayNanos = networkDelayNanos;
 
                     long serverTimeMillis = Long.parseLong(response.body().getServerTime());

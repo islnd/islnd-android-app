@@ -28,7 +28,7 @@ public class ServerTime {
                         long serverTimeOffset =
                                 MessageLayer.getServerTimeOffsetMillis(context, REPETITIONS);
                         settings.edit()
-                                .putString(prefKey, Long.toString(serverTimeOffset))
+                                .putLong(prefKey, serverTimeOffset)
                                 .apply();
                         Log.d(TAG, "ServerTime: saved new offset to prefs: " + serverTimeOffset);
                     } catch (IOException e) {
