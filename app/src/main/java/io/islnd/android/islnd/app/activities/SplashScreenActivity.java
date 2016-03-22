@@ -41,7 +41,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         Util.applyAppTheme(this);
 
         Util.setUsesApiKey(mContext, true);
-        //Util.setHasCreatedAccount(mContext, false);
 
         // Visual pause...
         Handler handler = new Handler();
