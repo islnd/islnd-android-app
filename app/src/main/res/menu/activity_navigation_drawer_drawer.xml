@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/group_0"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_feed"
             android:title="@string/nav_feed_title"
@@ -18,14 +20,13 @@
             android:id="@+id/nav_add_friend"
             android:title="@string/nav_add_friend"
             android:icon="@drawable/ic_person_add_24dp"/>
+    </group>
+    <group
+        android:id="@+id/group_1">
         <item
             android:id="@+id/nav_settings"
             android:title="@string/nav_settings_title"
             android:icon="@drawable/ic_settings_24dp"/>
-        <item
-            android:id="@+id/delete_database"
-            android:title="Clear all databases"
-            android:icon="@drawable/ic_delete_24dp"/>
     </group>
 
 </menu>

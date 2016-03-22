@@ -55,7 +55,7 @@
 
     <string-array name="nav_add_friend_actions">
         <item>QR Code</item>
-        <item>SMS</item>
+        <!--<item>SMS</item>-->
     </string-array>
 
     <string name="add_friend_dialog">Pick Add Friend Action</string>

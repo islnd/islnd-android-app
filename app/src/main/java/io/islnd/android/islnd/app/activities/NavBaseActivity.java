@@ -159,9 +159,6 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case R.id.delete_database:
-                DataUtils.deleteAll(this);
-                break;
         }
 
         if (isFragment) {
