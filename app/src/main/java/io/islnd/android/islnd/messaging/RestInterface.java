@@ -4,6 +4,7 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
+import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 
 import java.util.List;
 
@@ -26,6 +27,9 @@ public interface RestInterface {
             @Body String publicKey,
             @Query("apiKey") String apiKey);
 
+    @GET("/ping/")
+    Call<Void> getPing(
+            @Query("apiKey") String apiKey);
 
     @POST("/event")
     Call<Void> postEvent(
@@ -35,5 +39,9 @@ public interface RestInterface {
     @POST("/eventQuery")
     Call<EventQueryResponse> postEventQuery(
             @Body EventQuery eventQuery,
+            @Query("apiKey") String apiKey);
+            
+    @GET("/serverTime/")
+    Call<ServerTimeResponse> getServerTime(
             @Query("apiKey") String apiKey);
 }

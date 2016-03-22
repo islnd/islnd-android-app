@@ -12,9 +12,10 @@
     tools:showIn="@layout/activity_edit_profile">
 
     <FrameLayout
+        android:id="@+id/profile_header_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/profile_header_frame">
+        android:layout_marginBottom="@dimen/profile_header_frame_margin">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -66,31 +67,41 @@
         </FrameLayout>
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/profile_user_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/profile_header_frame"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="@dimen/profile_user_name_padding"
-        style="@style/Base.TextAppearance.AppCompat.Title"
-        android:textColor="@color/primary_text"/>
-
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/edit_display_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profile_user_name">
+        android:layout_below="@id/profile_header_frame">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/edit_display_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/about_me_edit_text_padding"
+            android:layout_marginRight="@dimen/about_me_edit_text_padding"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:hint="@string/display_name"
+            android:textColor="@color/primary_text"
+            android:textColorHint="@color/hint_text"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/edit_profile_about_me_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_display_name_layout">
+
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edit_profile_about_me"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/about_me_edit_text_padding"
             android:layout_marginRight="@dimen/about_me_edit_text_padding"
-            android:layout_marginTop="@dimen/about_me_padding"
             android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/about_me"
             android:textColor="@color/primary_text"
             android:textColorHint="@color/hint_text"/>
     </android.support.design.widget.TextInputLayout>
+
 </RelativeLayout>

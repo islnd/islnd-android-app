@@ -7,10 +7,6 @@ import java.util.List;
 public class ContentUtil {
     private static final String TAG = ContentUtil.class.getSimpleName();
 
-    public static long getContentTimestamp() {
-        return System.currentTimeMillis();
-    }
-
     public static <T extends VersionedContent> T getNewest(List<T> versionedContent) {
         T newestItem = null;
         int newestVersion = Integer.MIN_VALUE;

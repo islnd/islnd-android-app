@@ -36,6 +36,7 @@ public class CreateIdentityService extends IntentService {
         int userId = setAlias(context, displayName);
         setDefaultProfile(context, userId, displayName);
 
+        context.sendBroadcast(new Intent(IslndIntent.CREATE_ACCOUNT_COMPLETED));
         Log.v(TAG, "onHandleIntent completed");
     }
 

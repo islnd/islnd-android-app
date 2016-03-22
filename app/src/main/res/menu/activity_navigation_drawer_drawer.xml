@@ -27,11 +27,11 @@
             android:title="Clear all databases"
             android:icon="@drawable/ic_delete_24dp"/>
         <item
-            android:id="@+id/edit_username"
-            android:title="Edit Username"/>
-        <item
             android:id="@+id/edit_api_key"
             android:title="Edit API Key"/>
+        <item
+            android:id="@+id/sync_server_time"
+            android:title="Sync Server Time"/>
     </group>
 
 </menu>

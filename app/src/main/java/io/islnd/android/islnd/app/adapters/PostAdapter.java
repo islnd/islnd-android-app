@@ -58,7 +58,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         );
 
         holder.postUserName.setText(post.getUserName());
-        holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(post.getTimestamp()));
+        holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, post.getTimestamp()));
         holder.postContent.setText(post.getContent());
         //TODO: Get actual comment count
         holder.postCommentCount.setText(Util.numberOfCommentsString(0));

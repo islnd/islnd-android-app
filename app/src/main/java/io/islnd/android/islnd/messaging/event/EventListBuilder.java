@@ -12,7 +12,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.ContentUtil;
+import io.islnd.android.islnd.messaging.ServerTime;
 
 public class EventListBuilder {
 
@@ -46,7 +46,7 @@ public class EventListBuilder {
                         getNewEventId(),
                         postId,
                         postText,
-                        ContentUtil.getContentTimestamp()));
+                        ServerTime.getCurrentTimeMillis(mContext)));
 
         return this;
     }
@@ -75,7 +75,7 @@ public class EventListBuilder {
                         postAuthorAlias,
                         commentId,
                         commentText,
-                        ContentUtil.getContentTimestamp()));
+                        ServerTime.getCurrentTimeMillis(mContext)));
 
         return this;
     }

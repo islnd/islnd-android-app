@@ -21,6 +21,7 @@ import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.models.Comment;
 
 import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
+import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 import java.security.Key;
@@ -33,9 +34,9 @@ import java.util.TimeZone;
 public class Util {
     private static final String TAG = Util.class.getSimpleName();
 
-    public static String smartTimestampFromUnixTime(long unixTimeMillis) {
+    public static String smartTimestampFromUnixTime(Context context, long unixTimeMillis) {
         // currentTimeMillis is already in UTC!
-        long currentTime = System.currentTimeMillis() / 1000;
+        long currentTime = ServerTime.getCurrentTimeMillis(context) / 1000;
         long timeDiff = currentTime - unixTimeMillis / 1000;
 
         String timestamp = "";
@@ -71,6 +72,32 @@ public class Util {
     public static String numberOfCommentsString(int numberOfComments) {
         String comments = numberOfComments == 1 ? " Comment" : " Comments";
         return numberOfComments + comments;
+    }
+
+    public static boolean getUsesApiKey(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.uses_api_key), false);
+    }
+
+    public static void setUsesApiKey(Context context, boolean usesApiKey) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean(context.getString(R.string.uses_api_key), usesApiKey);
+        editor.commit();
+    }
+
+    public static boolean getHasCreatedAccount(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.has_created_account), false);
+    }
+
+    public static void setHasCreatedAccount(Context context, boolean hasCreatedAccount) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean(context.getString(R.string.has_created_account), hasCreatedAccount);
+        editor.apply();
     }
 
     public static boolean isUser(Context context, int userId) {

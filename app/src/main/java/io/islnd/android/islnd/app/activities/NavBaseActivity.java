@@ -53,6 +53,7 @@ import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
+import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -78,6 +79,8 @@ public class NavBaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+        
+        ServerTime.synchronize(this, false);
 
         // Set launching fragment
         getSupportFragmentManager().beginTransaction()
@@ -159,12 +162,11 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.delete_database:
                 DataUtils.deleteAll(this);
                 break;
-            case R.id.edit_username:
-                editUsernameDialog();
-                break;
             case R.id.edit_api_key:
                 editApiKey();
                 break;
+            case R.id.sync_server_time:
+                ServerTime.synchronize(this, true);
         }
 
         if (isFragment) {
@@ -377,38 +379,6 @@ public class NavBaseActivity extends AppCompatActivity
 
         cursorID.close();
         return contactNumber;
-    }
-
-    private void editUsernameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
-        builder.setView(mDialogView);
-
-        EditText editText = (EditText) mDialogView.findViewById(R.id.edit_username_edit_text);
-
-        builder.setPositiveButton(getString(android.R.string.ok),
-                (DialogInterface dialog, int id) -> {
-                    final String newDisplayName = editText.getText().toString();
-                    final int userId = Util.getUserId(this);
-                    Log.v(TAG, "user id is " + userId);
-                    if (userId < 0) { //--create user for this device
-                        Intent createIdentityIntent = new Intent(this, CreateIdentityService.class);
-                        createIdentityIntent.putExtra(CreateIdentityService.DISPLAY_NAME_EXTRA, newDisplayName);
-                        startService(createIdentityIntent);
-                    } else { //--only update display name
-                        List<Event> eventList = new EventListBuilder(this)
-                                .changeDisplayName(newDisplayName)
-                                .build();
-                        for (Event event : eventList) {
-                            EventProcessor.process(this, event);
-                            Intent pushEventService = new Intent(this, EventPushService.class);
-                            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                            startService(pushEventService);
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
     }
 
     private void editApiKey() {
