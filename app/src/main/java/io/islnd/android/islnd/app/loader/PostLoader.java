@@ -13,6 +13,8 @@ import io.islnd.android.islnd.app.database.IslndContract;
 
 public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final int LOADER_ID = 2;
+
     private final Context mContext;
     private final Uri mContentUri;
     private final PostAdapter mAdapter;
@@ -29,6 +31,7 @@ public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                 IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
                 IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
                 IslndContract.PostEntry.COLUMN_POST_ID,
+                IslndContract.PostEntry.TABLE_NAME +"." + IslndContract.PostEntry.COLUMN_ALIAS,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,

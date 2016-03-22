@@ -62,6 +62,8 @@ public class NavBaseActivity extends AppCompatActivity
 
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
+    public static final int LOADER_ID = 6;
+
     private final static int REQUEST_SMS = 0;
     private final static int REQUEST_CONTACT = 1;
 
@@ -87,7 +89,7 @@ public class NavBaseActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, new FeedFragment())
                 .commit();
-        getSupportLoaderManager().initLoader(0, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
     }
 
     private void onCreateDrawer() {

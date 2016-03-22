@@ -144,6 +144,7 @@ public class EventProcessor {
         ContentValues values = new ContentValues();
         values.put(IslndContract.PostEntry.COLUMN_USER_ID, postUserId);
         values.put(IslndContract.PostEntry.COLUMN_POST_ID, newPostEvent.getPostId());
+        values.put(IslndContract.PostEntry.COLUMN_ALIAS, newPostEvent.getAlias());
         values.put(IslndContract.PostEntry.COLUMN_CONTENT, newPostEvent.getContent());
         values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, newPostEvent.getTimestamp());
         context.getContentResolver().insert(

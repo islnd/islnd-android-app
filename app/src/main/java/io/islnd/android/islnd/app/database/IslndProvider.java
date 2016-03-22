@@ -20,7 +20,7 @@ public class IslndProvider extends ContentProvider {
     static final int USER = 200;
     static final int USER_WITH_ID = 201;
     static final int COMMENT = 300;
-    static final int COMMENT_WITH_POST_USER_ID_AND_POST_ID = 301;
+    static final int COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID = 301;
     static final int PROFILE = 400;
     static final int PROFILE_WITH_USER_ID = 401;
     static final int ALIAS = 500;
@@ -262,7 +262,8 @@ public class IslndProvider extends ContentProvider {
         matcher.addURI(authority, IslndContract.PATH_POST + "/#", POST_WITH_USER);
 
         matcher.addURI(authority, IslndContract.PATH_COMMENT, COMMENT);
-        matcher.addURI(authority, IslndContract.PATH_COMMENT + "/#/*", COMMENT_WITH_POST_USER_ID_AND_POST_ID);
+        matcher.addURI(authority, IslndContract.PATH_COMMENT + "/*/*",
+                COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID);
 
         matcher.addURI(authority, IslndContract.PATH_USER, USER);
         matcher.addURI(authority, IslndContract.PATH_USER + "/#", USER_WITH_ID);
@@ -318,7 +319,7 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getUserByUserId(uri, projection, sortOrder);
                 break;
             }
-            case COMMENT_WITH_POST_USER_ID_AND_POST_ID: {
+            case COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID: {
                 retCursor = getCommentsByPostAuthorAliasAndPostId(uri, projection, sortOrder);
                 break;
             }
@@ -413,7 +414,7 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.UserEntry.CONTENT_ITEM_TYPE;
             case COMMENT:
                 return IslndContract.CommentEntry.CONTENT_TYPE;
-            case COMMENT_WITH_POST_USER_ID_AND_POST_ID:
+            case COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID:
                 return IslndContract.CommentEntry.CONTENT_TYPE;
             case PROFILE:
                 return IslndContract.ProfileEntry.CONTENT_TYPE;

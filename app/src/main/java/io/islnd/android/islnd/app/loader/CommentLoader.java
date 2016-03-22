@@ -15,6 +15,8 @@ public class CommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String POST_AUTHOR_ALIAS_BUNDLE_KEY = "post_author_alias_bundle_key";
     public static final String POST_ID_BUNDLE_KEY = "post_id_bundle_key";
 
+    public static final int LOADER_ID = 0;
+
     private final Context mContext;
     private final CommentAdapter mAdapter;
 

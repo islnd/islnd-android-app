@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -17,6 +18,8 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import java.security.Key;
 
 public class DataUtils {
+    private static final String TAG = DataUtils.class.getSimpleName();
+
     public static long insertUser(Context context, Identity identity) {
         return insertUser(
                 context,
@@ -177,6 +180,7 @@ public class DataUtils {
     }
 
     public static void deletePost(Context context, PostKey postKey) {
+        Log.v(TAG, "delete post " + postKey);
         String selection = IslndContract.PostEntry.COLUMN_USER_ID + " = ? AND " +
                 IslndContract.PostEntry.COLUMN_POST_ID + " = ?";
         String[] args = new String[] {

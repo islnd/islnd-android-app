@@ -37,6 +37,8 @@ import io.islnd.android.islnd.app.util.Util;
 public class ProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
+    public static final int LOADER_ID = 4;
+
     public static String USER_ID_EXTRA = "USER_ID";
     private static final int EDIT_PROFILE_REQUEST = 0;
 
@@ -79,8 +81,8 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
                 IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),
                 mAdapter);
 
-        getSupportLoaderManager().initLoader(0, new Bundle(), postLoader);
-        getSupportLoaderManager().initLoader(1, new Bundle(), this);
+        getSupportLoaderManager().initLoader(PostLoader.LOADER_ID, new Bundle(), postLoader);
+        getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));

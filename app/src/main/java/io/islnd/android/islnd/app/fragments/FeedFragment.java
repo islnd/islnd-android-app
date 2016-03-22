@@ -59,7 +59,7 @@ public class FeedFragment extends Fragment {
                 IslndContract.PostEntry.CONTENT_URI,
                 mAdapter);
         getLoaderManager().initLoader(
-                0,
+                PostLoader.LOADER_ID,
                 null,
                 postLoader);
 

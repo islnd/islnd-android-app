@@ -43,6 +43,8 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
 
     private static final String TAG = ViewPostActivity.class.getSimpleName();
 
+    public static final int LOADER_ID = 5;
+
     private Post mPost = null;
 
     private RecyclerView mRecyclerView;
@@ -86,8 +88,8 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
                 this,
                 mAdapter);
 
-        getSupportLoaderManager().initLoader(0, args, localCommentLoader);
-        getSupportLoaderManager().initLoader(1, new Bundle(), this);
+        getSupportLoaderManager().initLoader(CommentLoader.LOADER_ID, args, localCommentLoader);
+        getSupportLoaderManager().initLoader(this.LOADER_ID, new Bundle(), this);
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
