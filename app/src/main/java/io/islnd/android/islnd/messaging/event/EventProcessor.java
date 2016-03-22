@@ -17,11 +17,11 @@ public class EventProcessor {
     private static final String TAG = EventProcessor.class.getSimpleName();
     private static ContentResolver mContentResolver;
 
-    public static void process(Context context, Event event) {
+    public static boolean process(Context context, Event event) {
         Log.v(TAG, "processing " + event);
         mContentResolver = context.getContentResolver();
         if (alreadyProcessed(event)) {
-            return;
+            return false;
         }
 
         int eventType = event.getType();
@@ -58,9 +58,26 @@ public class EventProcessor {
                 changeAboutMe(context, (ChangeAboutMeEvent) event);
                 break;
             }
+            case EventType.CHANGE_ALIAS: {
+                changeAlias(context, (ChangeAliasEvent) event);
+                break;
+            }
         }
 
         recordEventProcessed(event);
+        return true;
+    }
+
+    private static void changeAlias(Context context, ChangeAliasEvent event) {
+        int userId = DataUtils.getUserIdFromAlias(context, event.getAlias());
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.AliasEntry.COLUMN_ALIAS, event.getNewAlias());
+
+        mContentResolver.update(
+                IslndContract.AliasEntry.buildAliasWithUserId(userId),
+                values,
+                null,
+                null);
     }
 
     private static void changeHeaderPicture(Context context, ChangeHeaderPictureEvent event) {

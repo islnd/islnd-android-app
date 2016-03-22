@@ -9,4 +9,5 @@ public class EventType {
     public static final int CHANGE_PROFILE_PICTURE = 5;
     public static final int CHANGE_HEADER_PICTURE = 6;
     public static final int CHANGE_ABOUT_ME = 7;
+    public static final int CHANGE_ALIAS = 8;
 }

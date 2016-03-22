@@ -52,7 +52,6 @@ public class DataUtils {
         aliasValues.put(IslndContract.AliasEntry.COLUMN_USER_ID, userId);
         aliasValues.put(IslndContract.AliasEntry.COLUMN_ALIAS, alias);
         aliasValues.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(groupKey));
-        aliasValues.put(IslndContract.AliasEntry.COLUMN_ALIAS_ID, -1);
         contentResolver.insert(
                 IslndContract.AliasEntry.CONTENT_URI,
                 aliasValues);
@@ -63,7 +62,6 @@ public class DataUtils {
     public static String getMostRecentAlias(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.AliasEntry.COLUMN_ALIAS,
-                IslndContract.AliasEntry.COLUMN_ALIAS_ID
         };
 
         Cursor cursor = context.getContentResolver().query(
@@ -71,7 +69,7 @@ public class DataUtils {
                 projection,
                 null,
                 null,
-                IslndContract.AliasEntry.COLUMN_ALIAS_ID + " DESC");
+                IslndContract.AliasEntry._ID + " DESC");
 
         try {
             if (cursor.moveToFirst()) {
@@ -229,28 +227,5 @@ public class DataUtils {
                 profile.getProfileImageUri().toString());
 
         context.getContentResolver().insert(IslndContract.ProfileEntry.CONTENT_URI, values);
-    }
-
-    public static int getUserIdFromPublicKey(Context context, Key publicKey) {
-        String[] projection = new String[] {
-                IslndContract.UserEntry._ID,
-        };
-
-        Cursor cursor = context.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
-                projection,
-                IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?",
-                new String[] {CryptoUtil.encodeKey(publicKey)},
-                null);
-
-        try {
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(0);
-            } else {
-                throw new IllegalArgumentException("database has no entry for public key: " + publicKey);
-            }
-        } finally {
-            cursor.close();
-        }
     }
 }

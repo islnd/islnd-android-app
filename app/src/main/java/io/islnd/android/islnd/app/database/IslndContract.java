@@ -126,7 +126,6 @@ public class IslndContract {
         public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_ALIAS = "alias";
         public static final String COLUMN_GROUP_KEY = "group_key";
-        public static final String COLUMN_ALIAS_ID = "alias_id";
 
         public static int getUserIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));

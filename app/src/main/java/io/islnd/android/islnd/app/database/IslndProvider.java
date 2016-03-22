@@ -460,7 +460,11 @@ public class IslndProvider extends ContentProvider {
                 break;
             }
             case ALIAS: {
-                long _id = db.insert(IslndContract.AliasEntry.TABLE_NAME, null, values);
+                long _id = db.insertWithOnConflict(
+                        IslndContract.AliasEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.AliasEntry.buildAliasUri(_id);
                 } else {
@@ -700,6 +704,18 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
+                break;
+            }
+            case ALIAS_WITH_USER_ID: {
+                String[] args = new String[] {
+                        Integer.toString(IslndContract.AliasEntry.getUserIdFromUri(uri))
+                };
+
+                db.update(
+                        IslndContract.AliasEntry.TABLE_NAME,
+                        values,
+                        IslndContract.AliasEntry.COLUMN_USER_ID + " = ?",
+                        args);
                 break;
             }
             default: {

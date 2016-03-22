@@ -40,7 +40,7 @@ public class MessageLayer {
 
         //--TODO get display name without a cursor
         String displayName = DataUtils.getDisplayName(context, Util.getUserId(context));
-        String alias = sharedPreferences.getString(context.getString(R.string.alias), "");
+        String alias = DataUtils.getMostRecentAlias(context, Util.getUserId(context));
         Log.v(TAG, String.format("alias is %s", alias));
         Key groupKey = CryptoUtil.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));

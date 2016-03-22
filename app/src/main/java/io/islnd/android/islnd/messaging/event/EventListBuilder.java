@@ -13,6 +13,7 @@ import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.ServerTime;
+import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class EventListBuilder {
 
@@ -118,6 +119,11 @@ public class EventListBuilder {
     }
 
     public List<Event> build() {
+        this.eventList.add(new ChangeAliasEvent(
+                        getCurrentAlias(),
+                        getNewEventId(),
+                        CryptoUtil.createAlias()
+                ));
         Util.setEventId(mContext, eventId);
         return this.eventList;
     }

@@ -10,6 +10,7 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -63,6 +64,8 @@ public class CryptoUtil {
             throw new ExceptionInInitializerError(e);
         }
     }
+
+    private static String alias;
 
     public static Key getKey() {
         return keyGenerator.generateKey();
@@ -189,6 +192,10 @@ public class CryptoUtil {
         }
 
         return null;
+    }
+
+    public static String createAlias() {
+        return String.valueOf(new SecureRandom().nextLong());
     }
 }
 
