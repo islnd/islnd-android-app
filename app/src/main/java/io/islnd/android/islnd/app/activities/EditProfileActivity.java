@@ -75,13 +75,17 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
 
             if (profileImageUriString != null) {
                 mNewProfileImageUri = Uri.parse(profileImageUriString);
-                ImageUtil.setProfileImageSampled(mContext, mProfileImageView,
+                ImageUtil.setProfileImageSampled(
+                        mContext,
+                        mProfileImageView,
                         mNewProfileImageUri);
             }
 
             if (headerImageUriString != null) {
                 mNewHeaderImageUri = Uri.parse(headerImageUriString);
-                ImageUtil.setHeaderImageSampled(mContext, mHeaderImageView,
+                ImageUtil.setHeaderImageSampled(
+                        mContext,
+                        mHeaderImageView,
                         mNewHeaderImageUri);
             }
         }
@@ -106,12 +110,16 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
                     break;
                 case CROP_PROFILE_IMAGE:
                     mNewProfileImageUri = Crop.getOutput(data);
-                    ImageUtil.setProfileImageSampled(getApplicationContext(), mProfileImageView,
+                    ImageUtil.setProfileImageSampled(
+                            mContext,
+                            mProfileImageView,
                             mNewProfileImageUri);
                     break;
                 case CROP_HEADER_IMAGE:
                     mNewHeaderImageUri = Crop.getOutput(data);
-                    ImageUtil.setHeaderImageSampled(getApplicationContext(), mHeaderImageView,
+                    ImageUtil.setHeaderImageSampled(
+                            mContext,
+                            mHeaderImageView,
                             mNewHeaderImageUri);
                     break;
             }
