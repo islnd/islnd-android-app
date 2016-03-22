@@ -161,14 +161,6 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case R.id.delete_database:
-                DataUtils.deleteAll(this);
-                break;
-            case R.id.edit_api_key:
-                editApiKey();
-                break;
-            case R.id.sync_server_time:
-                ServerTime.synchronize(this, true);
         }
 
         if (isFragment) {
@@ -381,21 +373,6 @@ public class NavBaseActivity extends AppCompatActivity
 
         cursorID.close();
         return contactNumber;
-    }
-
-    private void editApiKey() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialogView = getLayoutInflater().inflate(R.layout.edit_api_key_dialog, null);
-        builder.setView(mDialogView);
-
-        EditText editText = (EditText) mDialogView.findViewById(R.id.edit_api_key_edit_text);
-
-        builder.setPositiveButton(getString(android.R.string.ok),
-                (DialogInterface dialog, int id) -> {
-                    Util.setApiKey(getApplicationContext(), editText.getText().toString());
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
     }
 
     @Override

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:key="pref_delete_account_from_device_key"
+        android:title="@string/pref_delete_account_title"
+        android:summary="@string/pref_delete_account_summary"/>
+</PreferenceScreen>

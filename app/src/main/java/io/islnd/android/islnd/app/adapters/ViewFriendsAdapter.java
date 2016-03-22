@@ -68,15 +68,10 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
         holder.overflow.setOnClickListener((View v) ->
         {
             final int REMOVE_FRIEND = 0;
-            final int ALLOW_USER = 1;
 
             PopupMenu popup = new PopupMenu(mContext, holder.overflow);
 
-            // TODO: if(user is allowed)
             popup.getMenu().add(0, REMOVE_FRIEND, 0, mContext.getString(R.string.remove_friend));
-
-            // TODO: if(user is not allowed)
-            popup.getMenu().add(0, ALLOW_USER, 1, mContext.getString(R.string.allow_user));
 
             popup.setOnMenuItemClickListener((MenuItem item) ->
             {
@@ -84,10 +79,6 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
                 {
                     case REMOVE_FRIEND:
                         Dialogs.removeFriendDialog(mContext, user.getUserId(), user.getDisplayName());
-                        // TODO: Update UI to show user was removed
-                    case ALLOW_USER:
-                        Dialogs.allowUserDialog(mContext);
-                        // TODO: Update UI to show that user was allowed
                 }
 
                 return true;
