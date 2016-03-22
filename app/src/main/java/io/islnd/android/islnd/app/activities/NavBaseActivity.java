@@ -1,11 +1,8 @@
 package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -40,10 +37,10 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.util.List;
 
+import io.islnd.android.islnd.app.CreateIdentityService;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
@@ -56,6 +53,7 @@ import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
+import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -81,6 +79,8 @@ public class NavBaseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+        
+        ServerTime.synchronize(this, false);
 
         // Set launching fragment
         getSupportFragmentManager().beginTransaction()
@@ -162,8 +162,8 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.delete_database:
                 DataUtils.deleteAll(this);
                 break;
-            case R.id.edit_username:
-                editUsernameDialog();
+            case R.id.sync_server_time:
+                ServerTime.synchronize(this, true);
                 break;
         }
 
@@ -377,36 +377,6 @@ public class NavBaseActivity extends AppCompatActivity
 
         cursorID.close();
         return contactNumber;
-    }
-
-    private void editUsernameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialogView = getLayoutInflater().inflate(R.layout.edit_username_dialog, null);
-        builder.setView(mDialogView);
-
-        EditText editText = (EditText) mDialogView.findViewById(R.id.edit_username_edit_text);
-
-        builder.setPositiveButton(getString(android.R.string.ok),
-                (DialogInterface dialog, int id) -> {
-                    final String newDisplayName = editText.getText().toString();
-                    if (Util.getUserId(this) < 0) { //--create user for this device
-                        IslndDb.createIdentity(
-                                getApplicationContext(),
-                                newDisplayName);
-                    } else { //--only update display name
-                        List<Event> eventList = new EventListBuilder(this)
-                                .changeDisplayName(newDisplayName)
-                                .build();
-                        for (Event event : eventList) {
-                            EventProcessor.process(this, event);
-                            Intent pushEventService = new Intent(this, EventPushService.class);
-                            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                            startService(pushEventService);
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
     }
 
     @Override

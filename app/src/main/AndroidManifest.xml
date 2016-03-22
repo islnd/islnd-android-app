@@ -116,6 +116,10 @@
             android:name=".EventPushService"
             android:exported="false">
         </service>
+        <service
+            android:name=".CreateIdentityService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

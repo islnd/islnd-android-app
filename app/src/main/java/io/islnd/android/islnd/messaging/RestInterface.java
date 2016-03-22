@@ -4,7 +4,7 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
-import io.islnd.android.islnd.messaging.server.PseudonymResponse;
+import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 
 import java.util.List;
 
@@ -19,11 +19,6 @@ public interface RestInterface {
     @GET("/readers/{username}")
     Call<List<EncryptedData>> readers(
             @Path("username") String username,
-            @Query("apiKey") String apiKey);
-
-    @GET("/pseudonym/{seed}")
-    Call<PseudonymResponse> pseduonym(
-            @Path("seed") String seed,
             @Query("apiKey") String apiKey);
 
     @POST("/publicKey/{username}")
@@ -44,5 +39,9 @@ public interface RestInterface {
     @POST("/eventQuery")
     Call<EventQueryResponse> postEventQuery(
             @Body EventQuery eventQuery,
+            @Query("apiKey") String apiKey);
+            
+    @GET("/serverTime/")
+    Call<ServerTimeResponse> getServerTime(
             @Query("apiKey") String apiKey);
 }

@@ -13,8 +13,6 @@ import java.util.List;
 
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;

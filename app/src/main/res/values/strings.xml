@@ -43,8 +43,8 @@
     <string name="private_key">PRIVATE_KEY</string>
     <string name="public_key">PUBLIC_KEY</string>
     <string name="group_key">group_key</string>
-    <string name="pseudonym_seed">pseudonym_seed</string>
     <string name="alias">alias</string>
+    <string name="server_time_offset">server_time_offset</string>
 
     <string name="view_friend_status">Not Allowed</string>
 
@@ -116,9 +116,9 @@
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>
     <string name="discard">Discard</string>
+    <string name="display_name">Display Name</string>
     <string name="has_created_account">has_created_account</string>
     <string name="create_account_welcome_message">Welcome</string>
-    <string name="display_name_text">Display Name</string>
     <string name="create_account_text">Create Account</string>
     <string name="api_key_string">API Key</string>
     <string name="uses_api_key">uses_api_key</string>
@@ -127,4 +127,5 @@
     <string name="verifying_api_key_message">Verifying API Key&#8230;</string>
     <string name="invalid_api_key">Invalid API Key</string>
     <string name="comment_id_key">comment_id</string>
+    <string name="creating_identity_message">Creating identity…</string>
 </resources>

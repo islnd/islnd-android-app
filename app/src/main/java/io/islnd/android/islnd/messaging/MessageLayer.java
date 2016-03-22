@@ -11,18 +11,11 @@ import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 
+import java.io.IOException;
 import java.security.Key;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
-
-    public static String getPseudonym(Context context, String seed) {
-        return Rest.getPseudonym(seed, Util.getApiKey(context));
-    }
-
-    public static Boolean getPing(String apiKey) {
-        return Rest.getPing(apiKey);
-    }
 
     public static boolean addFriendFromEncodedIdentityString(Context context,
                                                              String encodedString) {
@@ -58,5 +51,9 @@ public class MessageLayer {
         String encodeString = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated encoded string: " + encodeString);
         return encodeString;
+    }
+
+    public static long getServerTimeOffsetMillis(Context context, int repetitions) throws IOException {
+        return Rest.getServerTimeOffsetMillis(repetitions, Util.getApiKey(context));
     }
 }
