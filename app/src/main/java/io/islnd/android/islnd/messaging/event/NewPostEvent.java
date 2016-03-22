@@ -1,8 +1,5 @@
 package io.islnd.android.islnd.messaging.event;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class NewPostEvent extends Event {
@@ -38,7 +35,7 @@ public class NewPostEvent extends Event {
                 .setEventId(this.eventId)
                 .setEventType(this.eventType)
                 .setContentId(this.postId)
-                .setContent(this.content)
+                .setTextContent(this.content)
                 .setTimestamp(this.timestamp)
                 .build()
                 .toByteArray();

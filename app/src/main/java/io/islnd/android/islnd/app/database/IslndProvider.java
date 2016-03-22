@@ -44,13 +44,18 @@ public class IslndProvider extends ContentProvider {
     static {
         sPostQueryBuilder = new SQLiteQueryBuilder();
 
+        //--TODO this is probably too many inner joins
+        //  Let's show that it is hurting performance and then let's fix it
         sPostQueryBuilder.setTables(
                 IslndContract.PostEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
                         " INNER JOIN " + IslndContract.AliasEntry.TABLE_NAME +
                         " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
-                        " = " + IslndContract.AliasEntry.TABLE_NAME + "." + IslndContract.AliasEntry.COLUMN_USER_ID
+                        " = " + IslndContract.AliasEntry.TABLE_NAME + "." + IslndContract.AliasEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " ON " + IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
         );
     }
 
@@ -62,7 +67,10 @@ public class IslndProvider extends ContentProvider {
         sCommentQueryBuilder.setTables(
                 IslndContract.CommentEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID +
-                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " ON " + IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID +
+                        " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
         );
     }
 
@@ -114,6 +122,23 @@ public class IslndProvider extends ContentProvider {
 
         return sPostQueryBuilder.query(
                 mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getDisplayNameById(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.DisplayNameEntry.getUserIdFromUri(uri);
+
+        String[] selectionArgs = new String[] {Integer.toString(userId)};
+        String selection = IslndContract.DisplayNameEntry.COLUMN_USER_ID + " = ?";
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.DisplayNameEntry.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,
@@ -216,6 +241,19 @@ public class IslndProvider extends ContentProvider {
                 sortOrder);
     }
 
+    private void updateProfileWithUserId(Uri uri, ContentValues values) {
+        int userId = IslndContract.ProfileEntry.getUserIdFromUri(uri);
+
+        String whereClause = IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
+        String[] whereArgs = { Integer.toString(userId) };
+
+        mOpenHelper.getWritableDatabase().update(
+                IslndContract.ProfileEntry.TABLE_NAME,
+                values,
+                whereClause,
+                whereArgs);
+    }
+
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = IslndContract.CONTENT_AUTHORITY;
@@ -316,6 +354,10 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case DISPLAY_NAME_WITH_USER_ID: {
+                retCursor = getDisplayNameById(uri, projection, sortOrder);
+                break;
+            }
             case IDENTITY: {
                 retCursor = sIdentityQueryBuilder.query(
                         mOpenHelper.getReadableDatabase(),
@@ -392,6 +434,8 @@ public class IslndProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
 
+        Log.v(TAG, "begin insert uri: " + uri);
+
         switch (match) {
             case POST: {
                 long _id = db.insertWithOnConflict(
@@ -447,6 +491,7 @@ public class IslndProvider extends ContentProvider {
                         SQLiteDatabase.CONFLICT_IGNORE);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.CommentEntry.buildCommentUri(_id);
+                    Log.v(TAG, "inserted comment");
                 } else {
                     Log.v(TAG, "insert comment failed");
                     return null;
@@ -634,6 +679,12 @@ public class IslndProvider extends ContentProvider {
                         selection,
                         selectionArgs
                 );
+                break;
+            }
+            case PROFILE_WITH_USER_ID: {
+                updateProfileWithUserId(uri, values);
+                getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {

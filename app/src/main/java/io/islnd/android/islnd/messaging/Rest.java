@@ -2,15 +2,10 @@ package io.islnd.android.islnd.messaging;
 
 import android.util.Log;
 
-import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
-import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
-import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
-import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
-import io.islnd.android.islnd.messaging.server.ProfileResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
 
 import java.io.IOException;
@@ -62,22 +57,6 @@ public class Rest {
         }
     }
 
-    public static void postProfile(String pseudonymSeed, EncryptedProfile profilePost, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            //--TODO check that post was successful
-            service.postProfile(pseudonymSeed, profilePost, apiKey).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static String getPseudonym(String seed, String apiKey) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
@@ -122,28 +101,6 @@ public class Rest {
         return false;
     }
 
-    public static List<EncryptedProfile> getProfiles(String pseudonym, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-        try {
-            Response<ProfileResponse> response = service.getProfiles(pseudonym, apiKey).execute();
-            if (response.code() == HTTP_OK) {
-                return response.body().getProfiles();
-            }
-            else {
-                Log.d(TAG, "/profile GET returned code " + response.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     public static int postEvent(EncryptedEvent encryptedEvent, String apiKey) throws IOException {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
@@ -183,48 +140,6 @@ public class Rest {
             }
             else {
                 Log.d(TAG, "post event query returned code" + response.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static void postComment(EncryptedComment encryptedComment, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            Response<Object> response = service.postComment(encryptedComment, apiKey).execute();
-            if (response.code() != HTTP_OK) {
-                Log.d(TAG, "post comment returned code" + response.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static List<EncryptedComment> getComments(CommentQueryRequest commentQueryPost, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            Response<CommentQueryResponse> response =
-                    service.getComments(commentQueryPost, apiKey).execute();
-            if (response.code() == HTTP_OK) {
-                return response.body().getComments();
-            }
-            else {
-                Log.d(TAG, "post comment returned code" + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

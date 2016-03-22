@@ -2,18 +2,18 @@ package io.islnd.android.islnd.messaging.event;
 
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
-public class DeletePostEvent extends Event {
+public class ChangeAboutMeEvent extends Event {
 
-    private final String postId;
+    private final String aboutMe;
 
-    protected DeletePostEvent(String alias, int eventId, String postId) {
-        super(alias, eventId, EventType.DELETE_POST);
+    protected ChangeAboutMeEvent(String alias, int eventId, String aboutMe) {
+        super(alias, eventId, EventType.CHANGE_ABOUT_ME);
 
-        this.postId = postId;
+        this.aboutMe = aboutMe;
     }
 
-    public String getPostId() {
-        return postId;
+    public String getAboutMe() {
+        return aboutMe;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class DeletePostEvent extends Event {
                 .setAlias(this.alias)
                 .setEventId(this.eventId)
                 .setEventType(this.eventType)
-                .setContentId(this.postId)
+                .setTextContent(this.aboutMe)
                 .build()
                 .toByteArray();
     }

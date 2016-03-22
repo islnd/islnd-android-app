@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -10,14 +11,16 @@ import android.support.v4.content.Loader;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 
-public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final Context mContext;
+    private final Uri mContentUri;
     private final PostAdapter mAdapter;
 
-    public LocalPostLoader(Context context, PostAdapter postAdapter) {
+    public PostLoader(Context context, Uri contentUri, PostAdapter postAdapter) {
         mContext = context;
         mAdapter = postAdapter;
+        mContentUri = contentUri;
     }
 
     @Override
@@ -28,12 +31,13 @@ public class LocalPostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                 IslndContract.PostEntry.COLUMN_POST_ID,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
 
         return new CursorLoader(
                 mContext,
-                IslndContract.PostEntry.CONTENT_URI,
+                mContentUri,
                 projection,
                 null,
                 null,

@@ -1,12 +1,15 @@
 package io.islnd.android.islnd.app.activities;
 
-import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -20,32 +23,39 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
-import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.Dialogs;
-import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
     public static String USER_ID_EXTRA = "USER_ID";
     private static final int EDIT_PROFILE_REQUEST = 0;
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private PostAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
+    private StopRefreshReceiver mStopRefreshReceiver;
 
     private int mProfileUserId;
-    private Profile mProfile;
-    private Cursor mPostCursor;
-    private Context mContext;
+    private String mDisplayName;
+
+    private ImageView mHeaderImageView;
+    private ImageView mProfileImageView;
+    private TextView mDisplayNameTextView;
+    private TextView mAboutMeTextView;
+
+    private String mProfileImageUriString;
+    private String mHeaderImageUriString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,38 +64,24 @@ public class ProfileActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mContext = getApplicationContext();
-
         Intent profileIntent = getIntent();
         mProfileUserId = profileIntent.getIntExtra(USER_ID_EXTRA, -1);
-        mProfile = DataUtils.getProfile(mContext, mProfileUserId);
         showProfile();
-        new GetProfileTask().execute();
 
         // Post list stuff
         mRecyclerView = (RecyclerView) findViewById(R.id.profile_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //--TODO this should use a loader
-        String[] projection = new String[]{
-                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
-                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
-                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
-                IslndContract.PostEntry.COLUMN_POST_ID,
-                IslndContract.PostEntry.COLUMN_TIMESTAMP,
-                IslndContract.PostEntry.COLUMN_CONTENT,
-        };
-        mPostCursor = getContentResolver().query(
+        mAdapter = new PostAdapter(this, null);
+        final PostLoader postLoader = new PostLoader(
+                this,
                 IslndContract.PostEntry.buildPostUriWithUserId(mProfileUserId),
-                projection,
-                null,
-                null,
-                null
-        );
+                mAdapter);
 
-        mAdapter = new PostAdapter(this, mPostCursor);
+        getSupportLoaderManager().initLoader(0, new Bundle(), postLoader);
+        getSupportLoaderManager().initLoader(1, new Bundle(), this);
+
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
     }
@@ -93,7 +89,6 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mPostCursor.close();
     }
 
     @Override
@@ -112,23 +107,13 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT_PROFILE_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                mProfile = DataUtils.getProfile(mContext, mProfileUserId);
-                showProfile();
-            }
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
             case R.id.remove_friend:
-                Dialogs.removeFriendDialog(this, mProfileUserId, mProfile.getDisplayName());
+                Dialogs.removeFriendDialog(this, mProfileUserId, mDisplayName);
                 // TODO: What behavior do we want after removing friend?
                 // Probably go back to feed.
                 break;
@@ -144,55 +129,55 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showProfile() {
-        if (mProfile == null) {
-            return;
-        }
+        mHeaderImageView = (ImageView) findViewById(R.id.profile_header_image);
+        mProfileImageView = (ImageView) findViewById(R.id.profile_profile_image);
+        mDisplayNameTextView = (TextView) findViewById(R.id.profile_display_name);
+        mAboutMeTextView = (TextView) findViewById(R.id.profile_about_me);
 
-        ImageView headerImage = (ImageView) findViewById(R.id.profile_header_image);
-        ImageView profileImage = (ImageView) findViewById(R.id.profile_profile_image);
-        TextView displayName = (TextView) findViewById(R.id.profile_display_name);
-        TextView aboutMe = (TextView) findViewById(R.id.profile_about_me);
         View toolbarOverlay = findViewById(R.id.toolbar_overlay);
         AppBarLayout appBar= (AppBarLayout) findViewById(R.id.app_bar_layout);
-        CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
 
-        displayName.setText(mProfile.getDisplayName());
-        aboutMe.setText(mProfile.getAboutMe());
         collapsingToolbar.setTitle(" ");
-        ImageUtil.setProfileImageSampled(mContext, profileImage, mProfile.getProfileImageUri());
-        ImageUtil.setHeaderImageSampled(mContext, headerImage, mProfile.getHeaderImageUri());
 
-        appBar.addOnOffsetChangedListener((AppBarLayout appBarLayout, int verticalOffset) -> {
-            mRefreshLayout.setEnabled(verticalOffset == 0);
 
-            verticalOffset = Math.abs(verticalOffset);
-            int scrollRange = appBarLayout.getTotalScrollRange();
-            float threshold = (int) (scrollRange * 0.70f);
-            float ratio = (float) verticalOffset / threshold;
-            ratio = Math.max(0f, Math.min(1f, ratio));
+        appBar.addOnOffsetChangedListener(
+                (AppBarLayout appBarLayout, int verticalOffset) -> {
+                    mRefreshLayout.setEnabled(verticalOffset == 0);
 
-            ViewCompat.setAlpha(profileImage, 1 - ratio);
-            ViewCompat.setAlpha(displayName, 1 - ratio);
-            ViewCompat.setAlpha(aboutMe, 1 - ratio);
-            ViewCompat.setAlpha(toolbarOverlay, 1 - ratio);
+                    verticalOffset = Math.abs(verticalOffset);
+                    int scrollRange = appBarLayout.getTotalScrollRange();
+                    float threshold = (int) (scrollRange * 0.70f);
+                    float ratio = (float) verticalOffset / threshold;
+                    ratio = Math.max(0f, Math.min(1f, ratio));
 
-            if (scrollRange - verticalOffset == 0) {
-                collapsingToolbar.setTitle(mProfile.getDisplayName());
-            } else {
-                collapsingToolbar.setTitle(" ");
-            }
-        });
+                    ViewCompat.setAlpha(mProfileImageView, 1 - ratio);
+                    ViewCompat.setAlpha(mDisplayNameTextView, 1 - ratio);
+                    ViewCompat.setAlpha(mAboutMeTextView, 1 - ratio);
+                    ViewCompat.setAlpha(toolbarOverlay, 1 - ratio);
 
-        profileImage.setOnClickListener((View view) -> {
-            viewProfileImage();
-        });
+                    if (scrollRange - verticalOffset == 0) {
+                        collapsingToolbar.setTitle(mDisplayName);
+                    } else {
+                        collapsingToolbar.setTitle(" ");
+                    }
+                });
 
-        mRefreshLayout.setOnRefreshListener(() -> {
-            // TODO: Run async task again
-            mRefreshLayout.setRefreshing(false);
-        });
+        mProfileImageView.setOnClickListener(
+                (View view) -> {
+                    viewProfileImage();
+                });
+
+        mRefreshLayout.setOnRefreshListener(
+                () -> {
+                    getApplicationContext().getContentResolver().requestSync(
+                            Util.getSyncAccount(getApplicationContext()),
+                            IslndContract.CONTENT_AUTHORITY,
+                            new Bundle()
+                    );
+                });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
     }
 
     public void startNewPostActivity(View view) {
@@ -204,7 +189,7 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
         intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
-                mProfile.getProfileImageUri().toString());
+                mProfileImageUriString);
         startActivity(intent);
     }
 
@@ -212,20 +197,69 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
         intent.putExtra(ImageViewerActivity.IMAGE_VIEW_URI,
-                mProfile.getHeaderImageUri().toString());
+                mHeaderImageUriString);
         startActivity(intent);
     }
 
-    private class GetProfileTask extends AsyncTask<Void, Void, Void> {
-        protected Void doInBackground(Void... params) {
-            mProfile = IslndDb.getMostRecentProfile(mContext, mProfileUserId);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        this.registerReceiver(mStopRefreshReceiver, filter);
+    }
 
-            return null;
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mStopRefreshReceiver);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = new String[]{
+                IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+        };
+
+        return new CursorLoader(
+                this,
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(mProfileUserId),
+                projection,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            return;
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            showProfile();
-        }
+        mDisplayName = data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
+        mDisplayNameTextView.setText(mDisplayName);
+
+        mAboutMeTextView.setText(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME)));
+
+        mProfileImageUriString = data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI));
+        ImageUtil.setProfileImageSampled(
+                this,
+                mProfileImageView,
+                Uri.parse(mProfileImageUriString));
+
+        mHeaderImageUriString = data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI));
+        ImageUtil.setHeaderImageSampled(
+                this,
+                mHeaderImageView,
+                Uri.parse(mHeaderImageUriString));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

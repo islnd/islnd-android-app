@@ -73,7 +73,6 @@
     <string name="previous_profile_version_key">previous_profile_version</string>
     <string name="api_key">api_key</string>
     <string name="fragment_delete_post">fragment_delete_post</string>
-    <string name="comment_version_key">comment_version_key</string>
     <string name="fragment_delete_comment">fragment_delete_comment</string>
     <string name="content_authority">io.islnd.android.islnd.app.database</string>
     <string name="sync_account_type">islnd.io</string>
@@ -86,7 +85,6 @@
     <string name="nav_settings_title">Settings</string>
     <string name="nav_add_friend">Add Friend</string>
     <string name="user_id">user_id</string>
-    <string name="display_name">display_name</string>
     <string name="event_id">event_id</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -124,4 +122,5 @@
     <string name="please_wait_title">Please wait</string>
     <string name="verifying_api_key_message">Verifying API Key&#8230;</string>
     <string name="invalid_api_key">Invalid API Key</string>
+    <string name="comment_id_key">comment_id</string>
 </resources>

@@ -8,23 +8,17 @@ import android.net.Uri;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
-import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.DeleteCommentDialog;
 import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.PostKey;
-import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.CommentViewHolder;
@@ -72,9 +66,10 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
             mContext.startActivity(profileIntent);
         });
 
-        Profile profile = DataUtils.getProfile(mContext, comment.getUserId());
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setCommentProfileImageSampled(mContext, holder.profileImage, profileImageUri);
+        ImageUtil.setCommentProfileImageSampled(
+                mContext,
+                holder.profileImage,
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
         if (Util.isUser(mContext, comment.getUserId())) {
             holder.view.setOnLongClickListener((View v) -> {
@@ -86,11 +81,7 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
                     String itemStr = items[item];
                     if (itemStr.equals(DELETE_COMMENT)) {
                         DialogFragment deleteCommentFragment =
-                                DeleteCommentDialog.buildWithArgs(
-                                        mPostUserId,
-                                        mPostId,
-                                        comment.getUserId(),
-                                        comment.getCommentId());
+                                DeleteCommentDialog.buildWithArgs(comment.getCommentId());
                         deleteCommentFragment.show(
                                 ((FragmentActivity) mContext).getSupportFragmentManager(),
                                 mContext.getString(R.string.fragment_delete_comment));

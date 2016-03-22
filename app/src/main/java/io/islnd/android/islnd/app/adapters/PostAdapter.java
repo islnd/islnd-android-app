@@ -72,9 +72,10 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             mContext.startActivity(profileIntent);
         });
 
-        Profile profile = DataUtils.getProfile(mContext, post.getUserId());
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setPostProfileImageSampled(mContext, holder.postProfileImage, profileImageUri);
+        ImageUtil.setPostProfileImageSampled(
+                mContext,
+                holder.postProfileImage,
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
         // View post on post click
         holder.itemView.setOnClickListener((View v) -> {
@@ -93,7 +94,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
                     String itemStr = items[item];
                     if (itemStr.equals(DELETE_POST)) {
                         DialogFragment deletePostFragment =
-                                DeletePostDialog.buildWithArgs(post.getUserId(), post.getPostId());
+                                DeletePostDialog.buildWithArgs(post.getPostId());
                         deletePostFragment.show(
                                 ((FragmentActivity) mContext).getSupportFragmentManager(),
                                 mContext.getString(R.string.fragment_delete_post));

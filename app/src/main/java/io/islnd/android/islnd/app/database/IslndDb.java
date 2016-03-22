@@ -7,19 +7,12 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.models.CommentKey;
-import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.util.Util;
 
-import io.islnd.android.islnd.messaging.CommentUpdate;
-import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.MessageLayer;
-import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 
@@ -28,13 +21,16 @@ public class IslndDb
     private static final String TAG = "IslndDb";
 
     public static void createIdentity(Context context, String displayName) {
-        Util.setDisplayName(context, displayName);
         setKeyPairAndPostPublicKey(context);
         setGroupKey(context);
-        setPseudonym(context);
+
+        //--TODO passing display name here is a hack
+        //  We will be moving create identity stuff into a service
+        //  instead of nested async tasks
+        setPseudonym(context, displayName);
     }
 
-    private static void setPseudonym(Context context) {
+    private static void setPseudonym(Context context, String displayName) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
 
@@ -55,7 +51,7 @@ public class IslndDb
 
                 long userId = DataUtils.insertUser(
                         context,
-                        Util.getDisplayName(context),
+                        displayName,
                         pseudonym,
                         Util.getGroupKey(context),
                         Util.getPublicKey(context));
@@ -66,7 +62,7 @@ public class IslndDb
 
                 Profile defaultProfile = Util.buildDefaultProfile(
                         context,
-                        Util.getDisplayName(context));
+                        displayName);
                 DataUtils.insertProfile(
                         context,
                         defaultProfile,
@@ -106,86 +102,5 @@ public class IslndDb
                 return null;
             }
         }.execute();
-    }
-
-    public static void addCommentToPost(Context context, Post post, String commentText)
-    /**
-     * Adds comment to existing post
-     *
-     * @param post Post I am adding comment to.
-     * @param comment Comment that I'm adding.
-     */
-    {
-        MessageLayer.comment(
-                context,
-                post.getUserId(),
-                post.getPostId(),
-                commentText);
-    }
-
-    public static void postProfile(Context context, ProfileWithImageData profile) {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                MessageLayer.postProfile(context, profile);
-                Log.v(TAG, "profile posted to server");
-                return null;
-            }
-        }.execute();
-    }
-
-    public static Profile getMostRecentProfile(Context context, int userId) {
-        Profile profile;
-
-        if (!Util.isUser(context, userId)) {
-            ProfileWithImageData profileWithImageData = MessageLayer.getMostRecentProfile(
-                    context,
-                    userId);
-            if (profileWithImageData == null) {
-                Log.v(TAG, "no profile on network for user " + userId);
-                return null;
-            }
-
-            profile = Util.saveProfileWithImageData(context, profileWithImageData);
-            DataUtils.insertProfile(context, profile, userId);
-
-        } else {
-            profile = DataUtils.getProfile(context, userId);
-        }
-
-        return profile;
-    }
-
-    public static void deleteComment(
-            Context context,
-            int postUserId,
-            String postId,
-            int commentUserId,
-            String commentId) {
-        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postUserId);
-        String commentAuthorPseudonym = DataUtils.getMostRecentAlias(context, commentUserId);
-        Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
-
-        CommentUpdate deleteComment = CommentUpdate.buildDelete(
-                postAuthorPseudonym,
-                commentAuthorPseudonym,
-                postId,
-                commentId);
-
-        EncryptedComment encryptedComment = new EncryptedComment(
-                deleteComment,
-                Util.getPrivateKey(context),
-                postAuthorGroupKey,
-                postAuthorPseudonym,
-                postId);
-
-        // Delete local
-        DataUtils.deleteComment(
-                context,
-                new CommentKey(commentUserId, commentId));
-
-        // Delete from network
-        Rest.postComment(encryptedComment, Util.getApiKey(context));
     }
 }

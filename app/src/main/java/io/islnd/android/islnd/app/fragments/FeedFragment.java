@@ -3,7 +3,7 @@ package io.islnd.android.islnd.app.fragments;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -15,16 +15,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.activities.NewPostActivity;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
-import io.islnd.android.islnd.app.PostCollection;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.loader.LocalPostLoader;
+import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.MessageLayer;
 
 public class FeedFragment extends Fragment {
     private final static String TAG = FeedFragment.class.getSimpleName();
@@ -38,6 +38,7 @@ public class FeedFragment extends Fragment {
     private PostAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
+    private StopRefreshReceiver mStopRefreshReceiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,22 +54,28 @@ public class FeedFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new PostAdapter(mContext, null);
-        getLoaderManager().initLoader(0, null, new LocalPostLoader(mContext, mAdapter));
+        final PostLoader postLoader = new PostLoader(
+                mContext,
+                IslndContract.PostEntry.CONTENT_URI,
+                mAdapter);
+        getLoaderManager().initLoader(
+                0,
+                null,
+                postLoader);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mContext));
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
-
         mRefreshLayout.setOnRefreshListener(
                 () -> {
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,
                             new Bundle());
-                    mRefreshLayout.setRefreshing(false);
                 });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
 
         // TODO: handle onclicks more betterer
         // Fab
@@ -85,6 +92,14 @@ public class FeedFragment extends Fragment {
         super.onResume();
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(R.string.app_name);
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        getContext().registerReceiver(mStopRefreshReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getContext().unregisterReceiver(mStopRefreshReceiver);
     }
 
     public void startNewPostActivity() {

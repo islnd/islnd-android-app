@@ -10,7 +10,7 @@ import android.support.v4.content.Loader;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 
-public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String POST_AUTHOR_ID_BUNDLE_KEY = "post_author_bundle_key";
     public static final String POST_ID_BUNDLE_KEY = "post_id_bundle_key";
@@ -18,7 +18,7 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
     private final Context mContext;
     private final CommentAdapter mAdapter;
 
-    public LocalCommentLoader(Context context, CommentAdapter adapter) {
+    public CommentLoader(Context context, CommentAdapter adapter) {
         mContext = context;
         mAdapter = adapter;
     }
@@ -27,6 +27,7 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = new String[]{
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
                 IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry._ID,
                 IslndContract.CommentEntry.COLUMN_POST_USER_ID,
                 IslndContract.CommentEntry.COLUMN_POST_ID,
@@ -44,7 +45,7 @@ public class LocalCommentLoader implements LoaderManager.LoaderCallbacks<Cursor>
                 projection,
                 null,
                 null,
-                IslndContract.CommentEntry.COLUMN_TIMESTAMP + " DESC"
+                IslndContract.CommentEntry.COLUMN_TIMESTAMP + " ASC"
         );
     }
 

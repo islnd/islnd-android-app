@@ -18,10 +18,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -45,7 +47,6 @@ import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
-import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -57,7 +58,8 @@ import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class NavBaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static String TAG = NavBaseActivity.class.getSimpleName();
 
@@ -70,6 +72,10 @@ public class NavBaseActivity extends AppCompatActivity
     private EditText mSmsEditText = null;
     private View mDialogView = null;
 
+    private ImageView mNavProfileImage;
+    private ImageView mNavHeaderImage;
+    private TextView mNavUserName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +86,7 @@ public class NavBaseActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, new FeedFragment())
                 .commit();
+        getSupportLoaderManager().initLoader(0, new Bundle(), this);
     }
 
     private void onCreateDrawer() {
@@ -96,33 +103,17 @@ public class NavBaseActivity extends AppCompatActivity
 
         // Set user in nav drawer
         View header = navigationView.getHeaderView(0);
-        ImageView navProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
-        ImageView navHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
-        TextView navUserName = (TextView) header.findViewById(R.id.nav_user_name);
-        String myDisplayName = Util.getDisplayName(this);
-        int myUserId = Util.getUserId(this);
+        mNavProfileImage = (ImageView) header.findViewById(R.id.nav_profile_image);
+        mNavHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
+        mNavUserName = (TextView) header.findViewById(R.id.nav_user_name);
 
-        navProfileImage.setOnClickListener(
+        int myUserId = Util.getUserId(this);
+        mNavProfileImage.setOnClickListener(
                 (View v) -> {
                     Intent profileIntent = new Intent(this, ProfileActivity.class);
                     profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myUserId);
                     startActivity(profileIntent);
                 });
-        navUserName.setText(myDisplayName);
-
-        if (myUserId >= 0) {
-            Profile profile = DataUtils.getProfile(getApplicationContext(), myUserId);
-            if (profile == null) {
-                Log.d(TAG, String.format("my id is %d and I have no profile", myUserId));
-            } else {
-                Uri profileImageUri = profile.getProfileImageUri();
-                Uri headerImageUri = profile.getHeaderImageUri();
-                ImageUtil.setNavProfileImageSampled(getApplicationContext(), navProfileImage,
-                        profileImageUri);
-                ImageUtil.setNavHeaderImageSampled(getApplicationContext(), navHeaderImage,
-                        headerImageUri);
-            }
-        }
     }
 
     @Override
@@ -402,10 +393,10 @@ public class NavBaseActivity extends AppCompatActivity
                 (DialogInterface dialog, int id) -> {
                     final String newDisplayName = editText.getText().toString();
                     if (Util.getUserId(this) < 0) { //--create user for this device
-                        IslndDb.createIdentity(getApplicationContext(),
+                        IslndDb.createIdentity(
+                                getApplicationContext(),
                                 newDisplayName);
                     } else { //--only update display name
-                        Util.setDisplayName(this, newDisplayName);
                         List<Event> eventList = new EventListBuilder(this)
                                 .changeDisplayName(newDisplayName)
                                 .build();
@@ -434,5 +425,48 @@ public class NavBaseActivity extends AppCompatActivity
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = new String[]{
+                IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+        };
+
+        return new CursorLoader(
+                this,
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(IslndContract.UserEntry.MY_USER_ID),
+                projection,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            return;
+        }
+
+        ImageUtil.setNavProfileImageSampled(
+                this,
+                mNavProfileImage,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+        ImageUtil.setNavProfileImageSampled(
+                this,
+                mNavHeaderImage,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))));
+        mNavUserName.setText(
+                data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME))
+        );
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

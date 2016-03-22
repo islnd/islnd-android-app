@@ -18,7 +18,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.models.ProfileWithImageData;
 import io.islnd.android.islnd.app.models.Comment;
 
 import io.islnd.android.islnd.app.preferences.ThemePreferenceFragment;
@@ -126,21 +125,6 @@ public class Util {
         return sharedPref.getInt(context.getString(R.string.user_id), -1);
     }
 
-    public static void setDisplayName(Context context, String displayName) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = settings.edit();
-
-        editor.putString(context.getString(R.string.display_name), displayName);
-        editor.commit();
-    }
-
-    public static String getDisplayName(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(
-                context.getString(R.string.display_name),
-                "no display name in shared pref");
-    }
-
     public static String getAlias(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.alias), "");
@@ -167,23 +151,6 @@ public class Util {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePrivateKey(
                 sharedPref.getString(context.getString(R.string.private_key), ""));
-    }
-
-    public static Profile saveProfileWithImageData(Context context, ProfileWithImageData profile) {
-        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
-                context,
-                profile.getProfileImageByteArray());
-        Uri savedHeaderImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
-                context,
-                profile.getHeaderImageByteArray());
-
-        return new Profile(
-                profile.getDisplayName(),
-                profile.getAboutMe(),
-                savedProfileImageUri,
-                savedHeaderImageUri,
-                profile.getVersion()
-        );
     }
 
     public static int getEventId(Context context) {

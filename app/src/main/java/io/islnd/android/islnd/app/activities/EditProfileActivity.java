@@ -4,49 +4,50 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.GravityCompat;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.models.ProfileWithImageData;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.ImageUtil;
-import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.app.VersionedContentBuilder;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
+
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
-public class EditProfileActivity extends AppCompatActivity {
+public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static String TAG = EditProfileActivity.class.getSimpleName();
 
-    private EditText aboutMe;
-    private ImageView profileImage;
-    private ImageView headerImage;
+    private EditText mAboutMeEditText;
+    private ImageView mProfileImageView;
+    private ImageView mHeaderImageView;
+    private TextView mUserNameTextView;
 
-    private Uri prevProfileImageUri = null;
-    private Uri prevHeaderImageUri = null;
-    private Uri profileImageUri = null;
-    private Uri headerImageUri = null;
+    private Uri mNewProfileImageUri = null;
+    private Uri mNewHeaderImageUri = null;
 
     private static final int SELECT_PROFILE_IMAGE = 1;
     private static final int SELECT_HEADER_IMAGE = 2;
     private static final int CROP_PROFILE_IMAGE = 3;
     private static final int CROP_HEADER_IMAGE = 4;
+
     private Context mContext;
-    private Profile mProfile;
+    private String mPreviousAboutMeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,25 +58,12 @@ public class EditProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mContext = getApplicationContext();
 
-        mProfile = DataUtils.getProfile(
-                getApplicationContext(),
-                Util.getUserId(getApplicationContext()));
+        mUserNameTextView = (TextView) findViewById(R.id.profile_user_name);
+        mProfileImageView = (ImageView) findViewById(R.id.profile_profile_image);
+        mHeaderImageView = (ImageView) findViewById(R.id.profile_header_image);
+        mAboutMeEditText = (EditText) findViewById(R.id.edit_profile_about_me);
 
-        TextView userName = (TextView) findViewById(R.id.profile_user_name);
-        profileImage = (ImageView) findViewById(R.id.profile_profile_image);
-        headerImage = (ImageView) findViewById(R.id.profile_header_image);
-        aboutMe = (EditText) findViewById(R.id.edit_profile_about_me);
-
-        prevProfileImageUri = mProfile.getProfileImageUri();
-        prevHeaderImageUri = mProfile.getHeaderImageUri();
-
-        userName.setText(mProfile.getDisplayName());
-        aboutMe.setText(mProfile.getAboutMe());
-
-        ImageUtil.setProfileImageSampled(getApplicationContext(), profileImage,
-                mProfile.getProfileImageUri());
-        ImageUtil.setHeaderImageSampled(getApplicationContext(), headerImage,
-                mProfile.getHeaderImageUri());
+        getSupportLoaderManager().initLoader(0, new Bundle(), this);
     }
 
     @Override
@@ -89,19 +77,19 @@ public class EditProfileActivity extends AppCompatActivity {
                 case SELECT_HEADER_IMAGE:
                     destination = Uri.fromFile(new File(getCacheDir(), "croppedHeader"));
                     Crop.of(data.getData(), destination).withAspect(
-                            headerImage.getWidth(),
-                            headerImage.getHeight()
+                            mHeaderImageView.getWidth(),
+                            mHeaderImageView.getHeight()
                     ).start(this, CROP_HEADER_IMAGE);
                     break;
                 case CROP_PROFILE_IMAGE:
-                    profileImageUri = Crop.getOutput(data);
-                    ImageUtil.setProfileImageSampled(getApplicationContext(), profileImage,
-                            profileImageUri);
+                    mNewProfileImageUri = Crop.getOutput(data);
+                    ImageUtil.setProfileImageSampled(getApplicationContext(), mProfileImageView,
+                            mNewProfileImageUri);
                     break;
                 case CROP_HEADER_IMAGE:
-                    headerImageUri = Crop.getOutput(data);
-                    ImageUtil.setHeaderImageSampled(getApplicationContext(), headerImage,
-                            headerImageUri);
+                    mNewHeaderImageUri = Crop.getOutput(data);
+                    ImageUtil.setHeaderImageSampled(getApplicationContext(), mHeaderImageView,
+                            mNewHeaderImageUri);
                     break;
             }
         }
@@ -131,58 +119,39 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     public void saveProfile(View view) {
-        String newAboutMeText = aboutMe.getText().toString();
-        String myDisplayName = Util.getDisplayName(mContext);
+        String newAboutMeText = mAboutMeEditText.getText().toString();
 
-        if (!hasProfileChanged()) {
-            Log.v(TAG, "profile was not changed");
-            finish();
-            return;
+        EventListBuilder profileEventList = new EventListBuilder(mContext);
+        if (!newAboutMeText.equals(mPreviousAboutMeText)) {
+            profileEventList.changeAboutMe(newAboutMeText);
         }
 
-        // TODO: Implement separate REST calls for profile/header images
-        Uri newProfileUri = profileImageUri == null ? prevProfileImageUri : profileImageUri;
-        Uri newHeaderUri = headerImageUri == null ? prevHeaderImageUri : headerImageUri;
+        if (mNewProfileImageUri != null) {
+            profileEventList.changeProfileImage(mNewProfileImageUri);
+        }
 
-        ProfileWithImageData newProfileWithImageData = VersionedContentBuilder.buildProfile(
-                mContext,
-                myDisplayName,
-                newAboutMeText,
-                ImageUtil.getByteArrayFromUri(getApplicationContext(), newProfileUri),
-                ImageUtil.getByteArrayFromUri(getApplicationContext(), newHeaderUri)
-        );
+        if (mNewHeaderImageUri != null) {
+            profileEventList.changeHeaderImage(mNewHeaderImageUri);
+        }
 
-        // TODO: This saves a new image every time. Will change with new REST calls.
-        Uri savedProfileImageUri = ImageUtil.saveBitmapToInternalFromUri(
-                mContext,
-                newProfileUri);
-        Uri savedHeaderImageUri = ImageUtil.saveBitmapToInternalFromUri(
-                mContext,
-                newHeaderUri);
+        for (Event event : profileEventList.build()) {
+            EventProcessor.process(mContext, event);
 
-        Profile newProfile = new Profile(
-                myDisplayName,
-                newAboutMeText,
-                savedProfileImageUri,
-                savedHeaderImageUri,
-                newProfileWithImageData.getVersion()
-        );
+            Intent pushEventService = new Intent(mContext, EventPushService.class);
+            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+            mContext.startService(pushEventService);
+        }
 
-        int myUserId = Util.getUserId(mContext);
-        DataUtils.updateProfile(getApplicationContext(), newProfile, myUserId);
-        IslndDb.postProfile(getApplicationContext(), newProfileWithImageData);
-
-        // TODO: Saving profile needs to go into its own thread so UI doesn't hang
         setResult(RESULT_OK, null);
         finish();
     }
 
     private boolean hasProfileChanged() {
-        String newAboutMeText = aboutMe.getText().toString();
+        String newAboutMeText = mAboutMeEditText.getText().toString();
 
-        return !newAboutMeText.equals(mProfile.getAboutMe())
-                || profileImageUri != null
-                || headerImageUri != null;
+        return !newAboutMeText.equals(mPreviousAboutMeText)
+                || mNewProfileImageUri != null
+                || mNewHeaderImageUri != null;
     }
 
     public void chooseProfileImage(View view) {
@@ -202,5 +171,52 @@ public class EditProfileActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = new String[]{
+                IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.PostEntry._ID,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
+        };
+
+        return new CursorLoader(
+                this,
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(IslndContract.UserEntry.MY_USER_ID),
+                projection,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            return;
+        }
+
+        mUserNameTextView.setText(data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)));
+        final String aboutMeText = data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME));
+        mAboutMeEditText.setText(aboutMeText);
+        mPreviousAboutMeText = aboutMeText;
+
+        ImageUtil.setProfileImageSampled(
+                this,
+                mProfileImageView,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+
+        ImageUtil.setHeaderImageSampled(
+                this,
+                mHeaderImageView,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI))));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

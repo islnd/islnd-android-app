@@ -1,14 +1,9 @@
 package io.islnd.android.islnd.messaging;
 
-import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
-import io.islnd.android.islnd.messaging.crypto.EncryptedProfile;
-import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
-import io.islnd.android.islnd.messaging.server.CommentQueryResponse;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
-import io.islnd.android.islnd.messaging.server.ProfileResponse;
 import io.islnd.android.islnd.messaging.server.PseudonymResponse;
 
 import java.util.List;
@@ -26,16 +21,6 @@ public interface RestInterface {
             @Path("username") String username,
             @Query("apiKey") String apiKey);
 
-    @POST("/getComments/") // TODO rename to /commentQuery/
-    Call<CommentQueryResponse> getComments(
-            @Body CommentQueryRequest commentQueryPost,
-            @Query("apiKey") String apiKey);
-
-    @POST("/comment/")
-    Call<Object> postComment(
-            @Body EncryptedComment postCommentRequest,
-            @Query("apiKey") String apiKey);
-
     @GET("/pseudonym/{seed}")
     Call<PseudonymResponse> pseduonym(
             @Path("seed") String seed,
@@ -47,20 +32,8 @@ public interface RestInterface {
             @Body String publicKey,
             @Query("apiKey") String apiKey);
 
-
-    @GET("/profiles/{pseudonym}")
-    Call<ProfileResponse> getProfiles(
-            @Path("pseudonym") String pseudonym,
-            @Query("apiKey") String apiKey);
-
     @GET("/ping/")
     Call<Void> getPing(
-            @Query("apiKey") String apiKey);
-
-    @POST("/profile/{pseudonymSeed}")
-    Call<Object> postProfile(
-            @Path("pseudonymSeed") String pseudonymSeed,
-            @Body EncryptedProfile encryptedProfile,
             @Query("apiKey") String apiKey);
 
     @POST("/event")

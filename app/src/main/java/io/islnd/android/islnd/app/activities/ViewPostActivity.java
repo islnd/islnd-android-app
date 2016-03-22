@@ -2,16 +2,21 @@ package io.islnd.android.islnd.app.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -20,21 +25,28 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.islnd.android.islnd.app.DeletePostDialog;
+import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.loader.LocalCommentLoader;
-import io.islnd.android.islnd.app.loader.NetworkCommentLoader;
+import io.islnd.android.islnd.app.loader.CommentLoader;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
-import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
 
-public class ViewPostActivity extends AppCompatActivity {
+public class ViewPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String TAG = ViewPostActivity.class.getSimpleName();
 
     private Post mPost = null;
 
@@ -44,6 +56,9 @@ public class ViewPostActivity extends AppCompatActivity {
     private SwipeRefreshLayout mRefreshLayout;
     private Context mContext;
 
+    private ImageView mPostProfileImageView;
+    private StopRefreshReceiver mStopRefreshReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -52,7 +67,7 @@ public class ViewPostActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mContext = getApplicationContext();
+        mContext = this;
 
         // Get intent with post info
         Intent intent = getIntent();
@@ -70,32 +85,26 @@ public class ViewPostActivity extends AppCompatActivity {
 
         // Load the local comments
         Bundle args = new Bundle();
-        args.putInt(LocalCommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
-        args.putString(LocalCommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
-        LocalCommentLoader localCommentLoader = new LocalCommentLoader(
+        args.putInt(CommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
+        args.putString(CommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
+        CommentLoader localCommentLoader = new CommentLoader(
                 this,
                 mAdapter);
 
         getSupportLoaderManager().initLoader(0, args, localCommentLoader);
+        getSupportLoaderManager().initLoader(1, new Bundle(), this);
 
         // Swipe to refresh
-        AsyncTaskLoader networkCommentsLoader = new NetworkCommentLoader(
-                this,
-                mPost.getUserId(),
-                mPost.getPostId());
-
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(() ->
         {
-            networkCommentsLoader.forceLoad();
             getApplicationContext().getContentResolver().requestSync(
                     Util.getSyncAccount(getApplicationContext()),
                     IslndContract.CONTENT_AUTHORITY,
                     new Bundle()
             );
-
-            mRefreshLayout.setRefreshing(false);
         });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
     }
 
     @Override
@@ -121,10 +130,19 @@ public class ViewPostActivity extends AppCompatActivity {
         }
         else
         {
-            IslndDb.addCommentToPost(
-                    this,
-                    mPost,
-                    commentText);
+            List<Event> makeCommentEvents = new EventListBuilder(mContext)
+                    .makeComment(
+                            mPost.getPostId(),
+                            DataUtils.getMostRecentAlias(mContext, mPost.getUserId()),
+                            commentText )
+                    .build();
+
+            for (Event event : makeCommentEvents) {
+                EventProcessor.process(mContext, event);
+                Intent pushEventService = new Intent(mContext, EventPushService.class);
+                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                mContext.startService(pushEventService);
+            }
 
             //--Clear edit text
             addCommentEditText.setText("");
@@ -137,7 +155,8 @@ public class ViewPostActivity extends AppCompatActivity {
             return;
         }
 
-        ImageView postProfileImage = (ImageView) findViewById(R.id.post_profile_image);
+        mPostProfileImageView = (ImageView) findViewById(R.id.post_profile_image);
+
         TextView postUserName = (TextView) findViewById(R.id.post_user_name);
         TextView postTimestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) findViewById(R.id.post_content);
@@ -151,15 +170,13 @@ public class ViewPostActivity extends AppCompatActivity {
         commentCount.setText(Util.numberOfCommentsString(0));
 
         // Go to profile on picture click
-        postProfileImage.setOnClickListener((View v) -> {
-            Intent profileIntent = new Intent(this, ProfileActivity.class);
-            profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, mPost.getUserId());
-            startActivity(profileIntent);
-        });
+        mPostProfileImageView.setOnClickListener(
+                (View v) -> {
+                    Intent profileIntent = new Intent(this, ProfileActivity.class);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, mPost.getUserId());
+                    startActivity(profileIntent);
+                });
 
-        Profile profile = DataUtils.getProfile(mContext, mPost.getUserId());
-        Uri profileImageUri = profile.getProfileImageUri();
-        ImageUtil.setPostProfileImageSampled(mContext, postProfileImage, profileImageUri);
 
         if(Util.isUser(mContext, mPost.getUserId())) {
             postOverflow.setVisibility(View.VISIBLE);
@@ -171,7 +188,7 @@ public class ViewPostActivity extends AppCompatActivity {
                     switch (item.getItemId()) {
                         case R.id.delete_post:
                             DeletePostDialog deletePostFragment =
-                                    DeletePostDialog.buildWithArgs(mPost.getUserId(), mPost.getPostId());
+                                    DeletePostDialog.buildWithArgs(mPost.getPostId());
                             deletePostFragment.show(
                                     getSupportFragmentManager(),
                                     mContext.getString(R.string.fragment_delete_post));
@@ -186,5 +203,52 @@ public class ViewPostActivity extends AppCompatActivity {
         } else {
             postOverflow.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(TAG, "create loader " + id);
+        String[] projection = new String[]{
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+        };
+
+        return new CursorLoader(
+                this,
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(mPost.getUserId()),
+                projection,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            return;
+        }
+
+        ImageUtil.setPostProfileImageSampled(
+                mContext,
+                mPostProfileImageView,
+                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        this.registerReceiver(mStopRefreshReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mStopRefreshReceiver);
     }
 }
