@@ -147,9 +147,12 @@ public class EventProcessor {
         values.put(IslndContract.PostEntry.COLUMN_ALIAS, newPostEvent.getAlias());
         values.put(IslndContract.PostEntry.COLUMN_CONTENT, newPostEvent.getContent());
         values.put(IslndContract.PostEntry.COLUMN_TIMESTAMP, newPostEvent.getTimestamp());
+        values.put(IslndContract.PostEntry.COLUMN_COMMENT_COUNT, 0);
         context.getContentResolver().insert(
                 IslndContract.PostEntry.CONTENT_URI,
                 values);
+
+        Log.v(TAG, "add post " + newPostEvent.getAlias() + " " + newPostEvent.getPostId());
     }
 
     private static void deletePost(Context context, DeletePostEvent deletePostEvent) {
@@ -171,6 +174,27 @@ public class EventProcessor {
         context.getContentResolver().insert(
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
+
+        int commentCount = DataUtils.getCommentCount(
+                context,
+                newCommentEvent.getPostAuthorAlias(),
+                newCommentEvent.getPostId());
+        Log.v(TAG, "comment count is " + commentCount);
+
+        Log.v(TAG, "update comment count for " + newCommentEvent.getPostAuthorAlias() + " " + newCommentEvent.getPostId());
+        ContentValues updateValues = new ContentValues();
+        updateValues.put(IslndContract.PostEntry.COLUMN_COMMENT_COUNT, commentCount + 1);
+        String selection = IslndContract.PostEntry.COLUMN_ALIAS + " = ? AND " +
+                IslndContract.PostEntry.COLUMN_POST_ID + " = ?";
+        String[] selectionArgs = new String[] {
+                newCommentEvent.getPostAuthorAlias(),
+                newCommentEvent.getPostId()
+        };
+        context.getContentResolver().update(
+                IslndContract.PostEntry.CONTENT_URI,
+                updateValues,
+                selection,
+                selectionArgs);
     }
 
     private static void deleteComment(Context context, DeleteCommentEvent deleteCommentEvent) {

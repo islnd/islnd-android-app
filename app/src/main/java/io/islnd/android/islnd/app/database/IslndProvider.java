@@ -102,18 +102,6 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
-    private Cursor getPosts(Uri uri, String[] projection, String sortOrder) {
-        return sPostQueryBuilder.query(
-                mOpenHelper.getReadableDatabase(),
-                projection,
-                null,
-                null,
-                null,
-                null,
-                sortOrder
-        );
-    }
-
     private Cursor getPostsByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
 
@@ -297,7 +285,14 @@ public class IslndProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case POST: {
-                retCursor = getPosts(uri, projection, sortOrder);
+                retCursor = sPostQueryBuilder.query(
+                            mOpenHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
                 break;
             }
             case POST_WITH_USER: {
@@ -684,6 +679,17 @@ public class IslndProvider extends ContentProvider {
                         selection,
                         selectionArgs
                 );
+                break;
+            }
+            case POST: {
+                rowsUpdated = db.update(
+                        IslndContract.PostEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+                Log.v(TAG, "update post updated " + rowsUpdated);
+                getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 break;
             }
             case PROFILE_WITH_USER_ID: {

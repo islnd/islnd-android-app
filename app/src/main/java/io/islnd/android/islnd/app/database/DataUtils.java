@@ -251,4 +251,38 @@ public class DataUtils {
             }
         }
     }
+
+    public static int getCommentCount(Context context, String postAuthorAlias, String postId) {
+        String[] projection = new String[] { IslndContract.PostEntry.COLUMN_COMMENT_COUNT };
+
+        String selection = IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_ALIAS + " = ? AND " +
+                IslndContract.PostEntry.COLUMN_POST_ID + " = ?";
+        String[] selectionArgs = new String[] {
+                postAuthorAlias,
+                postId
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.PostEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null);
+            Log.v(TAG, "cursor has " + cursor.getCount() + " rows.");
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException(
+                        String.format("database has no entry for post user id %s post id %d",
+                                postAuthorAlias,
+                                postId));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }

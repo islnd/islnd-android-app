@@ -156,8 +156,8 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         postUserName.setText(mPost.getDisplayName());
         postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, mPost.getTimestamp()));
         postContent.setText(mPost.getContent());
-        //TODO: Get actual comment count
-        commentCount.setText(Util.numberOfCommentsString(0));
+        //TODO: Need to use loader to have dynamic comment count
+        commentCount.setText("");
 
         // Go to profile on picture click
         mPostProfileImageView.setOnClickListener(

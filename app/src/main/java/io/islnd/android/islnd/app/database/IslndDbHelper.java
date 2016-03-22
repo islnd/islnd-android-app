@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -50,6 +50,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.PostEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
                 IslndContract.PostEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
                 IslndContract.PostEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
+                IslndContract.PostEntry.COLUMN_COMMENT_COUNT + " INTEGER NOT NULL, " +
 
                 " FOREIGN KEY (" + IslndContract.PostEntry.COLUMN_USER_ID + ") REFERENCES " +
                 IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "), " +

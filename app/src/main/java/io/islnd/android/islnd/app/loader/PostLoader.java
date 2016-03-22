@@ -34,6 +34,7 @@ public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                 IslndContract.PostEntry.TABLE_NAME +"." + IslndContract.PostEntry.COLUMN_ALIAS,
                 IslndContract.PostEntry.COLUMN_TIMESTAMP,
                 IslndContract.PostEntry.COLUMN_CONTENT,
+                IslndContract.PostEntry.COLUMN_COMMENT_COUNT,
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };

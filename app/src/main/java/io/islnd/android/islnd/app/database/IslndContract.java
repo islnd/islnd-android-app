@@ -37,6 +37,7 @@ public class IslndContract {
         public static final String COLUMN_POST_ID = "post_id";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_TIMESTAMP = "timestamp";
+        public static final String COLUMN_COMMENT_COUNT = "comment_count";
 
         public static int getUserIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));

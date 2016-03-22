@@ -24,8 +24,6 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.GlancePostViewHolder;
 
-import java.util.ArrayList;
-
 public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder> {
 
     public PostAdapter(Context context, Cursor cursor) {
@@ -50,13 +48,13 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
                 cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_ALIAS)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_POST_ID)),
                 cursor.getLong(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_TIMESTAMP)),
-                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_CONTENT)));
+                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_CONTENT)),
+                cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_COMMENT_COUNT)));
 
         holder.postUserName.setText(post.getDisplayName());
         holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, post.getTimestamp()));
         holder.postContent.setText(post.getContent());
-        //TODO: Get actual comment count
-        holder.postCommentCount.setText(Util.numberOfCommentsString(0));
+        holder.postCommentCount.setText(Util.numberOfCommentsString(post.getCommentCount()));
         
         holder.postProfileImage.setOnClickListener((View v) -> {
             if (mContext instanceof ProfileActivity) {

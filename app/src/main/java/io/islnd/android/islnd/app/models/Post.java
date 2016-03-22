@@ -14,12 +14,15 @@ public class Post implements Serializable
     private final long timestamp;
     private final String content;
     private final String postId;
+    private final int commentCount;
 
     public Post(String displayName,
                 int userId,
-                String alias, String postId,
+                String alias,
+                String postId,
                 long timestamp,
-                String content)
+                String content,
+                int commentCount)
     {
         this.displayName = displayName;
         this.userId = userId;
@@ -27,6 +30,7 @@ public class Post implements Serializable
         this.postId = postId;
         this.timestamp = timestamp;
         this.content = content;
+        this.commentCount = commentCount;
     }
 
     public String getDisplayName()
@@ -58,5 +62,9 @@ public class Post implements Serializable
 
     public String getAlias() {
         return alias;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
     }
 }
