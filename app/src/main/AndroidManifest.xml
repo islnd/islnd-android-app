@@ -96,16 +96,6 @@
                 android:resource="@xml/authenticator"/>
         </service>
         <service
-            android:name=".sync.CommentsSyncService"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-        <service
             android:name=".sync.EventSyncService"
             android:exported="false"
             >

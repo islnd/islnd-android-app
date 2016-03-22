@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.fragments;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.ViewFriendsAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.FriendLoader;
@@ -24,7 +27,8 @@ public class ViewFriendsFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ViewFriendsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private SwipeRefreshLayout refreshLayout;
+    private SwipeRefreshLayout mRefreshLayout;
+    private StopRefreshReceiver mStopRefreshReceiver;
 
     private Context mContext;
     private ContentResolver mResolver;
@@ -55,14 +59,15 @@ public class ViewFriendsFragment extends Fragment {
         getLoaderManager().initLoader(0, args, friendLoader);
 
         // Swipe to refresh
-        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
-        refreshLayout.setOnRefreshListener(() -> {
+        mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
+        mRefreshLayout.setOnRefreshListener(
+                () -> {
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,
                             new Bundle());
-                    refreshLayout.setRefreshing(false);
-        });
+                });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
 
         return v;
     }
@@ -72,5 +77,13 @@ public class ViewFriendsFragment extends Fragment {
         super.onResume();
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(R.string.view_friends_fragment);
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        getContext().registerReceiver(mStopRefreshReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getContext().unregisterReceiver(mStopRefreshReceiver);
     }
 }

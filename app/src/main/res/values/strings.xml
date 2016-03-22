@@ -74,7 +74,6 @@
     <string name="previous_profile_version_key">previous_profile_version</string>
     <string name="api_key">api_key</string>
     <string name="fragment_delete_post">fragment_delete_post</string>
-    <string name="comment_version_key">comment_version_key</string>
     <string name="fragment_delete_comment">fragment_delete_comment</string>
     <string name="content_authority">io.islnd.android.islnd.app.database</string>
     <string name="sync_account_type">islnd.io</string>
@@ -114,4 +113,5 @@
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>
     <string name="discard">Discard</string>
+    <string name="comment_id_key">comment_id</string>
 </resources>

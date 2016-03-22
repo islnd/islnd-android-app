@@ -1,74 +1,21 @@
 package io.islnd.android.islnd.messaging;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
-import io.islnd.android.islnd.messaging.crypto.EncryptedComment;
-import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
-import io.islnd.android.islnd.messaging.server.CommentQuery;
 import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.app.VersionedContentBuilder;
-
-import io.islnd.android.islnd.messaging.server.CommentQueryRequest;
 
 import java.io.IOException;
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
-
-    public static void comment(Context context, int postUserId, String postId, String content) {
-        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postUserId);
-        String myPseudonym = io.islnd.android.islnd.app.util.Util.getAlias(context);
-        int myId = Util.getUserId(context);
-        CommentUpdate commentUpdate = VersionedContentBuilder.buildComment(
-                context,
-                postAuthorPseudonym,
-                myPseudonym,
-                postId,
-                content);
-
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.CommentEntry.COLUMN_POST_USER_ID, postUserId);
-        values.put(IslndContract.CommentEntry.COLUMN_POST_ID, postId);
-        values.put(IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID, myId);
-        values.put(IslndContract.CommentEntry.COLUMN_COMMENT_ID, commentUpdate.getCommentId());
-        values.put(IslndContract.CommentEntry.COLUMN_TIMESTAMP, commentUpdate.getTimestamp());
-        values.put(IslndContract.CommentEntry.COLUMN_CONTENT, commentUpdate.getContent());
-
-        context.getContentResolver().insert(
-                IslndContract.CommentEntry.CONTENT_URI,
-                values);
-
-        Key postAuthorGroupKey = DataUtils.getGroupKey(context, postUserId);
-        EncryptedComment encryptedComment = new EncryptedComment(
-                commentUpdate,
-                Util.getPrivateKey(context),
-                postAuthorGroupKey,
-                postAuthorPseudonym,
-                commentUpdate.getPostId());
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Rest.postComment(
-                        encryptedComment,
-                        io.islnd.android.islnd.app.util.Util.getApiKey(context));
-                return null;
-            }
-        }.execute();
-    }
 
     public static String getPseudonym(Context context, String seed) {
         return Rest.getPseudonym(seed, Util.getApiKey(context));
@@ -108,54 +55,6 @@ public class MessageLayer {
         String encodeString = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated encoded string: " + encodeString);
         return encodeString;
-    }
-
-    public static CommentCollection getCommentCollection(Context context, int postAuthorId, String postId) {
-        Log.v(TAG, String.format("getting comments user id %d post id %s", postAuthorId, postId));
-        List<CommentQuery> queries = new ArrayList<>();
-        String postAuthorPseudonym = DataUtils.getMostRecentAlias(context, postAuthorId);
-        queries.add(new CommentQuery(postAuthorPseudonym, postId));
-        return getCommentCollection(context, queries, postAuthorId);
-    }
-
-    public static CommentCollection getCommentCollection(
-            Context context,
-            List<CommentQuery> queries,
-            int postAuthorId) {
-        CommentCollection commentCollection= new CommentCollection();
-        CommentQueryRequest commentQueryPost = new CommentQueryRequest(queries);
-
-        List<EncryptedComment> encryptedComments = Rest.getComments(
-                commentQueryPost,
-                io.islnd.android.islnd.app.util.Util.getApiKey(context));
-        if (encryptedComments == null) {
-            return new CommentCollection();
-        }
-
-        Log.v(TAG, encryptedComments.size() + " comments");
-        for (EncryptedComment ec : encryptedComments) {
-            final Key groupKey = DataUtils.getGroupKey(context, postAuthorId);
-            CommentUpdate commentUpdate = ec.decrypt(groupKey);
-            try {
-                final int commentAuthorId = DataUtils.getUserIdFromAlias(context, commentUpdate.getCommentAuthorPseudonym());
-                final Key publicKey = DataUtils.getPublicKey(context, commentAuthorId);
-                ec.decryptAndVerify(groupKey, publicKey);
-            } catch (InvalidSignatureException e) {
-                Log.d(TAG, "could not verify comment: " + commentUpdate);
-                e.printStackTrace();
-            }
-            final String commentAuthorPseudonym = commentUpdate.getCommentAuthorPseudonym();
-
-            int commentAuthorId = DataUtils.getUserIdFromAlias(context, commentAuthorPseudonym);
-            if (commentUpdate.isDeletion()
-                    && commentAuthorId == -1) {
-                Log.v(TAG, "adding commment for unknown user");
-            }
-
-            commentCollection.add(postAuthorId, commentAuthorId, commentUpdate);
-        }
-
-        return commentCollection;
     }
 
     public static long getServerTimeOffsetMillis(Context context, int repetitions) throws IOException {

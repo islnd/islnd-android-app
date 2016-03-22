@@ -2,12 +2,12 @@ package io.islnd.android.islnd.app.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,17 +25,24 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.islnd.android.islnd.app.DeletePostDialog;
+import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.StopRefreshReceiver;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
-import io.islnd.android.islnd.app.database.IslndDb;
-import io.islnd.android.islnd.app.loader.LocalCommentLoader;
-import io.islnd.android.islnd.app.loader.NetworkCommentLoader;
+import io.islnd.android.islnd.app.loader.CommentLoader;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.event.Event;
+import io.islnd.android.islnd.messaging.event.EventListBuilder;
+import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class ViewPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -50,6 +57,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     private Context mContext;
 
     private ImageView mPostProfileImageView;
+    private StopRefreshReceiver mStopRefreshReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -59,7 +67,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mContext = getApplicationContext();
+        mContext = this;
 
         // Get intent with post info
         Intent intent = getIntent();
@@ -77,9 +85,9 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
 
         // Load the local comments
         Bundle args = new Bundle();
-        args.putInt(LocalCommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
-        args.putString(LocalCommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
-        LocalCommentLoader localCommentLoader = new LocalCommentLoader(
+        args.putInt(CommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
+        args.putString(CommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
+        CommentLoader localCommentLoader = new CommentLoader(
                 this,
                 mAdapter);
 
@@ -87,23 +95,16 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         getSupportLoaderManager().initLoader(1, new Bundle(), this);
 
         // Swipe to refresh
-        AsyncTaskLoader networkCommentsLoader = new NetworkCommentLoader(
-                this,
-                mPost.getUserId(),
-                mPost.getPostId());
-
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(() ->
         {
-            networkCommentsLoader.forceLoad();
             getApplicationContext().getContentResolver().requestSync(
                     Util.getSyncAccount(getApplicationContext()),
                     IslndContract.CONTENT_AUTHORITY,
                     new Bundle()
             );
-
-            mRefreshLayout.setRefreshing(false);
         });
+        mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
     }
 
     @Override
@@ -129,10 +130,19 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         }
         else
         {
-            IslndDb.addCommentToPost(
-                    this,
-                    mPost,
-                    commentText);
+            List<Event> makeCommentEvents = new EventListBuilder(mContext)
+                    .makeComment(
+                            mPost.getPostId(),
+                            DataUtils.getMostRecentAlias(mContext, mPost.getUserId()),
+                            commentText )
+                    .build();
+
+            for (Event event : makeCommentEvents) {
+                EventProcessor.process(mContext, event);
+                Intent pushEventService = new Intent(mContext, EventPushService.class);
+                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
+                mContext.startService(pushEventService);
+            }
 
             //--Clear edit text
             addCommentEditText.setText("");
@@ -178,7 +188,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
                     switch (item.getItemId()) {
                         case R.id.delete_post:
                             DeletePostDialog deletePostFragment =
-                                    DeletePostDialog.buildWithArgs(mPost.getUserId(), mPost.getPostId());
+                                    DeletePostDialog.buildWithArgs(mPost.getPostId());
                             deletePostFragment.show(
                                     getSupportFragmentManager(),
                                     mContext.getString(R.string.fragment_delete_post));
@@ -227,5 +237,18 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        this.registerReceiver(mStopRefreshReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mStopRefreshReceiver);
     }
 }

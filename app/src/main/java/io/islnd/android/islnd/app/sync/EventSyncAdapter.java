@@ -5,6 +5,7 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
@@ -107,6 +110,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             EventProcessor.process(mContext, events.poll());
         }
 
+        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
         Log.v(TAG, "completed on perform sync");
     }
 
