@@ -25,10 +25,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.List;
-
 import io.islnd.android.islnd.app.DeletePostDialog;
-import io.islnd.android.islnd.app.EventPushService;
+import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
@@ -40,9 +38,6 @@ import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.event.Event;
-import io.islnd.android.islnd.messaging.event.EventListBuilder;
-import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class ViewPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -87,7 +82,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
 
         // Load the local comments
         Bundle args = new Bundle();
-        args.putInt(CommentLoader.POST_AUTHOR_ID_BUNDLE_KEY, mPost.getUserId());
+        args.putString(CommentLoader.POST_AUTHOR_ALIAS_BUNDLE_KEY, mPost.getAlias());
         args.putString(CommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
         CommentLoader localCommentLoader = new CommentLoader(
                 this,
@@ -132,19 +127,12 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         }
         else
         {
-            List<Event> makeCommentEvents = new EventListBuilder(mContext)
+            new EventPublisher(mContext)
                     .makeComment(
                             mPost.getPostId(),
-                            DataUtils.getMostRecentAlias(mContext, mPost.getUserId()),
-                            commentText )
-                    .build();
-
-            for (Event event : makeCommentEvents) {
-                EventProcessor.process(mContext, event);
-                Intent pushEventService = new Intent(mContext, EventPushService.class);
-                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                mContext.startService(pushEventService);
-            }
+                            mPost.getAlias(),
+                            commentText)
+                    .publish();
 
             //--Clear edit text
             addCommentEditText.setText("");
@@ -165,11 +153,11 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         RelativeLayout postOverflow  = (RelativeLayout) findViewById(R.id.post_overflow_layout);
         TextView commentCount = (TextView) findViewById(R.id.post_comment_count);
         
-        postUserName.setText(mPost.getUserName());
+        postUserName.setText(mPost.getDisplayName());
         postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, mPost.getTimestamp()));
         postContent.setText(mPost.getContent());
-        //TODO: Get actual comment count
-        commentCount.setText(Util.numberOfCommentsString(0));
+        //TODO: Need to use loader to have dynamic comment count
+        commentCount.setText("");
 
         // Go to profile on picture click
         mPostProfileImageView.setOnClickListener(

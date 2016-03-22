@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.EventPushService;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -165,31 +166,24 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         String newDisplayNameText = mDisplayNameEditText.getText().toString();
         String newAboutMeText = mAboutMeEditText.getText().toString();
 
-        EventListBuilder profileEventList = new EventListBuilder(mContext);
+        EventPublisher profileEventPublisher = new EventPublisher(mContext);
         if (!newDisplayNameText.equals(mPreviousDisplayNameText)) {
-            profileEventList.changeDisplayName(newDisplayNameText);
+            profileEventPublisher.changeDisplayName(newDisplayNameText);
         }
 
         if (!newAboutMeText.equals(mPreviousAboutMeText)) {
-            profileEventList.changeAboutMe(newAboutMeText);
+            profileEventPublisher.changeAboutMe(newAboutMeText);
         }
 
         if (mNewProfileImageUri != null) {
-            profileEventList.changeProfileImage(mNewProfileImageUri);
+            profileEventPublisher.changeProfileImage(mNewProfileImageUri);
         }
 
         if (mNewHeaderImageUri != null) {
-            profileEventList.changeHeaderImage(mNewHeaderImageUri);
+            profileEventPublisher.changeHeaderImage(mNewHeaderImageUri);
         }
 
-        for (Event event : profileEventList.build()) {
-            EventProcessor.process(mContext, event);
-
-            Intent pushEventService = new Intent(mContext, EventPushService.class);
-            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-            mContext.startService(pushEventService);
-        }
-
+        profileEventPublisher.publish();
         setResult(RESULT_OK, null);
         finish();
     }

@@ -8,7 +8,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import java.security.KeyPair;
-import java.security.SecureRandom;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.models.Profile;
@@ -64,7 +63,7 @@ public class CreateIdentityService extends IntentService {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
 
-        String alias = String.valueOf(new SecureRandom().nextLong());
+        String alias = CryptoUtil.createAlias();
 
         long userId = DataUtils.insertUser(
                 context,
@@ -73,7 +72,6 @@ public class CreateIdentityService extends IntentService {
                 Util.getGroupKey(context),
                 Util.getPublicKey(context));
 
-        editor.putString(context.getString(R.string.alias), alias);
         editor.putInt(context.getString(R.string.user_id), (int) userId);
         editor.commit();
 

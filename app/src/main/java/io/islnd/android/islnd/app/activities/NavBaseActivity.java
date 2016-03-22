@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -195,7 +196,11 @@ public class NavBaseActivity extends AppCompatActivity
             } else {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
+                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
+                String message = friendAdded
+                        ? getString(R.string.added_new_friend_message)
+                        : getString(R.string.already_friends_message);
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
             }
         // Not QR result
         } else {

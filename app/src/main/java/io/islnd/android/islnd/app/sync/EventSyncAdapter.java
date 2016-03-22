@@ -55,36 +55,42 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.v(TAG, "starting event sync");
 
-        String[] projection = {
-                IslndContract.AliasEntry.COLUMN_ALIAS,
-                IslndContract.AliasEntry.COLUMN_GROUP_KEY,
-        };
+        boolean anyNewEventProcessed;
+        do {
+            anyNewEventProcessed = false;
+            List<EncryptedEvent> encryptedEvents = getEncryptedEvents();
+            if (encryptedEvents == null) {
+                mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+                Log.d(TAG, "event query returned null!");
+                return;
+            }
 
-        String[] args = new String[] {
-                Integer.toString(Util.getUserId(mContext)),
-        };
+            Log.v(TAG, String.format("event service returned %d events", encryptedEvents.size()));
+            PriorityQueue<Event> events = decryptEvents(encryptedEvents);
 
-        Cursor cursor = mContentResolver.query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
-                args,
-                null);
+            //--Process events in order
+            while (!events.isEmpty()) {
+                boolean newEventProcessed = EventProcessor.process(mContext, events.poll());
+                if (newEventProcessed) {
+                    anyNewEventProcessed = true;
+                }
+            }
+        } while (anyNewEventProcessed);
 
-        EventQuery eventQuery = buildEventQuery(cursor);
+        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        Log.v(TAG, "completed on perform sync");
+    }
 
-        //--Post event query to server and get result
-        List<EncryptedEvent> encryptedEvents = Rest.postEventQuery(
-                eventQuery,
-                Util.getApiKey(getContext()));
-        if (encryptedEvents == null) {
-            Log.d(TAG, "event query returned null!");
-            return;
-        }
+    @Override
+    public void onSyncCanceled() {
+        super.onSyncCanceled();
 
-        Log.v(TAG, String.format("event service returned %d events", encryptedEvents.size()));
+        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        Log.d(TAG, "sync cancelled");
+    }
 
-        //--Decrypt the events and add to queue
+    @NonNull
+    private PriorityQueue<Event> decryptEvents(List<EncryptedEvent> encryptedEvents) {
         PriorityQueue<Event> events = new PriorityQueue<>();
         for (EncryptedEvent encryptedEvent : encryptedEvents) {
             String alias = encryptedEvent.getAlias();
@@ -104,14 +110,26 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 e.printStackTrace();
             }
         }
+        return events;
+    }
 
-        //--Process events in order
-        while (!events.isEmpty()) {
-            EventProcessor.process(mContext, events.poll());
-        }
+    private List<EncryptedEvent> getEncryptedEvents() {
+        String[] projection = {
+                IslndContract.AliasEntry.COLUMN_ALIAS
+        };
 
-        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
-        Log.v(TAG, "completed on perform sync");
+        String[] args = new String[] { Integer.toString(Util.getUserId(mContext)) };
+        Cursor cursor = mContentResolver.query(
+                IslndContract.AliasEntry.CONTENT_URI,
+                projection,
+                IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
+                args,
+                null);
+
+        EventQuery eventQuery = buildEventQuery(cursor);
+        return Rest.postEventQuery(
+                eventQuery,
+                Util.getApiKey(getContext()));
     }
 
     @NonNull
@@ -122,7 +140,9 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         do {
-            aliases.add(cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_ALIAS)));
+            final String alias = cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_ALIAS));
+            Log.v(TAG, "query includes: " + alias);
+            aliases.add(alias);
         } while (cursor.moveToNext());
 
         return new EventQuery(aliases);

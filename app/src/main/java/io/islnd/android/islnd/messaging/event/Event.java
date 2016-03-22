@@ -117,6 +117,12 @@ public abstract class Event implements
                         event.getEventId(),
                         event.getTextContent());
             }
+            case EventType.CHANGE_ALIAS: {
+                return new ChangeAliasEvent(
+                        event.getAlias(),
+                        event.getEventId(),
+                        event.getTextContent());
+            }
             default: {
                 Log.d(TAG, "Cannot recognize event of type " + event.getEventType());
             }

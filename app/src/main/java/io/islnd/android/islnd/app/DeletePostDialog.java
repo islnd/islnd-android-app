@@ -39,17 +39,9 @@ public class DeletePostDialog extends DialogFragment {
                         {
                             String postId = getArguments().getString(POST_ID_BUNDLE_KEY);
                             final Context context = getContext();
-                            List<Event> deletePostEvents = new EventListBuilder(context)
+                            new EventPublisher(context)
                                     .deletePost(postId)
-                                    .build();
-
-                            for (Event event : deletePostEvents) {
-                                EventProcessor.process(context, event);
-
-                                Intent pushEventService = new Intent(context, EventPushService.class);
-                                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                                context.startService(pushEventService);
-                            }
+                                    .publish();
 
                             if (mFinishActivity) {
                                 getActivity().finish();

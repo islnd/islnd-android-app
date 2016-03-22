@@ -35,16 +35,9 @@ public class DeleteCommentDialog extends DialogFragment {
                         {
                             String commentId = getArguments().getString(COMMENT_ID_BUNDLE_KEY);
                             final Context context = getContext();
-                            List<Event> deleteCommentEvents = new EventListBuilder(context)
+                            new EventPublisher(context)
                                     .deleteComment(commentId)
-                                    .build();
-
-                            for (Event event : deleteCommentEvents) {
-                                EventProcessor.process(context, event);
-                                Intent pushEventService = new Intent(context, EventPushService.class);
-                                pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-                                context.startService(pushEventService);
-                            }
+                                    .publish();
                         })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();

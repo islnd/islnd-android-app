@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 12;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -27,10 +27,11 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.AliasEntry.COLUMN_USER_ID + " INTEGER NOT NULL, " +
                 IslndContract.AliasEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
                 IslndContract.AliasEntry.COLUMN_GROUP_KEY + " TEXT NOT NULL, " +
-                IslndContract.AliasEntry.COLUMN_ALIAS_ID + " INTEGER NOT NULL, " +
 
                 " FOREIGN KEY (" + IslndContract.AliasEntry.COLUMN_USER_ID + ") REFERENCES " +
-                IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "));";
+                IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "), " +
+
+                " UNIQUE (" + IslndContract.AliasEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_DISPLAY_NAME_TABLE = "CREATE TABLE " + IslndContract.DisplayNameEntry.TABLE_NAME + " (" +
                 IslndContract.DisplayNameEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -46,8 +47,10 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.PostEntry._ID + " INTEGER PRIMARY KEY, " +
                 IslndContract.PostEntry.COLUMN_USER_ID + " INTEGER NOT NULL, " +
                 IslndContract.PostEntry.COLUMN_POST_ID + " TEXT NOT NULL, " +
+                IslndContract.PostEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
                 IslndContract.PostEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
                 IslndContract.PostEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
+                IslndContract.PostEntry.COLUMN_COMMENT_COUNT + " INTEGER NOT NULL, " +
 
                 " FOREIGN KEY (" + IslndContract.PostEntry.COLUMN_USER_ID + ") REFERENCES " +
                 IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "), " +
@@ -57,17 +60,15 @@ public class IslndDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_COMMENT_TABLE = "CREATE TABLE " + IslndContract.CommentEntry.TABLE_NAME + " (" +
                 IslndContract.CommentEntry._ID + " INTEGER PRIMARY KEY," +
-                IslndContract.CommentEntry.COLUMN_POST_USER_ID + " INTEGER NOT NULL, " +
+                IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS + " TEXT NOT NULL, " +
                 IslndContract.CommentEntry.COLUMN_POST_ID + " TEXT NOT NULL, " +
                 IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID + " INTEGER NOT NULL, " +
                 IslndContract.CommentEntry.COLUMN_COMMENT_ID + " TEXT NOT NULL, " +
                 IslndContract.CommentEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
                 IslndContract.CommentEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
 
-                " FOREIGN KEY (" + IslndContract.CommentEntry.COLUMN_POST_USER_ID + ", " +
-                IslndContract.CommentEntry.COLUMN_POST_ID + ") REFERENCES " +
-                IslndContract.PostEntry.TABLE_NAME + " (" + IslndContract.PostEntry.COLUMN_USER_ID + ", " +
-                IslndContract.PostEntry.COLUMN_POST_ID + "), " +
+                " FOREIGN KEY (" + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID + ") REFERENCES " +
+                IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "), " +
 
                 " UNIQUE (" + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID + ", " +
                 IslndContract.CommentEntry.COLUMN_COMMENT_ID + ") ON CONFLICT IGNORE);";

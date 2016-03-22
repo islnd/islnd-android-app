@@ -20,7 +20,7 @@ public class IslndProvider extends ContentProvider {
     static final int USER = 200;
     static final int USER_WITH_ID = 201;
     static final int COMMENT = 300;
-    static final int COMMENT_WITH_POST_USER_ID_AND_POST_ID = 301;
+    static final int COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID = 301;
     static final int PROFILE = 400;
     static final int PROFILE_WITH_USER_ID = 401;
     static final int ALIAS = 500;
@@ -99,18 +99,6 @@ public class IslndProvider extends ContentProvider {
                         " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID +
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
-        );
-    }
-
-    private Cursor getPosts(Uri uri, String[] projection, String sortOrder) {
-        return sPostQueryBuilder.query(
-                mOpenHelper.getReadableDatabase(),
-                projection,
-                null,
-                null,
-                null,
-                null,
-                sortOrder
         );
     }
 
@@ -201,13 +189,13 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
-    private Cursor getCommentsByPostAuthorIdAndPostId(Uri uri, String[] projection, String sortOrder) {
-        int userId = IslndContract.CommentEntry.getUserIdFromUri(uri);
+    private Cursor getCommentsByPostAuthorAliasAndPostId(Uri uri, String[] projection, String sortOrder) {
+        String postAuthorAlias = IslndContract.CommentEntry.getUserAliasFromUri(uri);
         String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
 
-        String selection = IslndContract.CommentEntry.COLUMN_POST_USER_ID + " = ? AND " +
+        String selection = IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS + " = ? AND " +
                 IslndContract.CommentEntry.COLUMN_POST_ID + " = ?";
-        String[] selectionArgs = {Integer.toString(userId), postId};
+        String[] selectionArgs = {postAuthorAlias, postId};
 
         return sCommentQueryBuilder.query(
                 mOpenHelper.getReadableDatabase(),
@@ -262,7 +250,8 @@ public class IslndProvider extends ContentProvider {
         matcher.addURI(authority, IslndContract.PATH_POST + "/#", POST_WITH_USER);
 
         matcher.addURI(authority, IslndContract.PATH_COMMENT, COMMENT);
-        matcher.addURI(authority, IslndContract.PATH_COMMENT + "/#/*", COMMENT_WITH_POST_USER_ID_AND_POST_ID);
+        matcher.addURI(authority, IslndContract.PATH_COMMENT + "/*/*",
+                COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID);
 
         matcher.addURI(authority, IslndContract.PATH_USER, USER);
         matcher.addURI(authority, IslndContract.PATH_USER + "/#", USER_WITH_ID);
@@ -296,7 +285,14 @@ public class IslndProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case POST: {
-                retCursor = getPosts(uri, projection, sortOrder);
+                retCursor = sPostQueryBuilder.query(
+                            mOpenHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
                 break;
             }
             case POST_WITH_USER: {
@@ -318,8 +314,19 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getUserByUserId(uri, projection, sortOrder);
                 break;
             }
-            case COMMENT_WITH_POST_USER_ID_AND_POST_ID: {
-                retCursor = getCommentsByPostAuthorIdAndPostId(uri, projection, sortOrder);
+            case COMMENT: {
+                return sCommentQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+            }
+            case COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID: {
+                retCursor = getCommentsByPostAuthorAliasAndPostId(uri, projection, sortOrder);
                 break;
             }
             case PROFILE: {
@@ -413,7 +420,7 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.UserEntry.CONTENT_ITEM_TYPE;
             case COMMENT:
                 return IslndContract.CommentEntry.CONTENT_TYPE;
-            case COMMENT_WITH_POST_USER_ID_AND_POST_ID:
+            case COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID:
                 return IslndContract.CommentEntry.CONTENT_TYPE;
             case PROFILE:
                 return IslndContract.ProfileEntry.CONTENT_TYPE;
@@ -460,7 +467,11 @@ public class IslndProvider extends ContentProvider {
                 break;
             }
             case ALIAS: {
-                long _id = db.insert(IslndContract.AliasEntry.TABLE_NAME, null, values);
+                long _id = db.insertWithOnConflict(
+                        IslndContract.AliasEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.AliasEntry.buildAliasUri(_id);
                 } else {
@@ -681,6 +692,17 @@ public class IslndProvider extends ContentProvider {
                 );
                 break;
             }
+            case POST: {
+                rowsUpdated = db.update(
+                        IslndContract.PostEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+                Log.v(TAG, "update post updated " + rowsUpdated);
+                getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
+                break;
+            }
             case PROFILE_WITH_USER_ID: {
                 updateProfileWithUserId(uri, values);
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
@@ -700,6 +722,18 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
+                break;
+            }
+            case ALIAS_WITH_USER_ID: {
+                String[] args = new String[] {
+                        Integer.toString(IslndContract.AliasEntry.getUserIdFromUri(uri))
+                };
+
+                db.update(
+                        IslndContract.AliasEntry.TABLE_NAME,
+                        values,
+                        IslndContract.AliasEntry.COLUMN_USER_ID + " = ?",
+                        args);
                 break;
             }
             default: {
