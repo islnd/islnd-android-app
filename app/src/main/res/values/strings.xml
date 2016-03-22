@@ -43,7 +43,6 @@
     <string name="private_key">PRIVATE_KEY</string>
     <string name="public_key">PUBLIC_KEY</string>
     <string name="group_key">group_key</string>
-    <string name="pseudonym_seed">pseudonym_seed</string>
     <string name="alias">alias</string>
     <string name="server_time_offset">server_time_offset</string>
 
@@ -124,4 +123,5 @@
     <string name="verifying_api_key_message">Verifying API Key&#8230;</string>
     <string name="invalid_api_key">Invalid API Key</string>
     <string name="comment_id_key">comment_id</string>
+    <string name="creating_identity_message">Creating identity…</string>
 </resources>

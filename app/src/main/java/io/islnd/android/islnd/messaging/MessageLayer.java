@@ -17,14 +17,6 @@ import java.security.Key;
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
-    public static String getPseudonym(Context context, String seed) {
-        return Rest.getPseudonym(seed, Util.getApiKey(context));
-    }
-
-    public static Boolean getPing(String apiKey) {
-        return Rest.getPing(apiKey);
-    }
-
     public static boolean addFriendFromEncodedIdentityString(Context context,
                                                              String encodedString) {
         Log.v(TAG, "adding friend from encoded string: " + encodedString);

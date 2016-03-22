@@ -1,11 +1,8 @@
 package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -40,10 +37,10 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.util.List;
 
+import io.islnd.android.islnd.app.CreateIdentityService;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.IslndDb;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
