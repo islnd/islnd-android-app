@@ -228,4 +228,23 @@ public class DataUtils {
 
         context.getContentResolver().insert(IslndContract.ProfileEntry.CONTENT_URI, values);
     }
+
+    public static boolean containsPublicKey(Context context, Key publicKey) {
+        String[] projection = new String[0];
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?",
+                    new String[] {CryptoUtil.encodeKey(publicKey)},
+                    null);
+            return cursor.moveToFirst();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }

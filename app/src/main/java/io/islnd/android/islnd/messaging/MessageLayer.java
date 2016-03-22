@@ -25,11 +25,15 @@ public class MessageLayer {
         return addFriendToDatabaseAndCreateDefaultProfile(context, pk);
     }
 
-    private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity pk) {
-        //--TODO only add if not already friends
-        long userId = DataUtils.insertUser(context, pk);
+    private static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity) {
+        if (DataUtils.containsPublicKey(context, identity.getPublicKey())) {
+            return false;
+        }
 
-        Profile profile = Util.buildDefaultProfile(context, pk.getDisplayName());
+        //--TODO only add if not already friends
+        long userId = DataUtils.insertUser(context, identity);
+
+        Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
         DataUtils.insertProfile(context, profile, userId);
 
         return true;
