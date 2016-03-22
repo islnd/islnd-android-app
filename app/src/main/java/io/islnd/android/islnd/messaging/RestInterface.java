@@ -33,6 +33,9 @@ public interface RestInterface {
             @Body String publicKey,
             @Query("apiKey") String apiKey);
 
+    @GET("/ping/")
+    Call<Void> getPing(
+            @Query("apiKey") String apiKey);
 
     @POST("/event")
     Call<Void> postEvent(

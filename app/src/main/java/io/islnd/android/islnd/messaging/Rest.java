@@ -81,6 +81,28 @@ public class Rest {
         return null;
     }
 
+    public static Boolean getPing(String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+        try {
+            Response<Void> result = service.getPing(apiKey).execute();
+            if (result.code() == HTTP_OK) {
+                return true;
+            }
+            else {
+                Log.d(TAG, "/ping GET returned code " + result.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public static int postEvent(EncryptedEvent encryptedEvent, String apiKey) throws IOException {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)

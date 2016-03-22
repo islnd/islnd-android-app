@@ -113,5 +113,15 @@
     <string name="view_friends_fragment">Friends</string>
     <string name="discard_profile_changes_dialog">Discard changes?</string>
     <string name="discard">Discard</string>
+    <string name="has_created_account">has_created_account</string>
+    <string name="create_account_welcome_message">Welcome</string>
+    <string name="display_name_text">Display Name</string>
+    <string name="create_account_text">Create Account</string>
+    <string name="api_key_string">API Key</string>
+    <string name="uses_api_key">uses_api_key</string>
+    <string name="create_account_summary_message">Pick your display name and we\'ll generate your keys</string>
+    <string name="please_wait_title">Please wait</string>
+    <string name="verifying_api_key_message">Verifying API Key&#8230;</string>
+    <string name="invalid_api_key">Invalid API Key</string>
     <string name="comment_id_key">comment_id</string>
 </resources>
