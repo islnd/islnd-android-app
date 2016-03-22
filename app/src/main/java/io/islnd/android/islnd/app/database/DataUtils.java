@@ -8,7 +8,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import io.islnd.android.islnd.app.models.Comment;
 import io.islnd.android.islnd.app.models.CommentKey;
+import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 
 import io.islnd.android.islnd.app.models.Profile;
@@ -278,6 +280,45 @@ public class DataUtils {
                         String.format("database has no entry for post user id %s post id %d",
                                 postAuthorAlias,
                                 postId));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static PostAliasKey getParentPostFromComment(Context context, int commmentAuthorUserId, String commentId) {
+        String[] projection = new String[] {
+                IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS,
+                IslndContract.CommentEntry.COLUMN_POST_ID
+        };
+
+        String selection =
+                IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID + " = ? AND " +
+                IslndContract.CommentEntry.COLUMN_COMMENT_ID + " = ?";
+        String[] selectionArgs = new String[] {
+                Integer.toString(commmentAuthorUserId),
+                commentId
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.CommentEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null);
+            if (cursor.moveToFirst()) {
+                return new PostAliasKey(
+                        cursor.getString(0),
+                        cursor.getString(1));
+            } else {
+                throw new IllegalArgumentException(
+                        String.format("database has no entry for comment user id %s comment id %s",
+                                commmentAuthorUserId,
+                                commentId));
             }
         } finally {
             if (cursor != null) {

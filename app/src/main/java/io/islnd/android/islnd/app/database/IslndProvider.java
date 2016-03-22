@@ -314,6 +314,17 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getUserByUserId(uri, projection, sortOrder);
                 break;
             }
+            case COMMENT: {
+                return sCommentQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+            }
             case COMMENT_WITH_POST_AUTHOR_ALIAS_AND_POST_ID: {
                 retCursor = getCommentsByPostAuthorAliasAndPostId(uri, projection, sortOrder);
                 break;

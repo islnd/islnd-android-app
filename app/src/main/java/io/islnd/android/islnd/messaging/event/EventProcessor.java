@@ -10,6 +10,7 @@ import android.util.Log;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.CommentKey;
+import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.util.ImageUtil;
 
@@ -181,7 +182,9 @@ public class EventProcessor {
                 newCommentEvent.getPostId());
         Log.v(TAG, "comment count is " + commentCount);
 
-        Log.v(TAG, "update comment count for " + newCommentEvent.getPostAuthorAlias() + " " + newCommentEvent.getPostId());
+        Log.v(
+                TAG,
+                "update comment count for " + newCommentEvent.getPostAuthorAlias() + " " + newCommentEvent.getPostId());
         ContentValues updateValues = new ContentValues();
         updateValues.put(IslndContract.PostEntry.COLUMN_COMMENT_COUNT, commentCount + 1);
         String selection = IslndContract.PostEntry.COLUMN_ALIAS + " = ? AND " +
@@ -198,9 +201,33 @@ public class EventProcessor {
     }
 
     private static void deleteComment(Context context, DeleteCommentEvent deleteCommentEvent) {
-        int postUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
-        CommentKey commentToDelete = new CommentKey(postUserId, deleteCommentEvent.getCommentId());
+        int commentUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
+        PostAliasKey postAliasKey = DataUtils.getParentPostFromComment(
+                context,
+                commentUserId,
+                deleteCommentEvent.getCommentId());
+
+        CommentKey commentToDelete = new CommentKey(commentUserId, deleteCommentEvent.getCommentId());
         DataUtils.deleteComment(context, commentToDelete);
+
+        int commentCount = DataUtils.getCommentCount(
+                context,
+                postAliasKey.getPostAuthorAlias(),
+                postAliasKey.getPostId());
+
+        ContentValues updateValues = new ContentValues();
+        updateValues.put(IslndContract.PostEntry.COLUMN_COMMENT_COUNT, commentCount - 1);
+        String selection = IslndContract.PostEntry.COLUMN_ALIAS + " = ? AND " +
+                IslndContract.PostEntry.COLUMN_POST_ID + " = ?";
+        String[] selectionArgs = new String[] {
+                postAliasKey.getPostAuthorAlias(),
+                postAliasKey.getPostId()
+        };
+        context.getContentResolver().update(
+                IslndContract.PostEntry.CONTENT_URI,
+                updateValues,
+                selection,
+                selectionArgs);
     }
 
     private static void recordEventProcessed(Event event) {
