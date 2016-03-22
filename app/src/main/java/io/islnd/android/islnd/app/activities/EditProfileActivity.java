@@ -34,6 +34,8 @@ import java.io.File;
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static String TAG = EditProfileActivity.class.getSimpleName();
 
+    public static final int LOADER_ID = 3;
+
     private static final int SELECT_PROFILE_IMAGE = 1;
     private static final int SELECT_HEADER_IMAGE = 2;
     private static final int CROP_PROFILE_IMAGE = 3;
@@ -63,7 +65,7 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
         mProfileImageView = (ImageView) findViewById(R.id.profile_profile_image);
         mHeaderImageView = (ImageView) findViewById(R.id.profile_header_image);
 
-        getSupportLoaderManager().initLoader(0, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
     }
 
     @Override

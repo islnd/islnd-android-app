@@ -56,7 +56,7 @@ public class ViewFriendsFragment extends Fragment {
         FriendLoader friendLoader = new FriendLoader(
                 mContext,
                 mAdapter);
-        getLoaderManager().initLoader(0, args, friendLoader);
+        getLoaderManager().initLoader(FriendLoader.LOADER_ID, args, friendLoader);
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
