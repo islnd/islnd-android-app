@@ -9,13 +9,10 @@ import android.net.Uri;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
@@ -23,7 +20,6 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.GlancePostViewHolder;
@@ -52,12 +48,11 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
                 cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
                 cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_POST_ID)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_ALIAS)),
                 cursor.getLong(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_TIMESTAMP)),
-                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_CONTENT)),
-                new ArrayList<>()
-        );
+                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_CONTENT)));
 
-        holder.postUserName.setText(post.getUserName());
+        holder.postUserName.setText(post.getDisplayName());
         holder.postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, post.getTimestamp()));
         holder.postContent.setText(post.getContent());
         //TODO: Get actual comment count

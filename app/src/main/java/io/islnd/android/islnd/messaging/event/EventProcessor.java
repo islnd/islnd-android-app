@@ -159,10 +159,9 @@ public class EventProcessor {
 
     private static void addComment(Context context, NewCommentEvent newCommentEvent) {
         int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
-        int postUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getPostAuthorAlias());
 
         ContentValues values = new ContentValues();
-        values.put(IslndContract.CommentEntry.COLUMN_POST_USER_ID, postUserId);
+        values.put(IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS, newCommentEvent.getPostAuthorAlias());
         values.put(IslndContract.CommentEntry.COLUMN_POST_ID, newCommentEvent.getPostId());
         values.put(IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID, commentUserId);
         values.put(IslndContract.CommentEntry.COLUMN_COMMENT_ID, newCommentEvent.getCommentId());

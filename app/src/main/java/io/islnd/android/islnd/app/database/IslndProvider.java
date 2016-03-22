@@ -201,13 +201,13 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
-    private Cursor getCommentsByPostAuthorIdAndPostId(Uri uri, String[] projection, String sortOrder) {
-        int userId = IslndContract.CommentEntry.getUserIdFromUri(uri);
+    private Cursor getCommentsByPostAuthorAliasAndPostId(Uri uri, String[] projection, String sortOrder) {
+        String postAuthorAlias = IslndContract.CommentEntry.getUserAliasFromUri(uri);
         String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
 
-        String selection = IslndContract.CommentEntry.COLUMN_POST_USER_ID + " = ? AND " +
+        String selection = IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS + " = ? AND " +
                 IslndContract.CommentEntry.COLUMN_POST_ID + " = ?";
-        String[] selectionArgs = {Integer.toString(userId), postId};
+        String[] selectionArgs = {postAuthorAlias, postId};
 
         return sCommentQueryBuilder.query(
                 mOpenHelper.getReadableDatabase(),
@@ -319,7 +319,7 @@ public class IslndProvider extends ContentProvider {
                 break;
             }
             case COMMENT_WITH_POST_USER_ID_AND_POST_ID: {
-                retCursor = getCommentsByPostAuthorIdAndPostId(uri, projection, sortOrder);
+                retCursor = getCommentsByPostAuthorAliasAndPostId(uri, projection, sortOrder);
                 break;
             }
             case PROFILE: {

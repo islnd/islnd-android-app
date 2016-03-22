@@ -12,7 +12,7 @@ import io.islnd.android.islnd.app.database.IslndContract;
 
 public class CommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String POST_AUTHOR_ID_BUNDLE_KEY = "post_author_bundle_key";
+    public static final String POST_AUTHOR_ALIAS_BUNDLE_KEY = "post_author_alias_bundle_key";
     public static final String POST_ID_BUNDLE_KEY = "post_id_bundle_key";
 
     private final Context mContext;
@@ -29,7 +29,6 @@ public class CommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
                 IslndContract.CommentEntry.TABLE_NAME + "." + IslndContract.CommentEntry._ID,
-                IslndContract.CommentEntry.COLUMN_POST_USER_ID,
                 IslndContract.CommentEntry.COLUMN_POST_ID,
                 IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID,
                 IslndContract.CommentEntry.COLUMN_COMMENT_ID,
@@ -37,11 +36,13 @@ public class CommentLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                 IslndContract.CommentEntry.COLUMN_CONTENT,
         };
 
-        int postAuthorId = args.getInt(POST_AUTHOR_ID_BUNDLE_KEY);
+        String postAuthorAlias = args.getString(POST_AUTHOR_ALIAS_BUNDLE_KEY);
         String postId = args.getString(POST_ID_BUNDLE_KEY);
         return new CursorLoader(
                 mContext,
-                IslndContract.CommentEntry.buildCommentUriWithPostAuthorIdAndPostId(postAuthorId, postId),
+                IslndContract.CommentEntry.buildCommentUriWithPostAuthorIdAndPostId(
+                        postAuthorAlias,
+                        postId),
                 projection,
                 null,
                 null,

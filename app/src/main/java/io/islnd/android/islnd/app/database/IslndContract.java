@@ -33,6 +33,7 @@ public class IslndContract {
         public static final String TABLE_NAME = "post";
 
         public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_ALIAS = "alias";
         public static final String COLUMN_POST_ID = "post_id";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_TIMESTAMP = "timestamp";
@@ -155,7 +156,7 @@ public class IslndContract {
 
         public static final String TABLE_NAME = "comment";
 
-        public static final String COLUMN_POST_USER_ID = "post_user_id";
+        public static final String COLUMN_POST_AUTHOR_ALIAS = "post_alias";
         public static final String COLUMN_POST_ID = "post_id";
         public static final String COLUMN_COMMENT_USER_ID = "comment_user_id";
         public static final String COLUMN_COMMENT_ID = "comment_id";
@@ -166,17 +167,17 @@ public class IslndContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static int getUserIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(1));
+        public static String getUserAliasFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
 
         public static String getPostIdFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }
 
-        public static Uri buildCommentUriWithPostAuthorIdAndPostId(int postAuthorId, String postId) {
+        public static Uri buildCommentUriWithPostAuthorIdAndPostId(String postAuthorAlias, String postId) {
             return CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(postAuthorId))
+                    .appendPath(postAuthorAlias)
                     .appendPath(postId)
                     .build();
         }
