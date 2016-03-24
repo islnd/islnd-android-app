@@ -28,8 +28,9 @@ public class IslndProvider extends ContentProvider {
     static final int DISPLAY_NAME = 600;
     static final int DISPLAY_NAME_WITH_USER_ID = 601;
     static final int IDENTITY = 700;
-    static final int EVENT = 800;
-    static final int EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
+    static final int RECEIVED_EVENT = 800;
+    static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
+    static final int OUTGOING_EVENT = 900;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -209,18 +210,18 @@ public class IslndProvider extends ContentProvider {
     }
 
     private Cursor getEventByAliasAndUserId(Uri uri, String[] projection, String sortOrder) {
-        String alias = IslndContract.EventEntry.getAliasFromUri(uri);
-        int eventId = IslndContract.EventEntry.getEventIdFromUri(uri);
+        String alias = IslndContract.ReceivedEventEntry.getAliasFromUri(uri);
+        int eventId = IslndContract.ReceivedEventEntry.getEventIdFromUri(uri);
 
-        String selection = IslndContract.EventEntry.COLUMN_ALIAS + " = ? AND " +
-                IslndContract.EventEntry.COLUMN_EVENT_ID + " = ?";
+        String selection = IslndContract.ReceivedEventEntry.COLUMN_ALIAS + " = ? AND " +
+                IslndContract.ReceivedEventEntry.COLUMN_EVENT_ID + " = ?";
         String[] selectionArgs = {
                 alias,
                 Integer.toString(eventId)
         };
 
         return mOpenHelper.getReadableDatabase().query(
-                IslndContract.EventEntry.TABLE_NAME,
+                IslndContract.ReceivedEventEntry.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,
@@ -267,8 +268,12 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_IDENTITY, IDENTITY);
 
-        matcher.addURI(authority, IslndContract.PATH_EVENT, EVENT);
-        matcher.addURI(authority, IslndContract.PATH_EVENT + "/*/#", EVENT_WITH_ALIAS_AND_EVENT_ID);
+        matcher.addURI(authority, IslndContract.PATH_RECEIVED_EVENT, RECEIVED_EVENT);
+        matcher.addURI(authority,
+                IslndContract.PATH_RECEIVED_EVENT + "/*/#",
+                RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID);
+
+        matcher.addURI(authority, IslndContract.PATH_OUTGOING_EVENT, OUTGOING_EVENT);
 
         return matcher;
     }
@@ -391,8 +396,19 @@ public class IslndProvider extends ContentProvider {
                 retCursor = getAliasesByUserId(uri, projection, sortOrder);
                 break;
             }
-            case EVENT_WITH_ALIAS_AND_EVENT_ID: {
+            case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID: {
                 retCursor = getEventByAliasAndUserId(uri, projection, sortOrder);
+                break;
+            }
+            case OUTGOING_EVENT: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.OutgoingEventEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
             }
 
@@ -426,10 +442,10 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.ProfileEntry.CONTENT_TYPE;
             case PROFILE_WITH_USER_ID:
                 return IslndContract.ProfileEntry.CONTENT_ITEM_TYPE;
-            case EVENT:
-                return IslndContract.EventEntry.CONTENT_TYPE;
-            case EVENT_WITH_ALIAS_AND_EVENT_ID:
-                return IslndContract.EventEntry.CONTENT_ITEM_TYPE;
+            case RECEIVED_EVENT:
+                return IslndContract.ReceivedEventEntry.CONTENT_TYPE;
+            case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID:
+                return IslndContract.ReceivedEventEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -525,19 +541,19 @@ public class IslndProvider extends ContentProvider {
 
                 break;
             }
-            case EVENT: {
+            case RECEIVED_EVENT: {
                 long _id = db.insertWithOnConflict(
-                        IslndContract.EventEntry.TABLE_NAME,
+                        IslndContract.ReceivedEventEntry.TABLE_NAME,
                         null,
                         values,
                         SQLiteDatabase.CONFLICT_IGNORE);
                 if ( _id > 0 )
-                    returnUri = IslndContract.EventEntry.buildEventUri(_id);
+                    returnUri = IslndContract.ReceivedEventEntry.buildEventUri(_id);
                 else
                     return null;
                 break;
             }
-            case EVENT_WITH_ALIAS_AND_EVENT_ID: {
+            case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID: {
                 returnUri = insertEventWithAliasAndUri(db, uri);
                 break;
             }
@@ -553,18 +569,18 @@ public class IslndProvider extends ContentProvider {
     private Uri insertEventWithAliasAndUri(SQLiteDatabase db, Uri uri) {
         ContentValues values = new ContentValues();
         values.put(
-                IslndContract.EventEntry.COLUMN_ALIAS,
-                IslndContract.EventEntry.getAliasFromUri(uri));
+                IslndContract.ReceivedEventEntry.COLUMN_ALIAS,
+                IslndContract.ReceivedEventEntry.getAliasFromUri(uri));
         values.put(
-                IslndContract.EventEntry.COLUMN_EVENT_ID,
-                IslndContract.EventEntry.getEventIdFromUri(uri));
+                IslndContract.ReceivedEventEntry.COLUMN_EVENT_ID,
+                IslndContract.ReceivedEventEntry.getEventIdFromUri(uri));
         long _id = db.insertWithOnConflict(
-                IslndContract.EventEntry.TABLE_NAME,
+                IslndContract.ReceivedEventEntry.TABLE_NAME,
                 null,
                 values,
                 SQLiteDatabase.CONFLICT_IGNORE);
         if ( _id > 0 )
-            return IslndContract.EventEntry.buildEventUri(_id);
+            return IslndContract.ReceivedEventEntry.buildEventUri(_id);
         else
             return null;
     }
@@ -599,6 +615,25 @@ public class IslndProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(IslndContract.CommentEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
+            case OUTGOING_EVENT: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(IslndContract.OutgoingEventEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }
@@ -659,9 +694,14 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.DisplayNameEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
-            case EVENT: {
+            case RECEIVED_EVENT: {
                 rowsDeleted = db.delete(
-                        IslndContract.EventEntry.TABLE_NAME, selection, selectionArgs);
+                        IslndContract.ReceivedEventEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case OUTGOING_EVENT: {
+                rowsDeleted = db.delete(
+                        IslndContract.OutgoingEventEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:

@@ -10,7 +10,9 @@ import io.islnd.android.islnd.messaging.event.Event;
 public class IslndContract {
 
     public static final String CONTENT_AUTHORITY = "io.islnd.android.islnd.app.database";
+
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
     public static final String PATH_USER = "user";
     public static final String PATH_ALIAS = "alias";
     public static final String PATH_DISPLAY_NAME = "display_name";
@@ -18,7 +20,8 @@ public class IslndContract {
     public static final String PATH_COMMENT = "comment";
     public static final String PATH_PROFILE = "profile";
     public static final String PATH_IDENTITY = "identity";
-    public static final String PATH_EVENT = "event";
+    public static final String PATH_RECEIVED_EVENT = "received_event";
+    public static final String PATH_OUTGOING_EVENT = "outgoing_event";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -217,33 +220,17 @@ public class IslndContract {
         }
     }
 
-    public static final class IdentityEntry {
-        private static final String TAG = IdentityEntry.class.getSimpleName();
+    public static final class ReceivedEventEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_IDENTITY).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECEIVED_EVENT).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IDENTITY;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RECEIVED_EVENT;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IDENTITY;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RECEIVED_EVENT;
 
-        public static Uri buildProfileUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-    }
-
-    public static final class EventEntry implements BaseColumns {
-
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENT).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENT;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENT;
-
-        public static final String TABLE_NAME = "event";
+        public static final String TABLE_NAME = "received_event";
 
         public static final String COLUMN_ALIAS = "alias";
         public static final String COLUMN_EVENT_ID = "event_id";
@@ -266,5 +253,21 @@ public class IslndContract {
         public static Uri buildEventUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+    }
+
+    public static final class OutgoingEventEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_OUTGOING_EVENT).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
+
+        public static final String TABLE_NAME = "outgoing_event";
+
+        public static final String COLUMN_ALIAS = "alias";
+        public static final String COLUMN_BLOB = "blob";
     }
 }

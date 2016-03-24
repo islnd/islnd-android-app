@@ -9,9 +9,11 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ import io.islnd.android.islnd.messaging.event.EventProcessor;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 
 public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
+
     private static final String TAG = EventSyncAdapter.class.getSimpleName();
 
     private Context mContext;
@@ -53,8 +56,11 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.v(TAG, "starting event sync");
+        Log.v(TAG, "onPerformSync");
 
+        pushOutgoingEvents(provider);
+
+        //--Receive incoming events
         boolean anyNewEventProcessed;
         do {
             anyNewEventProcessed = false;
@@ -79,6 +85,47 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
         mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
         Log.v(TAG, "completed on perform sync");
+    }
+
+    private void pushOutgoingEvents(ContentProviderClient provider) {
+        String[] projections = new String[] {
+                IslndContract.OutgoingEventEntry.COLUMN_ALIAS,
+                IslndContract.OutgoingEventEntry.COLUMN_BLOB
+        };
+        try {
+            Cursor cursor = provider.query(
+                    IslndContract.OutgoingEventEntry.CONTENT_URI,
+                    projections,
+                    null,
+                    null,
+                    null
+            );
+            Log.v(TAG, String.format("found %d outgoing events", cursor.getCount()));
+            if (cursor.moveToFirst()) {
+                String apiKey = Util.getApiKey(mContext);
+
+                do {
+                    EncryptedEvent encryptedEvent = new EncryptedEvent(
+                            cursor.getString(1),
+                            cursor.getString(0)
+                    );
+                    Rest.postEvent(encryptedEvent, apiKey);
+                } while (cursor.moveToNext());
+
+                int records = mContentResolver.delete(
+                        IslndContract.OutgoingEventEntry.CONTENT_URI,
+                        null,
+                        null
+                );
+                Log.v(TAG, String.format("posted and deleted %d events", records));
+            }
+        } catch (RemoteException e) {
+            Log.d(TAG, "RemoteException: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.d(TAG, "IOException: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override

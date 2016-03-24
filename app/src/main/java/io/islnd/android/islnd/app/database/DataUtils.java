@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import io.islnd.android.islnd.app.models.Comment;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -218,7 +217,7 @@ public class DataUtils {
         contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
-        contentResolver.delete(IslndContract.EventEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.ReceivedEventEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {

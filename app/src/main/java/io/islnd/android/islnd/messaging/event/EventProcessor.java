@@ -232,21 +232,21 @@ public class EventProcessor {
 
     private static void recordEventProcessed(Event event) {
         mContentResolver.insert(
-                IslndContract.EventEntry.buildEventUriWithPseudonymAndEventId(event),
+                IslndContract.ReceivedEventEntry.buildEventUriWithPseudonymAndEventId(event),
                 new ContentValues()
         );
     }
 
     private static boolean alreadyProcessed(Event event) {
         String[] projection = new String[] {
-                IslndContract.EventEntry._ID
+                IslndContract.ReceivedEventEntry._ID
         };
 
         Cursor cursor = null;
         boolean alreadyProcessed;
         try {
             cursor = mContentResolver.query(
-                    IslndContract.EventEntry.buildEventUriWithPseudonymAndEventId(event),
+                    IslndContract.ReceivedEventEntry.buildEventUriWithPseudonymAndEventId(event),
                     projection,
                     null,
                     null,
