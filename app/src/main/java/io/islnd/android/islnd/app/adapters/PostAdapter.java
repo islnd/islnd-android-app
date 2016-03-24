@@ -13,13 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.DeletePostDialog;
+import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.DeletePostDialog;
+import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.models.Post;
-import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.app.viewholders.GlancePostViewHolder;

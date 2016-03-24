@@ -2,16 +2,14 @@ package io.islnd.android.islnd.app.models;
 
 import java.io.Serializable;
 
-public class CommentViewModel implements Serializable
-{
+public class CommentViewModel implements Serializable {
     private final String username;
     private final int userId;
     private final String commentId;
     private final String comment;
     private final long timestamp;
 
-    public CommentViewModel(String username, int userId, String commentId, String comment, long timestamp)
-    {
+    public CommentViewModel(String username, int userId, String commentId, String comment, long timestamp) {
         this.username = username;
         this.userId = userId;
         this.commentId = commentId;
@@ -27,13 +25,11 @@ public class CommentViewModel implements Serializable
         this.timestamp = System.currentTimeMillis();
     }
 
-    public String getComment()
-    {
+    public String getComment() {
         return comment;
     }
 
-    public String getUsername()
-    {
+    public String getUsername() {
         return username;
     }
 

@@ -36,24 +36,15 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import java.util.List;
-
-import io.islnd.android.islnd.app.CreateIdentityService;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-
 import io.islnd.android.islnd.messaging.MessageLayer;
-import io.islnd.android.islnd.app.EventPushService;
-import io.islnd.android.islnd.messaging.event.Event;
-import io.islnd.android.islnd.messaging.event.EventListBuilder;
-import io.islnd.android.islnd.messaging.event.EventProcessor;
 import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends AppCompatActivity

@@ -13,10 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.DeleteCommentDialog;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.DeleteCommentDialog;
 import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.util.ImageUtil;

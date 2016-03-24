@@ -1,11 +1,11 @@
 package io.islnd.android.islnd.messaging.crypto;
 
+import java.security.Key;
+import java.util.Arrays;
+
 import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
-
-import java.security.Key;
-import java.util.Arrays;
 
 public class ObjectSigner {
 

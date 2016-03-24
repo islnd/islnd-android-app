@@ -2,8 +2,7 @@ package io.islnd.android.islnd.app.models;
 
 import java.io.Serializable;
 
-public class Post implements Serializable
-{
+public class Post implements Serializable {
     private static final String TAG = Post.class.getSimpleName();
 
     public static String POST_EXTRA = "POST_OBJECT";
@@ -22,8 +21,7 @@ public class Post implements Serializable
                 String postId,
                 long timestamp,
                 String content,
-                int commentCount)
-    {
+                int commentCount) {
         this.displayName = displayName;
         this.userId = userId;
         this.alias = alias;
@@ -33,18 +31,15 @@ public class Post implements Serializable
         this.commentCount = commentCount;
     }
 
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
         return displayName;
     }
 
-    public long getTimestamp()
-    {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public String getContent()
-    {
+    public String getContent() {
         return content;
     }
 

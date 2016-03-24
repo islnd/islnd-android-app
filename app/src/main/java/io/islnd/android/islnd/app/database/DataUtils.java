@@ -8,16 +8,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import io.islnd.android.islnd.app.models.Comment;
+import java.security.Key;
+
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
-
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
-
-import java.security.Key;
 
 public class DataUtils {
     private static final String TAG = DataUtils.class.getSimpleName();

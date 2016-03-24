@@ -2,11 +2,11 @@ package io.islnd.android.islnd.messaging;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
-import io.islnd.android.islnd.messaging.proto.IslandProto;
-
 import java.io.Serializable;
 import java.security.Key;
+
+import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
+import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class Identity implements Serializable, ProtoSerializable<Identity> {
     private final String displayName;

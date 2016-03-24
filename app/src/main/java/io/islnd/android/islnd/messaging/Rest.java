@@ -2,16 +2,15 @@ package io.islnd.android.islnd.messaging;
 
 import android.util.Log;
 
+import java.io.IOException;
+import java.util.List;
+
 import io.islnd.android.islnd.messaging.crypto.EncryptedData;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.interceptor.DelayInterceptor;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
-
-import java.io.IOException;
-import java.util.List;
-
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

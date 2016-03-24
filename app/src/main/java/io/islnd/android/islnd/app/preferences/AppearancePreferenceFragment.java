@@ -15,7 +15,6 @@ import io.islnd.android.islnd.app.util.Util;
 
 public class AppearancePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener {
-
     private static final String TAG = AppearancePreferenceFragment.class.getSimpleName();
 
     public static final String PREFERENCE_THEME_KEY = "pref_theme_key";
@@ -87,8 +86,7 @@ public class AppearancePreferenceFragment extends PreferenceFragmentCompat
     private void showRestartActivityDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
         builder.setMessage(getString(R.string.restart_settings_message))
-                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
-                {
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) -> {
                     Util.restartActivity((AppCompatActivity) getContext());
                 })
                 .setNegativeButton(android.R.string.cancel, null)

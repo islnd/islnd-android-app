@@ -15,22 +15,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-
-import io.islnd.android.islnd.app.EventPublisher;
-import io.islnd.android.islnd.app.EventPushService;
-import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.util.ImageUtil;
-import io.islnd.android.islnd.messaging.event.Event;
-import io.islnd.android.islnd.messaging.event.EventListBuilder;
-import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+
+import io.islnd.android.islnd.app.EventPublisher;
+import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.util.ImageUtil;
 
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 

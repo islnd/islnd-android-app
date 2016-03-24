@@ -1,11 +1,11 @@
 package io.islnd.android.islnd.messaging.crypto;
 
 
+import java.security.Key;
+
 import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
-
-import java.security.Key;
 
 public class ObjectEncrypter {
     private static Encoder encoder = new Encoder();
