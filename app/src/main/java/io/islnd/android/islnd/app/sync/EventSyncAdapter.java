@@ -59,8 +59,14 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.v(TAG, "onPerformSync");
 
         pushOutgoingEvents(provider);
+        getIncomingEvents();
+        
+        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
 
-        //--Receive incoming events
+        Log.v(TAG, "completed on perform sync");
+    }
+
+    private void getIncomingEvents() {
         boolean anyNewEventProcessed;
         do {
             anyNewEventProcessed = false;
@@ -82,9 +88,6 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         } while (anyNewEventProcessed);
-
-        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
-        Log.v(TAG, "completed on perform sync");
     }
 
     private void pushOutgoingEvents(ContentProviderClient provider) {
