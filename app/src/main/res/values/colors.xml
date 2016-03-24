@@ -13,20 +13,16 @@
     <color name="background">#FAFAFA</color>
     <color name="background_core">#FFFFFF</color>
     <color name="background_mat">#FAFAFA</color>
-
     <color name="icons">#FFFFFF</color>
 
     <!-- Other Colors -->
     <color name="transparent_black">#99000000</color>
-
     <color name="translucent_scrim_top">#26000000</color>
     <color name="translucent_scrim_top_center">#0C000000</color>
     <color name="translucent_scrim_bottom">#2A000000</color>
     <color name="translucent_scrim_bottom_center">#0D000000</color>
-
     <color name="splash_background">#FAFAFA</color>
     <color name="splash_text">#8A000000</color>
-
     <color name="active_icon">#8a000000</color>
     <color name="inactive_icon">#42000000</color>
     <color name="black_tint">#61000000</color>

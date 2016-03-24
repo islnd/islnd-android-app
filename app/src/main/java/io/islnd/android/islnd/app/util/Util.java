@@ -254,7 +254,7 @@ public class Util {
         // TODO: default image Uris will probably be assets...
         return new Profile(
                 displayName,
-                context.getString(R.string.profile_default_about_me),
+                "",
                 ImageUtil.getDefaultProfileImageUri(context),
                 ImageUtil.getDefaultHeaderImageUri(context),
                 Integer.MIN_VALUE);
