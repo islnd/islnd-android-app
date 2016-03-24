@@ -11,8 +11,22 @@ import java.security.Key;
 public class Identity implements Serializable, ProtoSerializable<Identity> {
     private final String displayName;
     private final String alias;
+    private final String messageInbox;
     private final Key groupKey;
     private final Key publicKey;
+
+    public Identity(
+            String displayName,
+            String alias,
+            String messageInbox,
+            Key groupKey,
+            Key publicKey) {
+        this.displayName = displayName;
+        this.alias = alias;
+        this.messageInbox = messageInbox;
+        this.groupKey = groupKey;
+        this.publicKey = publicKey;
+    }
 
     public String getAlias() {
         return alias;
@@ -26,11 +40,12 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
         return publicKey;
     }
 
-    public Identity(String displayName, String alias, Key groupKey, Key publicKey) {
-        this.displayName = displayName;
-        this.alias = alias;
-        this.groupKey = groupKey;
-        this.publicKey = publicKey;
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    public String getMessageInbox() {
+        return messageInbox;
     }
 
     @Override
@@ -46,10 +61,6 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
                 && this.publicKey.equals(otherKey.publicKey);
     }
 
-    public String getDisplayName() {
-        return this.displayName;
-    }
-
     public static Identity fromProto(byte[] bytes) {
         IslandProto.Identity identity = null;
         try {
@@ -62,6 +73,7 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
         return new Identity(
                 identity.getDisplayName(),
                 identity.getAlias(),
+                identity.getMessageInbox(),
                 CryptoUtil.decodeSymmetricKey(identity.getGroupKey()),
                 CryptoUtil.decodePublicKey(identity.getPublicKey()));
     }
@@ -72,6 +84,7 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
                 .setGroupKey(CryptoUtil.encodeKey(this.getGroupKey()))
                 .setPublicKey(CryptoUtil.encodeKey(this.getPublicKey()))
                 .setAlias(this.getAlias())
+                .setMessageInbox(this.getMessageInbox())
                 .setDisplayName(this.getDisplayName())
                 .build()
                 .toByteArray();

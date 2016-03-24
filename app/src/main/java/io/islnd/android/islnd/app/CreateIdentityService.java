@@ -64,11 +64,13 @@ public class CreateIdentityService extends IntentService {
         SharedPreferences.Editor editor = settings.edit();
 
         String alias = CryptoUtil.createAlias();
+        String profileAlias = CryptoUtil.createAlias();
 
         long userId = DataUtils.insertUser(
                 context,
                 displayName,
                 alias,
+                profileAlias,
                 Util.getGroupKey(context),
                 Util.getPublicKey(context));
 

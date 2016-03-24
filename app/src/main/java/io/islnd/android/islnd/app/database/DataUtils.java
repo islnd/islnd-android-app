@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import io.islnd.android.islnd.app.models.Comment;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -27,6 +26,7 @@ public class DataUtils {
                 context,
                 identity.getDisplayName(),
                 identity.getAlias(),
+                identity.getMessageInbox(),
                 identity.getGroupKey(),
                 identity.getPublicKey());
     }
@@ -35,10 +35,12 @@ public class DataUtils {
             Context context,
             String displayName,
             String alias,
+            String profileAlias,
             Key groupKey,
             Key publicKey) {
         ContentValues userValues = new ContentValues();
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
+        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, profileAlias);
 
         final ContentResolver contentResolver = context.getContentResolver();
         Uri result = contentResolver.insert(
@@ -60,6 +62,10 @@ public class DataUtils {
         contentResolver.insert(
                 IslndContract.AliasEntry.CONTENT_URI,
                 aliasValues);
+
+        Log.v(TAG, "inserted user");
+        Log.v(TAG, "alias " + alias);
+        Log.v(TAG, "profile alias " + profileAlias);
 
         return userId;
     }
@@ -324,6 +330,29 @@ public class DataUtils {
             if (cursor != null) {
                 cursor.close();
             }
+        }
+    }
+
+    public static String getProfileAlias(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_MESSAGE_INBOX,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.UserEntry.buildUserWithUserId(userId),
+                projection,
+                null,
+                null,
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
+
+            return null;
+        } finally {
+            cursor.close();
         }
     }
 }

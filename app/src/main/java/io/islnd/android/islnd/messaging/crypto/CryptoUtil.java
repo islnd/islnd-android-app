@@ -16,6 +16,7 @@ import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -46,6 +47,7 @@ public class CryptoUtil {
     private static Cipher asymmetricCipherWithOAEP;
     private static Cipher asymmetricCipher;
     private static MessageDigest messageDigest;
+    private static SecureRandom secureRandom;
     private static Encoder encoder = new Encoder();
     private static Decoder decoder = new Decoder();
 
@@ -60,6 +62,7 @@ public class CryptoUtil {
             asymmetricCipherWithOAEP = Cipher.getInstance(ASYMMETRIC_ALGO_WITH_OAEP);
             asymmetricCipher = Cipher.getInstance(ASYMMETRIC_ALGO);
             messageDigest = MessageDigest.getInstance(DIGEST_ALGO);
+            secureRandom = new SecureRandom();
         } catch (GeneralSecurityException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -195,7 +198,7 @@ public class CryptoUtil {
     }
 
     public static String createAlias() {
-        return String.valueOf(new SecureRandom().nextLong());
+        return String.valueOf(secureRandom.nextLong());
     }
 }
 

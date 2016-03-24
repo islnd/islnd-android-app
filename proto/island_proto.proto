@@ -5,8 +5,9 @@ option java_package = "io.islnd.android.islnd.messaging.proto";
 message Identity {
   required string display_name = 1;
   required string alias = 2;
-  required string group_key = 3;
-  required string public_key = 4;
+  required string message_inbox = 3;
+  required string group_key = 4;
+  required string public_key = 5;
 }
 
 message SignedObject {

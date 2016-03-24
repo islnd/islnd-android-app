@@ -19,11 +19,15 @@ public final class IslandProto {
     boolean hasAlias();
     String getAlias();
     
-    // required string group_key = 3;
+    // required string message_inbox = 3;
+    boolean hasMessageInbox();
+    String getMessageInbox();
+    
+    // required string group_key = 4;
     boolean hasGroupKey();
     String getGroupKey();
     
-    // required string public_key = 4;
+    // required string public_key = 5;
     boolean hasPublicKey();
     String getPublicKey();
   }
@@ -120,11 +124,43 @@ public final class IslandProto {
       }
     }
     
-    // required string group_key = 3;
-    public static final int GROUP_KEY_FIELD_NUMBER = 3;
+    // required string message_inbox = 3;
+    public static final int MESSAGE_INBOX_FIELD_NUMBER = 3;
+    private java.lang.Object messageInbox_;
+    public boolean hasMessageInbox() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public String getMessageInbox() {
+      java.lang.Object ref = messageInbox_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          messageInbox_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getMessageInboxBytes() {
+      java.lang.Object ref = messageInbox_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        messageInbox_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required string group_key = 4;
+    public static final int GROUP_KEY_FIELD_NUMBER = 4;
     private java.lang.Object groupKey_;
     public boolean hasGroupKey() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     public String getGroupKey() {
       java.lang.Object ref = groupKey_;
@@ -152,11 +188,11 @@ public final class IslandProto {
       }
     }
     
-    // required string public_key = 4;
-    public static final int PUBLIC_KEY_FIELD_NUMBER = 4;
+    // required string public_key = 5;
+    public static final int PUBLIC_KEY_FIELD_NUMBER = 5;
     private java.lang.Object publicKey_;
     public boolean hasPublicKey() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     public String getPublicKey() {
       java.lang.Object ref = publicKey_;
@@ -187,6 +223,7 @@ public final class IslandProto {
     private void initFields() {
       displayName_ = "";
       alias_ = "";
+      messageInbox_ = "";
       groupKey_ = "";
       publicKey_ = "";
     }
@@ -200,6 +237,10 @@ public final class IslandProto {
         return false;
       }
       if (!hasAlias()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasMessageInbox()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -225,10 +266,13 @@ public final class IslandProto {
         output.writeBytes(2, getAliasBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getGroupKeyBytes());
+        output.writeBytes(3, getMessageInboxBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getPublicKeyBytes());
+        output.writeBytes(4, getGroupKeyBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBytes(5, getPublicKeyBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -249,11 +293,15 @@ public final class IslandProto {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getGroupKeyBytes());
+          .computeBytesSize(3, getMessageInboxBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getPublicKeyBytes());
+          .computeBytesSize(4, getGroupKeyBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, getPublicKeyBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -383,10 +431,12 @@ public final class IslandProto {
         bitField0_ = (bitField0_ & ~0x00000001);
         alias_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        groupKey_ = "";
+        messageInbox_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
-        publicKey_ = "";
+        groupKey_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
+        publicKey_ = "";
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       
@@ -436,9 +486,13 @@ public final class IslandProto {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.groupKey_ = groupKey_;
+        result.messageInbox_ = messageInbox_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
+        }
+        result.groupKey_ = groupKey_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         result.publicKey_ = publicKey_;
         result.bitField0_ = to_bitField0_;
@@ -463,6 +517,9 @@ public final class IslandProto {
         if (other.hasAlias()) {
           setAlias(other.getAlias());
         }
+        if (other.hasMessageInbox()) {
+          setMessageInbox(other.getMessageInbox());
+        }
         if (other.hasGroupKey()) {
           setGroupKey(other.getGroupKey());
         }
@@ -479,6 +536,10 @@ public final class IslandProto {
           return false;
         }
         if (!hasAlias()) {
+          
+          return false;
+        }
+        if (!hasMessageInbox()) {
           
           return false;
         }
@@ -528,11 +589,16 @@ public final class IslandProto {
             }
             case 26: {
               bitField0_ |= 0x00000004;
-              groupKey_ = input.readBytes();
+              messageInbox_ = input.readBytes();
               break;
             }
             case 34: {
               bitField0_ |= 0x00000008;
+              groupKey_ = input.readBytes();
+              break;
+            }
+            case 42: {
+              bitField0_ |= 0x00000010;
               publicKey_ = input.readBytes();
               break;
             }
@@ -614,10 +680,46 @@ public final class IslandProto {
         onChanged();
       }
       
-      // required string group_key = 3;
+      // required string message_inbox = 3;
+      private java.lang.Object messageInbox_ = "";
+      public boolean hasMessageInbox() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public String getMessageInbox() {
+        java.lang.Object ref = messageInbox_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          messageInbox_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setMessageInbox(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        messageInbox_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearMessageInbox() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        messageInbox_ = getDefaultInstance().getMessageInbox();
+        onChanged();
+        return this;
+      }
+      void setMessageInbox(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000004;
+        messageInbox_ = value;
+        onChanged();
+      }
+      
+      // required string group_key = 4;
       private java.lang.Object groupKey_ = "";
       public boolean hasGroupKey() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       public String getGroupKey() {
         java.lang.Object ref = groupKey_;
@@ -633,27 +735,27 @@ public final class IslandProto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  bitField0_ |= 0x00000008;
         groupKey_ = value;
         onChanged();
         return this;
       }
       public Builder clearGroupKey() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         groupKey_ = getDefaultInstance().getGroupKey();
         onChanged();
         return this;
       }
       void setGroupKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         groupKey_ = value;
         onChanged();
       }
       
-      // required string public_key = 4;
+      // required string public_key = 5;
       private java.lang.Object publicKey_ = "";
       public boolean hasPublicKey() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       public String getPublicKey() {
         java.lang.Object ref = publicKey_;
@@ -669,19 +771,19 @@ public final class IslandProto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000010;
         publicKey_ = value;
         onChanged();
         return this;
       }
       public Builder clearPublicKey() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         publicKey_ = getDefaultInstance().getPublicKey();
         onChanged();
         return this;
       }
       void setPublicKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         publicKey_ = value;
         onChanged();
       }
@@ -2212,17 +2314,17 @@ public final class IslandProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\030proto/island_proto.proto\022\005proto\"V\n\010Ide" +
+      "\n\030proto/island_proto.proto\022\005proto\"m\n\010Ide" +
       "ntity\022\024\n\014display_name\030\001 \002(\t\022\r\n\005alias\030\002 \002" +
-      "(\t\022\021\n\tgroup_key\030\003 \002(\t\022\022\n\npublic_key\030\004 \002(" +
-      "\t\"1\n\014SignedObject\022\016\n\006object\030\001 \002(\t\022\021\n\tsig" +
-      "nature\030\002 \002(\t\"\300\001\n\005Event\022\r\n\005alias\030\001 \002(\t\022\020\n" +
-      "\010event_id\030\002 \002(\005\022\022\n\nevent_type\030\003 \002(\005\022\022\n\nc" +
-      "ontent_id\030\004 \001(\t\022\024\n\014text_content\030\005 \001(\t\022\024\n" +
-      "\014data_content\030\006 \001(\014\022\021\n\ttimestamp\030\007 \001(\003\022\024" +
-      "\n\014parent_alias\030\010 \001(\t\022\031\n\021parent_content_i" +
-      "d\030\t \001(\tB(\n&io.islnd.android.islnd.messag",
-      "ing.proto"
+      "(\t\022\025\n\rmessage_inbox\030\003 \002(\t\022\021\n\tgroup_key\030\004" +
+      " \002(\t\022\022\n\npublic_key\030\005 \002(\t\"1\n\014SignedObject" +
+      "\022\016\n\006object\030\001 \002(\t\022\021\n\tsignature\030\002 \002(\t\"\300\001\n\005" +
+      "Event\022\r\n\005alias\030\001 \002(\t\022\020\n\010event_id\030\002 \002(\005\022\022" +
+      "\n\nevent_type\030\003 \002(\005\022\022\n\ncontent_id\030\004 \001(\t\022\024" +
+      "\n\014text_content\030\005 \001(\t\022\024\n\014data_content\030\006 \001" +
+      "(\014\022\021\n\ttimestamp\030\007 \001(\003\022\024\n\014parent_alias\030\010 " +
+      "\001(\t\022\031\n\021parent_content_id\030\t \001(\tB(\n&io.isl",
+      "nd.android.islnd.messaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2234,7 +2336,7 @@ public final class IslandProto {
           internal_static_proto_Identity_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_Identity_descriptor,
-              new java.lang.String[] { "DisplayName", "Alias", "GroupKey", "PublicKey", },
+              new java.lang.String[] { "DisplayName", "Alias", "MessageInbox", "GroupKey", "PublicKey", },
               io.islnd.android.islnd.messaging.proto.IslandProto.Identity.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.Identity.Builder.class);
           internal_static_proto_SignedObject_descriptor =

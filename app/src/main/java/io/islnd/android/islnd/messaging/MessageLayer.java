@@ -30,7 +30,6 @@ public class MessageLayer {
             return false;
         }
 
-        //--TODO only add if not already friends
         long userId = DataUtils.insertUser(context, identity);
 
         Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
@@ -45,13 +44,14 @@ public class MessageLayer {
         //--TODO get display name without a cursor
         String displayName = DataUtils.getDisplayName(context, Util.getUserId(context));
         String alias = DataUtils.getMostRecentAlias(context, Util.getUserId(context));
+        String profileAlias = DataUtils.getProfileAlias(context, Util.getUserId(context));
         Log.v(TAG, String.format("alias is %s", alias));
         Key groupKey = CryptoUtil.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));
         Key publicKey = CryptoUtil.decodePublicKey(
                 sharedPreferences.getString(context.getString(R.string.public_key), ""));
 
-        Identity pk = new Identity(displayName, alias, groupKey, publicKey);
+        Identity pk = new Identity(displayName, alias, profileAlias, groupKey, publicKey);
         String encodeString = new Encoder().encodeToString(pk.toByteArray());
         Log.v(TAG, "generated encoded string: " + encodeString);
         return encodeString;

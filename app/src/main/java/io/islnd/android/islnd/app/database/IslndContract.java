@@ -65,6 +65,7 @@ public class IslndContract {
         public static final String TABLE_NAME = "user";
 
         public static final String COLUMN_PUBLIC_KEY = "public_key";
+        public static final String COLUMN_MESSAGE_INBOX = "message_inbox";
 
         public static final int MY_USER_ID = 1; //--we are always the first user to go in the database
 
