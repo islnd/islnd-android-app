@@ -5,27 +5,20 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.Dialogs;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.models.User;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.activities.ProfileActivity;
+import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.models.User;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.viewholders.FriendGlanceViewHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceViewHolder>
-{
+public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceViewHolder> {
     private Context mContext = null;
 
     public ViewFriendsAdapter(Context context, Cursor cursor) {
@@ -34,8 +27,7 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
     }
 
     @Override
-    public FriendGlanceViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-    {
+    public FriendGlanceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.friend_glance, parent, false);
 
@@ -54,11 +46,11 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
 
         // Go to profile on view click
         holder.itemView.setOnClickListener((View v) ->
-                {
-                    Intent profileIntent = new Intent(mContext, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, user.getUserId());
-                    mContext.startActivity(profileIntent);
-                });
+        {
+            Intent profileIntent = new Intent(mContext, ProfileActivity.class);
+            profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, user.getUserId());
+            mContext.startActivity(profileIntent);
+        });
 
         ImageUtil.setViewFriendImageSampled(
                 mContext,
@@ -75,8 +67,7 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
 
             popup.setOnMenuItemClickListener((MenuItem item) ->
             {
-                switch (item.getItemId())
-                {
+                switch (item.getItemId()) {
                     case REMOVE_FRIEND:
                         Dialogs.removeFriendDialog(mContext, user.getUserId(), user.getDisplayName());
                 }

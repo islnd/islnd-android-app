@@ -20,20 +20,21 @@ import java.io.InputStream;
 import io.islnd.android.islnd.app.R;
 
 public class ImageUtil {
-    private static String TAG = ImageUtil.class.getSimpleName();
-    private static String IMAGE_DIR = "images";
-    private static String JPG_EXT = ".jpg";
 
-    private static String DEFAULT_HEADER_ASSET = "default_header.jpg";
-    private static String DEFAULT_PROFILE_ASSET = "default_profile.jpg";
+    private static final String TAG = ImageUtil.class.getSimpleName();
+    private static final String IMAGE_DIR = "images";
+    private static final String JPG_EXT = ".jpg";
 
-    private static String SLASH = "/";
+    private static final String DEFAULT_HEADER_ASSET = "default_header.jpg";
+    private static final String DEFAULT_PROFILE_ASSET = "default_profile.jpg";
 
-    private static int COMPRESSION = 65;
+    private static final String SLASH = "/";
+
+    private static final int COMPRESSION = 65;
 
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File bitmapPath = new File (directory, filePath);
+        File bitmapPath = new File(directory, filePath);
 
         try {
             FileOutputStream outputStream = new FileOutputStream(bitmapPath);
@@ -50,7 +51,7 @@ public class ImageUtil {
 
     public static Uri saveBitmapToInternalStorage(Context context, Bitmap bitmap) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File bitmapPath = new File (directory, getCurrentTimeJpgString());
+        File bitmapPath = new File(directory, getCurrentTimeJpgString());
 
         try {
             FileOutputStream outputStream = new FileOutputStream(bitmapPath);
@@ -69,7 +70,7 @@ public class ImageUtil {
 
     public static Bitmap getBitmapFromInternalStorage(Context context, String filePath) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File bitmapPath = new File (directory, filePath);
+        File bitmapPath = new File(directory, filePath);
         Bitmap bitmap = null;
 
         try {
@@ -154,7 +155,7 @@ public class ImageUtil {
 
     public static Uri getDefaultProfileImageUri(Context context) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File image = new File (directory, DEFAULT_PROFILE_ASSET);
+        File image = new File(directory, DEFAULT_PROFILE_ASSET);
 
         if (!image.exists()) {
             saveBitmapToInternalStorage(
@@ -167,7 +168,7 @@ public class ImageUtil {
 
     public static Uri getDefaultHeaderImageUri(Context context) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File image = new File (directory, DEFAULT_HEADER_ASSET);
+        File image = new File(directory, DEFAULT_HEADER_ASSET);
 
         if (!image.exists()) {
             saveBitmapToInternalStorage(
@@ -231,7 +232,7 @@ public class ImageUtil {
 
     public static void setHeaderImageSampled(Context context, ImageView imageView, Uri uri) {
         int headerHeightDimen = Util.getDpFromResource(context, R.dimen.profile_header_height);
-        int headerWidthDimen = 2*headerHeightDimen;
+        int headerWidthDimen = 2 * headerHeightDimen;
         imageView.setImageBitmap(ImageUtil.getSampledBitmapFromUri(
                 context,
                 uri,
@@ -277,7 +278,7 @@ public class ImageUtil {
 
     public static void setNavHeaderImageSampled(Context context, ImageView imageView, Uri uri) {
         int headerHeightDimen = Util.getDpFromResource(context, R.dimen.nav_header_height);
-        int headerWidthDimen = 2*headerHeightDimen;
+        int headerWidthDimen = 2 * headerHeightDimen;
         imageView.setImageBitmap(ImageUtil.getSampledBitmapFromUri(
                 context,
                 uri,

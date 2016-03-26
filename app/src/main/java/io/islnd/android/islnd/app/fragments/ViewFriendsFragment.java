@@ -14,13 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.ViewFriendsAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.FriendLoader;
-import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
-
 import io.islnd.android.islnd.app.util.Util;
 
 public class ViewFriendsFragment extends Fragment {

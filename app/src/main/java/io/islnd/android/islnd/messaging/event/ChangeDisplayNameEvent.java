@@ -1,8 +1,5 @@
 package io.islnd.android.islnd.messaging.event;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class ChangeDisplayNameEvent extends Event {

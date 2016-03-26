@@ -1,9 +1,5 @@
 package io.islnd.android.islnd.messaging.crypto;
 
-import io.islnd.android.islnd.messaging.Decoder;
-import io.islnd.android.islnd.messaging.Encoder;
-import io.islnd.android.islnd.messaging.ProtoSerializable;
-
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -25,6 +21,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
+
+import io.islnd.android.islnd.messaging.Decoder;
+import io.islnd.android.islnd.messaging.Encoder;
+import io.islnd.android.islnd.messaging.ProtoSerializable;
 
 public class CryptoUtil {
 

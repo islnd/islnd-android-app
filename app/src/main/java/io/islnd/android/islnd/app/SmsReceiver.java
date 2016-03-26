@@ -8,13 +8,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
-
 import io.islnd.android.islnd.messaging.MessageLayer;
 
 /**

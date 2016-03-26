@@ -2,18 +2,12 @@ package io.islnd.android.islnd.app.viewholders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.R;
 
-/**
- * Created by poo on 2/3/2016.
- */
-public class GlancePostViewHolder extends RecyclerView.ViewHolder
-{
+public class GlancePostViewHolder extends RecyclerView.ViewHolder {
     public ImageView postProfileImage;
     public TextView postUserName;
     public TextView postTimestamp;
@@ -21,8 +15,7 @@ public class GlancePostViewHolder extends RecyclerView.ViewHolder
     public TextView postCommentCount;
     public View view;
 
-    public GlancePostViewHolder(View itemView)
-    {
+    public GlancePostViewHolder(View itemView) {
         super(itemView);
         postProfileImage = (ImageView) itemView.findViewById(R.id.post_profile_image);
         postUserName = (TextView) itemView.findViewById(R.id.post_user_name);

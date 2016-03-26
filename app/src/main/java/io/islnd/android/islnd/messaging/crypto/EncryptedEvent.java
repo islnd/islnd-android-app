@@ -2,10 +2,7 @@ package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.Key;
 
-import io.islnd.android.islnd.messaging.ProtoSerializable;
-import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
 import io.islnd.android.islnd.messaging.event.Event;
-import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class EncryptedEvent extends SymmetricEncryptedData {
 

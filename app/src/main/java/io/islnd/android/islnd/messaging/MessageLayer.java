@@ -5,14 +5,14 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.util.Util;
-
 import java.io.IOException;
 import java.security.Key;
+
+import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
