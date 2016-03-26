@@ -36,8 +36,8 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
@@ -69,7 +69,6 @@ public class NavBaseActivity extends AppCompatActivity
     private ImageView mNavProfileImage;
     private ImageView mNavHeaderImage;
     private TextView mNavUserName;
-    private int mFragmentId;
     private Fragment mFragment;
 
     @Override

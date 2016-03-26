@@ -216,7 +216,7 @@ public class DataUtils {
         contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
-        contentResolver.delete(IslndContract.EventEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.ReceivedEventEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {

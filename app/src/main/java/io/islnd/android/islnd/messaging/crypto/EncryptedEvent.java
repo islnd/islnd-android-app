@@ -13,6 +13,11 @@ public class EncryptedEvent extends SymmetricEncryptedData {
         this.alias = event.getAlias();
     }
 
+    public EncryptedEvent(String blob, String alias) {
+        super(blob);
+        this.alias = alias;
+    }
+
     @Override
     public Event decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
         SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);

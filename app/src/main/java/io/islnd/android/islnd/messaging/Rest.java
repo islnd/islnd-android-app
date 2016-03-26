@@ -22,41 +22,6 @@ public class Rest {
     private final static String HOST = "https://islnd.io:1935";
     private static final int HTTP_OK = 200;
 
-    public static List<EncryptedData> getReaders(String username, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            return service.readers(username, apiKey).execute().body();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static void postPublicKey(String username, String publicKey, String apiKey) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
-
-        RestInterface service = retrofit.create(RestInterface.class);
-
-        try {
-            Response<String> response = service.postPublicKey(username, publicKey, apiKey).execute();
-            if (response.code() != HTTP_OK) {
-                Log.v(TAG, "/publicKey POST returned code " + response.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static Boolean getPing(String apiKey) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
