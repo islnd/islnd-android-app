@@ -13,7 +13,11 @@ public abstract class SymmetricEncryptedData<T extends ProtoSerializable> extend
         super();
         SignedObject signedObject = ObjectSigner.sign(object, privateKey);
         blob = ObjectEncrypter.encryptSymmetric(signedObject, groupKey);
-        Log.v(TAG, "blob " + blob);
+    }
+
+    public SymmetricEncryptedData(String blob) {
+        super();
+        this.blob = blob;
     }
 
     public abstract T decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException;
