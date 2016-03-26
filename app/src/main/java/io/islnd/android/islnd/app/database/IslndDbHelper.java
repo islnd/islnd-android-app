@@ -86,13 +86,18 @@ public class IslndDbHelper extends SQLiteOpenHelper {
 
                 " UNIQUE (" + IslndContract.ProfileEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
-        final String SQL_CREATE_EVENT_TABLE = "CREATE TABLE " + IslndContract.EventEntry.TABLE_NAME + " (" +
-                IslndContract.EventEntry._ID + " INTEGER PRIMARY KEY," +
-                IslndContract.EventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
-                IslndContract.EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, " +
+        final String SQL_CREATE_RECEIVED_EVENT_TABLE = "CREATE TABLE " + IslndContract.ReceivedEventEntry.TABLE_NAME + " (" +
+                IslndContract.ReceivedEventEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.ReceivedEventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
+                IslndContract.ReceivedEventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, " +
 
-                " UNIQUE (" + IslndContract.EventEntry.COLUMN_ALIAS +", " +
-                IslndContract.EventEntry.COLUMN_EVENT_ID + ") ON CONFLICT IGNORE);";
+                " UNIQUE (" + IslndContract.ReceivedEventEntry.COLUMN_ALIAS +", " +
+                IslndContract.ReceivedEventEntry.COLUMN_EVENT_ID + ") ON CONFLICT IGNORE);";
+
+        final String SQL_CREATE_OUTGOING_EVENT_TABLE = "CREATE TABLE " + IslndContract.OutgoingEventEntry.TABLE_NAME + " (" +
+                IslndContract.OutgoingEventEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.OutgoingEventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
+                IslndContract.OutgoingEventEntry.COLUMN_BLOB + " INTEGER NOT NULL);";
 
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_ALIAS_TABLE);
@@ -100,7 +105,8 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_POST_TABLE);
         db.execSQL(SQL_CREATE_COMMENT_TABLE);
         db.execSQL(SQL_CREATE_PROFILE_TABLE);
-        db.execSQL(SQL_CREATE_EVENT_TABLE);
+        db.execSQL(SQL_CREATE_RECEIVED_EVENT_TABLE);
+        db.execSQL(SQL_CREATE_OUTGOING_EVENT_TABLE);
     }
 
     @Override
@@ -111,7 +117,8 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.PostEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.CommentEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ProfileEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.EventEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedEventEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingEventEntry.TABLE_NAME);
         onCreate(db);
     }
 }

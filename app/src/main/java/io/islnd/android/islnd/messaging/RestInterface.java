@@ -16,17 +16,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface RestInterface {
-    @GET("/readers/{username}")
-    Call<List<EncryptedData>> readers(
-            @Path("username") String username,
-            @Query("apiKey") String apiKey);
-
-    @POST("/publicKey/{username}")
-    Call<String> postPublicKey(
-            @Path("username") String username,
-            @Body String publicKey,
-            @Query("apiKey") String apiKey);
-
     @GET("/ping/")
     Call<Void> getPing(
             @Query("apiKey") String apiKey);

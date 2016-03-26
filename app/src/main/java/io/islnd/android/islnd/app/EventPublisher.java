@@ -1,14 +1,26 @@
 package io.islnd.android.islnd.app;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
 
+import java.security.Key;
+import java.util.List;
+
+import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.sync.EventSyncAdapter;
+import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventListBuilder;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
 
 public class EventPublisher {
+
+    private static final String TAG = EventPublisher.class.getSimpleName();
 
     private final Context mContext;
     private final EventListBuilder eventListBuilder;
@@ -64,12 +76,26 @@ public class EventPublisher {
     }
 
     public void publish() {
-        for (Event event : this.eventListBuilder.build()) {
-            EventProcessor.process(mContext, event);
-
-            Intent pushEventService = new Intent(mContext, EventPushService.class);
-            pushEventService.putExtra(EventPushService.EVENT_EXTRA, event);
-            mContext.startService(pushEventService);
+        final List<Event> events = this.eventListBuilder.build();
+        ContentValues[] values = new ContentValues[events.size()];
+        Key privateKey = Util.getPrivateKey(mContext);
+        Key groupKey = Util.getGroupKey(mContext);
+        for (int i = 0; i < events.size(); i++) {
+            EventProcessor.process(mContext, events.get(i));
+            EncryptedEvent encryptedEvent = new EncryptedEvent(events.get(i), privateKey, groupKey);
+            values[i] = new ContentValues();
+            values[i].put(IslndContract.OutgoingEventEntry.COLUMN_ALIAS, encryptedEvent.getAlias());
+            values[i].put(IslndContract.OutgoingEventEntry.COLUMN_BLOB, encryptedEvent.getBlob());
         }
+
+        mContext.getContentResolver().bulkInsert(
+                IslndContract.OutgoingEventEntry.CONTENT_URI,
+                values
+        );
+
+        mContext.getContentResolver().requestSync(
+                Util.getSyncAccount(mContext),
+                IslndContract.CONTENT_AUTHORITY,
+                new Bundle());
     }
 }
