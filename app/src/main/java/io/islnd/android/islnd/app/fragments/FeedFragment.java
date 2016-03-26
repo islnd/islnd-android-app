@@ -17,13 +17,12 @@ import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.activities.NewPostActivity;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.PostLoader;
-import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
-
 import io.islnd.android.islnd.app.util.Util;
 
 public class FeedFragment extends Fragment {

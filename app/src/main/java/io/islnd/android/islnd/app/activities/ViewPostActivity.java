@@ -29,13 +29,12 @@ import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.CommentLoader;
 import io.islnd.android.islnd.app.models.Post;
-import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
@@ -57,8 +56,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     private StopRefreshReceiver mStopRefreshReceiver;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_post);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -68,7 +66,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
 
         // Get intent with post info
         Intent intent = getIntent();
-        mPost = (Post)intent.getSerializableExtra(Post.POST_EXTRA);
+        mPost = (Post) intent.getSerializableExtra(Post.POST_EXTRA);
         bindPost();
 
         // List view stuff
@@ -114,19 +112,15 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         return super.onOptionsItemSelected(item);
     }
 
-    public void addCommentToPost(View view)
-    {
+    public void addCommentToPost(View view) {
         EditText addCommentEditText = (EditText) findViewById(R.id.post_comment_edit_text);
         String commentText = addCommentEditText.getText().toString();
 
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        if(commentText.equals(""))
-        {
+        if (commentText.equals("")) {
             Snackbar.make(view, getString(R.string.empty_comment_post), Snackbar.LENGTH_SHORT).show();
-        }
-        else
-        {
+        } else {
             new EventPublisher(mContext)
                     .makeComment(
                             mPost.getPostId(),
@@ -139,7 +133,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
             imm.hideSoftInputFromWindow(addCommentEditText.getWindowToken(), 0);
         }
     }
-    
+
     private void bindPost() {
         if (mPost == null) {
             return;
@@ -150,9 +144,9 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         TextView postUserName = (TextView) findViewById(R.id.post_user_name);
         TextView postTimestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) findViewById(R.id.post_content);
-        RelativeLayout postOverflow  = (RelativeLayout) findViewById(R.id.post_overflow_layout);
+        RelativeLayout postOverflow = (RelativeLayout) findViewById(R.id.post_overflow_layout);
         TextView commentCount = (TextView) findViewById(R.id.post_comment_count);
-        
+
         postUserName.setText(mPost.getDisplayName());
         postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, mPost.getTimestamp()));
         postContent.setText(mPost.getContent());
@@ -168,7 +162,7 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
                 });
 
 
-        if(Util.isUser(mContext, mPost.getUserId())) {
+        if (Util.isUser(mContext, mPost.getUserId())) {
             postOverflow.setVisibility(View.VISIBLE);
 
             postOverflow.setOnClickListener((View v) -> {

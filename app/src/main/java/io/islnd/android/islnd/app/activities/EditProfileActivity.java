@@ -17,14 +17,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.soundcloud.android.crop.Crop;
+
+import java.io.File;
+
 import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.ImageUtil;
-
-import com.soundcloud.android.crop.Crop;
-
-import java.io.File;
 
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 

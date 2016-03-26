@@ -1,8 +1,8 @@
 package io.islnd.android.islnd.messaging;
 
-import io.islnd.android.islnd.app.models.VersionedContent;
-
 import java.util.List;
+
+import io.islnd.android.islnd.app.models.VersionedContent;
 
 public class ContentUtil {
     private static final String TAG = ContentUtil.class.getSimpleName();

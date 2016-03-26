@@ -39,22 +39,15 @@
     <dimen name="friend_profile_image">64dp</dimen>
     <dimen name="friend_profile_image_name_margin">16dp</dimen>
 
-    <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="nav_profile_image">64dp</dimen>
-
     <dimen name="new_post_edit_text_margin">72dp</dimen>
-
     <dimen name="about_me_edit_text_padding">16dp</dimen>
     <dimen name="edit_profile_header_image_icon_padding">16dp</dimen>
-
     <dimen name="expanded_title_name_margin">46dp</dimen>
-
     <dimen name="view_friend_status_padding">8dp</dimen>
-
     <dimen name="sms_allow_dialog_margin">8dp</dimen>
-
     <dimen name="image_button_padding">8dp</dimen>
     <dimen name="splash_screen_padding">64dp</dimen>
     <dimen name="splash_screen_icon">128dp</dimen>

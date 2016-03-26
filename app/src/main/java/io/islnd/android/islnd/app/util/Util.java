@@ -17,17 +17,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.models.CommentViewModel;
-import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.app.models.Comment;
-
-import io.islnd.android.islnd.app.preferences.ServerPreferenceFragment;
-import io.islnd.android.islnd.app.preferences.AppearancePreferenceFragment;
-import io.islnd.android.islnd.messaging.ServerTime;
-import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
-
 import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +24,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.models.Comment;
+import io.islnd.android.islnd.app.models.CommentViewModel;
+import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.preferences.AppearancePreferenceFragment;
+import io.islnd.android.islnd.app.preferences.ServerPreferenceFragment;
+import io.islnd.android.islnd.messaging.ServerTime;
+import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
+
 public class Util {
+    
     private static final String TAG = Util.class.getSimpleName();
 
     public static String smartTimestampFromUnixTime(Context context, long unixTimeMillis) {
@@ -46,16 +46,16 @@ public class Util {
         String timestamp = "";
 
         // Under 1 minute
-        if(timeDiff < 60) {
+        if (timeDiff < 60) {
             timestamp = timeDiff + (timeDiff == 1 ? " sec" : " secs");
         }
         // Under one hour
-        else if(timeDiff >= 60 && timeDiff < 3600) {
+        else if (timeDiff >= 60 && timeDiff < 3600) {
             long minutes = timeDiff / 60;
             timestamp = minutes + (minutes == 1 ? " min" : " mins");
         }
         // Under 24 hours
-        else if(timeDiff >= 3600 && timeDiff < 86400) {
+        else if (timeDiff >= 3600 && timeDiff < 86400) {
             long hours = timeDiff / 3600;
             timestamp = hours + (hours == 1 ? " hr" : " hrs");
         }
@@ -236,14 +236,14 @@ public class Util {
             e.printStackTrace();
         }
 
-        if(bitMatrix == null) {
+        if (bitMatrix == null) {
             return;
         }
 
         Bitmap bmp = Bitmap.createBitmap(DIMEN, DIMEN, Bitmap.Config.RGB_565);
         for (int x = 0; x < DIMEN; x++) {
             for (int y = 0; y < DIMEN; y++) {
-                bmp.setPixel(x, y, bitMatrix.get(x,y) ? Color.BLACK : Color.WHITE);
+                bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
             }
         }
 
@@ -254,7 +254,7 @@ public class Util {
         // TODO: default image Uris will probably be assets...
         return new Profile(
                 displayName,
-                context.getString(R.string.profile_default_about_me),
+                "",
                 ImageUtil.getDefaultProfileImageUri(context),
                 ImageUtil.getDefaultHeaderImageUri(context),
                 Integer.MIN_VALUE);

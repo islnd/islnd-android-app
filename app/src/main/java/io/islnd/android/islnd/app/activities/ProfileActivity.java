@@ -23,23 +23,24 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.islnd.android.islnd.app.Dialogs;
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.Dialogs;
 import io.islnd.android.islnd.app.loader.PostLoader;
-import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
 public class ProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
     public static final int LOADER_ID = 4;
 
-    public static String USER_ID_EXTRA = "USER_ID";
+    public static final String USER_ID_EXTRA = "USER_ID";
     private static final int EDIT_PROFILE_REQUEST = 0;
 
     private RecyclerView mRecyclerView;

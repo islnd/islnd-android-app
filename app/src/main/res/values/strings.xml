@@ -10,31 +10,21 @@
     <string name="title_activity_view_friends">ViewFriendsActivity</string>
     <string name="title_activity_edit_profile">EditProfileActivity</string>
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
-
     <string name="add_comment">Add Comment</string>
     <string name="new_post_hint">Whatcha got?</string>
-
     <string name="empty_string_post">Cannot submit empty post!</string>
     <string name="empty_comment_post">Cannot submit empty comment!</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_user_name">UserName</string>
-
     <string name="search_friends_hint">Search friends</string>
     <string name="search">Search</string>
-
     <string name="about_me">About me</string>
-
     <string name="profile_saved">Profile saved</string>
-
     <string name="select_image">Select Image</string>
-
     <string name="remove_friend">Remove Friend</string>
     <string name="allow_user">Allow User</string>
-
     <string name="edit_profile">Edit Profile</string>
-
     <string name="delete_post">Delete post</string>
     <string name="delete_post_dialog">Delete post?</string>
     <string name="delete_comment">Delete comment</string>
@@ -44,21 +34,11 @@
     <string name="public_key">PUBLIC_KEY</string>
     <string name="group_key">group_key</string>
     <string name="server_time_offset">server_time_offset</string>
-
     <string name="view_friend_status">Not Allowed</string>
-
     <string name="allow_user_dialog">Allow user?</string>
-
     <string name="get_qr_code">Get Friend\'s QR Code</string>
     <string name="qr_dialog_title">Show this to your friend</string>
-
-    <string-array name="nav_add_friend_actions">
-        <item>QR Code</item>
-        <!--<item>SMS</item>-->
-    </string-array>
-
     <string name="add_friend_dialog">Pick Add Friend Action</string>
-
     <string name="title_activity_show_qr">ShowQRActivity</string>
     <string name="sms_prefix">ISLAND-#-#-</string>
     <string name="sms_allow_dialog_title">Allow user with SMS</string>
@@ -68,7 +48,6 @@
     <string name="new_friend_notification">New Friend</string>
     <string name="request_sms_send_explanation">SMS permissions are needed to allow user with SMS</string>
     <string name="request_contact_explanation">Contact permissions are needed to get contact number</string>
-    <string name="profile_default_about_me"></string>
     <string name="previous_profile_version_key">previous_profile_version</string>
     <string name="api_key">api_key</string>
     <string name="fragment_delete_post">fragment_delete_post</string>
@@ -86,22 +65,9 @@
     <string name="user_id">user_id</string>
     <string name="event_id">event_id</string>
     <string name="title_activity_settings">Settings</string>
-
     <string name="light_theme">Light</string>
     <string name="dark_theme">Dark</string>
     <string name="day_night_theme">DayNight</string>
-    <string-array name="pref_theme_array">
-        <item>@string/light_theme</item>
-        <item>@string/dark_theme</item>
-        <item>@string/day_night_theme</item>
-    </string-array>
-
-    <string-array name="pref_theme_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
     <string name="pref_header_appearance">Appearance</string>
     <string name="pref_theme_title">Theme</string>
     <string name="pref_theme_default_value">1</string>
@@ -136,4 +102,18 @@
     <string name="delete_account_title">WARNING</string>
     <string name="delete_account_message">All data will be deleted from device. You will no longer have access to account.</string>
     <string name="delete_button">Delete</string>
+    <string-array name="pref_theme_array">
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+        <item>@string/day_night_theme</item>
+    </string-array>
+    <string-array name="pref_theme_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="nav_add_friend_actions">
+        <item>QR Code</item>
+        <!--<item>SMS</item>-->
+    </string-array>
 </resources>

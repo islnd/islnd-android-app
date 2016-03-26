@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-
 import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.R;
 

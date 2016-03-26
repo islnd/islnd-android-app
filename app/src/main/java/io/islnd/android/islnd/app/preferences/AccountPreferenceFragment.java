@@ -1,9 +1,8 @@
 package io.islnd.android.islnd.app.preferences;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -13,7 +12,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 
 public class AccountPreferenceFragment extends PreferenceFragmentCompat
-        implements Preference.OnPreferenceClickListener{
+        implements Preference.OnPreferenceClickListener {
 
     private static final String TAG = AccountPreferenceFragment.class.getSimpleName();
 
@@ -44,8 +43,7 @@ public class AccountPreferenceFragment extends PreferenceFragmentCompat
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
         builder.setTitle(getString(R.string.delete_account_title))
                 .setMessage(getString(R.string.delete_account_message))
-                .setPositiveButton(getString(R.string.delete_button), (DialogInterface dialog, int id) ->
-                {
+                .setPositiveButton(getString(R.string.delete_button), (DialogInterface dialog, int id) -> {
                     Util.deleteDataAndPreferences(getContext());
                     Util.restartApp((AppCompatActivity) getContext());
                 })

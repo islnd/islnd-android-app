@@ -20,14 +20,12 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import io.islnd.android.islnd.app.IslndIntent;
-import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
-import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
 import io.islnd.android.islnd.messaging.server.EventQuery;

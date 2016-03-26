@@ -2,9 +2,9 @@ package io.islnd.android.islnd.messaging.crypto;
 
 import android.util.Log;
 
-import io.islnd.android.islnd.messaging.ProtoSerializable;
-
 import java.security.Key;
+
+import io.islnd.android.islnd.messaging.ProtoSerializable;
 
 public abstract class SymmetricEncryptedData<T extends ProtoSerializable> extends EncryptedData {
     private static final String TAG = SymmetricEncryptedData.class.getSimpleName();
