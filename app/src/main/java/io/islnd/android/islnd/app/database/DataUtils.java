@@ -332,7 +332,7 @@ public class DataUtils {
         }
     }
 
-    public static String getProfileAlias(Context context, int userId) {
+    public static String getMessageInbox(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX,
         };

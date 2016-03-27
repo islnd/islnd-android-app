@@ -54,15 +54,17 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
             return false;
         }
 
-        Identity otherKey = (Identity)other;
-        return this.alias.equals(otherKey.alias)
-                && this.displayName.equals(otherKey.displayName)
-                && this.groupKey.equals(otherKey.groupKey)
-                && this.publicKey.equals(otherKey.publicKey);
+        Identity otherIdentity = (Identity)other;
+        return this.alias.equals(otherIdentity.alias)
+                && this.displayName.equals(otherIdentity.displayName)
+                && this.groupKey.equals(otherIdentity.groupKey)
+                && this.publicKey.equals(otherIdentity.publicKey)
+                && this.messageInbox.equals(otherIdentity.messageInbox);
     }
 
-    public static Identity fromProto(byte[] bytes) {
+    public static Identity fromProto(String blob) {
         IslandProto.Identity identity = null;
+        byte[] bytes = new Decoder().decode(blob);
         try {
             identity = IslandProto.Identity.parseFrom(bytes);
         } catch (InvalidProtocolBufferException e) {
