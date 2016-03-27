@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.security.Key;
 
+import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -158,6 +159,32 @@ public class DataUtils {
             return null;
         } finally {
             cursor.close();
+        }
+    }
+
+    public static int getUserIdFromMailbox(Context context, String mailbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry._ID,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " = ? AND " +
+                    IslndContract.UserEntry._ID + " != " + IslndContract.UserEntry.MY_USER_ID,
+                    new String[] {mailbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException("database has no entry for mailbox: " + mailbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -347,6 +374,34 @@ public class DataUtils {
         try {
             if (cursor.moveToFirst()) {
                 return cursor.getString(0);
+            }
+
+            return null;
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public static Profile getProfile(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
+                projection,
+                null,
+                null,
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return new Profile(
+                        cursor.getString(0),
+                        Uri.parse(cursor.getString(1)),
+                        Uri.parse(cursor.getString(2)));
             }
 
             return null;

@@ -142,6 +142,11 @@ public class Util {
                 sharedPref.getString(context.getString(R.string.public_key), ""));
     }
 
+    public static String getMailbox(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.mailbox), "");
+    }
+
     public static Key getPrivateKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePrivateKey(
@@ -149,6 +154,7 @@ public class Util {
     }
 
     public static int getEventId(Context context) {
+        //--TODO we can delete event ID stuff
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getInt(context.getString(R.string.event_id), 0);
     }
@@ -253,11 +259,9 @@ public class Util {
     public static Profile buildDefaultProfile(Context context, String displayName) {
         // TODO: default image Uris will probably be assets...
         return new Profile(
-                displayName,
                 "",
                 ImageUtil.getDefaultProfileImageUri(context),
-                ImageUtil.getDefaultHeaderImageUri(context),
-                Integer.MIN_VALUE);
+                ImageUtil.getDefaultHeaderImageUri(context));
     }
 
     public static Account getSyncAccount(Context context) {

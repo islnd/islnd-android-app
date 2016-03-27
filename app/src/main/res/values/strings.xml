@@ -102,6 +102,7 @@
     <string name="delete_account_title">WARNING</string>
     <string name="delete_account_message">All data will be deleted from device. You will no longer have access to account.</string>
     <string name="delete_button">Delete</string>
+    <string name="mailbox">mailbox</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>

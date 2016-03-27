@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -13,15 +14,20 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.message.Message;
+import io.islnd.android.islnd.messaging.message.MessageType;
+import io.islnd.android.islnd.messaging.message.ProfileMessage;
 import io.islnd.android.islnd.messaging.server.MessageQuery;
-import io.islnd.android.islnd.messaging.server.MessageQueryResponse;
 
 public class FindNewFriendService extends Service {
 
@@ -46,8 +52,7 @@ public class FindNewFriendService extends Service {
 
             @Override
             protected Void doInBackground(Void... params) {
-                int[] delay = {5000, 5000, 5000, 5000, 8000, 10000, 10000, 10000, 10000};
-
+                int[] delay = {20000, 20000, 20000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
                     List<String> mailboxes = getMailboxes();
@@ -59,10 +64,19 @@ public class FindNewFriendService extends Service {
 
                     if (messages != null
                             && messages.size() > 0) {
-                        Identity friendToAdd = Identity.fromProto(messages.get(0).getBlob());
-                        MessageLayer.addFriendToDatabaseAndCreateDefaultProfile(mContext, friendToAdd);
+                        Log.v(TAG, messages.size() + " messages");
+                        PriorityQueue<Message> messageQueue = new PriorityQueue<>();
+                        for (Message message : messages) {
+                            messageQueue.add(message);
+                        }
+
+                        while (!messageQueue.isEmpty()) {
+                            processMessage(messageQueue.poll());
+                        }
+
                         break;
                     }
+
 
                     try {
                         Thread.sleep(delay[i]);
@@ -75,6 +89,41 @@ public class FindNewFriendService extends Service {
                 return null;
             }
         }.execute();
+    }
+
+    private void processMessage(Message message) {
+        Log.v(TAG, "message type " + message.getType());
+        if (message.getType() == MessageType.IDENTITY) {
+            Log.v(TAG, "process identity");
+            Identity friendToAdd = Identity.fromProto(message.getBlob());
+            Identity friendWithOurMailbox = new Identity(
+                    friendToAdd.getDisplayName(),
+                    friendToAdd.getAlias(),
+                    Util.getMailbox(mContext),
+                    friendToAdd.getGroupKey(),
+                    friendToAdd.getPublicKey()
+            );
+
+            MessageLayer.addFriendToDatabaseAndCreateDefaultProfile(mContext, friendWithOurMailbox);
+        }
+        else if (message.getType() == MessageType.PROFILE) {
+            Log.v(TAG, "process profile");
+            ProfileMessage profileMessage = ProfileMessage.fromProto(message.getBlob());
+            Uri headerImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
+                    mContext,
+                    profileMessage.getHeaderImageBytes());
+            Uri profileImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
+                    mContext,
+                    profileMessage.getProfileImageBytes());
+            Profile profile = new Profile(
+                    profileMessage.getAboutMe(),
+                    profileImageUri,
+                    headerImageUri
+            );
+
+            int userId = DataUtils.getUserIdFromMailbox(mContext, message.getMailbox());
+            DataUtils.insertProfile(mContext, profile, userId);
+        }
     }
 
     @NonNull

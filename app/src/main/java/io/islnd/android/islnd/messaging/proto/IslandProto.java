@@ -2290,6 +2290,525 @@ public final class IslandProto {
     // @@protoc_insertion_point(class_scope:proto.Event)
   }
   
+  public interface ProfileMessageOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required string about_me = 1;
+    boolean hasAboutMe();
+    String getAboutMe();
+    
+    // required bytes profile_image = 2;
+    boolean hasProfileImage();
+    com.google.protobuf.ByteString getProfileImage();
+    
+    // required bytes header_image = 3;
+    boolean hasHeaderImage();
+    com.google.protobuf.ByteString getHeaderImage();
+  }
+  public static final class ProfileMessage extends
+      com.google.protobuf.GeneratedMessage
+      implements ProfileMessageOrBuilder {
+    // Use ProfileMessage.newBuilder() to construct.
+    private ProfileMessage(Builder builder) {
+      super(builder);
+    }
+    private ProfileMessage(boolean noInit) {}
+    
+    private static final ProfileMessage defaultInstance;
+    public static ProfileMessage getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public ProfileMessage getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_ProfileMessage_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_ProfileMessage_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required string about_me = 1;
+    public static final int ABOUT_ME_FIELD_NUMBER = 1;
+    private java.lang.Object aboutMe_;
+    public boolean hasAboutMe() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public String getAboutMe() {
+      java.lang.Object ref = aboutMe_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          aboutMe_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getAboutMeBytes() {
+      java.lang.Object ref = aboutMe_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        aboutMe_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required bytes profile_image = 2;
+    public static final int PROFILE_IMAGE_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString profileImage_;
+    public boolean hasProfileImage() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public com.google.protobuf.ByteString getProfileImage() {
+      return profileImage_;
+    }
+    
+    // required bytes header_image = 3;
+    public static final int HEADER_IMAGE_FIELD_NUMBER = 3;
+    private com.google.protobuf.ByteString headerImage_;
+    public boolean hasHeaderImage() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public com.google.protobuf.ByteString getHeaderImage() {
+      return headerImage_;
+    }
+    
+    private void initFields() {
+      aboutMe_ = "";
+      profileImage_ = com.google.protobuf.ByteString.EMPTY;
+      headerImage_ = com.google.protobuf.ByteString.EMPTY;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasAboutMe()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasProfileImage()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasHeaderImage()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getAboutMeBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, profileImage_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, headerImage_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getAboutMeBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, profileImage_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, headerImage_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessageOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_ProfileMessage_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_ProfileMessage_fieldAccessorTable;
+      }
+      
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        aboutMe_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        profileImage_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        headerImage_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.getDescriptor();
+      }
+      
+      public io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.getDefaultInstance();
+      }
+      
+      public io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage result = new io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.aboutMe_ = aboutMe_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.profileImage_ = profileImage_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.headerImage_ = headerImage_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.getDefaultInstance()) return this;
+        if (other.hasAboutMe()) {
+          setAboutMe(other.getAboutMe());
+        }
+        if (other.hasProfileImage()) {
+          setProfileImage(other.getProfileImage());
+        }
+        if (other.hasHeaderImage()) {
+          setHeaderImage(other.getHeaderImage());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasAboutMe()) {
+          
+          return false;
+        }
+        if (!hasProfileImage()) {
+          
+          return false;
+        }
+        if (!hasHeaderImage()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              aboutMe_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              profileImage_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              headerImage_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required string about_me = 1;
+      private java.lang.Object aboutMe_ = "";
+      public boolean hasAboutMe() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public String getAboutMe() {
+        java.lang.Object ref = aboutMe_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          aboutMe_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setAboutMe(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        aboutMe_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearAboutMe() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        aboutMe_ = getDefaultInstance().getAboutMe();
+        onChanged();
+        return this;
+      }
+      void setAboutMe(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000001;
+        aboutMe_ = value;
+        onChanged();
+      }
+      
+      // required bytes profile_image = 2;
+      private com.google.protobuf.ByteString profileImage_ = com.google.protobuf.ByteString.EMPTY;
+      public boolean hasProfileImage() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public com.google.protobuf.ByteString getProfileImage() {
+        return profileImage_;
+      }
+      public Builder setProfileImage(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        profileImage_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearProfileImage() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        profileImage_ = getDefaultInstance().getProfileImage();
+        onChanged();
+        return this;
+      }
+      
+      // required bytes header_image = 3;
+      private com.google.protobuf.ByteString headerImage_ = com.google.protobuf.ByteString.EMPTY;
+      public boolean hasHeaderImage() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public com.google.protobuf.ByteString getHeaderImage() {
+        return headerImage_;
+      }
+      public Builder setHeaderImage(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        headerImage_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearHeaderImage() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        headerImage_ = getDefaultInstance().getHeaderImage();
+        onChanged();
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:proto.ProfileMessage)
+    }
+    
+    static {
+      defaultInstance = new ProfileMessage(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:proto.ProfileMessage)
+  }
+  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_Identity_descriptor;
   private static
@@ -2305,6 +2824,11 @@ public final class IslandProto {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_proto_Event_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_ProfileMessage_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_proto_ProfileMessage_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2323,8 +2847,10 @@ public final class IslandProto {
       "\n\nevent_type\030\003 \002(\005\022\022\n\ncontent_id\030\004 \001(\t\022\024" +
       "\n\014text_content\030\005 \001(\t\022\024\n\014data_content\030\006 \001" +
       "(\014\022\021\n\ttimestamp\030\007 \001(\003\022\024\n\014parent_alias\030\010 " +
-      "\001(\t\022\031\n\021parent_content_id\030\t \001(\tB(\n&io.isl",
-      "nd.android.islnd.messaging.proto"
+      "\001(\t\022\031\n\021parent_content_id\030\t \001(\t\"O\n\016Profil",
+      "eMessage\022\020\n\010about_me\030\001 \002(\t\022\025\n\rprofile_im" +
+      "age\030\002 \002(\014\022\024\n\014header_image\030\003 \002(\014B(\n&io.is" +
+      "lnd.android.islnd.messaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2355,6 +2881,14 @@ public final class IslandProto {
               new java.lang.String[] { "Alias", "EventId", "EventType", "ContentId", "TextContent", "DataContent", "Timestamp", "ParentAlias", "ParentContentId", },
               io.islnd.android.islnd.messaging.proto.IslandProto.Event.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.Event.Builder.class);
+          internal_static_proto_ProfileMessage_descriptor =
+            getDescriptor().getMessageTypes().get(3);
+          internal_static_proto_ProfileMessage_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_proto_ProfileMessage_descriptor,
+              new java.lang.String[] { "AboutMe", "ProfileImage", "HeaderImage", },
+              io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.Builder.class);
           return null;
         }
       };

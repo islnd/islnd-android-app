@@ -4,31 +4,20 @@ import android.net.Uri;
 
 import java.io.Serializable;
 
-public class Profile implements Serializable, VersionedContent {
+public class Profile implements Serializable {
 
-    private final String displayName;
     private final String aboutMe;
     private final Uri profileImageUri;
     private final Uri headerImageUri;
-    private final int version;
 
     public Profile(
-            String displayName,
             String aboutMe,
             Uri profileImageUri,
-            Uri headerImageUri,
-            int version)
+            Uri headerImageUri)
     {
-        this.displayName = displayName;
         this.aboutMe = aboutMe;
         this.profileImageUri = profileImageUri;
         this.headerImageUri = headerImageUri;
-        this.version = version;
-    }
-
-    public String getDisplayName()
-    {
-        return displayName;
     }
 
     public String getAboutMe()
@@ -42,9 +31,5 @@ public class Profile implements Serializable, VersionedContent {
 
     public Uri getHeaderImageUri() {
         return headerImageUri;
-    }
-
-    public int getVersion() {
-        return version;
     }
 }

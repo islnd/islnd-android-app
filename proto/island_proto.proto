@@ -26,3 +26,9 @@ message Event {
   optional string parent_alias = 8;
   optional string parent_content_id = 9;
 }
+
+message ProfileMessage {
+  required string about_me = 1;
+  required bytes profile_image = 2;
+  required bytes header_image = 3;
+}
