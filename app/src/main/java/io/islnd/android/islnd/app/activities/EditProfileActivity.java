@@ -28,7 +28,7 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static String TAG = EditProfileActivity.class.getSimpleName();
+    private static final String TAG = EditProfileActivity.class.getSimpleName();
 
     private static final String PROFILE_IMAGE_URI_STATE = "PROFILE_IMAGE_URI_STATE";
     private static final String HEADER_IMAGE_URI_STATE = "HEADER_IMAGE_URI_STATE";

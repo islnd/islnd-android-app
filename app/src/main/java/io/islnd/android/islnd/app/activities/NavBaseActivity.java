@@ -39,6 +39,7 @@ import com.google.zxing.integration.android.IntentResult;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.fragments.NotificationsFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
@@ -156,6 +157,13 @@ public class NavBaseActivity extends AppCompatActivity
                     break;
                 }
                 mFragment = new ViewFriendsFragment();
+                isFragment = true;
+                break;
+            case R.id.nav_notifications:
+                if (currentFragment instanceof NotificationsFragment) {
+                    break;
+                }
+                mFragment = new NotificationsFragment();
                 isFragment = true;
                 break;
             case R.id.nav_add_friend:
