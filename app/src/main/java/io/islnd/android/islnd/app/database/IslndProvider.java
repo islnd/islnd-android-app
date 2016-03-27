@@ -31,6 +31,7 @@ public class IslndProvider extends ContentProvider {
     static final int RECEIVED_EVENT = 800;
     static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
     static final int OUTGOING_EVENT = 900;
+    static final int NOTIFICATION = 1000;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -100,6 +101,21 @@ public class IslndProvider extends ContentProvider {
                         " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID +
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
+        );
+    }
+
+    private static final SQLiteQueryBuilder sNotificationQueryBuilder;
+
+    static {
+        sNotificationQueryBuilder = new SQLiteQueryBuilder();
+
+        sNotificationQueryBuilder.setTables(
+                IslndContract.NotificationEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                        " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
+                        " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
         );
     }
 
@@ -275,6 +291,8 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_EVENT, OUTGOING_EVENT);
 
+        matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
+
         return matcher;
     }
 
@@ -411,6 +429,17 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case NOTIFICATION: {
+                retCursor = sNotificationQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -446,6 +475,8 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.ReceivedEventEntry.CONTENT_TYPE;
             case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID:
                 return IslndContract.ReceivedEventEntry.CONTENT_ITEM_TYPE;
+            case NOTIFICATION:
+                return IslndContract.NotificationEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -555,6 +586,18 @@ public class IslndProvider extends ContentProvider {
             }
             case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID: {
                 returnUri = insertEventWithAliasAndUri(db, uri);
+                break;
+            }
+            case NOTIFICATION: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.NotificationEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if ( _id > 0 )
+                    returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
+                else
+                    return null;
                 break;
             }
             default:
@@ -702,6 +745,11 @@ public class IslndProvider extends ContentProvider {
             case OUTGOING_EVENT: {
                 rowsDeleted = db.delete(
                         IslndContract.OutgoingEventEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case NOTIFICATION: {
+                rowsDeleted = db.delete(
+                        IslndContract.NotificationEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:
