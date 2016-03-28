@@ -24,7 +24,6 @@ public class Message implements Comparable<Message> {
         return blob;
     }
 
-
     @Override
     public int compareTo(Message another) {
         return type - another.type;
