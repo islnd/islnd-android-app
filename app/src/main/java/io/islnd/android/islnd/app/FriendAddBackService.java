@@ -15,6 +15,7 @@ import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.message.Message;
+import io.islnd.android.islnd.messaging.message.MessageBuilder;
 import io.islnd.android.islnd.messaging.message.MessageType;
 import io.islnd.android.islnd.messaging.message.ProfileMessage;
 
@@ -42,10 +43,9 @@ public class FriendAddBackService extends IntentService {
         switch (job) {
             case IDENTITY_JOB: {
                 Identity myIdentity = MessageLayer.getMyIdentity(this);
-                Message identityMessage = new Message(
+                Message identityMessage = MessageBuilder.buildIdentityMessage(
                         inbox,
-                        MessageType.IDENTITY,
-                        new Encoder().encodeToString(myIdentity.toByteArray()));
+                        myIdentity);
                 Rest.postMessage(identityMessage, Util.getApiKey(this));
                 break;
             }
@@ -55,10 +55,9 @@ public class FriendAddBackService extends IntentService {
                         profile.getAboutMe(),
                         ImageUtil.getByteArrayFromUri(this, profile.getProfileImageUri()),
                         ImageUtil.getByteArrayFromUri(this, profile.getHeaderImageUri()));
-                Message profileMessage = new Message(
+                Message profileMessage = MessageBuilder.buildProfileMessage(
                         inbox,
-                        MessageType.PROFILE,
-                        new Encoder().encodeToString(myProfile.toByteArray()));
+                        myProfile);
                 Rest.postMessage(profileMessage, Util.getApiKey(this));
                 break;
             }
