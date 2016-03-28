@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.security.Key;
 
-import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -21,12 +20,13 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class DataUtils {
     private static final String TAG = DataUtils.class.getSimpleName();
 
-    public static long insertUser(Context context, Identity identity) {
+    public static long insertUser(Context context, Identity identity, String messageOutbox) {
         return insertUser(
                 context,
                 identity.getDisplayName(),
                 identity.getAlias(),
                 identity.getMessageInbox(),
+                messageOutbox,
                 identity.getGroupKey(),
                 identity.getPublicKey());
     }
@@ -35,12 +35,14 @@ public class DataUtils {
             Context context,
             String displayName,
             String alias,
-            String profileAlias,
+            String messageInbox,
+            String messageOutbox,
             Key groupKey,
             Key publicKey) {
         ContentValues userValues = new ContentValues();
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
-        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, profileAlias);
+        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, messageInbox);
+        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, messageOutbox);
 
         final ContentResolver contentResolver = context.getContentResolver();
         Uri result = contentResolver.insert(
@@ -65,7 +67,7 @@ public class DataUtils {
 
         Log.v(TAG, "inserted user");
         Log.v(TAG, "alias " + alias);
-        Log.v(TAG, "profile alias " + profileAlias);
+        Log.v(TAG, "profile alias " + messageInbox);
 
         return userId;
     }
@@ -162,7 +164,7 @@ public class DataUtils {
         }
     }
 
-    public static int getUserIdFromMailbox(Context context, String mailbox) {
+    public static int getUserIdWithMessageOutbox(Context context, String mailbox) {
         String[] projection = new String[] {
                 IslndContract.UserEntry._ID,
         };
@@ -172,8 +174,7 @@ public class DataUtils {
             cursor = context.getContentResolver().query(
                     IslndContract.UserEntry.CONTENT_URI,
                     projection,
-                    IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " = ? AND " +
-                    IslndContract.UserEntry._ID + " != " + IslndContract.UserEntry.MY_USER_ID,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " = ?",
                     new String[] {mailbox},
                     null);
             if (cursor.moveToFirst()) {

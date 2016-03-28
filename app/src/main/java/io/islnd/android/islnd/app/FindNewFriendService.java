@@ -79,15 +79,16 @@ public class FindNewFriendService extends Service {
                             processMessage(messageQueue.poll());
                         }
 
-                        if (mIdentityAdded
-                                && mProfileAdded) {
+                        if (mProfileAdded) {
                             removeMailboxFromQuerySet();
 
                             final String newMailbox = CryptoUtil.createAlias();
                             DataUtils.updateMyUserMailbox(mContext, newMailbox);
                             Util.setMyMailbox(mContext, newMailbox);
                             DataUtils.addMailboxToQuerySet(mContext, newMailbox);
+
                             Log.v(TAG, "my new mailbox is " + newMailbox);
+
                             break;
                         }
                     }
@@ -125,13 +126,25 @@ public class FindNewFriendService extends Service {
             Identity friendWithOurMailbox = new Identity(
                     friendToAdd.getDisplayName(),
                     friendToAdd.getAlias(),
-                    Util.getMyMailbox(mContext),
+                    friendToAdd.getMessageInbox(),
                     friendToAdd.getGroupKey(),
                     friendToAdd.getPublicKey()
             );
 
-            MessageLayer.addFriendToDatabaseAndCreateDefaultProfile(mContext, friendWithOurMailbox);
+            MessageLayer.addFriendToDatabaseAndCreateDefaultProfile(
+                    mContext,
+                    friendWithOurMailbox,
+                    Util.getMyInbox(mContext)
+            );
+
             mIdentityAdded = true;
+
+            Intent sendProfileIntent = new Intent(mContext, FriendAddBackService.class);
+            sendProfileIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, friendToAdd.getMessageInbox());
+            sendProfileIntent.putExtra(
+                    FriendAddBackService.JOB_EXTRA,
+                    FriendAddBackService.PROFILE_JOB);
+            mContext.startService(sendProfileIntent);
         }
         else if (message.getType() == MessageType.PROFILE) {
             Log.v(TAG, "process profile");
@@ -148,7 +161,7 @@ public class FindNewFriendService extends Service {
                     headerImageUri
             );
 
-            int userId = DataUtils.getUserIdFromMailbox(mContext, message.getMailbox());
+            int userId = DataUtils.getUserIdWithMessageOutbox(mContext, message.getMailbox());
             DataUtils.insertProfile(mContext, profile, userId);
             Log.v(TAG, "adding profile for user " + userId);
             mProfileAdded = true;

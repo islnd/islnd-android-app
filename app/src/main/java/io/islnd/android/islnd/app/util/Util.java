@@ -142,7 +142,7 @@ public class Util {
                 sharedPref.getString(context.getString(R.string.public_key), ""));
     }
 
-    public static String getMyMailbox(Context context) {
+    public static String getMyInbox(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.mailbox), "");
     }
@@ -240,7 +240,7 @@ public class Util {
     }
 
     public static void buildQrCode(ImageView qrImageView, String content) {
-        final int DIMEN = 500;
+        final int DIMEN = 700;
 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = null;

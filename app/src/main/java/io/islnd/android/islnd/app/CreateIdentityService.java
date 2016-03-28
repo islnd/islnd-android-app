@@ -64,19 +64,20 @@ public class CreateIdentityService extends IntentService {
         SharedPreferences.Editor editor = settings.edit();
 
         String alias = CryptoUtil.createAlias();
-        String mailbox = CryptoUtil.createAlias();
-        DataUtils.addMailboxToQuerySet(context, mailbox);
+        String messageInbox = CryptoUtil.createAlias();
+        DataUtils.addMailboxToQuerySet(context, messageInbox);
 
         long userId = DataUtils.insertUser(
                 context,
                 displayName,
                 alias,
-                mailbox,
+                messageInbox,
+                null,
                 Util.getGroupKey(context),
                 Util.getPublicKey(context));
 
         editor.putInt(context.getString(R.string.user_id), (int) userId);
-        editor.putString(context.getString(R.string.mailbox), mailbox);
+        editor.putString(context.getString(R.string.mailbox), messageInbox);
         editor.commit();
 
         return (int)userId;

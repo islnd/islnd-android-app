@@ -186,7 +186,9 @@ public class NavBaseActivity extends AppCompatActivity
             } else {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
+                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(
+                        getApplicationContext(),
+                        contents);
                 String message = friendAdded
                         ? getString(R.string.added_new_friend_message)
                         : getString(R.string.already_friends_message);

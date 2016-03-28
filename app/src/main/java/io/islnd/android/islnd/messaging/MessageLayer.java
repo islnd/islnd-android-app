@@ -20,32 +20,48 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
-    public static boolean addFriendFromEncodedIdentityString(Context context,
-                                                             String encodedString) {
+    public static boolean addFriendFromEncodedIdentityString(Context context, String encodedString) {
         context.stopService(new Intent(context, FindNewFriendService.class));
 
         Identity identity = Identity.fromProto(encodedString);
-        boolean newFriend =  addFriendToDatabaseAndCreateDefaultProfile(context, identity);
+        boolean newFriend =  addFriendToDatabaseAndCreateDefaultProfile(
+                context,
+                identity,
+                Util.getMyInbox(context));
+
         if (!newFriend) {
             return false;
         }
 
+        //--We need a new inbox to give to our next friend
+        Util.setMyMailbox(context, CryptoUtil.createAlias());
+
         Intent findFriendServiceIntent = new Intent(context, FindNewFriendService.class);
         context.startService(findFriendServiceIntent);
 
-        Intent addBackFriendIntent = new Intent(context, FriendAddBackService.class);
-        addBackFriendIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, identity.getMessageInbox());
-        context.startService(addBackFriendIntent);
+        Intent sendIdentityIntent = new Intent(context, FriendAddBackService.class);
+        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, identity.getMessageInbox());
+        sendIdentityIntent.putExtra(
+                FriendAddBackService.JOB_EXTRA,
+                FriendAddBackService.IDENTITY_JOB);
+        context.startService(sendIdentityIntent);
+
+        Intent sendProfileIntent = new Intent(context, FriendAddBackService.class);
+        sendProfileIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, identity.getMessageInbox());
+        sendProfileIntent.putExtra(
+                FriendAddBackService.JOB_EXTRA,
+                FriendAddBackService.PROFILE_JOB);
+        context.startService(sendProfileIntent);
 
         return newFriend;
     }
 
-    public static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity) {
+    public static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity, String messageOutbox) {
         if (DataUtils.containsPublicKey(context, identity.getPublicKey())) {
             return false;
         }
 
-        long userId = DataUtils.insertUser(context, identity);
+        long userId = DataUtils.insertUser(context, identity, messageOutbox);
 
         Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
         DataUtils.insertProfile(context, profile, userId);

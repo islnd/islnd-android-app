@@ -23,6 +23,9 @@ public class FriendAddBackService extends IntentService {
     private static final String TAG = FriendAddBackService.class.getSimpleName();
 
     public static final String MAILBOX_EXTRA = "mailbox_extra";
+    public static final String JOB_EXTRA = "job_extra";
+    public static final int IDENTITY_JOB = 0;
+    public static final int PROFILE_JOB = 1;
 
     public FriendAddBackService() {
         super(TAG);
@@ -33,25 +36,36 @@ public class FriendAddBackService extends IntentService {
         Log.v(TAG, "onHandleIntent");
 
         String inbox = intent.getStringExtra(MAILBOX_EXTRA);
-        Log.v(TAG, "add back to mailbox " + inbox);
 
-        Identity myIdentity = MessageLayer.getMyIdentity(this);
-        Message identityMessage = new Message(
-                inbox,
-                MessageType.IDENTITY,
-                new Encoder().encodeToString(myIdentity.toByteArray()));
-        Rest.postMessage(identityMessage, Util.getApiKey(this));
-
-        Profile profile = DataUtils.getProfile(this, IslndContract.UserEntry.MY_USER_ID);
-        ProfileMessage myProfile = new ProfileMessage(
-                profile.getAboutMe(),
-                ImageUtil.getByteArrayFromUri(this, profile.getProfileImageUri()),
-                ImageUtil.getByteArrayFromUri(this, profile.getHeaderImageUri()));
-        Message profileMessage = new Message(
-                inbox,
-                MessageType.PROFILE,
-                new Encoder().encodeToString(myProfile.toByteArray()));
-        Rest.postMessage(profileMessage, Util.getApiKey(this));
+        int job = intent.getIntExtra(JOB_EXTRA, -1);
+        Log.v(TAG, "add back to mailbox " + inbox + " job " + job);
+        switch (job) {
+            case IDENTITY_JOB: {
+                Identity myIdentity = MessageLayer.getMyIdentity(this);
+                Message identityMessage = new Message(
+                        inbox,
+                        MessageType.IDENTITY,
+                        new Encoder().encodeToString(myIdentity.toByteArray()));
+                Rest.postMessage(identityMessage, Util.getApiKey(this));
+                break;
+            }
+            case PROFILE_JOB: {
+                Profile profile = DataUtils.getProfile(this, IslndContract.UserEntry.MY_USER_ID);
+                ProfileMessage myProfile = new ProfileMessage(
+                        profile.getAboutMe(),
+                        ImageUtil.getByteArrayFromUri(this, profile.getProfileImageUri()),
+                        ImageUtil.getByteArrayFromUri(this, profile.getHeaderImageUri()));
+                Message profileMessage = new Message(
+                        inbox,
+                        MessageType.PROFILE,
+                        new Encoder().encodeToString(myProfile.toByteArray()));
+                Rest.postMessage(profileMessage, Util.getApiKey(this));
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("don't recognize job " + job);
+            }
+        }
 
         Log.v(TAG, "onHandleIntent complete");
     }
