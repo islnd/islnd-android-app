@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -36,6 +37,7 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
     public void onBindViewHolder(NotificationViewHolder holder, Cursor cursor) {
         String contentInfo = "";
         String displayName = cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
+        int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID));
 
         switch (cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE))) {
             case NotificationType.COMMENT:
@@ -58,7 +60,13 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                 break;
             case NotificationType.NEW_FRIEND:
                 contentInfo = displayName + " " + mContext.getString(R.string.notification_new_friend_content);
-                holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_24dp);
+                holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_18dp);
+
+                holder.view.setOnClickListener((View v) -> {
+                    Intent intent = new Intent(mContext, ProfileActivity.class);
+                    intent.putExtra(ProfileActivity.USER_ID_EXTRA, userId);
+                    mContext.startActivity(intent);
+                });
                 break;
         }
 

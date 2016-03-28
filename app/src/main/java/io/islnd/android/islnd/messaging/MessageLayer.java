@@ -10,6 +10,7 @@ import java.security.Key;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.database.NotificationType;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
@@ -35,6 +36,13 @@ public class MessageLayer {
 
         Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
         DataUtils.insertProfile(context, profile, userId);
+
+        DataUtils.insertNotification(
+                context,
+                (int) userId,
+                NotificationType.NEW_FRIEND,
+                "",
+                ServerTime.getCurrentTimeMillis(context));
 
         return true;
     }
