@@ -24,6 +24,7 @@ import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.Rest;
+import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.message.MessageType;
 import io.islnd.android.islnd.messaging.message.ProfileMessage;
@@ -35,6 +36,10 @@ public class FindNewFriendService extends Service {
 
     private Context mContext;
     private ContentResolver mContentResolver;
+
+    private boolean mIdentityAdded;
+    private boolean mProfileAdded;
+    private String mMailbox;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -52,7 +57,7 @@ public class FindNewFriendService extends Service {
 
             @Override
             protected Void doInBackground(Void... params) {
-                int[] delay = {20000, 20000, 20000, 20000, 20000};
+                int[] delay = {5000, 50000, 10000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
                     List<String> mailboxes = getMailboxes();
@@ -74,9 +79,18 @@ public class FindNewFriendService extends Service {
                             processMessage(messageQueue.poll());
                         }
 
-                        break;
-                    }
+                        if (mIdentityAdded
+                                && mProfileAdded) {
+                            removeMailboxFromQuerySet();
 
+                            final String newMailbox = CryptoUtil.createAlias();
+                            DataUtils.updateMyUserMailbox(mContext, newMailbox);
+                            Util.setMyMailbox(mContext, newMailbox);
+                            DataUtils.addMailboxToQuerySet(mContext, newMailbox);
+                            Log.v(TAG, "my new mailbox is " + newMailbox);
+                            break;
+                        }
+                    }
 
                     try {
                         Thread.sleep(delay[i]);
@@ -91,6 +105,18 @@ public class FindNewFriendService extends Service {
         }.execute();
     }
 
+    private void removeMailboxFromQuerySet() {
+        String selection = IslndContract.MailboxEntry.COLUMN_MAILBOX + " = ?";
+        String[] args = new String[] {
+                mMailbox
+        };
+        mContentResolver.delete(
+                IslndContract.MailboxEntry.CONTENT_URI,
+                selection,
+                args
+        );
+    }
+
     private void processMessage(Message message) {
         Log.v(TAG, "message type " + message.getType());
         if (message.getType() == MessageType.IDENTITY) {
@@ -99,12 +125,13 @@ public class FindNewFriendService extends Service {
             Identity friendWithOurMailbox = new Identity(
                     friendToAdd.getDisplayName(),
                     friendToAdd.getAlias(),
-                    Util.getMailbox(mContext),
+                    Util.getMyMailbox(mContext),
                     friendToAdd.getGroupKey(),
                     friendToAdd.getPublicKey()
             );
 
             MessageLayer.addFriendToDatabaseAndCreateDefaultProfile(mContext, friendWithOurMailbox);
+            mIdentityAdded = true;
         }
         else if (message.getType() == MessageType.PROFILE) {
             Log.v(TAG, "process profile");
@@ -123,14 +150,20 @@ public class FindNewFriendService extends Service {
 
             int userId = DataUtils.getUserIdFromMailbox(mContext, message.getMailbox());
             DataUtils.insertProfile(mContext, profile, userId);
+            Log.v(TAG, "adding profile for user " + userId);
+            mProfileAdded = true;
+
+            //--TODO this assumes all messages are from same mailbox
+            //--TODO assumes all messages are from same user
+            mMailbox = message.getMailbox();
         }
     }
 
     @NonNull
     private List<String> getMailboxes() {
-        String[] projection = new String[] { IslndContract.UserEntry.COLUMN_MESSAGE_INBOX};
+        String[] projection = new String[] { IslndContract.MailboxEntry.COLUMN_MAILBOX };
         Cursor cursor = mContentResolver.query(
-                IslndContract.UserEntry.CONTENT_URI,
+                IslndContract.MailboxEntry.CONTENT_URI,
                 projection,
                 null,
                 null,

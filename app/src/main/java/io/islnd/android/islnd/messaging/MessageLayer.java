@@ -41,10 +41,9 @@ public class MessageLayer {
     }
 
     public static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity) {
-        //--TODO handle duplicates
-//        if (DataUtils.containsPublicKey(context, identity.getPublicKey())) {
-//            return false;
-//        }
+        if (DataUtils.containsPublicKey(context, identity.getPublicKey())) {
+            return false;
+        }
 
         long userId = DataUtils.insertUser(context, identity);
 

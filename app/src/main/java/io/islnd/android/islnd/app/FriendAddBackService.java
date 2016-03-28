@@ -33,6 +33,7 @@ public class FriendAddBackService extends IntentService {
         Log.v(TAG, "onHandleIntent");
 
         String inbox = intent.getStringExtra(MAILBOX_EXTRA);
+        Log.v(TAG, "add back to mailbox " + inbox);
 
         Identity myIdentity = MessageLayer.getMyIdentity(this);
         Message identityMessage = new Message(

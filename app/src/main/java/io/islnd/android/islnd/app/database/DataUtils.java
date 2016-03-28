@@ -409,4 +409,31 @@ public class DataUtils {
             cursor.close();
         }
     }
+
+    public static void updateMyUserMailbox(Context context, String newMailbox) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, newMailbox);
+
+        String selection = IslndContract.UserEntry._ID + " = ?";
+        String[] selectionArgs = new String[]{
+                Integer.toString(IslndContract.UserEntry.MY_USER_ID)
+        };
+
+        context.getContentResolver().update(
+                IslndContract.UserEntry.CONTENT_URI,
+                values,
+                selection,
+                selectionArgs
+        );
+    }
+
+    public static void addMailboxToQuerySet(Context context, String newMailbox) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.MailboxEntry.COLUMN_MAILBOX, newMailbox);
+
+        context.getContentResolver().insert(
+                IslndContract.MailboxEntry.CONTENT_URI,
+                values
+        );
+    }
 }

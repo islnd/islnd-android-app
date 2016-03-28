@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 16;
+    private static final int DATABASE_VERSION = 17;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -99,6 +99,10 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.OutgoingEventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
                 IslndContract.OutgoingEventEntry.COLUMN_BLOB + " INTEGER NOT NULL);";
 
+        final String SQL_CREATE_MAILBOX_TABLE = "CREATE TABLE " + IslndContract.MailboxEntry.TABLE_NAME + " (" +
+                IslndContract.MailboxEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.MailboxEntry.COLUMN_MAILBOX + " TEXT NOT NULL);";
+
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_ALIAS_TABLE);
         db.execSQL(SQL_CREATE_DISPLAY_NAME_TABLE);
@@ -107,6 +111,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_PROFILE_TABLE);
         db.execSQL(SQL_CREATE_RECEIVED_EVENT_TABLE);
         db.execSQL(SQL_CREATE_OUTGOING_EVENT_TABLE);
+        db.execSQL(SQL_CREATE_MAILBOX_TABLE);
     }
 
     @Override
@@ -119,6 +124,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ProfileEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedEventEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingEventEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.MailboxEntry.TABLE_NAME);
         onCreate(db);
     }
 }

@@ -142,9 +142,17 @@ public class Util {
                 sharedPref.getString(context.getString(R.string.public_key), ""));
     }
 
-    public static String getMailbox(Context context) {
+    public static String getMyMailbox(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.mailbox), "");
+    }
+
+    public static void setMyMailbox(Context context, String mailbox) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString(context.getString(R.string.mailbox), mailbox);
+        editor.commit();
     }
 
     public static Key getPrivateKey(Context context) {
