@@ -179,7 +179,7 @@ public class EventProcessor {
                 values);
 
         if (Util.getUserId(context) != commentUserId) {
-            DataUtils.addNotification(
+            DataUtils.insertNotification(
                     context,
                     commentUserId,
                     NotificationType.COMMENT,

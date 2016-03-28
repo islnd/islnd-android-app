@@ -325,11 +325,11 @@ public class DataUtils {
         }
     }
 
-    public static void addNotification(Context context,
-                                       int userId,
-                                       int notificationType,
-                                       String postId,
-                                       long timestamp) {
+    public static void insertNotification(Context context,
+                                          int userId,
+                                          int notificationType,
+                                          String postId,
+                                          long timestamp) {
         ContentValues values = new ContentValues();
         values.put(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID, userId);
         values.put(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE, notificationType);

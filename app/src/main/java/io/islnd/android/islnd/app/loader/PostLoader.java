@@ -13,8 +13,6 @@ import io.islnd.android.islnd.app.database.IslndContract;
 
 public class PostLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final int LOADER_ID = 2;
-
     private final Context mContext;
     private final Uri mContentUri;
     private final PostAdapter mAdapter;

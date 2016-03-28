@@ -20,6 +20,7 @@ import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.ViewFriendsAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.FriendLoader;
+import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.util.Util;
 
 public class ViewFriendsFragment extends Fragment {
@@ -55,7 +56,7 @@ public class ViewFriendsFragment extends Fragment {
         FriendLoader friendLoader = new FriendLoader(
                 mContext,
                 mAdapter);
-        getLoaderManager().initLoader(FriendLoader.LOADER_ID, args, friendLoader);
+        getLoaderManager().initLoader(LoaderId.FRIEND_LOADER_ID, args, friendLoader);
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);

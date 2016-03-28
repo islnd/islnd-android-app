@@ -22,6 +22,7 @@ import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.activities.NewPostActivity;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.Util;
 
@@ -58,7 +59,7 @@ public class FeedFragment extends Fragment {
                 IslndContract.PostEntry.CONTENT_URI,
                 mAdapter);
         getLoaderManager().initLoader(
-                PostLoader.LOADER_ID,
+                LoaderId.POST_LOADER_ID,
                 null,
                 postLoader);
 

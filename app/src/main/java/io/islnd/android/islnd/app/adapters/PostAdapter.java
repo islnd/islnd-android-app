@@ -73,7 +73,6 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
         // View post on post click
         holder.itemView.setOnClickListener((View v) -> {
             Intent viewPostIntent = new Intent(mContext, ViewPostActivity.class);
-            //viewPostIntent.putExtra(Post.POST_EXTRA, post);
             viewPostIntent.putExtra(Post.POST_ID_EXTRA, post.getPostId());
             viewPostIntent.putExtra(Post.POST_USER_ID_EXTRA, post.getUserId());
             ((Activity)mContext).startActivityForResult(viewPostIntent, FeedFragment.DELETE_POST_RESULT);

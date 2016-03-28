@@ -34,6 +34,7 @@ import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.CommentAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.CommentLoader;
+import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -42,8 +43,6 @@ public class ViewPostActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ViewPostActivity.class.getSimpleName();
-
-    public static final int LOADER_ID = 5;
 
     private Post mPost = null;
     private String mPostId;
@@ -73,7 +72,7 @@ public class ViewPostActivity extends AppCompatActivity
         mPostId = intent.getStringExtra(Post.POST_ID_EXTRA);
         mPostUserId = intent.getIntExtra(Post.POST_USER_ID_EXTRA, -1);
 
-        getSupportLoaderManager().initLoader(this.LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.VIEW_POST_LOADER_ID, new Bundle(), this);
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
@@ -237,7 +236,7 @@ public class ViewPostActivity extends AppCompatActivity
                 this,
                 mAdapter);
 
-        getSupportLoaderManager().initLoader(CommentLoader.LOADER_ID, args, localCommentLoader);
+        getSupportLoaderManager().initLoader(LoaderId.COMMENT_LOADER_ID, args, localCommentLoader);
     }
 
     @Override

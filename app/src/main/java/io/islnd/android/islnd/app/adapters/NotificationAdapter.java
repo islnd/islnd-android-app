@@ -9,6 +9,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ import io.islnd.android.islnd.app.viewholders.NotificationViewHolder;
 
 public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationViewHolder> {
 
+    private static final String TAG = NotificationAdapter.class.getSimpleName();
+
     public NotificationAdapter(Context context, Cursor cursor) {
         super(context, cursor);
     }
@@ -39,11 +42,14 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                 contentInfo = displayName + " " + mContext.getString(R.string.notification_comment_content);
                 holder.notificationTypeIcon.setImageResource(R.drawable.ic_comment_18dp);
 
-                holder.view.setOnClickListener((View view) -> {
+                String postId =
+                        cursor.getString(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_POST_ID));
+
+                holder.view.setOnClickListener((View v) -> {
                     Intent intent = new Intent(mContext, ViewPostActivity.class);
                     intent.putExtra(
                             Post.POST_ID_EXTRA,
-                            cursor.getString(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_POST_ID)));
+                            postId);
                     intent.putExtra(
                             Post.POST_USER_ID_EXTRA,
                             Util.getUserId(mContext));
@@ -74,6 +80,8 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.notification, parent, false);
 
-        return new NotificationViewHolder(v);
+        NotificationViewHolder viewHolder = new NotificationViewHolder(v);
+
+        return viewHolder;
     }
 }

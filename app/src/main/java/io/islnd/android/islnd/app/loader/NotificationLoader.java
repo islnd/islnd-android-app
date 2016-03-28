@@ -13,8 +13,6 @@ import io.islnd.android.islnd.app.database.IslndContract;
 
 public class NotificationLoader implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    public static final int LOADER_ID = 3;
-
     private final Context mContext;
     private final Uri mContentUri;
     private final NotificationAdapter mAdapter;

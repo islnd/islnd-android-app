@@ -16,6 +16,7 @@ import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.adapters.NotificationAdapter;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.loader.NotificationLoader;
 import io.islnd.android.islnd.app.loader.PostLoader;
 
@@ -46,7 +47,7 @@ public class NotificationsFragment extends Fragment {
                 IslndContract.NotificationEntry.CONTENT_URI,
                 mAdapter);
         getLoaderManager().initLoader(
-                NotificationLoader.LOADER_ID,
+                LoaderId.NOTIFICATION_LOADER_ID,
                 null,
                 notificationLoader);
 
