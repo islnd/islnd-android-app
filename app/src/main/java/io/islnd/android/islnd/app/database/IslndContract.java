@@ -54,6 +54,17 @@ public class IslndContract {
         public static Uri buildPostUriWithUserId(int userId) {
             return CONTENT_URI.buildUpon().appendPath(Integer.toString(userId)).build();
         }
+
+        public static Uri buildPostUriWithUserIdAndPostId(int userId, String postId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
+                    .appendPath(postId)
+                    .build();
+        }
+
+        public static String getPostIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
+        }
     }
 
     public static final class UserEntry implements BaseColumns {
@@ -234,27 +245,13 @@ public class IslndContract {
 
         public static final String TABLE_NAME = "notification";
 
-        public static final String COLUMN_NOTIFICATION_USER_ID = "comment_user_id";
+        public static final String COLUMN_NOTIFICATION_USER_ID = "user_id";
         public static final String COLUMN_NOTIFICATION_TYPE = "notification_type";
         public static final String COLUMN_POST_ID = "post_id";
         public static final String COLUMN_TIMESTAMP = "timestamp";
 
-        public static int getUserIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(1));
-        }
-
-        public static String getPostIdFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);
-        }
-
         public static Uri buildNotificationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
-        public static Uri buildNotificationWithUserId(int userId) {
-            return CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(userId))
-                    .build();
         }
     }
 

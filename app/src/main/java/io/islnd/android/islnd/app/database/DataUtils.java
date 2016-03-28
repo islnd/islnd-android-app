@@ -324,4 +324,20 @@ public class DataUtils {
             }
         }
     }
+
+    public static void addNotification(Context context,
+                                       int userId,
+                                       int notificationType,
+                                       String postId,
+                                       long timestamp) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID, userId);
+        values.put(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE, notificationType);
+        values.put(IslndContract.NotificationEntry.COLUMN_POST_ID, postId);
+        values.put(IslndContract.NotificationEntry.COLUMN_TIMESTAMP, timestamp);
+        context.getContentResolver().insert(
+                IslndContract.NotificationEntry.CONTENT_URI,
+                values);
+        Log.v(TAG, "notification added");
+    }
 }

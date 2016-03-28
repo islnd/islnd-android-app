@@ -12,6 +12,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder  {
     public TextView notificationContent;
     public ImageView notificationTypeIcon;
     public TextView timestamp;
+    public View view;
 
     public NotificationViewHolder(View itemView) {
         super(itemView);
@@ -19,5 +20,6 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder  {
         notificationContent = (TextView) itemView.findViewById(R.id.notification_content);
         notificationTypeIcon = (ImageView) itemView.findViewById(R.id.notification_type_icon);
         timestamp = (TextView) itemView.findViewById(R.id.timestamp);
+        view = itemView;
     }
 }

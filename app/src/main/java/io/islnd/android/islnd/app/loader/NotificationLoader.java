@@ -24,13 +24,15 @@ public class NotificationLoader implements LoaderManager.LoaderCallbacks<Cursor>
         mAdapter = notificationAdapter;
         mContentUri = contentUri;
     }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = new String[]{
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry._ID,
                 IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID,
-                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE,
-                IslndContract.NotificationEntry.COLUMN_POST_ID,
-                IslndContract.NotificationEntry.COLUMN_TIMESTAMP,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_POST_ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_TIMESTAMP,
                 IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
@@ -41,17 +43,17 @@ public class NotificationLoader implements LoaderManager.LoaderCallbacks<Cursor>
                 projection,
                 null,
                 null,
-                IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " DESC"
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " DESC"
         );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        mAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mAdapter.swapCursor(null);
     }
 }

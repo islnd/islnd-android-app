@@ -38,13 +38,17 @@ import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ViewPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ViewPostActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ViewPostActivity.class.getSimpleName();
 
     public static final int LOADER_ID = 5;
 
     private Post mPost = null;
+    private String mPostId;
+    private int mPostUserId;
+    private Uri mPostProfileImageUri;
 
     private RecyclerView mRecyclerView;
     private CommentAdapter mAdapter;
@@ -66,27 +70,9 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
 
         // Get intent with post info
         Intent intent = getIntent();
-        mPost = (Post) intent.getSerializableExtra(Post.POST_EXTRA);
-        bindPost();
+        mPostId = intent.getStringExtra(Post.POST_ID_EXTRA);
+        mPostUserId = intent.getIntExtra(Post.POST_USER_ID_EXTRA, -1);
 
-        // List view stuff
-        mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new CommentAdapter(this, null, mPost.getKey());
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        mRecyclerView.setNestedScrollingEnabled(false);
-
-        // Load the local comments
-        Bundle args = new Bundle();
-        args.putString(CommentLoader.POST_AUTHOR_ALIAS_BUNDLE_KEY, mPost.getAlias());
-        args.putString(CommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
-        CommentLoader localCommentLoader = new CommentLoader(
-                this,
-                mAdapter);
-
-        getSupportLoaderManager().initLoader(CommentLoader.LOADER_ID, args, localCommentLoader);
         getSupportLoaderManager().initLoader(this.LOADER_ID, new Bundle(), this);
 
         // Swipe to refresh
@@ -140,6 +126,10 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
         }
 
         mPostProfileImageView = (ImageView) findViewById(R.id.post_profile_image);
+        ImageUtil.setPostProfileImageSampled(
+                mContext,
+                mPostProfileImageView,
+                mPostProfileImageUri);
 
         TextView postUserName = (TextView) findViewById(R.id.post_user_name);
         TextView postTimestamp = (TextView) findViewById(R.id.post_timestamp);
@@ -193,12 +183,19 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(TAG, "create loader " + id);
         String[] projection = new String[]{
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_ALIAS,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_POST_ID,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_TIMESTAMP,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_CONTENT,
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_COMMENT_COUNT,
                 IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME
         };
 
         return new CursorLoader(
                 this,
-                IslndContract.ProfileEntry.buildProfileUriWithUserId(mPost.getUserId()),
+                IslndContract.PostEntry.buildPostUriWithUserIdAndPostId(mPostUserId, mPostId),
                 projection,
                 null,
                 null,
@@ -207,15 +204,40 @@ public class ViewPostActivity extends AppCompatActivity implements LoaderManager
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (!data.moveToFirst()) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (!cursor.moveToFirst()) {
             return;
         }
 
-        ImageUtil.setPostProfileImageSampled(
-                mContext,
-                mPostProfileImageView,
-                Uri.parse(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+        mPost = new Post(
+                cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME)),
+                cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_USER_ID)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_ALIAS)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_POST_ID)),
+                cursor.getLong(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_TIMESTAMP)),
+                cursor.getString(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_CONTENT)),
+                cursor.getInt(cursor.getColumnIndex(IslndContract.PostEntry.COLUMN_COMMENT_COUNT)));
+
+        mPostProfileImageUri = Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI)));
+        bindPost();
+
+        // Comments
+        mRecyclerView = (RecyclerView) findViewById(R.id.view_post_recycler_view);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new CommentAdapter(this, null, mPost.getKey());
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        mRecyclerView.setNestedScrollingEnabled(false);
+
+        Bundle args = new Bundle();
+        args.putString(CommentLoader.POST_AUTHOR_ALIAS_BUNDLE_KEY, mPost.getAlias());
+        args.putString(CommentLoader.POST_ID_BUNDLE_KEY, mPost.getPostId());
+        CommentLoader localCommentLoader = new CommentLoader(
+                this,
+                mAdapter);
+
+        getSupportLoaderManager().initLoader(CommentLoader.LOADER_ID, args, localCommentLoader);
     }
 
     @Override

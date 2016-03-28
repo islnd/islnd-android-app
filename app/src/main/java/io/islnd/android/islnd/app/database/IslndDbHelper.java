@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -86,8 +86,9 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 " UNIQUE (" + IslndContract.ProfileEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_NOTIFICATION_TABLE = "CREATE TABLE " + IslndContract.NotificationEntry.TABLE_NAME + " (" +
+                IslndContract.NotificationEntry._ID + " INTEGER PRIMARY KEY," +
                 IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER NOT NULL," +
-                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " TEXT NOT NULL," +
+                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " INTEGER NOT NULL," +
                 IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT NOT NULL, " +
                 IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL);";
 
