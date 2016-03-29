@@ -49,39 +49,18 @@ public class FindNewFriendService extends Service {
                 int[] delay = {10000, 5000, 5000, 10000, 20000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
-                    List<String> mailboxes = getMailboxes();
-                    MessageQuery messageQuery = new MessageQuery(mailboxes);
+                    boolean complete = processMessages();
 
-                    List<EncryptedMessage> encryptedMessages = Rest.postMessageQuery(
-                            messageQuery,
-                            Util.getApiKey(mContext));
-
-                    if (encryptedMessages != null
-                            && encryptedMessages.size() > 0) {
-                        Log.v(TAG, encryptedMessages.size() + " messages");
-                        PriorityQueue<Message> messageQueue = new PriorityQueue<>();
-                        for (EncryptedMessage encryptedMessage : encryptedMessages) {
-                            Log.v(TAG, "begin decrypt");
-                            Message message = encryptedMessage.decrypt(Util.getPrivateKey(mContext));
-                            Log.v(TAG, "decrypt done");
-                            messageQueue.add(message);
-                        }
-
-                        boolean complete = false;
-                        while (!messageQueue.isEmpty()) {
-                            complete = MessageProcessor.process(mContext, messageQueue.poll());
-                        }
-
-                        //--This assumes we only add one friend at a time
-                        if (complete) {
-                            break;
-                        }
+                    //--This assumes we only add one friend at a time
+                    if (complete) {
+                        break;
                     }
 
                     try {
                         Thread.sleep(delay[i]);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, "sleep interrupted");
+                        Log.d(TAG, e.toString());
                     }
                 }
 
@@ -91,25 +70,61 @@ public class FindNewFriendService extends Service {
         }.execute();
     }
 
+    private boolean processMessages() {
+        MessageQuery messageQuery = new MessageQuery(getMailboxes());
+        List<EncryptedMessage> encryptedMessages = Rest.postMessageQuery(
+                messageQuery,
+                Util.getApiKey(mContext));
+
+        if (encryptedMessages == null
+                || encryptedMessages.size() == 0) {
+            return false;
+        }
+
+        Log.v(TAG, encryptedMessages.size() + " messages");
+        PriorityQueue<Message> messageQueue = new PriorityQueue<>();
+        for (EncryptedMessage encryptedMessage : encryptedMessages) {
+            Message message = encryptedMessage.decrypt(Util.getPrivateKey(mContext));
+            messageQueue.add(message);
+        }
+
+        boolean complete = false;
+        while (!messageQueue.isEmpty()) {
+            if (MessageProcessor.process(mContext, messageQueue.poll())) {
+                complete = true;
+            }
+        }
+
+        return complete;
+    }
+
     @NonNull
     private List<String> getMailboxes() {
         String[] projection = new String[] { IslndContract.MailboxEntry.COLUMN_MAILBOX };
-        Cursor cursor = mContentResolver.query(
-                IslndContract.MailboxEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-        List<String> mailboxes = new ArrayList<>();
-        if (!cursor.moveToFirst()) {
+        Cursor cursor = null;
+        try {
+            cursor = mContentResolver.query(
+                    IslndContract.MailboxEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
+            List<String> mailboxes = new ArrayList<>();
+            if (!cursor.moveToFirst()) {
+                return mailboxes;
+            }
+
+            do {
+                mailboxes.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+
             return mailboxes;
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-
-        do {
-            mailboxes.add(cursor.getString(0));
-        } while (cursor.moveToNext());
-
-        return mailboxes;
     }
 
     @Override

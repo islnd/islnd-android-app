@@ -10,7 +10,6 @@ import java.util.List;
 
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -21,7 +20,6 @@ import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedResource;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
-import io.islnd.android.islnd.messaging.proto.IslandProto;
 import io.islnd.android.islnd.messaging.server.ResourceQuery;
 
 public class MessageProcessor {
@@ -52,7 +50,7 @@ public class MessageProcessor {
 
             if (encryptedResources != null
                     && encryptedResources.size() > 0) {
-                int userId = DataUtils.getUserIdWithMessageOutbox(context, message.getMailbox());
+                int userId = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
                 Key groupKey = DataUtils.getGroupKey(context, userId);
                 Key publicKey = DataUtils.getPublicKey(context, userId);
                 try {
@@ -92,7 +90,9 @@ public class MessageProcessor {
 
     private static void sendOurProfileToNewFriend(Context context, Identity friendToAdd) {
         Intent sendProfileIntent = new Intent(context, FriendAddBackService.class);
-        sendProfileIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, friendToAdd.getMessageInbox());
+        sendProfileIntent.putExtra(
+                FriendAddBackService.MAILBOX_EXTRA,
+                friendToAdd.getMessageInbox());
         sendProfileIntent.putExtra(
                 FriendAddBackService.JOB_EXTRA,
                 FriendAddBackService.PROFILE_JOB);
@@ -100,15 +100,17 @@ public class MessageProcessor {
     }
 
     private static void updateMailbox(Context context, Message message) {
-        //--This is a hack to stop querying the mailbox because
-        //  it assumes we won't get any more messages
-        removeMailboxFromQuerySet(context, message.getMailbox());
+        //--This stops querying the mailbox because
+        //  it assumes we won't get any more messages from that user.
+        //--It is a bit of a hack but it works for adding identities and profiles.
+        //--When messages also include removing friends, this will have to change.
+        DataUtils.removeMailboxFromQuerySet(context, message.getMailbox());
 
         //--Update our inbox for the next friend we make
         //  and add it to the query set
         final String newMailbox = CryptoUtil.createAlias();
         DataUtils.updateMyUserMailbox(context, newMailbox);
-        Util.setMyMailbox(context, newMailbox);
+        Util.setMyInbox(context, newMailbox);
         DataUtils.addMailboxToQuerySet(context, newMailbox);
 
         Log.v(TAG, "my new mailbox is " + newMailbox);
@@ -127,20 +129,8 @@ public class MessageProcessor {
                 headerImageUri
         );
 
-        int userId = DataUtils.getUserIdWithMessageOutbox(context, message.getMailbox());
+        int userId = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
         DataUtils.insertProfile(context, profile, userId);
         Log.v(TAG, "adding profile for user " + userId);
-    }
-
-    private static void removeMailboxFromQuerySet(Context context, String mailbox) {
-        String selection = IslndContract.MailboxEntry.COLUMN_MAILBOX + " = ?";
-        String[] args = new String[] {
-                mailbox
-        };
-        context.getContentResolver().delete(
-                IslndContract.MailboxEntry.CONTENT_URI,
-                selection,
-                args
-        );
     }
 }

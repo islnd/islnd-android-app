@@ -165,7 +165,7 @@ public class DataUtils {
         }
     }
 
-    public static int getUserIdWithMessageOutbox(Context context, String mailbox) {
+    public static int getUserIdForMessageOutbox(Context context, String mailbox) {
         String[] projection = new String[] {
                 IslndContract.UserEntry._ID,
         };
@@ -436,6 +436,18 @@ public class DataUtils {
         context.getContentResolver().insert(
                 IslndContract.MailboxEntry.CONTENT_URI,
                 values
+        );
+    }
+
+    public static void removeMailboxFromQuerySet(Context context, String mailbox) {
+        String selection = IslndContract.MailboxEntry.COLUMN_MAILBOX + " = ?";
+        String[] args = new String[] {
+                mailbox
+        };
+        context.getContentResolver().delete(
+                IslndContract.MailboxEntry.CONTENT_URI,
+                selection,
+                args
         );
     }
 

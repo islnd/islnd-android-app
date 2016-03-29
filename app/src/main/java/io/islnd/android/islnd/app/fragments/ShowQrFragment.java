@@ -38,6 +38,7 @@ public class ShowQrFragment extends Fragment {
         String encodedIdentity = new Encoder().encodeToString(myIdentity.toByteArray());
         Util.buildQrCode(qrImageView, encodedIdentity);
 
+        //--Start find friend service because someone may snap our QR code
         Intent findFriendServiceIntent = new Intent(mContext, FindNewFriendService.class);
         mContext.startService(findFriendServiceIntent);
 

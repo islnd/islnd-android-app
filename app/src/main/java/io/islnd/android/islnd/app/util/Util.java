@@ -144,14 +144,14 @@ public class Util {
 
     public static String getMyInbox(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.mailbox), "");
+        return sharedPref.getString(context.getString(R.string.message_inbox), "");
     }
 
-    public static void setMyMailbox(Context context, String mailbox) {
+    public static void setMyInbox(Context context, String inbox) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPref.edit();
 
-        editor.putString(context.getString(R.string.mailbox), mailbox);
+        editor.putString(context.getString(R.string.message_inbox), inbox);
         editor.commit();
     }
 
@@ -162,7 +162,6 @@ public class Util {
     }
 
     public static int getEventId(Context context) {
-        //--TODO we can delete event ID stuff
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getInt(context.getString(R.string.event_id), 0);
     }

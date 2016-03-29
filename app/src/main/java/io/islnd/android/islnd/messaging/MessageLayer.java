@@ -24,7 +24,7 @@ public class MessageLayer {
         context.stopService(new Intent(context, FindNewFriendService.class));
 
         Identity identity = Identity.fromProto(encodedString);
-        boolean newFriend =  addFriendToDatabaseAndCreateDefaultProfile(
+        boolean newFriend = addFriendToDatabaseAndCreateDefaultProfile(
                 context,
                 identity,
                 Util.getMyInbox(context));
@@ -34,26 +34,27 @@ public class MessageLayer {
         }
 
         //--We need a new inbox to give to our next friend
-        Util.setMyMailbox(context, CryptoUtil.createAlias());
+        Util.setMyInbox(context, CryptoUtil.createAlias());
 
+        //--This service will get our new friend's profile
         Intent findFriendServiceIntent = new Intent(context, FindNewFriendService.class);
         context.startService(findFriendServiceIntent);
 
-        Intent sendIdentityIntent = new Intent(context, FriendAddBackService.class);
-        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, identity.getMessageInbox());
-        sendIdentityIntent.putExtra(
-                FriendAddBackService.JOB_EXTRA,
-                FriendAddBackService.IDENTITY_JOB);
-        context.startService(sendIdentityIntent);
-
-        Intent sendProfileIntent = new Intent(context, FriendAddBackService.class);
-        sendProfileIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, identity.getMessageInbox());
-        sendProfileIntent.putExtra(
-                FriendAddBackService.JOB_EXTRA,
-                FriendAddBackService.PROFILE_JOB);
-        context.startService(sendProfileIntent);
+        //--Send our identity and profile to new friend
+        final String friendInbox = identity.getMessageInbox();
+        startAddBackJob(context, friendInbox, FriendAddBackService.IDENTITY_JOB);
+        startAddBackJob(context, friendInbox, FriendAddBackService.PROFILE_JOB);
 
         return newFriend;
+    }
+
+    private static void startAddBackJob(Context context, String friendInbox, int identityJob) {
+        Intent sendIdentityIntent = new Intent(context, FriendAddBackService.class);
+        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, friendInbox);
+        sendIdentityIntent.putExtra(
+                FriendAddBackService.JOB_EXTRA,
+                identityJob);
+        context.startService(sendIdentityIntent);
     }
 
     public static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity, String messageOutbox) {
