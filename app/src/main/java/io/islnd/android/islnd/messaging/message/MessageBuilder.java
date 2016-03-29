@@ -17,4 +17,11 @@ public class MessageBuilder {
                 MessageType.PROFILE,
                 new Encoder().encodeToString(profileMessage.toByteArray()));
     }
+
+    public static Message buildNewAliasMessage(String mailbox, String newAlias) {
+        return new Message(
+                mailbox,
+                MessageType.NEW_ALIAS,
+                newAlias);
+    }
 }

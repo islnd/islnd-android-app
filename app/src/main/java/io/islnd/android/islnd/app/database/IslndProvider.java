@@ -31,7 +31,8 @@ public class IslndProvider extends ContentProvider {
     static final int RECEIVED_EVENT = 800;
     static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
     static final int OUTGOING_EVENT = 900;
-    static final int MAILBOX = 1000;
+    static final int OUTGOING_MESSAGE = 1000;
+    static final int MAILBOX = 1100;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -275,6 +276,8 @@ public class IslndProvider extends ContentProvider {
                 RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID);
 
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_EVENT, OUTGOING_EVENT);
+
+        matcher.addURI(authority, IslndContract.PATH_OUTGOING_MESSAGE, OUTGOING_MESSAGE);
 
         matcher.addURI(authority, IslndContract.PATH_MAILBOX, MAILBOX);
 
@@ -660,6 +663,25 @@ public class IslndProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(IslndContract.OutgoingEventEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
+            case OUTGOING_MESSAGE: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(IslndContract.OutgoingMessageEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

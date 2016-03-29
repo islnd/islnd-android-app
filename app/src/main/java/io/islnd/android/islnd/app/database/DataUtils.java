@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.models.CommentKey;

@@ -79,6 +79,8 @@ public class EventProcessor {
                 values,
                 null,
                 null);
+
+        Log.v(TAG, "new alias is " + event.getNewAlias());
     }
 
     private static void changeHeaderPicture(Context context, ChangeHeaderPictureEvent event) {
