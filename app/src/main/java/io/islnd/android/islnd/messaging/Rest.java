@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.util.List;
 
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
+import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
+import io.islnd.android.islnd.messaging.crypto.EncryptedResource;
 import io.islnd.android.islnd.messaging.interceptor.DelayInterceptor;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.MessageQuery;
 import io.islnd.android.islnd.messaging.server.MessageQueryResponse;
+import io.islnd.android.islnd.messaging.server.ResourceQuery;
+import io.islnd.android.islnd.messaging.server.ResourceQueryResponse;
 import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -45,7 +49,7 @@ public class Rest {
         return false;
     }
 
-    public static void postMessage(Message message, String apiKey) {
+    public static void postMessage(EncryptedMessage encryptedMessage, String apiKey) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -54,10 +58,30 @@ public class Rest {
         RestInterface service = retrofit.create(RestInterface.class);
 
         try {
-            Response<Void> response = service.postMessage(message, apiKey).execute();
+            Response<Void> response = service.postMessage(encryptedMessage, apiKey).execute();
 
             if (response.code() != HTTP_OK) {
                 Log.d(TAG, "post event returned code" + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void postResource(EncryptedResource encryptedResource, String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Log.v(TAG, "posting resource with key " + encryptedResource.getResourceKey());
+            Response<Void> response = service.postResource(encryptedResource, apiKey).execute();
+
+            if (response.code() != HTTP_OK) {
+                Log.d(TAG, "post resource returned code" + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,7 +109,7 @@ public class Rest {
         }
     }
 
-    public static List<Message> postMessageQuery(MessageQuery messageQuery, String apiKey) {
+    public static List<EncryptedMessage> postMessageQuery(MessageQuery messageQuery, String apiKey) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -104,6 +128,33 @@ public class Rest {
             }
             else {
                 Log.d(TAG, "post event query returned code" + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static List<EncryptedResource> postResourceQuery(ResourceQuery resourceQuery, String apiKey) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(HOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface service = retrofit.create(RestInterface.class);
+
+        try {
+            Log.v(TAG, "getting resources " + resourceQuery);
+            Response<ResourceQueryResponse> response = service.postResourceQuery(
+                    resourceQuery,
+                    apiKey).execute();
+            if (response.code() == HTTP_OK) {
+                Log.v(TAG, response.body().getResources().size() + " resources");
+                return response.body().getResources();
+            }
+            else {
+                Log.d(TAG, "post resource query returned code" + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();

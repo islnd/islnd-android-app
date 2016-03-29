@@ -3,11 +3,15 @@ package io.islnd.android.islnd.messaging;
 import java.util.concurrent.Executor;
 
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
+import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
+import io.islnd.android.islnd.messaging.crypto.EncryptedResource;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.EventQueryResponse;
 import io.islnd.android.islnd.messaging.server.MessageQuery;
 import io.islnd.android.islnd.messaging.server.MessageQueryResponse;
+import io.islnd.android.islnd.messaging.server.ResourceQuery;
+import io.islnd.android.islnd.messaging.server.ResourceQueryResponse;
 import io.islnd.android.islnd.messaging.server.ServerTimeResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,6 +25,16 @@ public interface RestInterface {
 
     @GET("/ping/")
     Call<Void> getPing(
+            @Query(API_KEY_PARAM) String apiKey);
+
+    @POST("/resource")
+    Call<Void> postResource(
+            @Body EncryptedResource encryptedResource,
+            @Query(API_KEY_PARAM) String apiKey);
+
+    @POST("/resourceQuery")
+    Call<ResourceQueryResponse> postResourceQuery(
+            @Body ResourceQuery resourceQuery,
             @Query(API_KEY_PARAM) String apiKey);
 
     @POST("/event")
@@ -39,7 +53,7 @@ public interface RestInterface {
 
     @POST("/message")
     Call<Void> postMessage(
-            @Body Message message,
+            @Body EncryptedMessage encryptedMessage,
             @Query(API_KEY_PARAM) String apiKey);
 
     @POST("/messageQuery")

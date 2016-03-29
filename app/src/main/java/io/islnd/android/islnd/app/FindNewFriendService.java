@@ -18,6 +18,7 @@ import java.util.PriorityQueue;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
+import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.message.MessageProcessor;
 import io.islnd.android.islnd.messaging.server.MessageQuery;
@@ -45,21 +46,24 @@ public class FindNewFriendService extends Service {
 
             @Override
             protected Void doInBackground(Void... params) {
-                int[] delay = {5000, 50000, 10000, 20000, 20000};
+                int[] delay = {10000, 5000, 5000, 10000, 20000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
                     List<String> mailboxes = getMailboxes();
                     MessageQuery messageQuery = new MessageQuery(mailboxes);
 
-                    List<Message> messages = Rest.postMessageQuery(
+                    List<EncryptedMessage> encryptedMessages = Rest.postMessageQuery(
                             messageQuery,
                             Util.getApiKey(mContext));
 
-                    if (messages != null
-                            && messages.size() > 0) {
-                        Log.v(TAG, messages.size() + " messages");
+                    if (encryptedMessages != null
+                            && encryptedMessages.size() > 0) {
+                        Log.v(TAG, encryptedMessages.size() + " messages");
                         PriorityQueue<Message> messageQueue = new PriorityQueue<>();
-                        for (Message message : messages) {
+                        for (EncryptedMessage encryptedMessage : encryptedMessages) {
+                            Log.v(TAG, "begin decrypt");
+                            Message message = encryptedMessage.decrypt(Util.getPrivateKey(mContext));
+                            Log.v(TAG, "decrypt done");
                             messageQueue.add(message);
                         }
 

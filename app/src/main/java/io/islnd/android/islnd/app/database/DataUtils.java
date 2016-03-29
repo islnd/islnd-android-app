@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.security.Key;
 
+import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -436,5 +437,30 @@ public class DataUtils {
                 IslndContract.MailboxEntry.CONTENT_URI,
                 values
         );
+    }
+
+    public static Key getPublicKeyForUserInbox(Context context, String inbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " = ?",
+                    new String[] {inbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return CryptoUtil.decodePublicKey(cursor.getString(0));
+            } else {
+                throw new IllegalArgumentException("database has no entry for inbox: " + inbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

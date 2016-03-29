@@ -28,7 +28,17 @@ message Event {
 }
 
 message ProfileMessage {
+  required string resource_key = 1;
+}
+
+message ProfileResource {
   required string about_me = 1;
   required bytes profile_image = 2;
   required bytes header_image = 3;
+}
+
+message Message {
+  required string mailbox = 1;
+  required int32 type = 2;
+  required string blob = 3;
 }

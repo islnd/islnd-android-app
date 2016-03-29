@@ -8,14 +8,14 @@ import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class ProfileMessage implements ProtoSerializable<ProfileMessage> {
-    private final String aboutMe;
-    private final byte[] profileImageBytes;
-    private final byte[] headerImageBytes;
+    private final String resourceKey;
 
-    public ProfileMessage(String aboutMe, byte[] profileImageBytes, byte[] headerImageBytes) {
-        this.aboutMe = aboutMe;
-        this.profileImageBytes = profileImageBytes;
-        this.headerImageBytes = headerImageBytes;
+    public ProfileMessage(String resourceKey) {
+        this.resourceKey = resourceKey;
+    }
+
+    public String getResourceKey() {
+        return this.resourceKey;
     }
 
     public static ProfileMessage fromProto(String encodedBytes) {
@@ -27,30 +27,13 @@ public class ProfileMessage implements ProtoSerializable<ProfileMessage> {
             e.printStackTrace();
         }
 
-        return new ProfileMessage(
-                profileMessage.getAboutMe(),
-                profileMessage.getProfileImage().toByteArray(),
-                profileMessage.getHeaderImage().toByteArray());
-    }
-
-    public String getAboutMe() {
-        return aboutMe;
-    }
-
-    public byte[] getProfileImageBytes() {
-        return profileImageBytes;
-    }
-
-    public byte[] getHeaderImageBytes() {
-        return headerImageBytes;
+        return new ProfileMessage(profileMessage.getResourceKey());
     }
 
     @Override
     public byte[] toByteArray() {
         return IslandProto.ProfileMessage.newBuilder()
-                .setAboutMe(this.aboutMe)
-                .setProfileImage(ByteString.copyFrom(this.profileImageBytes))
-                .setHeaderImage(ByteString.copyFrom(this.headerImageBytes))
+                .setResourceKey(this.resourceKey)
                 .build()
                 .toByteArray();
     }

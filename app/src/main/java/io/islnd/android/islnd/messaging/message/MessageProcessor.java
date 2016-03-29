@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import java.security.Key;
+import java.util.List;
+
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -13,7 +16,13 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.messaging.ProfileResource;
+import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
+import io.islnd.android.islnd.messaging.crypto.EncryptedResource;
+import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
+import io.islnd.android.islnd.messaging.proto.IslandProto;
+import io.islnd.android.islnd.messaging.server.ResourceQuery;
 
 public class MessageProcessor {
 
@@ -35,9 +44,29 @@ public class MessageProcessor {
             Log.v(TAG, "process profile");
 
             ProfileMessage profileMessage = ProfileMessage.fromProto(message.getBlob());
-            saveProfile(context, message, profileMessage);
+            ResourceQuery resourceQuery = new ResourceQuery(profileMessage.getResourceKey());
+            List<EncryptedResource> encryptedResources = Rest.postResourceQuery(
+                    resourceQuery,
+                    Util.getApiKey(context)
+            );
 
-            updateMailbox(context, message);
+            if (encryptedResources != null
+                    && encryptedResources.size() > 0) {
+                int userId = DataUtils.getUserIdWithMessageOutbox(context, message.getMailbox());
+                Key groupKey = DataUtils.getGroupKey(context, userId);
+                Key publicKey = DataUtils.getPublicKey(context, userId);
+                try {
+                    ProfileResource profileResource = (ProfileResource) encryptedResources.get(0).decryptAndVerify(
+                            groupKey,
+                            publicKey
+                    );
+
+                    saveProfile(context, message, profileResource);
+                    updateMailbox(context, message);
+                } catch (InvalidSignatureException e) {
+                    e.printStackTrace();
+                }
+            }
 
             return true;
         }
@@ -85,15 +114,15 @@ public class MessageProcessor {
         Log.v(TAG, "my new mailbox is " + newMailbox);
     }
 
-    private static void saveProfile(Context context, Message message, ProfileMessage profileMessage) {
+    private static void saveProfile(Context context, Message message, ProfileResource profileResource) {
         Uri headerImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
                 context,
-                profileMessage.getHeaderImageBytes());
+                profileResource.getHeaderImageBytes());
         Uri profileImageUri = ImageUtil.saveBitmapToInternalFromByteArray(
                 context,
-                profileMessage.getProfileImageBytes());
+                profileResource.getProfileImageBytes());
         Profile profile = new Profile(
-                profileMessage.getAboutMe(),
+                profileResource.getAboutMe(),
                 profileImageUri,
                 headerImageUri
         );
