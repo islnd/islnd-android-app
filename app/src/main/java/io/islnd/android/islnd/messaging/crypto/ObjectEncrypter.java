@@ -10,7 +10,7 @@ import io.islnd.android.islnd.messaging.ProtoSerializable;
 
 public class ObjectEncrypter {
 
-    private static final int CHUNK_SIZE = 190;
+    private static final int CHUNK_SIZE = 40;
     private static final String DELIMITER = "_";
 
     private static Encoder encoder = new Encoder();

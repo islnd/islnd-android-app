@@ -36,7 +36,7 @@ public class CryptoUtil {
     private static final String ASYMMETRIC_ALGO = "RSA/ECB/PKCS1Padding";
     private static final String DIGEST_ALGO = "SHA-1";
     private static final int SYMMETRIC_GENERATOR_LENGTH = 128;
-    private static final int ASYMMETRIC_GENERATOR_LENGTH = 2048;
+    private static final int ASYMMETRIC_GENERATOR_LENGTH = 1024;
     private static final int IV_SIZE = 16;
 
     // encryption instances
