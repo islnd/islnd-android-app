@@ -18,6 +18,12 @@ The server stores all of the data events in a database. The server simply sees a
 
 From the server's point of view, posts, comments, and changes to a user's profile 
 all look the same. An *alias* and an encrypted binary blob.
+##Exactly what data does the server store?
+The server stores 3 types of data as key-value pairs: *events, messages, and resources*. *Events* are posted by users when they make posts, comments, change their profile, delete comments, etc... *Events* are tied to a specific user, and the key to look up events is called the user's *alias*. *Events* use symmetric encryption and read by many users.
+
+*Messages* are meant for a single user to read. They are used to exchange information when two users become friends, and they are also used to unfriend people or to change an *alias* in a private way. *Messages* use asymmetric encryption. The lookup key is called a mailbox, and each pair of users maintains two distinct mailboxes. Each functions as a one way communication stream between the pair of users. If user A wants to send a message to user B, they will post it to B's inbox. If they want to read messages from B, they will post it to B's outbox.
+
+*Resources* store other data on the server that is too large for asymmetric encryption but is not a good match for the event model. One use of *resources* is a user can post their profile for a new friend to download. The keys for *resources* are arbitrary strings (not unlike the other keys, but we don't have a fancy name for them).
 ##Forward secrecy
 The protocol will allow users to change their *group key* at any time. The advantage of this is that if any device is compromised, content that was encrypted with previous *group keys* cannot be decrypted. However, the decrypted content may be stored on the phone that was compromised -- for example if Sally's *group key* is stolen from Bob's phone, Bob's phone probably has all of Sally's posts on it as well. So even though Sally's *group key* cannot decrypt all of Sally's messages, the comromised device will have many of Sally's message on it.
 ##Revealing meta-data through traffic analysis
