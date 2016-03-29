@@ -10,7 +10,6 @@ import io.islnd.android.islnd.messaging.ProtoSerializable;
 
 public class ObjectEncrypter {
 
-    private static final int CHUNK_SIZE = 40;
     private static final String DELIMITER = "_";
 
     private static Encoder encoder = new Encoder();
@@ -58,7 +57,7 @@ public class ObjectEncrypter {
         byte[] object = new byte[totalLength];
         for (int i = 0; i < chunks.length; i++) {
             for (int j = 0; j < chunks[i].length; j++) {
-                object[i * CHUNK_SIZE + j] = chunks[i][j];
+                object[i * CryptoUtil.ASYMMETRIC_BLOCK_SIZE + j] = chunks[i][j];
             }
         }
 
@@ -77,11 +76,11 @@ public class ObjectEncrypter {
     }
 
     private static byte[][] divideIntoChunks(byte[] bytes) {
-        int numberOfChunks = (int) Math.ceil((double)bytes.length / CHUNK_SIZE);
+        int numberOfChunks = (int) Math.ceil((double)bytes.length / CryptoUtil.ASYMMETRIC_BLOCK_SIZE);
         byte[][] chunks = new byte[numberOfChunks][];
         for (int i = 0; i < numberOfChunks; i++) {
-            int firstIndex = CHUNK_SIZE * i;
-            int lastIndex = Math.min(bytes.length, CHUNK_SIZE * (i + 1));
+            int firstIndex = CryptoUtil.ASYMMETRIC_BLOCK_SIZE * i;
+            int lastIndex = Math.min(bytes.length, CryptoUtil.ASYMMETRIC_BLOCK_SIZE * (i + 1));
             chunks[i] = Arrays.copyOfRange(bytes, firstIndex, lastIndex);
         }
 

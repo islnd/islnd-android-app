@@ -37,6 +37,7 @@ public class CryptoUtil {
     private static final String DIGEST_ALGO = "SHA-1";
     private static final int SYMMETRIC_GENERATOR_LENGTH = 128;
     private static final int ASYMMETRIC_GENERATOR_LENGTH = 1024;
+    public static final int ASYMMETRIC_BLOCK_SIZE = 60;
     private static final int IV_SIZE = 16;
 
     // encryption instances
