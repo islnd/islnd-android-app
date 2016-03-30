@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.security.Key;
 
+import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -21,11 +22,13 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class DataUtils {
     private static final String TAG = DataUtils.class.getSimpleName();
 
-    public static long insertUser(Context context, Identity identity) {
+    public static long insertUser(Context context, Identity identity, String messageOutbox) {
         return insertUser(
                 context,
                 identity.getDisplayName(),
                 identity.getAlias(),
+                identity.getMessageInbox(),
+                messageOutbox,
                 identity.getGroupKey(),
                 identity.getPublicKey());
     }
@@ -34,10 +37,14 @@ public class DataUtils {
             Context context,
             String displayName,
             String alias,
+            String messageInbox,
+            String messageOutbox,
             Key groupKey,
             Key publicKey) {
         ContentValues userValues = new ContentValues();
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
+        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, messageInbox);
+        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, messageOutbox);
 
         final ContentResolver contentResolver = context.getContentResolver();
         Uri result = contentResolver.insert(
@@ -59,6 +66,10 @@ public class DataUtils {
         contentResolver.insert(
                 IslndContract.AliasEntry.CONTENT_URI,
                 aliasValues);
+
+        Log.v(TAG, "inserted user");
+        Log.v(TAG, "alias " + alias);
+        Log.v(TAG, "profile alias " + messageInbox);
 
         return userId;
     }
@@ -152,6 +163,31 @@ public class DataUtils {
             return null;
         } finally {
             cursor.close();
+        }
+    }
+
+    public static int getUserIdForMessageOutbox(Context context, String mailbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry._ID,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " = ?",
+                    new String[] {mailbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException("database has no entry for mailbox: " + mailbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -359,5 +395,120 @@ public class DataUtils {
                 NotificationType.COMMENT,
                 postId,
                 timestamp);
+    }
+
+    public static String getMessageInbox(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_MESSAGE_INBOX,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.UserEntry.buildUserWithUserId(userId),
+                projection,
+                null,
+                null,
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
+
+            return null;
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public static Profile getProfile(Context context, int userId) {
+        String[] projection = new String[] {
+                IslndContract.ProfileEntry.COLUMN_ABOUT_ME,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI,
+                IslndContract.ProfileEntry.COLUMN_HEADER_IMAGE_URI,
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                IslndContract.ProfileEntry.buildProfileUriWithUserId(userId),
+                projection,
+                null,
+                null,
+                null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return new Profile(
+                        cursor.getString(0),
+                        Uri.parse(cursor.getString(1)),
+                        Uri.parse(cursor.getString(2)));
+            }
+
+            return null;
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public static void updateMyUserMailbox(Context context, String newMailbox) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, newMailbox);
+
+        String selection = IslndContract.UserEntry._ID + " = ?";
+        String[] selectionArgs = new String[]{
+                Integer.toString(IslndContract.UserEntry.MY_USER_ID)
+        };
+
+        context.getContentResolver().update(
+                IslndContract.UserEntry.CONTENT_URI,
+                values,
+                selection,
+                selectionArgs
+        );
+    }
+
+    public static void addMailboxToQuerySet(Context context, String newMailbox) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.MailboxEntry.COLUMN_MAILBOX, newMailbox);
+
+        context.getContentResolver().insert(
+                IslndContract.MailboxEntry.CONTENT_URI,
+                values
+        );
+    }
+
+    public static void removeMailboxFromQuerySet(Context context, String mailbox) {
+        String selection = IslndContract.MailboxEntry.COLUMN_MAILBOX + " = ?";
+        String[] args = new String[] {
+                mailbox
+        };
+        context.getContentResolver().delete(
+                IslndContract.MailboxEntry.CONTENT_URI,
+                selection,
+                args
+        );
+    }
+
+    public static Key getPublicKeyForUserInbox(Context context, String inbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " = ?",
+                    new String[] {inbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return CryptoUtil.decodePublicKey(cursor.getString(0));
+            } else {
+                throw new IllegalArgumentException("database has no entry for inbox: " + inbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

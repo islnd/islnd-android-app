@@ -23,6 +23,7 @@ public class IslndContract {
     public static final String PATH_RECEIVED_EVENT = "received_event";
     public static final String PATH_OUTGOING_EVENT = "outgoing_event";
     public static final String PATH_NOTIFICATION = "notification";
+    public static final String PATH_MAILBOX = "mailbox";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -80,6 +81,8 @@ public class IslndContract {
         public static final String TABLE_NAME = "user";
 
         public static final String COLUMN_PUBLIC_KEY = "public_key";
+        public static final String COLUMN_MESSAGE_INBOX = "message_inbox";
+        public static final String COLUMN_MESSAGE_OUTBOX = "message_outbox";
 
         public static final int MY_USER_ID = 1; //--we are always the first user to go in the database
 
@@ -304,5 +307,24 @@ public class IslndContract {
 
         public static final String COLUMN_ALIAS = "alias";
         public static final String COLUMN_BLOB = "blob";
+    }
+
+    public static final class MailboxEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MAILBOX).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
+
+        public static final String TABLE_NAME = "mailbox";
+
+        public static final String COLUMN_MAILBOX = "mailbox";
+
+        public static Uri buildMailboxUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 }

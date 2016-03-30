@@ -5,8 +5,9 @@ option java_package = "io.islnd.android.islnd.messaging.proto";
 message Identity {
   required string display_name = 1;
   required string alias = 2;
-  required string group_key = 3;
-  required string public_key = 4;
+  required string message_inbox = 3;
+  required string group_key = 4;
+  required string public_key = 5;
 }
 
 message SignedObject {
@@ -24,4 +25,20 @@ message Event {
   optional int64 timestamp = 7;
   optional string parent_alias = 8;
   optional string parent_content_id = 9;
+}
+
+message ProfileMessage {
+  required string resource_key = 1;
+}
+
+message ProfileResource {
+  required string about_me = 1;
+  required bytes profile_image = 2;
+  required bytes header_image = 3;
+}
+
+message Message {
+  required string mailbox = 1;
+  required int32 type = 2;
+  required string blob = 3;
 }

@@ -32,7 +32,8 @@ public class IslndProvider extends ContentProvider {
     static final int RECEIVED_EVENT = 800;
     static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
     static final int OUTGOING_EVENT = 900;
-    static final int NOTIFICATION = 1000;
+    static final int MAILBOX = 1000;
+    static final int NOTIFICATION = 1100;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -319,6 +320,8 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
 
+        matcher.addURI(authority, IslndContract.PATH_MAILBOX, MAILBOX);
+
         return matcher;
     }
 
@@ -332,7 +335,9 @@ public class IslndProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         Cursor retCursor;
-        switch (sUriMatcher.match(uri)) {
+        Log.v(TAG, "query " + uri);
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
             case POST: {
                 retCursor = sPostQueryBuilder.query(
                             mOpenHelper.getReadableDatabase(),
@@ -470,6 +475,17 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case MAILBOX: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.MailboxEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -533,6 +549,16 @@ public class IslndProvider extends ContentProvider {
                     returnUri = IslndContract.PostEntry.buildPostUri(_id);
                 else
                     return null;
+                break;
+            }
+            case MAILBOX: {
+                long _id = db.insert(IslndContract.MailboxEntry.TABLE_NAME, null, values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.MailboxEntry.buildMailboxUri(_id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+
                 break;
             }
             case USER: {
@@ -783,6 +809,11 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.NotificationEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case MAILBOX: {
+                rowsDeleted = db.delete(
+                        IslndContract.MailboxEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -827,6 +858,17 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
+                break;
+            }
+            case USER: {
+                rowsUpdated = db.update(
+                        IslndContract.UserEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+                Log.v(TAG, "update user updated " + rowsUpdated);
+                getContext().getContentResolver().notifyChange(IslndContract.UserEntry.CONTENT_URI, null);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {
