@@ -621,11 +621,10 @@ public class IslndProvider extends ContentProvider {
                 break;
             }
             case NOTIFICATION: {
-                long _id = db.insertWithOnConflict(
+                long _id = db.insert(
                         IslndContract.NotificationEntry.TABLE_NAME,
                         null,
-                        values,
-                        SQLiteDatabase.CONFLICT_IGNORE);
+                        values);
                 if ( _id > 0 )
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
                 else
@@ -827,6 +826,7 @@ public class IslndProvider extends ContentProvider {
                 updateProfileWithUserId(uri, values);
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {
@@ -842,6 +842,7 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
                 break;
             }
             case ALIAS_WITH_USER_ID: {

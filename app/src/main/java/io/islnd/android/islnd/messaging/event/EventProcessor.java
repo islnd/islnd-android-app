@@ -179,10 +179,9 @@ public class EventProcessor {
                 values);
 
         if (Util.getUserId(context) != commentUserId) {
-            DataUtils.insertNotification(
+            DataUtils.insertNewCommentNotification(
                     context,
                     commentUserId,
-                    NotificationType.COMMENT,
                     newCommentEvent.getPostId(),
                     newCommentEvent.getTimestamp()
             );

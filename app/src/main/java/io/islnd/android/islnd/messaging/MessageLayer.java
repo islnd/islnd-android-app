@@ -37,12 +37,7 @@ public class MessageLayer {
         Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
         DataUtils.insertProfile(context, profile, userId);
 
-        DataUtils.insertNotification(
-                context,
-                (int) userId,
-                NotificationType.NEW_FRIEND,
-                "",
-                ServerTime.getCurrentTimeMillis(context));
+        DataUtils.insertNewFriendNotification(context, (int) userId);
 
         return true;
     }

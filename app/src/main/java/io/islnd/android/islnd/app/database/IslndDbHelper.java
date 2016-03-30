@@ -89,8 +89,11 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.NotificationEntry._ID + " INTEGER PRIMARY KEY," +
                 IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER NOT NULL," +
                 IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " INTEGER NOT NULL," +
-                IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT NOT NULL, " +
-                IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL);";
+                IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT, " +
+                IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
+
+                " FOREIGN KEY (" + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + ") REFERENCES " +
+                IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "));";
 
         final String SQL_CREATE_RECEIVED_EVENT_TABLE = "CREATE TABLE " + IslndContract.ReceivedEventEntry.TABLE_NAME + " (" +
                 IslndContract.ReceivedEventEntry._ID + " INTEGER PRIMARY KEY," +

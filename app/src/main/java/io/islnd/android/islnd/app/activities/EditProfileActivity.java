@@ -84,7 +84,7 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
             }
         }
 
-        getSupportLoaderManager().initLoader(LoaderId.EDIT_PROFILE_LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.EDIT_PROFILE_ACTIVITY_LOADER_ID, new Bundle(), this);
     }
 
     @Override

@@ -90,7 +90,7 @@ public class NavBaseActivity extends AppCompatActivity
                 .replace(R.id.content_frame, mFragment)
                 .commit();
 
-        getSupportLoaderManager().initLoader(LoaderId.NAV_LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.NAV_BASE_ACTIVITY_LOADER_ID, new Bundle(), this);
     }
 
     private void onCreateDrawer() {

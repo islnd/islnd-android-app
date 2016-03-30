@@ -15,6 +15,7 @@ import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class DataUtils {
@@ -325,7 +326,7 @@ public class DataUtils {
         }
     }
 
-    public static void insertNotification(Context context,
+    private static void insertNotification(Context context,
                                           int userId,
                                           int notificationType,
                                           String postId,
@@ -339,5 +340,24 @@ public class DataUtils {
                 IslndContract.NotificationEntry.CONTENT_URI,
                 values);
         Log.v(TAG, "notification added");
+    }
+
+    public static void insertNewFriendNotification(Context context, int userId) {
+        insertNotification(context,
+                userId,
+                NotificationType.NEW_FRIEND,
+                null,
+                ServerTime.getCurrentTimeMillis(context));
+    }
+
+    public static void insertNewCommentNotification(Context context,
+                                                    int userId,
+                                                    String postId,
+                                                    long timestamp) {
+        insertNotification(context,
+                userId,
+                NotificationType.COMMENT,
+                postId,
+                timestamp);
     }
 }

@@ -82,7 +82,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
                 mAdapter);
 
         getSupportLoaderManager().initLoader(LoaderId.POST_LOADER_ID, new Bundle(), postLoader);
-        getSupportLoaderManager().initLoader(LoaderId.PROFILE_LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.PROFILE_ACTIVITY_LOADER_ID, new Bundle(), this);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));

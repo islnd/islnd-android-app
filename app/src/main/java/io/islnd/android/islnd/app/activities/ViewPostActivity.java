@@ -73,7 +73,7 @@ public class ViewPostActivity extends AppCompatActivity
         mPostId = intent.getStringExtra(Post.POST_ID_EXTRA);
         mPostUserId = intent.getIntExtra(Post.POST_USER_ID_EXTRA, -1);
 
-        getSupportLoaderManager().initLoader(LoaderId.VIEW_POST_LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.VIEW_POST_ACTIVITY_LOADER_ID, new Bundle(), this);
 
         // Swipe to refresh
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
