@@ -56,5 +56,6 @@
     <dimen name="notification_profile_image">64dp</dimen>
     <dimen name="notification_vertical_padding">8dp</dimen>
     <dimen name="notification_profile_image_margin">8dp</dimen>
-    <dimen name="notification_content_margin">8dp</dimen>
+    <dimen name="notification_content_margin">16dp</dimen>
+    <dimen name="notification_type_icon_margin">8dp</dimen>
 </resources>

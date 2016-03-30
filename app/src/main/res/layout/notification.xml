@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/notification_vertical_padding"
@@ -13,40 +12,39 @@
         android:id="@+id/profile_image"
         android:layout_width="@dimen/notification_profile_image"
         android:layout_height="@dimen/notification_profile_image"
+        android:layout_alignParentLeft="true"
         android:layout_marginRight="@dimen/notification_profile_image_margin"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/notification_content"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_toRightOf="@id/profile_image"
+        android:layout_marginBottom="@dimen/notification_content_margin"
+        style="@style/Base.TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/primary_text"/>
 
-        <TextView
-            android:id="@+id/notification_content"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notification_content"
+        android:layout_alignLeft="@id/notification_content"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/notification_type_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/notification_content_margin"
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/primary_text"/>
+            android:layout_marginRight="@dimen/notification_type_icon_margin"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/timestamp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_toRightOf="@id/notification_type_icon"
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            android:textColor="@color/secondary_text"/>
 
-            <ImageView
-                android:id="@+id/notification_type_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+    </RelativeLayout>
 
-            <TextView
-                android:id="@+id/timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Base.TextAppearance.AppCompat.Caption"
-                android:textColor="@color/secondary_text"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>
