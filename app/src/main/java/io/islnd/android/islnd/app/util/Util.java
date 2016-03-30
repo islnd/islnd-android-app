@@ -173,6 +173,18 @@ public class Util {
         editor.commit();
     }
 
+    public static int getMessageId(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getInt(context.getString(R.string.message_id), 0);
+    }
+
+    public static void setMessageId(Context context, int eventId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(context.getString(R.string.message_id), eventId);
+        editor.commit();
+    }
+
     public static String getApiKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(ServerPreferenceFragment.PREFERENCE_API_KEY_KEY, "");

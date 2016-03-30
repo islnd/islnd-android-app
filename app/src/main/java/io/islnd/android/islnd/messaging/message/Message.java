@@ -1,31 +1,20 @@
 package io.islnd.android.islnd.messaging.message;
 
-import android.util.Log;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
-import io.islnd.android.islnd.messaging.event.ChangeAboutMeEvent;
-import io.islnd.android.islnd.messaging.event.ChangeAliasEvent;
-import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
-import io.islnd.android.islnd.messaging.event.ChangeHeaderPictureEvent;
-import io.islnd.android.islnd.messaging.event.ChangeProfilePictureEvent;
-import io.islnd.android.islnd.messaging.event.DeleteCommentEvent;
-import io.islnd.android.islnd.messaging.event.DeletePostEvent;
-import io.islnd.android.islnd.messaging.event.EventType;
-import io.islnd.android.islnd.messaging.event.NewCommentEvent;
-import io.islnd.android.islnd.messaging.event.NewPostEvent;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class Message implements Comparable<Message>, ProtoSerializable {
 
     private final String mailbox;
+    private final int messageId;
     private final int type;
     private final String blob;
 
-    public Message(String mailbox, int type, String blob) {
+    public Message(String mailbox, int messageId, int type, String blob) {
         this.mailbox = mailbox;
+        this.messageId = messageId;
         this.type = type;
         this.blob = blob;
     }
@@ -42,6 +31,10 @@ public class Message implements Comparable<Message>, ProtoSerializable {
         return blob;
     }
 
+    public int getMessageId() {
+        return messageId;
+    }
+
     @Override
     public int compareTo(Message another) {
         return type - another.type;
@@ -51,6 +44,7 @@ public class Message implements Comparable<Message>, ProtoSerializable {
     public byte[] toByteArray() {
         return IslandProto.Message.newBuilder()
                 .setMailbox(this.mailbox)
+                .setMessageId(this.messageId)
                 .setType(this.type)
                 .setBlob(this.blob)
                 .build()
@@ -67,8 +61,14 @@ public class Message implements Comparable<Message>, ProtoSerializable {
 
         return new Message(
                 message.getMailbox(),
+                message.getMessageId(),
                 message.getType(),
                 message.getBlob()
         );
+    }
+
+    @Override
+    public String toString() {
+        return "MESSAGE: " + mailbox + " " + messageId;
     }
 }

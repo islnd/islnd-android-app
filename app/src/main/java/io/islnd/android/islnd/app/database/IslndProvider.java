@@ -30,9 +30,9 @@ public class IslndProvider extends ContentProvider {
     static final int IDENTITY = 700;
     static final int RECEIVED_EVENT = 800;
     static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
-    static final int OUTGOING_EVENT = 900;
-    static final int OUTGOING_MESSAGE = 1000;
-    static final int MAILBOX = 1100;
+    static final int RECEIVED_MESSAGE = 900;
+    static final int OUTGOING_EVENT = 1000;
+    static final int OUTGOING_MESSAGE = 1100;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -275,11 +275,11 @@ public class IslndProvider extends ContentProvider {
                 IslndContract.PATH_RECEIVED_EVENT + "/*/#",
                 RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID);
 
+        matcher.addURI(authority, IslndContract.PATH_RECEIVED_MESSAGE, RECEIVED_MESSAGE);
+
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_EVENT, OUTGOING_EVENT);
 
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_MESSAGE, OUTGOING_MESSAGE);
-
-        matcher.addURI(authority, IslndContract.PATH_MAILBOX, MAILBOX);
 
         return matcher;
     }
@@ -419,9 +419,9 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-            case OUTGOING_MESSAGE: {
+            case RECEIVED_MESSAGE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        IslndContract.OutgoingMessageEntry.TABLE_NAME,
+                        IslndContract.ReceivedMessageEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -430,9 +430,9 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-            case MAILBOX: {
+            case OUTGOING_MESSAGE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        IslndContract.MailboxEntry.TABLE_NAME,
+                        IslndContract.OutgoingMessageEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -500,16 +500,6 @@ public class IslndProvider extends ContentProvider {
                     returnUri = IslndContract.PostEntry.buildPostUri(_id);
                 else
                     return null;
-                break;
-            }
-            case MAILBOX: {
-                long _id = db.insert(IslndContract.MailboxEntry.TABLE_NAME, null, values);
-                if ( _id > 0 ) {
-                    returnUri = IslndContract.MailboxEntry.buildMailboxUri(_id);
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
-
                 break;
             }
             case USER: {
@@ -595,6 +585,21 @@ public class IslndProvider extends ContentProvider {
             }
             case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID: {
                 returnUri = insertEventWithAliasAndUri(db, uri);
+                break;
+            }
+            case RECEIVED_MESSAGE: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.ReceivedMessageEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if ( _id > 0 )
+                    returnUri = IslndContract.ReceivedEventEntry.buildEventUri(_id);
+                else {
+                    Log.d(TAG, "message already added to content provider");
+                    return null;
+                }
+
                 break;
             }
             default:
@@ -766,11 +771,6 @@ public class IslndProvider extends ContentProvider {
             case OUTGOING_MESSAGE: {
                 rowsDeleted = db.delete(
                         IslndContract.OutgoingMessageEntry.TABLE_NAME, selection, selectionArgs);
-                break;
-            }
-            case MAILBOX: {
-                rowsDeleted = db.delete(
-                        IslndContract.MailboxEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:

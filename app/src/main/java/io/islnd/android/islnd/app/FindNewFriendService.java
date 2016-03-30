@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -49,12 +50,10 @@ public class FindNewFriendService extends Service {
                 int[] delay = {10000, 5000, 5000, 10000, 20000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
-                    boolean complete = processMessages();
-
-                    //--This assumes we only add one friend at a time
-                    if (complete) {
-                        break;
-                    }
+                    mContext.getContentResolver().requestSync(
+                            Util.getSyncAccount(mContext),
+                            IslndContract.CONTENT_AUTHORITY,
+                            new Bundle());
 
                     try {
                         Thread.sleep(delay[i]);
@@ -68,63 +67,6 @@ public class FindNewFriendService extends Service {
                 return null;
             }
         }.execute();
-    }
-
-    private boolean processMessages() {
-        MessageQuery messageQuery = new MessageQuery(getMailboxes());
-        List<EncryptedMessage> encryptedMessages = Rest.postMessageQuery(
-                messageQuery,
-                Util.getApiKey(mContext));
-
-        if (encryptedMessages == null
-                || encryptedMessages.size() == 0) {
-            return false;
-        }
-
-        Log.v(TAG, encryptedMessages.size() + " messages");
-        PriorityQueue<Message> messageQueue = new PriorityQueue<>();
-        for (EncryptedMessage encryptedMessage : encryptedMessages) {
-            Message message = encryptedMessage.decrypt(Util.getPrivateKey(mContext));
-            messageQueue.add(message);
-        }
-
-        boolean complete = false;
-        while (!messageQueue.isEmpty()) {
-            if (MessageProcessor.process(mContext, messageQueue.poll())) {
-                complete = true;
-            }
-        }
-
-        return complete;
-    }
-
-    @NonNull
-    private List<String> getMailboxes() {
-        String[] projection = new String[] { IslndContract.MailboxEntry.COLUMN_MAILBOX };
-        Cursor cursor = null;
-        try {
-            cursor = mContentResolver.query(
-                    IslndContract.MailboxEntry.CONTENT_URI,
-                    projection,
-                    null,
-                    null,
-                    null);
-            List<String> mailboxes = new ArrayList<>();
-            if (!cursor.moveToFirst()) {
-                return mailboxes;
-            }
-
-            do {
-                mailboxes.add(cursor.getString(0));
-            } while (cursor.moveToNext());
-
-            return mailboxes;
-
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
     @Override

@@ -431,28 +431,6 @@ public class DataUtils {
         );
     }
 
-    public static void addMailboxToQuerySet(Context context, String newMailbox) {
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.MailboxEntry.COLUMN_MAILBOX, newMailbox);
-
-        context.getContentResolver().insert(
-                IslndContract.MailboxEntry.CONTENT_URI,
-                values
-        );
-    }
-
-    public static void removeMailboxFromQuerySet(Context context, String mailbox) {
-        String selection = IslndContract.MailboxEntry.COLUMN_MAILBOX + " = ?";
-        String[] args = new String[] {
-                mailbox
-        };
-        context.getContentResolver().delete(
-                IslndContract.MailboxEntry.CONTENT_URI,
-                selection,
-                args
-        );
-    }
-
     public static Key getPublicKeyForUserInbox(Context context, String inbox) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
@@ -476,5 +454,16 @@ public class DataUtils {
                 cursor.close();
             }
         }
+    }
+
+    public static void updateAlias(Context context, int userId, String newAlias) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.AliasEntry.COLUMN_ALIAS, newAlias);
+
+        context.getContentResolver().update(
+                IslndContract.AliasEntry.buildAliasWithUserId(userId),
+                values,
+                null,
+                null);
     }
 }

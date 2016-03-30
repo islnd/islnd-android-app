@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -100,14 +100,18 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.OutgoingEventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
                 IslndContract.OutgoingEventEntry.COLUMN_BLOB + " TEXT NOT NULL);";
 
+        final String SQL_CREATE_RECEIVED_MESSAGE_TABLE = "CREATE TABLE " + IslndContract.ReceivedMessageEntry.TABLE_NAME + " (" +
+                IslndContract.ReceivedMessageEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.ReceivedMessageEntry.COLUMN_MAILBOX + " TEXT NOT NULL, " +
+                IslndContract.ReceivedMessageEntry.COLUMN_MESSAGE_ID + " INTEGER NOT NULL, " +
+
+                " UNIQUE (" + IslndContract.ReceivedMessageEntry.COLUMN_MAILBOX +", " +
+                IslndContract.ReceivedMessageEntry.COLUMN_MESSAGE_ID + ") ON CONFLICT IGNORE);";
+
         final String SQL_CREATE_OUTGOING_MESSAGE_TABLE = "CREATE TABLE " + IslndContract.OutgoingMessageEntry.TABLE_NAME + " (" +
                 IslndContract.OutgoingMessageEntry._ID + " INTEGER PRIMARY KEY," +
                 IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX + " TEXT NOT NULL, " +
                 IslndContract.OutgoingMessageEntry.COLUMN_BLOB + " TEXT NOT NULL);";
-
-        final String SQL_CREATE_MAILBOX_TABLE = "CREATE TABLE " + IslndContract.MailboxEntry.TABLE_NAME + " (" +
-                IslndContract.MailboxEntry._ID + " INTEGER PRIMARY KEY," +
-                IslndContract.MailboxEntry.COLUMN_MAILBOX + " TEXT NOT NULL);";
 
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_ALIAS_TABLE);
@@ -117,8 +121,8 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_PROFILE_TABLE);
         db.execSQL(SQL_CREATE_RECEIVED_EVENT_TABLE);
         db.execSQL(SQL_CREATE_OUTGOING_EVENT_TABLE);
+        db.execSQL(SQL_CREATE_RECEIVED_MESSAGE_TABLE);
         db.execSQL(SQL_CREATE_OUTGOING_MESSAGE_TABLE);
-        db.execSQL(SQL_CREATE_MAILBOX_TABLE);
     }
 
     @Override
@@ -131,8 +135,8 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ProfileEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedEventEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingEventEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedMessageEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingMessageEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.MailboxEntry.TABLE_NAME);
         onCreate(db);
     }
 }

@@ -22,6 +22,7 @@ public class IslndContract {
     public static final String PATH_IDENTITY = "identity";
     public static final String PATH_RECEIVED_EVENT = "received_event";
     public static final String PATH_OUTGOING_EVENT = "outgoing_event";
+    public static final String PATH_RECEIVED_MESSAGE = "received_message";
     public static final String PATH_OUTGOING_MESSAGE = "outgoing_message";
     public static final String PATH_MAILBOX = "mailbox";
 
@@ -275,6 +276,26 @@ public class IslndContract {
         public static final String COLUMN_BLOB = "blob";
     }
 
+    public static final class ReceivedMessageEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECEIVED_MESSAGE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RECEIVED_MESSAGE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RECEIVED_MESSAGE;
+
+        public static final String TABLE_NAME = "received_message";
+
+        public static final String COLUMN_MAILBOX = "mailbox";
+        public static final String COLUMN_MESSAGE_ID = "message_id";
+
+        public static Uri buildReceivedMessageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
     public static final class OutgoingMessageEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =
@@ -289,24 +310,5 @@ public class IslndContract {
 
         public static final String COLUMN_MAILBOX = "mailbox";
         public static final String COLUMN_BLOB = "blob";
-    }
-
-    public static final class MailboxEntry implements BaseColumns {
-
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MAILBOX).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
-
-        public static final String TABLE_NAME = "mailbox";
-
-        public static final String COLUMN_MAILBOX = "mailbox";
-
-        public static Uri buildMailboxUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
     }
 }

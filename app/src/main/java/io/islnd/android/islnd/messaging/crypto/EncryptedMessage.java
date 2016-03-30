@@ -20,6 +20,10 @@ public class EncryptedMessage extends AsymmetricEncryptedData {
         this.blob = blob;
     }
 
+    public String getMailbox() {
+        return mailbox;
+    }
+
     @Override
     public Message decrypt(Key privateKey) {
         byte[] decryptedBytes = ObjectEncrypter.decryptAsymmetric(this.blob, privateKey);

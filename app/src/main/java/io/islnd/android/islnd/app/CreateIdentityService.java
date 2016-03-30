@@ -65,7 +65,6 @@ public class CreateIdentityService extends IntentService {
 
         String alias = CryptoUtil.createAlias();
         String messageInbox = CryptoUtil.createAlias();
-        DataUtils.addMailboxToQuerySet(context, messageInbox);
 
         long userId = DataUtils.insertUser(
                 context,

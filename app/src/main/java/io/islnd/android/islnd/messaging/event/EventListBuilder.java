@@ -133,12 +133,6 @@ public class EventListBuilder {
         return this.eventList;
     }
 
-    public Event[] buildArray() {
-        changeAlias();
-        Util.setEventId(mContext, eventId);
-        return this.eventList.toArray(new Event[0]);
-    }
-
     private String getCurrentAlias() {
         return DataUtils.getMostRecentAlias(mContext, mUserId);
     }
