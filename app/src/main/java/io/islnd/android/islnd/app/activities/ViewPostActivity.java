@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import io.islnd.android.islnd.app.DeletePostDialog;
 import io.islnd.android.islnd.app.EventPublisher;
@@ -205,6 +206,8 @@ public class ViewPostActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (!cursor.moveToFirst()) {
+            Toast.makeText(this, getString(R.string.post_does_not_exist), Toast.LENGTH_LONG).show();
+            finish();
             return;
         }
 
