@@ -27,6 +27,7 @@ import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.Util;
 
 public class FeedFragment extends Fragment {
+
     private final static String TAG = FeedFragment.class.getSimpleName();
 
     private static final int NEW_POST_RESULT = 1;

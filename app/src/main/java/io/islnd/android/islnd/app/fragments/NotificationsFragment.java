@@ -18,11 +18,9 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
 import io.islnd.android.islnd.app.adapters.NotificationAdapter;
-import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.loader.NotificationLoader;
-import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.Util;
 
 public class NotificationsFragment extends Fragment {
@@ -43,7 +41,6 @@ public class NotificationsFragment extends Fragment {
         mContext = getContext();
         mResolver = mContext.getContentResolver();
 
-        // Feed posts setup
         mRecyclerView = (RecyclerView) v.findViewById(R.id.notification_recycler_view);
         mLayoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
