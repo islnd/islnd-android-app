@@ -186,7 +186,9 @@ public class NavBaseActivity extends AppCompatActivity
             } else {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(getApplicationContext(), contents);
+                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(
+                        getApplicationContext(),
+                        contents);
                 String message = friendAdded
                         ? getString(R.string.added_new_friend_message)
                         : getString(R.string.already_friends_message);
@@ -282,7 +284,7 @@ public class NavBaseActivity extends AppCompatActivity
 
     private void sendSms(String number) {
         String sms = getString(R.string.sms_prefix) +
-                MessageLayer.getEncodedIdentityString(getApplicationContext());
+                MessageLayer.getMyIdentity(getApplicationContext());
 
         try {
             SmsManager smsManager = SmsManager.getDefault();

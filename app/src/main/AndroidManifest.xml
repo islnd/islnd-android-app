@@ -113,12 +113,16 @@
                 android:resource="@xml/syncadapter"/>
         </service>
         <service
-            android:name=".EventPushService"
+            android:name=".CreateIdentityService"
+            android:exported="false" >
+        </service>
+        <service
+            android:name=".FindNewFriendService"
             android:exported="false">
         </service>
         <service
-            android:name=".CreateIdentityService"
-            android:exported="false" >
+            android:name=".FriendAddBackService"
+            android:exported="false">
         </service>
     </application>
 

@@ -10,13 +10,11 @@ public abstract class SymmetricEncryptedData<T extends ProtoSerializable> extend
     private static final String TAG = SymmetricEncryptedData.class.getSimpleName();
 
     public SymmetricEncryptedData(T object, Key privateKey, Key groupKey) {
-        super();
         SignedObject signedObject = ObjectSigner.sign(object, privateKey);
         blob = ObjectEncrypter.encryptSymmetric(signedObject, groupKey);
     }
 
     public SymmetricEncryptedData(String blob) {
-        super();
         this.blob = blob;
     }
 

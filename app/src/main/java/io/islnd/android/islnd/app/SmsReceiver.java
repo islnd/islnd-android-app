@@ -56,7 +56,8 @@ public class SmsReceiver extends BroadcastReceiver
         {
             Log.d(TAG, smsBody);
             // TODO: Don't notify if user is already friend.
-            boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(context,
+            boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(
+                    context,
                     smsBody.replace(context.getString(R.string.sms_prefix), ""));
 
             if (friendAdded)
