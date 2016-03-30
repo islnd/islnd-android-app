@@ -25,6 +25,7 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
+import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
@@ -56,12 +57,51 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.v(TAG, "onPerformSync");
 
+        pushOutoingMessages(provider);
         pushOutgoingEvents(provider);
         getIncomingEvents();
         
         mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
 
         Log.v(TAG, "completed on perform sync");
+    }
+
+    private void pushOutoingMessages(ContentProviderClient provider) {
+        String[] projections = new String[] {
+                IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX,
+                IslndContract.OutgoingMessageEntry.COLUMN_BLOB
+        };
+        try {
+            Cursor cursor = provider.query(
+                    IslndContract.OutgoingMessageEntry.CONTENT_URI,
+                    projections,
+                    null,
+                    null,
+                    null
+            );
+            Log.v(TAG, String.format("found %d outgoing messages", cursor.getCount()));
+            if (cursor.moveToFirst()) {
+                String apiKey = Util.getApiKey(mContext);
+
+                do {
+                    EncryptedMessage encryptedMessage = new EncryptedMessage(
+                            cursor.getString(1),
+                            cursor.getString(0)
+                    );
+                    Rest.postMessage(encryptedMessage, apiKey);
+                } while (cursor.moveToNext());
+
+                int records = mContentResolver.delete(
+                        IslndContract.OutgoingMessageEntry.CONTENT_URI,
+                        null,
+                        null
+                );
+                Log.v(TAG, String.format("posted and deleted %d messages", records));
+            }
+        } catch (RemoteException e) {
+            Log.d(TAG, "RemoteException: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void getIncomingEvents() {

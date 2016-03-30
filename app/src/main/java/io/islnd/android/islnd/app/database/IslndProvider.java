@@ -419,6 +419,17 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case OUTGOING_MESSAGE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.OutgoingMessageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
             case MAILBOX: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         IslndContract.MailboxEntry.TABLE_NAME,
@@ -750,6 +761,11 @@ public class IslndProvider extends ContentProvider {
             case OUTGOING_EVENT: {
                 rowsDeleted = db.delete(
                         IslndContract.OutgoingEventEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case OUTGOING_MESSAGE: {
+                rowsDeleted = db.delete(
+                        IslndContract.OutgoingMessageEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             case MAILBOX: {
