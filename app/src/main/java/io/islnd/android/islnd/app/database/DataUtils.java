@@ -16,6 +16,7 @@ import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class DataUtils {
@@ -359,6 +360,41 @@ public class DataUtils {
                 cursor.close();
             }
         }
+    }
+
+    private static void insertNotification(Context context,
+                                          int userId,
+                                          int notificationType,
+                                          String postId,
+                                          long timestamp) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID, userId);
+        values.put(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE, notificationType);
+        values.put(IslndContract.NotificationEntry.COLUMN_POST_ID, postId);
+        values.put(IslndContract.NotificationEntry.COLUMN_TIMESTAMP, timestamp);
+        context.getContentResolver().insert(
+                IslndContract.NotificationEntry.CONTENT_URI,
+                values);
+        Log.v(TAG, "notification added");
+    }
+
+    public static void insertNewFriendNotification(Context context, int userId) {
+        insertNotification(context,
+                userId,
+                NotificationType.NEW_FRIEND,
+                null,
+                ServerTime.getCurrentTimeMillis(context));
+    }
+
+    public static void insertNewCommentNotification(Context context,
+                                                    int userId,
+                                                    String postId,
+                                                    long timestamp) {
+        insertNotification(context,
+                userId,
+                NotificationType.COMMENT,
+                postId,
+                timestamp);
     }
 
     public static String getMessageInbox(Context context, int userId) {

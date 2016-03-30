@@ -22,6 +22,7 @@ public class IslndContract {
     public static final String PATH_IDENTITY = "identity";
     public static final String PATH_RECEIVED_EVENT = "received_event";
     public static final String PATH_OUTGOING_EVENT = "outgoing_event";
+    public static final String PATH_NOTIFICATION = "notification";
     public static final String PATH_MAILBOX = "mailbox";
 
     public static final class PostEntry implements BaseColumns {
@@ -53,6 +54,17 @@ public class IslndContract {
 
         public static Uri buildPostUriWithUserId(int userId) {
             return CONTENT_URI.buildUpon().appendPath(Integer.toString(userId)).build();
+        }
+
+        public static Uri buildPostUriWithUserIdAndPostId(int userId, String postId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(userId))
+                    .appendPath(postId)
+                    .build();
+        }
+
+        public static String getPostIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
         }
     }
 
@@ -220,6 +232,29 @@ public class IslndContract {
             return CONTENT_URI.buildUpon()
                     .appendPath(Integer.toString(userId))
                     .build();
+        }
+    }
+
+    public static final class NotificationEntry implements BaseColumns {
+        private static final String TAG = NotificationEntry.class.getSimpleName();
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_NOTIFICATION).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATION;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATION;
+
+        public static final String TABLE_NAME = "notification";
+
+        public static final String COLUMN_NOTIFICATION_USER_ID = "user_id";
+        public static final String COLUMN_NOTIFICATION_TYPE = "notification_type";
+        public static final String COLUMN_POST_ID = "post_id";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+
+        public static Uri buildNotificationUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
 

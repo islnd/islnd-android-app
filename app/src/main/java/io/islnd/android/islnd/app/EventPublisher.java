@@ -2,16 +2,13 @@ package io.islnd.android.islnd.app;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.security.Key;
 import java.util.List;
 
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.sync.EventSyncAdapter;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.event.Event;

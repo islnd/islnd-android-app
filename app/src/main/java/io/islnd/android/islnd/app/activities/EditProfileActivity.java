@@ -24,16 +24,15 @@ import java.io.File;
 import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.util.ImageUtil;
 
 public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static String TAG = EditProfileActivity.class.getSimpleName();
+    private static final String TAG = EditProfileActivity.class.getSimpleName();
 
     private static final String PROFILE_IMAGE_URI_STATE = "PROFILE_IMAGE_URI_STATE";
     private static final String HEADER_IMAGE_URI_STATE = "HEADER_IMAGE_URI_STATE";
-
-    public static final int LOADER_ID = 3;
 
     private static final int SELECT_PROFILE_IMAGE = 1;
     private static final int SELECT_HEADER_IMAGE = 2;
@@ -85,7 +84,7 @@ public class EditProfileActivity extends AppCompatActivity implements LoaderMana
             }
         }
 
-        getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.EDIT_PROFILE_ACTIVITY_LOADER_ID, new Bundle(), this);
     }
 
     @Override
