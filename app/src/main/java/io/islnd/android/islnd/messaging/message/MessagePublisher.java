@@ -3,7 +3,10 @@ package io.islnd.android.islnd.messaging.message;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.util.Log;
+
+import java.security.Key;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -15,18 +18,44 @@ public class MessagePublisher {
 
     public static void removeFriend(Context context, int userId) {
         String newAlias = CryptoUtil.createAlias();
-        ContentValues[] values = buildEncryptedMessagesToRemoveFriend(context, userId, newAlias);
+        createMessagesForRemainingFriends(context, userId, newAlias);
+        DataUtils.updateAlias(context, IslndContract.UserEntry.MY_USER_ID, newAlias);
+
+        createMessageForFriendToRemove(context, userId);
+    }
+
+    private static void createMessageForFriendToRemove(Context context, int userId) {
+        EncryptedMessage encryptedMessage = buildEncryptedMessageToRemoveFriend(context, userId);
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX, encryptedMessage.getMailbox());
+        values.put(IslndContract.OutgoingMessageEntry.COLUMN_BLOB, encryptedMessage.getBlob());
+        context.getContentResolver().insert(
+                IslndContract.OutgoingMessageEntry.CONTENT_URI,
+                values
+        );
+        Log.v(TAG, "inserted 'delete me' message");
+    }
+
+    @NonNull
+    private static EncryptedMessage buildEncryptedMessageToRemoveFriend(Context context, int userId) {
+        String friendToRemoveMailbox = DataUtils.getMessageInbox(context, userId);
+        Key friendToRemovePublicKey = DataUtils.getPublicKey(context, userId);
+        Message deleteMeMessage = MessageBuilder.buildDeleteMeMessage(
+                context,
+                friendToRemoveMailbox);
+        return new EncryptedMessage(deleteMeMessage, friendToRemovePublicKey);
+    }
+
+    private static void createMessagesForRemainingFriends(Context context, int userId, String newAlias) {
+        ContentValues[] values = createContentValuesForRemainingFriends(context, userId, newAlias);
         int recordsInserted = context.getContentResolver().bulkInsert(
                 IslndContract.OutgoingMessageEntry.CONTENT_URI,
                 values
         );
         Log.v(TAG, String.format("wrote %d messages", recordsInserted));
-
-        //--Update my alias if bulk insert successful
-        DataUtils.updateAlias(context, IslndContract.UserEntry.MY_USER_ID, newAlias);
     }
 
-    private static ContentValues[] buildEncryptedMessagesToRemoveFriend(Context context, int userId, String newAlias) {
+    private static ContentValues[] createContentValuesForRemainingFriends(Context context, int userId, String newAlias) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX

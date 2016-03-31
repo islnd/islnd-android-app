@@ -77,6 +77,8 @@ public class IslndContract {
 
         public static final int MY_USER_ID = 1; //--we are always the first user to go in the database
 
+        public static final int NOT_DELETED = 0;
+
         public static int getUserIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));
         }
@@ -311,5 +313,9 @@ public class IslndContract {
 
         public static final String COLUMN_MAILBOX = "mailbox";
         public static final String COLUMN_BLOB = "blob";
+
+        public static Uri buildOutgoingMessageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 }

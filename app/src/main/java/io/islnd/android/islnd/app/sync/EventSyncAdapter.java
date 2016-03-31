@@ -275,8 +275,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             cursor = mContentResolver.query(
                     IslndContract.UserEntry.CONTENT_URI,
                     projection,
-                    null,
-                    null,
+                    IslndContract.UserEntry.COLUMN_DELETED + " = ?",
+                    new String[] {Integer.toString(IslndContract.UserEntry.NOT_DELETED)},
                     null);
             List<String> mailboxes = new ArrayList<>();
             if (!cursor.moveToFirst()) {

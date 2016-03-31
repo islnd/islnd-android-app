@@ -57,6 +57,11 @@ public class MessageProcessor {
                 DataUtils.updateAlias(context, userID, message.getBlob());
                 break;
             }
+            case MessageType.DELETE_ME: {
+                Log.v(TAG, "process delete user");
+                int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
+                DataUtils.markUserAsDeletedAndDeletePosts(context, userID);
+            }
         }
 
         recordProcessed(context, message);

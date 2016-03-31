@@ -34,6 +34,14 @@ public class MessageBuilder {
                 newAlias);
     }
 
+    public static Message buildDeleteMeMessage(Context context, String mailbox) {
+        return new Message(
+                mailbox,
+                getNewMessageIdAndUpdate(context),
+                MessageType.DELETE_ME,
+                "");
+    }
+
     private static int getNewMessageIdAndUpdate(Context context) {
         int currentMessageId = Util.getMessageId(context);
         int newMessageId = currentMessageId + 1;

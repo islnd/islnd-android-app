@@ -22,7 +22,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " TEXT NULL, " +
-                IslndContract.UserEntry.COLUMN_DELETED + " INTEGER DEFAULT 0 " +
+                IslndContract.UserEntry.COLUMN_DELETED + " INTEGER DEFAULT " + IslndContract.UserEntry.NOT_DELETED +
                 " );";
 
         final String SQL_CREATE_ALIAS_TABLE = "CREATE TABLE " + IslndContract.AliasEntry.TABLE_NAME + " (" +

@@ -590,6 +590,16 @@ public class IslndProvider extends ContentProvider {
                 returnUri = insertEventWithAliasAndUri(db, uri);
                 break;
             }
+            case OUTGOING_MESSAGE: {
+                long _id = db.insert(IslndContract.OutgoingMessageEntry.TABLE_NAME, null, values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.OutgoingMessageEntry.buildOutgoingMessageUri(_id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+
+                break;
+            }
             case RECEIVED_MESSAGE: {
                 long _id = db.insertWithOnConflict(
                         IslndContract.ReceivedMessageEntry.TABLE_NAME,
