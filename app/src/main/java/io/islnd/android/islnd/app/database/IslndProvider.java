@@ -85,7 +85,10 @@ public class IslndProvider extends ContentProvider {
         sProfileQueryBuilder.setTables(
                 IslndContract.ProfileEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID +
-                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.UserEntry.TABLE_NAME +
+                        " ON " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID
         );
     }
 
@@ -733,6 +736,14 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.PostEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case POST_WITH_USER: {
+                int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
+                rowsDeleted = db.delete(
+                        IslndContract.PostEntry.TABLE_NAME,
+                        sPostTableUserIdSelection,
+                        new String[] {Integer.toString(userId)});
+                break;
+            }
             case COMMENT: {
                 rowsDeleted = db.delete(
                         IslndContract.CommentEntry.TABLE_NAME, selection, selectionArgs);
@@ -827,6 +838,19 @@ public class IslndProvider extends ContentProvider {
                 );
                 Log.v(TAG, "update user updated " + rowsUpdated);
                 getContext().getContentResolver().notifyChange(IslndContract.UserEntry.CONTENT_URI, null);
+                break;
+            }
+            case USER_WITH_ID: {
+                int userId = IslndContract.UserEntry.getUserIdFromUri(uri);
+                rowsUpdated = db.update(
+                        IslndContract.UserEntry.TABLE_NAME,
+                        values,
+                        sUserTableUserIdSelection,
+                        new String[] {Integer.toString(userId)}
+                );
+                Log.v(TAG, "update user updated " + rowsUpdated);
+                getContext().getContentResolver().notifyChange(IslndContract.UserEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {

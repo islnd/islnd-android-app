@@ -1,15 +1,10 @@
 package io.islnd.android.islnd.app;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
 
-import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
-import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
-import io.islnd.android.islnd.messaging.message.MessageBuilder;
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.messaging.message.MessagePublisher;
 
 public class Dialogs {
@@ -21,6 +16,7 @@ public class Dialogs {
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
                     MessagePublisher.removeFriend(context, userId);
+                    DataUtils.markUserAsDeletedAndDeletePosts(context, userId);
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

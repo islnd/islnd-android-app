@@ -466,4 +466,22 @@ public class DataUtils {
                 null,
                 null);
     }
+
+    public static void markUserAsDeletedAndDeletePosts(Context context, int userId) {
+        ContentResolver contentResolver = context.getContentResolver();
+        contentResolver.delete(
+                IslndContract.PostEntry.buildPostUriWithUserId(userId),
+                null,
+                null
+        );
+
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_DELETED, true);
+        contentResolver.update(
+                IslndContract.UserEntry.buildUserWithUserId(userId),
+                values,
+                null,
+                null
+        );
+    }
 }

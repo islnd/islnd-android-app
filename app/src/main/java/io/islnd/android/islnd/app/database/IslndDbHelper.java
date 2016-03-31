@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 21;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -21,7 +21,8 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.UserEntry._ID + " INTEGER PRIMARY KEY, " +
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " TEXT NOT NULL, " +
-                IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " TEXT NULL " +
+                IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " TEXT NULL, " +
+                IslndContract.UserEntry.COLUMN_DELETED + " INTEGER DEFAULT 0 " +
                 " );";
 
         final String SQL_CREATE_ALIAS_TABLE = "CREATE TABLE " + IslndContract.AliasEntry.TABLE_NAME + " (" +
