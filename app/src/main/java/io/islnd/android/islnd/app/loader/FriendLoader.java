@@ -14,8 +14,6 @@ public class FriendLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String USER_ID_BUNDLE_KEY = "USER_ID";
 
-    public static final int LOADER_ID = 1;
-
     private final Context mContext;
     private final ViewFriendsAdapter mAdapter;
 

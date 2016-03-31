@@ -36,11 +36,13 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.fragments.NotificationsFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
+import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
@@ -54,8 +56,6 @@ public class NavBaseActivity extends AppCompatActivity
     private static final String TAG = NavBaseActivity.class.getSimpleName();
 
     private static final String FRAGMENT_STATE = "FRAGMENT_STATE";
-
-    public static final int LOADER_ID = 6;
 
     private static final int REQUEST_SMS = 0;
     private static final int REQUEST_CONTACT = 1;
@@ -90,7 +90,7 @@ public class NavBaseActivity extends AppCompatActivity
                 .replace(R.id.content_frame, mFragment)
                 .commit();
 
-        getSupportLoaderManager().initLoader(LOADER_ID, new Bundle(), this);
+        getSupportLoaderManager().initLoader(LoaderId.NAV_BASE_ACTIVITY_LOADER_ID, new Bundle(), this);
     }
 
     private void onCreateDrawer() {
@@ -156,6 +156,13 @@ public class NavBaseActivity extends AppCompatActivity
                     break;
                 }
                 mFragment = new ViewFriendsFragment();
+                isFragment = true;
+                break;
+            case R.id.nav_notifications:
+                if (currentFragment instanceof NotificationsFragment) {
+                    break;
+                }
+                mFragment = new NotificationsFragment();
                 isFragment = true;
                 break;
             case R.id.nav_add_friend:

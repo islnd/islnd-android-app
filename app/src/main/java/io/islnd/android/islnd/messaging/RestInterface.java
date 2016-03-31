@@ -1,6 +1,5 @@
 package io.islnd.android.islnd.messaging;
 
-
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 import io.islnd.android.islnd.messaging.crypto.EncryptedResource;

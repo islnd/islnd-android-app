@@ -1,8 +1,8 @@
 package io.islnd.android.islnd.app;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.messaging.message.MessagePublisher;

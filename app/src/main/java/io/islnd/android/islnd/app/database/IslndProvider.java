@@ -17,6 +17,7 @@ public class IslndProvider extends ContentProvider {
 
     static final int POST = 100;
     static final int POST_WITH_USER = 101;
+    static final int POST_WITH_USER_AND_POST_ID = 102;
     static final int USER = 200;
     static final int USER_WITH_ID = 201;
     static final int COMMENT = 300;
@@ -30,13 +31,20 @@ public class IslndProvider extends ContentProvider {
     static final int IDENTITY = 700;
     static final int RECEIVED_EVENT = 800;
     static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
-    static final int RECEIVED_MESSAGE = 900;
-    static final int OUTGOING_EVENT = 1000;
+    static final int OUTGOING_EVENT = 900;
+    static final int RECEIVED_MESSAGE = 1000;
     static final int OUTGOING_MESSAGE = 1100;
+    static final int NOTIFICATION = 1200;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
                     "." + IslndContract.PostEntry.COLUMN_USER_ID + " = ? ";
+
+    private static final String sPostTableUserIdAndPostIdSelection =
+            IslndContract.PostEntry.TABLE_NAME
+                    + "." + IslndContract.PostEntry.COLUMN_USER_ID + " = ? AND "
+                    + IslndContract.PostEntry.TABLE_NAME
+                    + "." + IslndContract.PostEntry.COLUMN_POST_ID + " = ? ";
 
     private static final String sUserTableUserIdSelection =
             IslndContract.UserEntry.TABLE_NAME +
@@ -108,11 +116,44 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private static final SQLiteQueryBuilder sNotificationQueryBuilder;
+
+    static {
+        sNotificationQueryBuilder = new SQLiteQueryBuilder();
+
+        sNotificationQueryBuilder.setTables(
+                IslndContract.NotificationEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                        " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
+                        " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
+        );
+    }
+
     private Cursor getPostsByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
 
         String[] selectionArgs = new String[] {Integer.toString(userId)};
         String selection = sPostTableUserIdSelection;
+
+        return sPostQueryBuilder.query(
+                mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getPostsByUserIdAndPostId(Uri uri, String[] projection, String sortOrder) {
+        int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
+        String postId = IslndContract.PostEntry.getPostIdFromUri(uri);
+
+        String selection = sPostTableUserIdAndPostIdSelection;
+        String[] selectionArgs = {Integer.toString(userId), postId};
 
         return sPostQueryBuilder.query(
                 mOpenHelper.getReadableDatabase(),
@@ -254,6 +295,7 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_POST, POST);
         matcher.addURI(authority, IslndContract.PATH_POST + "/#", POST_WITH_USER);
+        matcher.addURI(authority, IslndContract.PATH_POST + "/#/*", POST_WITH_USER_AND_POST_ID);
 
         matcher.addURI(authority, IslndContract.PATH_COMMENT, COMMENT);
         matcher.addURI(authority, IslndContract.PATH_COMMENT + "/*/*",
@@ -278,11 +320,14 @@ public class IslndProvider extends ContentProvider {
                 IslndContract.PATH_RECEIVED_EVENT + "/*/#",
                 RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID);
 
-        matcher.addURI(authority, IslndContract.PATH_RECEIVED_MESSAGE, RECEIVED_MESSAGE);
 
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_EVENT, OUTGOING_EVENT);
 
+        matcher.addURI(authority, IslndContract.PATH_RECEIVED_MESSAGE, RECEIVED_MESSAGE);
+
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_MESSAGE, OUTGOING_MESSAGE);
+
+        matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
 
         return matcher;
     }
@@ -313,6 +358,10 @@ public class IslndProvider extends ContentProvider {
             }
             case POST_WITH_USER: {
                 retCursor = getPostsByUserId(uri, projection, sortOrder);
+                break;
+            }
+            case POST_WITH_USER_AND_POST_ID: {
+                retCursor = getPostsByUserIdAndPostId(uri, projection, sortOrder);
                 break;
             }
             case USER: {
@@ -433,6 +482,17 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case NOTIFICATION: {
+                retCursor = sNotificationQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
             case OUTGOING_MESSAGE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         IslndContract.OutgoingMessageEntry.TABLE_NAME,
@@ -463,6 +523,8 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.PostEntry.CONTENT_TYPE;
             case POST_WITH_USER:
                 return IslndContract.PostEntry.CONTENT_TYPE;
+            case POST_WITH_USER_AND_POST_ID:
+                return IslndContract.PostEntry.CONTENT_TYPE;
             case USER:
                 return IslndContract.UserEntry.CONTENT_TYPE;
             case USER_WITH_ID:
@@ -479,6 +541,8 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.ReceivedEventEntry.CONTENT_TYPE;
             case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID:
                 return IslndContract.ReceivedEventEntry.CONTENT_ITEM_TYPE;
+            case NOTIFICATION:
+                return IslndContract.NotificationEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -612,6 +676,18 @@ public class IslndProvider extends ContentProvider {
                     Log.d(TAG, "message already added to content provider");
                     return null;
                 }
+
+                break;
+            }
+            case NOTIFICATION: {
+                long _id = db.insert(
+                        IslndContract.NotificationEntry.TABLE_NAME,
+                        null,
+                        values);
+                if ( _id > 0 )
+                    returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
+                else
+                    return null;
 
                 break;
             }
@@ -789,6 +865,11 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.OutgoingEventEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case NOTIFICATION: {
+                rowsDeleted = db.delete(
+                        IslndContract.NotificationEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             case OUTGOING_MESSAGE: {
                 rowsDeleted = db.delete(
                         IslndContract.OutgoingMessageEntry.TABLE_NAME, selection, selectionArgs);
@@ -837,6 +918,7 @@ public class IslndProvider extends ContentProvider {
                 updateProfileWithUserId(uri, values);
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
                 break;
             }
             case USER: {
@@ -876,6 +958,7 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
                 break;
             }
             case ALIAS_WITH_USER_ID: {

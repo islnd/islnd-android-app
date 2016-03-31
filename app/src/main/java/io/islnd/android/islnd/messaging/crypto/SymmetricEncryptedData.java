@@ -1,7 +1,5 @@
 package io.islnd.android.islnd.messaging.crypto;
 
-import android.util.Log;
-
 import java.security.Key;
 
 import io.islnd.android.islnd.messaging.ProtoSerializable;

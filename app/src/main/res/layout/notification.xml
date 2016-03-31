@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/notification_vertical_padding"
+    android:paddingBottom="@dimen/notification_vertical_padding"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="@dimen/notification_profile_image"
+        android:layout_height="@dimen/notification_profile_image"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="@dimen/notification_profile_image_margin"/>
+
+    <TextView
+        android:id="@+id/notification_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/profile_image"
+        android:layout_marginBottom="@dimen/notification_content_margin"
+        style="@style/Base.TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/primary_text"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notification_content"
+        android:layout_alignLeft="@id/notification_content"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/notification_type_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/notification_type_icon_margin"/>
+
+        <TextView
+            android:id="@+id/timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/notification_type_icon"
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            android:textColor="@color/secondary_text"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

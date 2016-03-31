@@ -9,10 +9,12 @@ import android.util.Log;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.database.NotificationType;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.util.ImageUtil;
+import io.islnd.android.islnd.app.util.Util;
 
 public class EventProcessor {
     private static final String TAG = EventProcessor.class.getSimpleName();
@@ -177,6 +179,15 @@ public class EventProcessor {
         context.getContentResolver().insert(
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
+
+        if (Util.getUserId(context) != commentUserId) {
+            DataUtils.insertNewCommentNotification(
+                    context,
+                    commentUserId,
+                    newCommentEvent.getPostId(),
+                    newCommentEvent.getTimestamp()
+            );
+        }
 
         int commentCount = DataUtils.getCommentCount(
                 context,

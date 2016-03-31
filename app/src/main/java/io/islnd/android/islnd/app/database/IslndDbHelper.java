@@ -88,6 +88,16 @@ public class IslndDbHelper extends SQLiteOpenHelper {
 
                 " UNIQUE (" + IslndContract.ProfileEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
+        final String SQL_CREATE_NOTIFICATION_TABLE = "CREATE TABLE " + IslndContract.NotificationEntry.TABLE_NAME + " (" +
+                IslndContract.NotificationEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER NOT NULL," +
+                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " INTEGER NOT NULL," +
+                IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT, " +
+                IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
+
+                " FOREIGN KEY (" + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + ") REFERENCES " +
+                IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "));";
+
         final String SQL_CREATE_RECEIVED_EVENT_TABLE = "CREATE TABLE " + IslndContract.ReceivedEventEntry.TABLE_NAME + " (" +
                 IslndContract.ReceivedEventEntry._ID + " INTEGER PRIMARY KEY," +
                 IslndContract.ReceivedEventEntry.COLUMN_ALIAS + " TEXT NOT NULL, " +
@@ -120,6 +130,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_POST_TABLE);
         db.execSQL(SQL_CREATE_COMMENT_TABLE);
         db.execSQL(SQL_CREATE_PROFILE_TABLE);
+        db.execSQL(SQL_CREATE_NOTIFICATION_TABLE);
         db.execSQL(SQL_CREATE_RECEIVED_EVENT_TABLE);
         db.execSQL(SQL_CREATE_OUTGOING_EVENT_TABLE);
         db.execSQL(SQL_CREATE_RECEIVED_MESSAGE_TABLE);
@@ -134,6 +145,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.PostEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.CommentEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ProfileEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.NotificationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedEventEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingEventEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedMessageEntry.TABLE_NAME);

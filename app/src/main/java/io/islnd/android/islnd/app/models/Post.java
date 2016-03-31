@@ -5,7 +5,8 @@ import java.io.Serializable;
 public class Post implements Serializable {
     private static final String TAG = Post.class.getSimpleName();
 
-    public static String POST_EXTRA = "POST_OBJECT";
+    public static final String POST_ID_EXTRA = "POST_ID_EXTRA";
+    public static final String POST_USER_ID_EXTRA = "POST_USER_ID_EXTRA";
 
     private final String displayName;
     private final int userId;
