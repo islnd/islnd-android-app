@@ -87,7 +87,7 @@ public class MessageProcessor {
                 );
 
                 saveProfile(context, message, profileResource);
-                updateMailbox(context, message);
+                updateMailbox(context);
             } catch (InvalidSignatureException e) {
                 e.printStackTrace();
             }
@@ -168,8 +168,8 @@ public class MessageProcessor {
         context.startService(sendProfileIntent);
     }
 
-    private static void updateMailbox(Context context, Message message) {
-        //--Update our inbox for the next friend we make
+    private static void updateMailbox(Context context) {
+        //--We need a new inbox for the next friend we make
         final String newMailbox = CryptoUtil.createAlias();
         DataUtils.updateMyUserMailbox(context, newMailbox);
         Util.setMyInbox(context, newMailbox);
