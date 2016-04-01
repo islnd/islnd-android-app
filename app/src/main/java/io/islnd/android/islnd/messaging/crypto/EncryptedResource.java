@@ -19,8 +19,8 @@ public class EncryptedResource extends SymmetricEncryptedData {
 
     @Override
     public ProtoSerializable decryptAndVerify(Key groupKey, PublicKey authorPublicKey) throws InvalidSignatureException {
-        SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);
-        return ProfileResource.fromProto(signedObject.getObject());
+        String object = this.verifySignatureAndGetObject(groupKey, authorPublicKey);
+        return ProfileResource.fromProto(object);
     }
 
     public String getResourceKey() {

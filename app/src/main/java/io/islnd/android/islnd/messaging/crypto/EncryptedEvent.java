@@ -22,8 +22,8 @@ public class EncryptedEvent extends SymmetricEncryptedData {
 
     @Override
     public Event decryptAndVerify(Key groupKey, PublicKey authorPublicKey) throws InvalidSignatureException {
-        SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);
-        return Event.fromProto(signedObject.getObject());
+        String object = this.verifySignatureAndGetObject(groupKey, authorPublicKey);
+        return Event.fromProto(object);
     }
 
     public String getAlias() {

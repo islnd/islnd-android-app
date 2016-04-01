@@ -382,7 +382,8 @@ public class DataUtils {
     }
 
     public static void insertNewFriendNotification(Context context, int userId) {
-        insertNotification(context,
+        insertNotification(
+                context,
                 userId,
                 NotificationType.NEW_FRIEND,
                 null,
@@ -485,6 +486,31 @@ public class DataUtils {
                 return CryptoUtil.decodePublicKey(cursor.getString(0));
             } else {
                 throw new IllegalArgumentException("database has no entry for inbox: " + inbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static PublicKey getPublicKeyForUserOutbox(Context context, String outbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " = ?",
+                    new String[] {outbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return CryptoUtil.decodePublicKey(cursor.getString(0));
+            } else {
+                throw new IllegalArgumentException("database has no entry for outbox: " + outbox);
             }
         } finally {
             if (cursor != null) {

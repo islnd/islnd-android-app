@@ -87,7 +87,16 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.v(TAG, encryptedMessages.size() + " messages");
         PriorityQueue<Message> messageQueue = new PriorityQueue<>();
         for (EncryptedMessage encryptedMessage : encryptedMessages) {
-            Message message = encryptedMessage.decrypt(Util.getPrivateKey(mContext));
+            PublicKey authorPublicKey = DataUtils.getPublicKeyForUserOutbox(
+                    mContext,
+                    encryptedMessage.getMailbox());
+            Message message = null;
+            try {
+                message = encryptedMessage.decryptAndVerify(Util.getPrivateKey(mContext), authorPublicKey);
+            } catch (InvalidSignatureException e) {
+                Log.d(TAG, "message signature invalid!");
+                Log.d(TAG, e.toString());
+            }
             messageQueue.add(message);
         }
 
