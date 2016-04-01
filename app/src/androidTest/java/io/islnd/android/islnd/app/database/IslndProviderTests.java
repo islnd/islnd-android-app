@@ -16,8 +16,4 @@ public class IslndProviderTests extends AndroidTestCase {
 
         assertEquals(IslndContract.UserEntry.CONTENT_TYPE, type);
     }
-
-    public void testPostQuery() {
-
-    }
 }

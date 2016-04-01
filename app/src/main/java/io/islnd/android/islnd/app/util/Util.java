@@ -18,6 +18,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.security.Key;
+import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -155,7 +156,7 @@ public class Util {
         editor.commit();
     }
 
-    public static Key getPrivateKey(Context context) {
+    public static PrivateKey getPrivateKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePrivateKey(
                 sharedPref.getString(context.getString(R.string.private_key), ""));

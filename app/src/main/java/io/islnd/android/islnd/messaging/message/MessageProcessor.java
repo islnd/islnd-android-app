@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.List;
 
 import io.islnd.android.islnd.app.FriendAddBackService;
@@ -79,7 +80,7 @@ public class MessageProcessor {
                 && encryptedResources.size() > 0) {
             int userId = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
             Key groupKey = DataUtils.getGroupKey(context, userId);
-            Key publicKey = DataUtils.getPublicKey(context, userId);
+            PublicKey publicKey = DataUtils.getPublicKey(context, userId);
             try {
                 ProfileResource profileResource = (ProfileResource) encryptedResources.get(0).decryptAndVerify(
                         groupKey,

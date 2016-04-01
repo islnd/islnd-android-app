@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,7 +146,7 @@ public class DataUtils {
         }
     }
 
-    public static Key getPublicKey(Context context, int userId) {
+    public static PublicKey getPublicKey(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY
         };

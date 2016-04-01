@@ -15,6 +15,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -217,7 +218,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
             //--TODO keys need to be a keystore or in-memory cache service
             Key groupKey = DataUtils.getGroupKey(mContext, userId);
-            Key publicKey = DataUtils.getPublicKey(mContext, userId);
+            PublicKey publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
                 final Event event = encryptedEvent.decryptAndVerify(groupKey, publicKey);
                 if (event != null) {

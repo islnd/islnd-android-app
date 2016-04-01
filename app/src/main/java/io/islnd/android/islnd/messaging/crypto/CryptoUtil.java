@@ -1,20 +1,22 @@
 package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Random;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
@@ -30,15 +32,16 @@ public class CryptoUtil {
 
     // encryption configurations
     private static final String SYMMETRIC_GENERATOR_ALGO = "AES";
-    private static final String ASYMMETRIC_GENERATOR_ALGO = "RSA";
     private static final String SYMMETRIC_ALGO = "AES/CBC/PKCS5Padding";
-    private static final String ASYMMETRIC_ALGO_WITH_OAEP = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
-    private static final String ASYMMETRIC_ALGO = "RSA/ECB/PKCS1Padding";
-    private static final String DIGEST_ALGO = "SHA-1";
     private static final int SYMMETRIC_GENERATOR_LENGTH = 128;
+    private static final int IV_SIZE = 16;
+
+    private static final String ASYMMETRIC_GENERATOR_ALGO = "RSA";
+    private static final String ASYMMETRIC_ALGO_WITH_OAEP = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     private static final int ASYMMETRIC_GENERATOR_LENGTH = 1024;
     public static final int ASYMMETRIC_BLOCK_SIZE = 60;
-    private static final int IV_SIZE = 16;
+
+    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
 
     // encryption instances
     private static KeyGenerator keyGenerator;
@@ -46,9 +49,8 @@ public class CryptoUtil {
     private static KeyFactory keyFactory;
     private static Cipher symmetricCipher;
     private static Cipher asymmetricCipherWithOAEP;
-    private static Cipher asymmetricCipher;
-    private static MessageDigest messageDigest;
     private static SecureRandom secureRandom;
+    private static Signature cryptoSignature;
     private static Encoder encoder = new Encoder();
     private static Decoder decoder = new Decoder();
 
@@ -56,20 +58,22 @@ public class CryptoUtil {
         try {
             keyGenerator = KeyGenerator.getInstance(SYMMETRIC_GENERATOR_ALGO);
             keyGenerator.init(SYMMETRIC_GENERATOR_LENGTH);
+
             keyPairGenerator = KeyPairGenerator.getInstance(ASYMMETRIC_GENERATOR_ALGO);
             keyPairGenerator.initialize(ASYMMETRIC_GENERATOR_LENGTH);
+
             keyFactory = KeyFactory.getInstance(ASYMMETRIC_GENERATOR_ALGO);
+
             symmetricCipher = Cipher.getInstance(SYMMETRIC_ALGO);
             asymmetricCipherWithOAEP = Cipher.getInstance(ASYMMETRIC_ALGO_WITH_OAEP);
-            asymmetricCipher = Cipher.getInstance(ASYMMETRIC_ALGO);
-            messageDigest = MessageDigest.getInstance(DIGEST_ALGO);
+
+            cryptoSignature = Signature.getInstance(SIGNATURE_ALGORITHM);
+
             secureRandom = new SecureRandom();
         } catch (GeneralSecurityException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
-
-    private static String alias;
 
     public static Key getKey() {
         return keyGenerator.generateKey();
@@ -79,23 +83,12 @@ public class CryptoUtil {
         return keyPairGenerator.generateKeyPair();
     }
 
-    public static byte[] encryptAsymmetric(byte[] bytes, Key key) {
-        try {
-            asymmetricCipher.init(Cipher.ENCRYPT_MODE, key);
-            return asymmetricCipher.doFinal(bytes);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     public static String encodeKey(Key key) {
         byte[] encodedKey = key.getEncoded();
         return encoder.encodeToString(encodedKey);
     }
 
-    public static Key decodePrivateKey(String string) {
+    public static PrivateKey decodePrivateKey(String string) {
         byte[] encodedKey = decoder.decode(string);
         try {
             return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
@@ -106,7 +99,7 @@ public class CryptoUtil {
         return null;
     }
 
-    public static Key decodePublicKey(String string) {
+    public static PublicKey decodePublicKey(String string) {
         byte[] encodedKey = decoder.decode(string);
         try {
             return keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
@@ -177,29 +170,40 @@ public class CryptoUtil {
         return null;
     }
 
-    public static byte[] getDigest(ProtoSerializable object) {
-        return messageDigest.digest(object.toByteArray());
+    public static String createAlias() {
+        return String.valueOf(secureRandom.nextLong());
     }
 
-    public static byte[] getDigest(String object) {
-        return messageDigest.digest(decoder.decode(object));
-    }
-
-    public static byte[] decryptAsymmetric(byte[] cipherText, Key key) throws DecryptionErrorException {
+    public static SignedObject sign(ProtoSerializable object, PrivateKey privateKey) {
+        byte[] objectBytes = object.toByteArray();
         try {
-            asymmetricCipher.init(Cipher.DECRYPT_MODE, key);
-            return asymmetricCipher.doFinal(cipherText);
-        } catch (BadPaddingException e) {
-            throw new DecryptionErrorException();
-        } catch (GeneralSecurityException e) {
+            cryptoSignature.initSign(privateKey);
+            cryptoSignature.update(objectBytes);
+            byte[] objectSignature = cryptoSignature.sign();
+            return new SignedObject(
+                    encoder.encodeToString(object.toByteArray()),
+                    encoder.encodeToString(objectSignature));
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public static String createAlias() {
-        return String.valueOf(secureRandom.nextLong());
+    public static boolean verifySignedObject(SignedObject signedObject, PublicKey publicKey) {
+        try {
+            cryptoSignature.initVerify(publicKey);
+            cryptoSignature.update(decoder.decode(signedObject.getObject()));
+            return cryptoSignature.verify(decoder.decode(signedObject.getSignature()));
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }
 
