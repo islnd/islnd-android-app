@@ -34,7 +34,7 @@ public class FriendLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         int myUserId = args.getInt(USER_ID_BUNDLE_KEY);
         String selection = IslndContract.DisplayNameEntry.TABLE_NAME + "." +
                 IslndContract.DisplayNameEntry.COLUMN_USER_ID + " != ? AND " +
-                IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry.COLUMN_DELETED + " = 0";
+                IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry.COLUMN_ACTIVE + " = " + IslndContract.UserEntry.ACTIVE;
         String[] selectionArgs = new String[]{
                 Integer.toString(myUserId)
         };

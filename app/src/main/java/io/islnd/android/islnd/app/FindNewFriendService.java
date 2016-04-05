@@ -29,13 +29,11 @@ public class FindNewFriendService extends Service {
     private static final String TAG = FindNewFriendService.class.getSimpleName();
 
     private Context mContext;
-    private ContentResolver mContentResolver;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand");
         mContext = this;
-        mContentResolver = getContentResolver();
 
         checkMailbox();
 

@@ -8,7 +8,10 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.List;
+
+import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.database.DataUtils;
@@ -30,7 +33,6 @@ public class MessageProcessor {
     private static final String TAG = MessageProcessor.class.getSimpleName();
 
     public static void process(Context context, Message message) {
-        Log.v(TAG, "message type " + message.getType());
         if (alreadyProcessed(context, message)) {
             return;
         }
@@ -60,7 +62,14 @@ public class MessageProcessor {
             case MessageType.DELETE_ME: {
                 Log.v(TAG, "process delete user");
                 int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
-                DataUtils.markUserAsDeletedAndDeletePosts(context, userID);
+                if (userID > 0) {
+                    DataUtils.markUserAsDeletedAndDeletePosts(context, userID);
+                }
+                else {
+                    Log.d(TAG, "user already deleted or their outbox was modified");
+                }
+
+                break;
             }
         }
 
@@ -78,8 +87,8 @@ public class MessageProcessor {
         if (encryptedResources != null
                 && encryptedResources.size() > 0) {
             int userId = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
-            Key groupKey = DataUtils.getGroupKey(context, userId);
-            Key publicKey = DataUtils.getPublicKey(context, userId);
+            SecretKey groupKey = DataUtils.getGroupKey(context, userId);
+            PublicKey publicKey = DataUtils.getPublicKey(context, userId);
             try {
                 ProfileResource profileResource = (ProfileResource) encryptedResources.get(0).decryptAndVerify(
                         groupKey,
@@ -132,10 +141,6 @@ public class MessageProcessor {
             if (cursor != null) {
                 cursor.close();
             }
-        }
-
-        if (alreadyProcessed) {
-            Log.v(TAG, "already processed " + message);
         }
 
         return alreadyProcessed;
@@ -191,7 +196,7 @@ public class MessageProcessor {
         );
 
         int userId = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
-        DataUtils.insertProfile(context, profile, userId);
         Log.v(TAG, "adding profile for user " + userId);
+        DataUtils.insertProfile(context, profile, userId);
     }
 }

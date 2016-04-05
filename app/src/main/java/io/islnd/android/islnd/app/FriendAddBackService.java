@@ -57,6 +57,7 @@ public class FriendAddBackService extends IntentService {
                         myIdentity);
                 EncryptedMessage encryptedMessage = new EncryptedMessage(identityMessage, publicKey);
                 Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+                Log.v(TAG, "sending identity w alias " + myIdentity.getAlias());
                 break;
             }
             case PROFILE_JOB: {

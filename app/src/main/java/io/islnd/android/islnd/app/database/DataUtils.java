@@ -1,7 +1,6 @@
 package io.islnd.android.islnd.app.database;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,10 +8,10 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.List;
+import java.security.PublicKey;
 
-import io.islnd.android.islnd.app.FriendAddBackService;
+import javax.crypto.SecretKey;
+
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -42,17 +41,24 @@ public class DataUtils {
             String messageInbox,
             String messageOutbox,
             Key groupKey,
-            Key publicKey) {
+            PublicKey publicKey) {
         ContentValues userValues = new ContentValues();
-        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
+        final String encodedPublicKey = CryptoUtil.encodeKey(publicKey);
+        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, encodedPublicKey);
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, messageInbox);
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, messageOutbox);
 
         final ContentResolver contentResolver = context.getContentResolver();
-        Uri result = contentResolver.insert(
+        Uri uri = contentResolver.insert(
                 IslndContract.UserEntry.CONTENT_URI,
                 userValues);
-        long userId = ContentUris.parseId(result);
+
+        if (uri == null) {
+            Log.d(TAG, "failed to insert user!");
+        }
+
+        long userId = DataUtils.getUserIdFromPublicKey(context, publicKey);
+        Log.v(TAG, "user inserted with id " + userId);
 
         ContentValues displayNameValues = new ContentValues();
         displayNameValues.put(IslndContract.DisplayNameEntry.COLUMN_USER_ID, userId);
@@ -99,7 +105,8 @@ public class DataUtils {
         }
     }
 
-    public static Key getGroupKey(Context context, int userId) {
+    public static SecretKey getGroupKey(Context context, int userId) {
+        Log.v(TAG, "get group key for user " + userId);
         String[] projection = new String[] {
                 IslndContract.AliasEntry.COLUMN_GROUP_KEY,
         };
@@ -145,7 +152,7 @@ public class DataUtils {
         }
     }
 
-    public static Key getPublicKey(Context context, int userId) {
+    public static PublicKey getPublicKey(Context context, int userId) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY
         };
@@ -184,7 +191,33 @@ public class DataUtils {
             if (cursor.moveToFirst()) {
                 return cursor.getInt(0);
             } else {
-                throw new IllegalArgumentException("database has no entry for mailbox: " + mailbox);
+                return -1;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static int getUserIdFromPublicKey(Context context, PublicKey publicKey) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry._ID,
+        };
+
+        String encodedPublicKey = CryptoUtil.encodeKey(publicKey);
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?",
+                    new String[] {encodedPublicKey},
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException("database has no entry for public key: " + encodedPublicKey);
             }
         } finally {
             if (cursor != null) {
@@ -272,18 +305,88 @@ public class DataUtils {
         context.getContentResolver().insert(IslndContract.ProfileEntry.CONTENT_URI, values);
     }
 
-    public static boolean containsPublicKey(Context context, Key publicKey) {
+    public static boolean activeUserHasPublicKey(Context context, PublicKey publicKey) {
         String[] projection = new String[0];
 
         Cursor cursor = null;
         try {
+            final String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ? AND " +
+                    IslndContract.UserEntry.COLUMN_ACTIVE + " = " + IslndContract.UserEntry.ACTIVE;
+            final String[] selectionArgs = {CryptoUtil.encodeKey(publicKey)};
             cursor = context.getContentResolver().query(
                     IslndContract.UserEntry.CONTENT_URI,
                     projection,
-                    IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?",
-                    new String[] {CryptoUtil.encodeKey(publicKey)},
+                    selection,
+                    selectionArgs,
                     null);
-            return cursor.moveToFirst();
+            boolean result = cursor.moveToFirst();
+            Log.v(TAG, "active user has public key " + result);
+            return result;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static boolean inactiveUserHasPublicKey(Context context, PublicKey publicKey) {
+        String[] projection = new String[0];
+
+        Cursor cursor = null;
+        try {
+            final String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ? AND " +
+                    IslndContract.UserEntry.COLUMN_ACTIVE + " = " + IslndContract.UserEntry.NOT_ACTIVE;
+            final String[] selectionArgs = {CryptoUtil.encodeKey(publicKey)};
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null);
+            boolean result = cursor.moveToFirst();
+            Log.v(TAG, "inactive user has public key " + result);
+            return result;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static void activateAndUpdateUser(Context context, Identity identity, String messageOutbox) {
+        Cursor cursor = null;
+        try {
+            final String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?";
+            final String[] selectionArgs = {CryptoUtil.encodeKey(identity.getPublicKey())};
+            ContentValues values = new ContentValues();
+            values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, messageOutbox);
+            values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, identity.getMessageInbox());
+            values.put(IslndContract.UserEntry.COLUMN_ACTIVE, IslndContract.UserEntry.ACTIVE);
+            int rowsUpdated = context.getContentResolver().update(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    values,
+                    selection,
+                    selectionArgs);
+            Log.v(TAG, "updated user rows " + rowsUpdated);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        int userId = getUserIdFromPublicKey(context, identity.getPublicKey());
+        Log.v(TAG, "updating user id " + userId);
+        Log.v(TAG, "new alias " + identity.getAlias());
+        Log.v(TAG, "new group key " + CryptoUtil.encodeKey(identity.getGroupKey()));
+        try {
+            ContentValues values = new ContentValues();
+            values.put(IslndContract.AliasEntry.COLUMN_ALIAS, identity.getAlias());
+            values.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(identity.getGroupKey()));
+            context.getContentResolver().update(
+                    IslndContract.AliasEntry.buildAliasWithUserId(userId),
+                    values,
+                    null,
+                    null);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -381,7 +484,8 @@ public class DataUtils {
     }
 
     public static void insertNewFriendNotification(Context context, int userId) {
-        insertNotification(context,
+        insertNotification(
+                context,
                 userId,
                 NotificationType.NEW_FRIEND,
                 null,
@@ -512,7 +616,7 @@ public class DataUtils {
         );
 
         ContentValues values = new ContentValues();
-        values.put(IslndContract.UserEntry.COLUMN_DELETED, true);
+        values.put(IslndContract.UserEntry.COLUMN_ACTIVE, IslndContract.UserEntry.NOT_ACTIVE);
         contentResolver.update(
                 IslndContract.UserEntry.buildUserWithUserId(userId),
                 values,

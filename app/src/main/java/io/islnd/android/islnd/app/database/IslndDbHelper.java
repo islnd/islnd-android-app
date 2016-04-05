@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 29;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -22,8 +22,9 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " TEXT NULL, " +
-                IslndContract.UserEntry.COLUMN_DELETED + " INTEGER DEFAULT " + IslndContract.UserEntry.NOT_DELETED +
-                " );";
+                IslndContract.UserEntry.COLUMN_ACTIVE + " INTEGER DEFAULT " + Integer.toString(IslndContract.UserEntry.ACTIVE) + " , " +
+
+                " UNIQUE (" + IslndContract.UserEntry.COLUMN_PUBLIC_KEY + ") ON CONFLICT FAIL);";
 
         final String SQL_CREATE_ALIAS_TABLE = "CREATE TABLE " + IslndContract.AliasEntry.TABLE_NAME + " (" +
                 IslndContract.AliasEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -44,7 +45,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + IslndContract.DisplayNameEntry.COLUMN_USER_ID + ") REFERENCES " +
                 IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "), " +
 
-                " UNIQUE (" + IslndContract.DisplayNameEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
+                "UNIQUE (" + IslndContract.DisplayNameEntry.COLUMN_USER_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_POST_TABLE = "CREATE TABLE " + IslndContract.PostEntry.TABLE_NAME + " (" +
                 IslndContract.PostEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -151,5 +152,13 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedMessageEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingMessageEntry.TABLE_NAME);
         onCreate(db);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            db.execSQL("PRAGMA foreign_keys=ON");
+        }
     }
 }

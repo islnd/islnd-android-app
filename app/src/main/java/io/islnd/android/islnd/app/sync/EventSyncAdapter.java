@@ -15,9 +15,12 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+
+import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.database.DataUtils;
@@ -211,20 +214,22 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         PriorityQueue<Event> events = new PriorityQueue<>();
         for (EncryptedEvent encryptedEvent : encryptedEvents) {
             String alias = encryptedEvent.getAlias();
+            Log.v(TAG, "event alias " + alias);
 
             //--TODO need to handle multiple users having same alias
             int userId = DataUtils.getUserIdFromAlias(mContext, alias);
 
             //--TODO keys need to be a keystore or in-memory cache service
-            Key groupKey = DataUtils.getGroupKey(mContext, userId);
-            Key publicKey = DataUtils.getPublicKey(mContext, userId);
+            SecretKey groupKey = DataUtils.getGroupKey(mContext, userId);
+            PublicKey publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
                 final Event event = encryptedEvent.decryptAndVerify(groupKey, publicKey);
                 if (event != null) {
                     events.add(event);
                 }
             } catch (InvalidSignatureException e) {
-                e.printStackTrace();
+                Log.d(TAG, "could not decrypt and verify event!");
+                Log.d(TAG, e.toString());
             }
         }
         return events;
@@ -236,14 +241,22 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         };
 
         String[] args = new String[] { Integer.toString(Util.getUserId(mContext)) };
-        Cursor cursor = mContentResolver.query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
-                args,
-                null);
+        EventQuery eventQuery;
+        Cursor cursor = null;
+        try {
+            cursor = mContentResolver.query(
+                    IslndContract.AliasEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
+                    args,
+                    null);
 
-        EventQuery eventQuery = buildEventQuery(cursor);
+            eventQuery = buildEventQuery(cursor);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
         return Rest.postEventQuery(
                 eventQuery,
                 Util.getApiKey(getContext()));
@@ -275,8 +288,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             cursor = mContentResolver.query(
                     IslndContract.UserEntry.CONTENT_URI,
                     projection,
-                    IslndContract.UserEntry.COLUMN_DELETED + " = ?",
-                    new String[] {Integer.toString(IslndContract.UserEntry.NOT_DELETED)},
+                    IslndContract.UserEntry.COLUMN_ACTIVE + " = ?",
+                    new String[] {Integer.toString(IslndContract.UserEntry.ACTIVE)},
                     null);
             List<String> mailboxes = new ArrayList<>();
             if (!cursor.moveToFirst()) {

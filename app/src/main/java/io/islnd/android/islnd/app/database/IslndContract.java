@@ -84,11 +84,12 @@ public class IslndContract {
         public static final String COLUMN_PUBLIC_KEY = "public_key";
         public static final String COLUMN_MESSAGE_INBOX = "message_inbox";
         public static final String COLUMN_MESSAGE_OUTBOX = "message_outbox";
-        public static final String COLUMN_DELETED = "deleted";
+        public static final String COLUMN_ACTIVE = "active";
 
         public static final int MY_USER_ID = 1; //--we are always the first user to go in the database
 
-        public static final int NOT_DELETED = 0;
+        public static final int ACTIVE = 1;
+        public static final int NOT_ACTIVE = 0;
 
         public static int getUserIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));
