@@ -3,37 +3,14 @@
 ## What is islnd?
 Islnd is an Android app where people can share thoughts and ideas with their friends. It uses end-to-end encryption, so that no intermediate party can read messages, and it uses a messaging protocol that obscures metadata.
 
-##The communication model
-When islnd is installed, the device creates a public/private key pair and third key called a *group key*. The public/private key pair is used to sign messages and verify their authenticity. The *group key* is used encrypting and decrypting the messages (symmetric encryption).  
+## Who should use islnd?
+Islnd is designed for people who want to have social interaction online, but they are uncomfortable with third parties reading their thoughts and ideas. No knowledge of cryptography is required to use islnd.
 
-When two users become friends, they share their public key and *group key* with each other through a QR code scan. If user A is friends with {B, C, D}, then all four parties will know A's *group key*. This allows a message to be encrypted once and sent to many recipients. Since all of these users have the *group key*, authenticity is provided by signing and verifying messages with a public/private key pair. In this case, a message from A would be encrypted with A's *group key* and signed with A's private key.  
+## Our philosophy
+We believe that a company that offers a communication does not inherently have a right to know everything people communicate on the tool.
 
-##Non-repudiation
-Since all messages are signed and verified with a user's public/private key pair, any third-party can verify that a message was created by the user that posseses the private-key. This is different than a protocol like OTR, where both parties can verify each others' messages, but neither party can prove any message to a third-party. Non-repudiation may be undesirable for certain scenarios, and users should choose whatever protocol is most appropriate for their security requirements and threat models.
-
-##Obscuring meta-data
-Users have no unique username that they use on the service. Instead, the app chooses a random *alias*. Friends all know what *alias* their friend is currently using. Part of the messaging protocol is that users can choose a new *alias* at any time.  
-
-The server stores all of the data events in a database. The server simply sees an *alias* and an encrypted binary blob. Since the *alias* can change at any time, no metadata patterns can be revealed by static analysis of the data on the server. Certain types of traffic analysis are possible and will be discussed later.  
-
-From the server's point of view, posts, comments, and changes to a user's profile 
-all look the same. An *alias* and an encrypted binary blob.
-##Exactly what data does the server store?
-The server stores 3 types of data as key-value pairs: *events, messages, and resources*. *Events* are posted by users when they make posts, comments, change their profile, delete comments, etc... *Events* are tied to a specific user, and the key to look up events is called the user's *alias*. *Events* use symmetric encryption and read by many users.
-
-*Messages* are meant for a single user to read. They are used to exchange information when two users become friends, and they are also used to unfriend people or to change an *alias* in a private way. *Messages* use asymmetric encryption. The lookup key is called a mailbox, and each pair of users maintains two distinct mailboxes. Each functions as a one way communication stream between the pair of users. If user A wants to send a message to user B, they will post it to B's inbox. If they want to read messages from B, they will post it to B's outbox.
-
-*Resources* store other data on the server that is too large for asymmetric encryption but is not a good match for the event model. One use of *resources* is a user can post their profile for a new friend to download. The keys for *resources* are arbitrary strings (not unlike the other keys, but we don't have a fancy name for them).
-##Forward secrecy
-The protocol will allow users to change their *group key* at any time. The advantage of this is that if any device is compromised, content that was encrypted with previous *group keys* cannot be decrypted. However, the decrypted content may be stored on the phone that was compromised -- for example if Sally's *group key* is stolen from Bob's phone, Bob's phone probably has all of Sally's posts on it as well. So even though Sally's *group key* cannot decrypt all of Sally's messages, the comromised device will have many of Sally's message on it.
-##Revealing meta-data through traffic analysis
-Even if a user changes their *alias* frequently, it is likely that they requests to the server are coming from the same IP address. If the server records these IP addresses, they can make connections between all of the *aliases* and consider them one user. The ease of creating these logical connections varies depending on the access mode of the user -- a home router, a network at school or work, connecting over a mobile data carrier, VPN, Tor, etc...
-
-Metadata is also revealed through the queries themselves. When a user gets new content, they query the server for the events for a set of *aliases*. Even though users can change their *alias* at any time, a single query like this reveals that at this state in time, that set of *aliases* was related in some way. A query like this may also reveal a logical connection between a users' *aliases*. For example, I query for users [A, B, C, D]. Then user D changes their alias to E. On my next query, I query for users [A, B, C, E]. If a server records and analyzes these queries, a connection between *alias* D and E can be revealed.  
-
-Another possible analysis method is counting the number of times users query for a specific *alias*. This could reveal the popularity of a certain user or content item.  
-
-We believe these analysis opportunities could be eliminated if the network is sufficiently distributed. However, this has not been formally proven, and the protocol to create this de-centralized version of islnd has not been proposed.
+## Supported devices
+Islnd is currently available on Android devices.
 
 ##Current issues with the app
 
@@ -51,6 +28,9 @@ We believe these analysis opportunities could be eliminated if the network is su
 		- Android SDK Build-tools 23.0.1
 		- Android Support Repository 25
 		- Android Support Library
+		
+## Technical documentation
+For more information, please see [the wiki](https://github.com/Daviddt17/island-android-app/wiki/Technical-documentation)
 
 ## Contributing
 
