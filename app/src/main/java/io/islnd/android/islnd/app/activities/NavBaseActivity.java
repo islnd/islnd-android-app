@@ -55,6 +55,8 @@ public class NavBaseActivity extends AppCompatActivity
 
     private static final String TAG = NavBaseActivity.class.getSimpleName();
 
+    public static final String NOTIFICATION_ACTION = "NOTIFICATION_ACTION";
+
     private static final String FRAGMENT_STATE = "FRAGMENT_STATE";
 
     private static final int REQUEST_SMS = 0;
@@ -79,9 +81,13 @@ public class NavBaseActivity extends AppCompatActivity
         
         ServerTime.synchronize(this, false);
 
+        Intent intent = getIntent();
+
         // Set fragment
         if (savedInstanceState != null) {
             mFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_STATE);
+        } else if (NOTIFICATION_ACTION.equals(intent.getAction())) {
+            mFragment = new NotificationsFragment();
         } else {
             mFragment = new FeedFragment();
         }

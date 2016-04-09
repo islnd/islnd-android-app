@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -15,6 +16,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.database.NotificationType;
@@ -53,13 +55,25 @@ public class NotificationHelper {
             inboxStyle.addLine(activeNotifications.get(i));
         }
 
+        // Open notifications fragment
+        Intent resultIntent = new Intent(context, NavBaseActivity.class);
+        resultIntent.setAction(NavBaseActivity.NOTIFICATION_ACTION);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(NavBaseActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
         // Build and notify
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(bigContentTitle)
                 .setContentText(activeNotifications.get(0))
                 .setDeleteIntent(deleteIntent)
-                .setStyle(inboxStyle);
+                .setStyle(inboxStyle)
+                .setContentIntent(resultPendingIntent);
 
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
