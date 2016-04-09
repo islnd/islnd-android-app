@@ -9,7 +9,6 @@ import android.util.Log;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.NotificationType;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;

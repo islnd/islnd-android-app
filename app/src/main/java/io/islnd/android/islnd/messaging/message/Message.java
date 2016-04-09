@@ -1,21 +1,8 @@
 package io.islnd.android.islnd.messaging.message;
 
-import android.util.Log;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
-import io.islnd.android.islnd.messaging.event.ChangeAboutMeEvent;
-import io.islnd.android.islnd.messaging.event.ChangeAliasEvent;
-import io.islnd.android.islnd.messaging.event.ChangeDisplayNameEvent;
-import io.islnd.android.islnd.messaging.event.ChangeHeaderPictureEvent;
-import io.islnd.android.islnd.messaging.event.ChangeProfilePictureEvent;
-import io.islnd.android.islnd.messaging.event.DeleteCommentEvent;
-import io.islnd.android.islnd.messaging.event.DeletePostEvent;
-import io.islnd.android.islnd.messaging.event.EventType;
-import io.islnd.android.islnd.messaging.event.NewCommentEvent;
-import io.islnd.android.islnd.messaging.event.NewPostEvent;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class Message implements Comparable<Message>, ProtoSerializable {
