@@ -107,6 +107,7 @@
     <string name="notification_new_friend_content">is now your friend.</string>
     <string name="post_does_not_exist">Post does not exist</string>
     <string name="message_inbox">message_inbox</string>
+    <string name="notification_big_content_title">new islnd notifications</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>

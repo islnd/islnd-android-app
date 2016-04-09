@@ -655,7 +655,7 @@ public class IslndProvider extends ContentProvider {
                         values);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
-                    NotificationHelper.updateNotification();
+                    NotificationHelper.updateNotification(getContext());
                 }
                 else
                     return null;
