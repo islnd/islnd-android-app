@@ -1,5 +1,6 @@
 package io.islnd.android.islnd.app;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -73,15 +75,19 @@ public class NotificationHelper {
                 .setContentText(activeNotifications.get(0))
                 .setDeleteIntent(deleteIntent)
                 .setStyle(inboxStyle)
-                .setContentIntent(resultPendingIntent);
+                .setContentIntent(resultPendingIntent)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setCategory(Notification.CATEGORY_SOCIAL)
+                .setColor(ContextCompat.getColor(context, R.color.notification_primary))
+                .setAutoCancel(true);
 
-        NotificationManager mNotificationManager =
+        NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    public static void cancelNotification(Context context) {
-        Log.v(TAG, "cancelNotification");
+    public static void setNotificationsToNotActive(Context context) {
+        Log.v(TAG, "setNotificationsToNotActive");
 
         ContentValues values = new ContentValues();
         values.put(
@@ -99,6 +105,13 @@ public class NotificationHelper {
                 selection,
                 selectionArgs
         );
+    }
+
+    public static void cancelNotifications(Context context) {
+        setNotificationsToNotActive(context);
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(NOTIFICATION_ID);
     }
 
     private static List<SpannableStringBuilder> getActiveNotifications(Context context) {

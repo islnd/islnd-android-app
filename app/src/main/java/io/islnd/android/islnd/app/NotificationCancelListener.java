@@ -12,6 +12,6 @@ public class NotificationCancelListener extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "notification cancel onReceive");
-        NotificationHelper.cancelNotification(context);
+        NotificationHelper.setNotificationsToNotActive(context);
     }
 }
