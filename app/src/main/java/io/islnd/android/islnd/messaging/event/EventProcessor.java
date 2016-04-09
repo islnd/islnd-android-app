@@ -166,6 +166,7 @@ public class EventProcessor {
 
     private static void addComment(Context context, NewCommentEvent newCommentEvent) {
         int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
+        int postUserId = DataUtils.getUserIdFromPostAuthorAlias(context, newCommentEvent.getPostAuthorAlias());
 
         ContentValues values = new ContentValues();
         values.put(IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS, newCommentEvent.getPostAuthorAlias());
@@ -178,7 +179,9 @@ public class EventProcessor {
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
 
-        if (Util.getUserId(context) != commentUserId) {
+        int userId = Util.getUserId(context);
+        if (userId != commentUserId
+                && userId == postUserId) {
             DataUtils.insertNewCommentNotification(
                     context,
                     commentUserId,
