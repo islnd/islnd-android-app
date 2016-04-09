@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -65,8 +66,25 @@ public class NotificationHelper {
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    public static void cancelNotification() {
+    public static void cancelNotification(Context context) {
         Log.v(TAG, "cancelNotification");
+
+        ContentValues values = new ContentValues();
+        values.put(
+                IslndContract.NotificationEntry.COLUMN_ACTIVE,
+                IslndContract.NotificationEntry.NOT_ACTIVE);
+
+        String selection = IslndContract.NotificationEntry.COLUMN_ACTIVE + " = ?";
+        String[] selectionArgs = new String[]{
+                Integer.toString(IslndContract.NotificationEntry.ACTIVE)
+        };
+
+        context.getContentResolver().update(
+                IslndContract.NotificationEntry.CONTENT_URI,
+                values,
+                selection,
+                selectionArgs
+        );
     }
 
     private static List<SpannableStringBuilder> getActiveNotifications(Context context) {
