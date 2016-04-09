@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
+import io.islnd.android.islnd.app.NotificationHelper;
+
 public class IslndProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -651,8 +653,10 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.NotificationEntry.TABLE_NAME,
                         null,
                         values);
-                if ( _id > 0 )
+                if ( _id > 0 ) {
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
+                    NotificationHelper.updateNotification();
+                }
                 else
                     return null;
                 break;

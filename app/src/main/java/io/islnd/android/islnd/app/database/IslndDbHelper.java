@@ -93,6 +93,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " INTEGER NOT NULL," +
                 IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT, " +
                 IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
+                IslndContract.NotificationEntry.COLUMN_ACTIVE + " INTEGER DEFAULT " + Integer.toString(IslndContract.NotificationEntry.ACTIVE) + ", " +
 
                 " FOREIGN KEY (" + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + ") REFERENCES " +
                 IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "));";
