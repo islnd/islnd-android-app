@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
@@ -31,13 +32,12 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
 
     @Override
     public void onBindViewHolder(NotificationViewHolder holder, Cursor cursor) {
-        String contentInfo = "";
         String displayName = cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
         int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID));
+        int notificationType = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE));
 
-        switch (cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE))) {
-            case NotificationType.COMMENT:
-                contentInfo = displayName + " " + mContext.getString(R.string.notification_comment_content);
+        switch (notificationType) {
+            case NotificationType.COMMENT: {
                 holder.notificationTypeIcon.setImageResource(R.drawable.ic_comment_18dp);
 
                 String postId =
@@ -54,8 +54,8 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                     mContext.startActivity(intent);
                 });
                 break;
-            case NotificationType.NEW_FRIEND:
-                contentInfo = displayName + " " + mContext.getString(R.string.notification_new_friend_content);
+            }
+            case NotificationType.NEW_FRIEND: {
                 holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_18dp);
 
                 holder.view.setOnClickListener((View v) -> {
@@ -64,19 +64,25 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                     mContext.startActivity(intent);
                 });
                 break;
+            }
         }
 
-        final SpannableStringBuilder stringBuilder = new SpannableStringBuilder(contentInfo);
-        final StyleSpan styleSpan = new StyleSpan(android.graphics.Typeface.BOLD);
-        stringBuilder.setSpan(styleSpan, 0, displayName.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        holder.notificationContent.setText(stringBuilder);
+        holder.notificationContent.setText(NotificationHelper.buildSpannableNotificationString(
+                mContext,
+                displayName,
+                notificationType)
+        );
 
-        holder.timestamp.setText(Util.smartTimestampFromUnixTime(mContext, cursor.getLong(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_TIMESTAMP))));
+        holder.timestamp.setText(Util.smartTimestampFromUnixTime(
+                mContext,
+                cursor.getLong(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_TIMESTAMP)))
+        );
 
         ImageUtil.setPostProfileImageSampled(
                 mContext,
                 holder.profileImage,
-                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
+                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI)))
+        );
     }
 
     @Override
