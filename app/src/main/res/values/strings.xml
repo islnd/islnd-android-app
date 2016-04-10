@@ -109,6 +109,7 @@
     <string name="message_inbox">message_inbox</string>
     <string name="notification_big_content_title">new islnd notifications</string>
     <string name="notification_big_content_title_single">1 new islnd notification</string>
+    <string name="notification_badge">notification_badge</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>

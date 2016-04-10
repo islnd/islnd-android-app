@@ -12,6 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,6 +22,7 @@ import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.activities.NewPostActivity;
 import io.islnd.android.islnd.app.adapters.PostAdapter;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -40,6 +44,12 @@ public class FeedFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
     private StopRefreshReceiver mStopRefreshReceiver;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,14 +88,22 @@ public class FeedFragment extends Fragment {
                 });
         mStopRefreshReceiver = new StopRefreshReceiver(mRefreshLayout);
 
-        // TODO: handle onclicks more betterer
-        // Fab
         FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
         fab.setOnClickListener((View view) -> {
             startNewPostActivity();
         });
 
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.feed_menu, menu);
+
+        MenuItem notificationBadge = menu.findItem(R.id.notification_badge);
+        notificationBadge.getActionView().setOnClickListener((View view) -> {
+            ((NavBaseActivity) getActivity()).notificationBadgeClick();
+        });
     }
 
     @Override

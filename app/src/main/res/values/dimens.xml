@@ -58,4 +58,5 @@
     <dimen name="notification_profile_image_margin">8dp</dimen>
     <dimen name="notification_content_margin">16dp</dimen>
     <dimen name="notification_type_icon_margin">8dp</dimen>
+    <dimen name="toolbar_icon_dimen">48dp</dimen>
 </resources>
