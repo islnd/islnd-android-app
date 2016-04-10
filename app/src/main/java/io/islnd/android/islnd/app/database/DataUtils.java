@@ -353,7 +353,7 @@ public class DataUtils {
         }
     }
 
-    public static void activateAndUpdateUser(Context context, Identity identity, String messageOutbox) {
+    public static long activateAndUpdateUser(Context context, Identity identity, String messageOutbox) {
         Cursor cursor = null;
         try {
             final String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?";
@@ -392,6 +392,8 @@ public class DataUtils {
                 cursor.close();
             }
         }
+
+        return userId;
     }
 
     public static int getCommentCount(Context context, String postAuthorAlias, String postId) {

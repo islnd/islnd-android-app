@@ -75,7 +75,6 @@ public class CreateIdentityService extends IntentService {
                 Util.getGroupKey(context),
                 Util.getPublicKey(context));
 
-        editor.putInt(context.getString(R.string.user_id), (int) userId);
         editor.putString(context.getString(R.string.message_inbox), messageInbox);
         editor.commit();
 

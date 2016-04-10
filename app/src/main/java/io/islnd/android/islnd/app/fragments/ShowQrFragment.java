@@ -13,7 +13,7 @@ import android.widget.ImageView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 
-import io.islnd.android.islnd.app.FindNewFriendService;
+import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.VerticalCaptureActivity;
 import io.islnd.android.islnd.app.util.Util;
@@ -39,7 +39,7 @@ public class ShowQrFragment extends Fragment {
         Util.buildQrCode(qrImageView, encodedIdentity);
 
         //--Start find friend service because someone may snap our QR code
-        Intent findFriendServiceIntent = new Intent(mContext, FindNewFriendService.class);
+        Intent findFriendServiceIntent = new Intent(mContext, RepeatSyncService.class);
         mContext.startService(findFriendServiceIntent);
 
         Button getQrButton = (Button) v.findViewById(R.id.get_qr_button);

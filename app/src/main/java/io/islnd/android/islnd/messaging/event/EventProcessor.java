@@ -180,7 +180,7 @@ public class EventProcessor {
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
 
-        if (Util.getUserId(context) != commentUserId) {
+        if (commentUserId != IslndContract.UserEntry.MY_USER_ID) {
             DataUtils.insertNewCommentNotification(
                     context,
                     commentUserId,

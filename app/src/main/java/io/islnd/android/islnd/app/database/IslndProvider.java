@@ -597,7 +597,7 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.DisplayNameEntry.TABLE_NAME,
                         null,
                         values,
-                        SQLiteDatabase.CONFLICT_FAIL);
+                        SQLiteDatabase.CONFLICT_REPLACE);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.DisplayNameEntry.buildDisplayNameUri(_id);
                 } else {

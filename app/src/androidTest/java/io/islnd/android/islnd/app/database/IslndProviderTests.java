@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 import android.test.AndroidTestCase;
 
 public class IslndProviderTests extends AndroidTestCase {
@@ -14,6 +15,11 @@ public class IslndProviderTests extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         DatabaseTestHelpers.clearTables(mContext);
+    }
+
+    public void testFirstUserHasExpectedId() {
+        long userId = DatabaseTestHelpers.insertFakeUser(mContext);
+        assertEquals(userId, IslndContract.UserEntry.MY_USER_ID);
     }
 
     public void testPostReturnsCorrectType() {

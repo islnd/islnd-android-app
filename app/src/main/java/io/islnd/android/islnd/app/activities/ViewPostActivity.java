@@ -152,7 +152,7 @@ public class ViewPostActivity extends AppCompatActivity
                 });
 
 
-        if (Util.isUser(mContext, mPost.getUserId())) {
+        if (mPost.getUserId() == IslndContract.UserEntry.MY_USER_ID) {
             postOverflow.setVisibility(View.VISIBLE);
 
             postOverflow.setOnClickListener((View v) -> {

@@ -240,7 +240,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 IslndContract.AliasEntry.COLUMN_ALIAS
         };
 
-        String[] args = new String[] { Integer.toString(Util.getUserId(mContext)) };
+        String[] args = new String[] { Integer.toString(IslndContract.UserEntry.MY_USER_ID) };
         EventQuery eventQuery;
         Cursor cursor = null;
         try {

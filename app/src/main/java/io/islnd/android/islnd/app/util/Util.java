@@ -105,10 +105,6 @@ public class Util {
         editor.apply();
     }
 
-    public static boolean isUser(Context context, int userId) {
-        return getUserId(context) == userId;
-    }
-
     public static void applyAppTheme(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String value = sharedPref.getString(AppearancePreferenceFragment.PREFERENCE_THEME_KEY, "1");
@@ -124,11 +120,6 @@ public class Util {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
                 break;
         }
-    }
-
-    public static int getUserId(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getInt(context.getString(R.string.user_id), -1);
     }
 
     public static Key getGroupKey(Context context) {

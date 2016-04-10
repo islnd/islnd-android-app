@@ -160,6 +160,9 @@ public class MessageProcessor {
                 friendWithOurMailbox,
                 Util.getMyInbox(context)
         );
+
+        //--We need a new inbox to give to our next friend
+        Util.setMyInbox(context, CryptoUtil.createAlias());
     }
 
     private static void sendOurProfileToNewFriend(Context context, Identity friendToAdd) {

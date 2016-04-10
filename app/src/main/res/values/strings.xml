@@ -62,7 +62,6 @@
     <string name="nav_sms_title">SMS Allow User</string>
     <string name="nav_settings_title">Settings</string>
     <string name="nav_add_friend">Add Friend</string>
-    <string name="user_id">user_id</string>
     <string name="event_id">event_id</string>
     <string name="title_activity_settings">Settings</string>
     <string name="light_theme">Light</string>

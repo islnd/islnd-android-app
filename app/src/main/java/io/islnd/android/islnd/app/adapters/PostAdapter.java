@@ -78,7 +78,7 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             ((Activity)mContext).startActivityForResult(viewPostIntent, FeedFragment.DELETE_POST_RESULT);
         });
 
-        if(Util.isUser(mContext, post.getUserId())) {
+        if(post.getUserId() == IslndContract.UserEntry.MY_USER_ID) {
             holder.view.setOnLongClickListener((View v) -> {
                 final String DELETE_POST = mContext.getString(R.string.delete_post);
                 final String[] items = {DELETE_POST};

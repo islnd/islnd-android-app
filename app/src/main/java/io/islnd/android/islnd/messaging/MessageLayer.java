@@ -10,10 +10,11 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.PublicKey;
 
-import io.islnd.android.islnd.app.FindNewFriendService;
+import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
@@ -22,27 +23,22 @@ public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
     public static boolean addFriendFromEncodedIdentityString(Context context, String encodedString) {
-        context.stopService(new Intent(context, FindNewFriendService.class));
-
-        Identity identity = Identity.fromProto(encodedString);
+        Identity friendIdentity = Identity.fromProto(encodedString);
         boolean newFriend = addFriendToDatabaseAndCreateDefaultProfile(
                 context,
-                identity,
-                Util.getMyInbox(context));
-
-        if (!newFriend) {
-            return false;
-        }
+                friendIdentity,
+                Util.getMyInbox(context));  //--My current inbox will be where I check for new
+                                            //  messages from this user
 
         //--We need a new inbox to give to our next friend
         Util.setMyInbox(context, CryptoUtil.createAlias());
 
-        //--This service will get our new friend's profile
-        Intent findFriendServiceIntent = new Intent(context, FindNewFriendService.class);
-        context.startService(findFriendServiceIntent);
+        //--Check for friend's profile
+        Intent repeatSyncServiceIntent = new Intent(context, RepeatSyncService.class);
+        context.startService(repeatSyncServiceIntent);
 
-        //--Send our identity and profile to new friend
-        final String friendInbox = identity.getMessageInbox();
+        //--Send our identity and profile to friend
+        final String friendInbox = friendIdentity.getMessageInbox();
         startAddBackJob(context, friendInbox, FriendAddBackService.IDENTITY_JOB);
         startAddBackJob(context, friendInbox, FriendAddBackService.PROFILE_JOB);
 
@@ -64,29 +60,25 @@ public class MessageLayer {
             return false;
         }
 
+        long userId;
         if (DataUtils.inactiveUserHasPublicKey(context, identity.getPublicKey())) {
-            DataUtils.activateAndUpdateUser(context, identity, messageOutbox);
-            //--TODO notification ?
-            return true;
+            userId = DataUtils.activateAndUpdateUser(context, identity, messageOutbox);
+        } else {
+            userId = DataUtils.insertUser(context, identity, messageOutbox);
+            Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
+            DataUtils.insertProfile(context, profile, userId);
         }
 
-        long userId = DataUtils.insertUser(context, identity, messageOutbox);
-
-        Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
-        DataUtils.insertProfile(context, profile, userId);
-
         DataUtils.insertNewFriendNotification(context, (int) userId);
-
         return true;
     }
 
     public static Identity getMyIdentity(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        //--TODO get display name without a cursor
-        String displayName = DataUtils.getDisplayName(context, Util.getUserId(context));
-        String alias = DataUtils.getMostRecentAlias(context, Util.getUserId(context));
-        String messageInbox = DataUtils.getMessageInbox(context, Util.getUserId(context));
+        String displayName = DataUtils.getDisplayName(context, IslndContract.UserEntry.MY_USER_ID);
+        String alias = DataUtils.getMostRecentAlias(context, IslndContract.UserEntry.MY_USER_ID);
+        String messageInbox = DataUtils.getMessageInbox(context, IslndContract.UserEntry.MY_USER_ID);
         Log.v(TAG, String.format("alias is %s", alias));
         Key groupKey = CryptoUtil.decodeSymmetricKey(
                 sharedPreferences.getString(context.getString(R.string.group_key), ""));

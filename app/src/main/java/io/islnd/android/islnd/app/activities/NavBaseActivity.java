@@ -111,11 +111,10 @@ public class NavBaseActivity extends AppCompatActivity
         mNavHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         mNavUserName = (TextView) header.findViewById(R.id.nav_user_name);
 
-        int myUserId = Util.getUserId(this);
         mNavProfileImage.setOnClickListener(
                 (View v) -> {
                     Intent profileIntent = new Intent(this, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myUserId);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, IslndContract.UserEntry.MY_USER_ID);
                     startActivity(profileIntent);
                 });
     }
@@ -148,7 +147,7 @@ public class NavBaseActivity extends AppCompatActivity
                 break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, Util.getUserId(this));
+                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, IslndContract.UserEntry.MY_USER_ID);
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:

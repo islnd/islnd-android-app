@@ -52,7 +52,7 @@ public class ViewFriendsFragment extends Fragment {
 
         //--Load the friends
         Bundle args = new Bundle();
-        args.putInt(FriendLoader.USER_ID_BUNDLE_KEY, Util.getUserId(mContext));
+        args.putInt(FriendLoader.USER_ID_BUNDLE_KEY, IslndContract.UserEntry.MY_USER_ID);
         FriendLoader friendLoader = new FriendLoader(
                 mContext,
                 mAdapter);

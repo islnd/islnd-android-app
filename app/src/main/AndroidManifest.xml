@@ -117,7 +117,7 @@
             android:exported="false" >
         </service>
         <service
-            android:name=".FindNewFriendService"
+            android:name=".RepeatSyncService"
             android:exported="false">
         </service>
         <service
