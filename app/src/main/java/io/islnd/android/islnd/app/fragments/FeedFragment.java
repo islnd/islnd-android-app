@@ -145,8 +145,10 @@ public class FeedFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void setNotificationBadgeCount() {
-        if (mNotificationCount != 0) {
+        if (mNotificationCount > 0 && mNotificationCount < 100) {
             mNotificationBadgeCount.setText(Integer.toString(mNotificationCount));
+        } else if (mNotificationCount >= 100) {
+            mNotificationBadgeCount.setText("99+");
         } else {
             mNotificationBadgeCount.setText("");
         }
