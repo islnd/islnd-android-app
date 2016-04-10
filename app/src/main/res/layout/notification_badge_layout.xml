@@ -14,8 +14,8 @@
         android:layout_gravity="center"/>
 
     <TextView
+        android:id="@+id/notification_badge_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|right"
-        android:text="7"/>
+        android:layout_gravity="top|right"/>
 </FrameLayout>

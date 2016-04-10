@@ -4,19 +4,27 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import io.islnd.android.islnd.app.IslndIntent;
 import io.islnd.android.islnd.app.R;
@@ -30,7 +38,7 @@ import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.Util;
 
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private final static String TAG = FeedFragment.class.getSimpleName();
 
@@ -44,6 +52,8 @@ public class FeedFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
     private StopRefreshReceiver mStopRefreshReceiver;
+    private TextView mNotificationBadgeCount;
+    private int mNotificationCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +103,8 @@ public class FeedFragment extends Fragment {
             startNewPostActivity();
         });
 
+        getActivity().getSupportLoaderManager().initLoader(LoaderId.FEED_NOTIFICATION_COUNT_LOADER_ID, new Bundle(), this);
+
         return v;
     }
 
@@ -101,9 +113,15 @@ public class FeedFragment extends Fragment {
         inflater.inflate(R.menu.feed_menu, menu);
 
         MenuItem notificationBadge = menu.findItem(R.id.notification_badge);
-        notificationBadge.getActionView().setOnClickListener((View view) -> {
+        View actionView = MenuItemCompat.getActionView(notificationBadge);
+
+        actionView.setOnClickListener((View view) -> {
             ((NavBaseActivity) getActivity()).notificationBadgeClick();
         });
+
+        mNotificationBadgeCount =
+                (TextView) actionView.findViewById(R.id.notification_badge_count);
+        setNotificationBadgeCount();
     }
 
     @Override
@@ -121,8 +139,55 @@ public class FeedFragment extends Fragment {
         getContext().unregisterReceiver(mStopRefreshReceiver);
     }
 
-    public void startNewPostActivity() {
+    private void startNewPostActivity() {
         Intent newPostIntent = new Intent(mContext, NewPostActivity.class);
         startActivityForResult(newPostIntent, NEW_POST_RESULT);
+    }
+
+    private void setNotificationBadgeCount() {
+        if (mNotificationCount != 0) {
+            mNotificationBadgeCount.setText(Integer.toString(mNotificationCount));
+        } else {
+            mNotificationBadgeCount.setText("");
+        }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(TAG, "create loader " + id);
+        String[] projection = new String[]{
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry._ID
+        };
+
+        String selection =
+                IslndContract.NotificationEntry.TABLE_NAME
+                        + "."
+                        + IslndContract.NotificationEntry.COLUMN_ACTIVE
+                        + " = ?";
+        String[] selectionArgs = new String[]{
+                Integer.toString(IslndContract.NotificationEntry.ACTIVE)
+        };
+
+        return new CursorLoader(
+                mContext,
+                IslndContract.NotificationEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mNotificationCount = data.getCount();
+
+        if (mNotificationBadgeCount != null) {
+            setNotificationBadgeCount();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
