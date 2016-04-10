@@ -59,7 +59,7 @@ public class NotificationHelper {
 
         // Open notifications fragment
         Intent resultIntent = new Intent(context, NavBaseActivity.class);
-        resultIntent.setAction(NavBaseActivity.NOTIFICATION_ACTION);
+        resultIntent.setAction(IslndAction.NOTIFICATION_CONTENT_CLICK);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(NavBaseActivity.class);
         stackBuilder.addNextIntent(resultIntent);
@@ -152,7 +152,7 @@ public class NotificationHelper {
     public static SpannableStringBuilder buildSpannableNotificationString(Context context,
                                                                   String displayName,
                                                                   int notificationType) {
-        String contentInfo = "";
+        String contentInfo;
 
         switch (notificationType) {
             case NotificationType.COMMENT:
@@ -161,6 +161,8 @@ public class NotificationHelper {
             case NotificationType.NEW_FRIEND:
                 contentInfo = displayName + " " + context.getString(R.string.notification_new_friend_content);
                 break;
+            default:
+                throw new UnsupportedOperationException();
         }
 
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder(contentInfo);

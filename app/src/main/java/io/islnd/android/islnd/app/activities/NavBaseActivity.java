@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -55,8 +56,6 @@ public class NavBaseActivity extends AppCompatActivity
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = NavBaseActivity.class.getSimpleName();
-
-    public static final String NOTIFICATION_ACTION = "NOTIFICATION_ACTION";
 
     private static final String FRAGMENT_STATE = "FRAGMENT_STATE";
 
@@ -87,7 +86,7 @@ public class NavBaseActivity extends AppCompatActivity
         // Set fragment
         if (savedInstanceState != null) {
             mFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_STATE);
-        } else if (NOTIFICATION_ACTION.equals(intent.getAction())) {
+        } else if (IslndAction.NOTIFICATION_CONTENT_CLICK.equals(intent.getAction())) {
             NotificationHelper.cancelNotifications(this);
             mFragment = new NotificationsFragment();
         } else {
