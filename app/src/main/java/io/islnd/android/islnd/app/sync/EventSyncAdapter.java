@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.IOException;
-import java.security.Key;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;

@@ -2,11 +2,9 @@ package io.islnd.android.islnd.app.database;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.provider.ContactsContract;
 import android.test.AndroidTestCase;
 
 public class IslndProviderTests extends AndroidTestCase {

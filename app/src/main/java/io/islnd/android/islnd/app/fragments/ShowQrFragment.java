@@ -13,8 +13,8 @@ import android.widget.ImageView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 
-import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.activities.VerticalCaptureActivity;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Encoder;
