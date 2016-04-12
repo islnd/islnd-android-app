@@ -32,11 +32,17 @@ public class NotificationHelper {
 
     private static final int NOTIFICATION_ID = 7403;
 
+    private static NotificationObserver mNotificationObserver;
+
     public static void initialize(Context context) {
+        if (mNotificationObserver == null) {
+            mNotificationObserver = new NotificationObserver(new Handler() , context);
+        }
+
         context.getContentResolver().registerContentObserver(
                 IslndContract.NotificationEntry.CONTENT_URI,
                 true,
-                new NotificationObserver(new Handler(), context)
+                mNotificationObserver
         );
     }
 
