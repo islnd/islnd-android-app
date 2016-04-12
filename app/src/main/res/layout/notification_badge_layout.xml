@@ -30,7 +30,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/badge_count_margin"
         android:layout_toRightOf="@+id/view_to_center"
-        android:background="@drawable/badge_circle"
+        android:background="@drawable/badge_background"
         android:textColor="@android:color/white"
         android:textSize="9sp"/>
 

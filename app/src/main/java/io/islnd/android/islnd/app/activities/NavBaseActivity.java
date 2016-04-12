@@ -409,6 +409,8 @@ public class NavBaseActivity extends AppCompatActivity
     public void notificationBadgeClick() {
         Log.v(TAG, "notificationBadgeClick");
 
+        NotificationHelper.cancelNotifications(getApplicationContext());
+
         mFragment = new NotificationsFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, mFragment)
