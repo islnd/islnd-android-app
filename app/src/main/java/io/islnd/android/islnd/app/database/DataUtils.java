@@ -251,6 +251,31 @@ public class DataUtils {
         }
     }
 
+    public static int getUserIdFromPostAuthorAlias(Context context, String alias) {
+        String[] projection = new String[] {
+                IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_USER_ID,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.PostEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.PostEntry.TABLE_NAME + "." + IslndContract.PostEntry.COLUMN_ALIAS + " = ?",
+                    new String[] {alias},
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            } else {
+                throw new IllegalArgumentException("database has no entry for alias: " + alias);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
     public static void deletePost(Context context, PostKey postKey) {
         Log.v(TAG, "delete post " + postKey);
         String selection = IslndContract.PostEntry.COLUMN_USER_ID + " = ? AND " +

@@ -978,6 +978,17 @@ public class IslndProvider extends ContentProvider {
                         args);
                 break;
             }
+            case NOTIFICATION: {
+                rowsUpdated = db.update(
+                        IslndContract.NotificationEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+                Log.v(TAG, "update notification updated " + rowsUpdated);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
+                break;
+            }
             default: {
                 throw new UnsupportedOperationException("update operation not supported for uri " + uri);
             }

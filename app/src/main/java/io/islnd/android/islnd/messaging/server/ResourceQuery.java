@@ -3,8 +3,6 @@ package io.islnd.android.islnd.messaging.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.islnd.android.islnd.messaging.ServerTime;
-
 public class ResourceQuery {
     private final List<String> data;
 

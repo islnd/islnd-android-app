@@ -257,6 +257,10 @@ public class IslndContract {
         public static final String COLUMN_NOTIFICATION_TYPE = "notification_type";
         public static final String COLUMN_POST_ID = "post_id";
         public static final String COLUMN_TIMESTAMP = "timestamp";
+        public static final String COLUMN_ACTIVE = "active";
+
+        public static final int ACTIVE = 1;
+        public static final int NOT_ACTIVE = 0;
 
         public static Uri buildNotificationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

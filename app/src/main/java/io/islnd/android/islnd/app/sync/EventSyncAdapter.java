@@ -22,7 +22,7 @@ import java.util.PriorityQueue;
 
 import javax.crypto.SecretKey;
 
-import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
@@ -69,7 +69,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         getIncomingMessages();
         getIncomingEvents();
         
-        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
 
         Log.v(TAG, "completed on perform sync");
     }
@@ -142,7 +142,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             anyNewEventProcessed = false;
             List<EncryptedEvent> encryptedEvents = getEncryptedEvents();
             if (encryptedEvents == null) {
-                mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+                mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
                 Log.d(TAG, "event query returned null!");
                 return;
             }
@@ -205,7 +205,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onSyncCanceled() {
         super.onSyncCanceled();
 
-        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
         Log.d(TAG, "sync cancelled");
     }
 

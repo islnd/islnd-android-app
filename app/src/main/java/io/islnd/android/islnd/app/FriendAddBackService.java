@@ -2,7 +2,6 @@ package io.islnd.android.islnd.app;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.support.v4.media.session.IMediaControllerCallback;
 import android.util.Log;
 
 import java.security.Key;
@@ -12,7 +11,6 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.ProfileResource;
@@ -22,9 +20,7 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 import io.islnd.android.islnd.messaging.crypto.EncryptedResource;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.message.MessageBuilder;
-import io.islnd.android.islnd.messaging.message.MessageType;
 import io.islnd.android.islnd.messaging.message.ProfileMessage;
-import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class FriendAddBackService extends IntentService {
 

@@ -9,7 +9,6 @@ import android.util.Log;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
-import io.islnd.android.islnd.app.database.NotificationType;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
@@ -168,6 +167,7 @@ public class EventProcessor {
 
     private static void addComment(Context context, NewCommentEvent newCommentEvent) {
         int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
+        int postUserId = DataUtils.getUserIdFromPostAuthorAlias(context, newCommentEvent.getPostAuthorAlias());
 
         ContentValues values = new ContentValues();
         values.put(IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS, newCommentEvent.getPostAuthorAlias());
@@ -180,7 +180,8 @@ public class EventProcessor {
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
 
-        if (commentUserId != IslndContract.UserEntry.MY_USER_ID) {
+        if (IslndContract.UserEntry.MY_USER_ID != commentUserId
+                && IslndContract.UserEntry.MY_USER_ID == postUserId) {
             DataUtils.insertNewCommentNotification(
                     context,
                     commentUserId,

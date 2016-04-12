@@ -14,7 +14,7 @@ import android.util.Log;
 import android.view.View;
 
 import io.islnd.android.islnd.app.CreateIdentityService;
-import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
@@ -51,7 +51,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         super.onResume();
         mContext.registerReceiver(
                 mAccountCreatedListener,
-                new IntentFilter(IslndIntent.CREATE_ACCOUNT_COMPLETED));
+                new IntentFilter(IslndAction.CREATE_ACCOUNT_COMPLETED));
     }
 
     @Override
