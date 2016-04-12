@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class IslndDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 29;
+    private static final int DATABASE_VERSION = 1;
 
     static final String DATABASE_NAME = "islnd.db";
 
@@ -97,7 +97,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
                 IslndContract.NotificationEntry.COLUMN_ACTIVE + " INTEGER DEFAULT " + Integer.toString(IslndContract.NotificationEntry.ACTIVE) + ", " +
 
-                " FOREIGN KEY (" + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + ") REFERENCES " +
+                " FOREIGN KEY (" + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + ") REFERENCES " +
                 IslndContract.UserEntry.TABLE_NAME + " (" + IslndContract.UserEntry._ID + "));";
 
         final String SQL_CREATE_RECEIVED_EVENT_TABLE = "CREATE TABLE " + IslndContract.ReceivedEventEntry.TABLE_NAME + " (" +
