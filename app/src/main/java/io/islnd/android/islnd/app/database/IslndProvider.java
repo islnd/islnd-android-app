@@ -2,15 +2,12 @@ package io.islnd.android.islnd.app.database;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
-
-import io.islnd.android.islnd.app.NotificationHelper;
 
 public class IslndProvider extends ContentProvider {
 
