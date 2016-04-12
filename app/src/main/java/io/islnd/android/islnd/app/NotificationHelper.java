@@ -6,7 +6,10 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +31,14 @@ public class NotificationHelper {
     private static final String TAG = NotificationHelper.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 7403;
+
+    public static void initialize(Context context) {
+        context.getContentResolver().registerContentObserver(
+                IslndContract.NotificationEntry.CONTENT_URI,
+                true,
+                new NotificationObserver(new Handler())
+        );
+    }
 
     public static void updateNotification(Context context) {
         Log.v(TAG, "updateNotification");
@@ -170,5 +181,22 @@ public class NotificationHelper {
         stringBuilder.setSpan(styleSpan, 0, displayName.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         return stringBuilder;
+    }
+
+    private static class NotificationObserver extends ContentObserver {
+
+        public NotificationObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            this.onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            Log.v(TAG, "onChange");
+        }
     }
 }

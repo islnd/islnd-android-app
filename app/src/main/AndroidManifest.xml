@@ -90,7 +90,6 @@
             android:name=".NotificationCancelListener"
             android:enabled="true"/>
 
-
         <provider
             android:name=".database.IslndProvider"
             android:authorities="@string/content_authority"

@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.database;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -655,7 +656,6 @@ public class IslndProvider extends ContentProvider {
                         values);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
-                    NotificationHelper.updateNotification(getContext());
                 }
                 else
                     return null;

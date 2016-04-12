@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
@@ -40,6 +41,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         Util.applyAppTheme(this);
 
         Util.setUsesApiKey(mContext, true);
+
+        NotificationHelper.initialize(mContext);
 
         // Visual pause...
         Handler handler = new Handler();
