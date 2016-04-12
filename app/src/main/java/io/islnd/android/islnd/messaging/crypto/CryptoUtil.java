@@ -6,6 +6,7 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -43,6 +44,7 @@ public class CryptoUtil {
     public static final int ASYMMETRIC_BLOCK_SIZE = 60;
 
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+    private static final String KEY_DIGEST_ALGORITHM = "SHA-1";
 
     // encryption instances
     private static KeyGenerator keyGenerator;
@@ -52,8 +54,10 @@ public class CryptoUtil {
     private static Cipher asymmetricCipherWithOAEP;
     private static SecureRandom secureRandom;
     private static Signature cryptoSignature;
+    private static MessageDigest keyDigest;
     private static Encoder encoder = new Encoder();
     private static Decoder decoder = new Decoder();
+
 
     static {
         try {
@@ -69,6 +73,8 @@ public class CryptoUtil {
             asymmetricCipherWithOAEP = Cipher.getInstance(ASYMMETRIC_ALGO_WITH_OAEP);
 
             cryptoSignature = Signature.getInstance(SIGNATURE_ALGORITHM);
+
+            keyDigest = MessageDigest.getInstance(KEY_DIGEST_ALGORITHM);
 
             secureRandom = new SecureRandom();
         } catch (GeneralSecurityException e) {
@@ -205,6 +211,12 @@ public class CryptoUtil {
         }
 
         return false;
+    }
+
+    public static String getDigest(PublicKey publicKey) {
+        keyDigest.reset();
+        keyDigest.update(publicKey.getEncoded());
+        return encoder.encodeToString(keyDigest.digest());
     }
 }
 

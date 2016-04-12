@@ -9,4 +9,5 @@ public class LoaderId {
     public static final int VIEW_POST_ACTIVITY_LOADER_ID = 5;
     public static final int NAV_BASE_ACTIVITY_LOADER_ID = 6;
     public static final int NOTIFICATION_LOADER_ID = 7;
+    public static final int VIEW_PUBLIC_KEY_ACTIVITY_LOADER_ID = 8;
 }

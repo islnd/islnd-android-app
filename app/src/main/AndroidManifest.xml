@@ -60,6 +60,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".activities.ViewPublicKeyActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
             android:name=".activities.VerticalCaptureActivity"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"

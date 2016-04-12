@@ -82,6 +82,7 @@ public class IslndContract {
         public static final String TABLE_NAME = "user";
 
         public static final String COLUMN_PUBLIC_KEY = "public_key";
+        public static final String COLUMN_PUBLIC_KEY_DIGEST = "public_key_digest";
         public static final String COLUMN_MESSAGE_INBOX = "message_inbox";
         public static final String COLUMN_MESSAGE_OUTBOX = "message_outbox";
         public static final String COLUMN_ACTIVE = "active";
