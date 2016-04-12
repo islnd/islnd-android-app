@@ -80,6 +80,8 @@ public class EventProcessor {
                 values,
                 null,
                 null);
+
+        Log.v(TAG, "new alias is " + event.getNewAlias());
     }
 
     private static void changeHeaderPicture(Context context, ChangeHeaderPictureEvent event) {
@@ -178,9 +180,8 @@ public class EventProcessor {
                 IslndContract.CommentEntry.CONTENT_URI,
                 values);
 
-        int userId = Util.getUserId(context);
-        if (userId != commentUserId
-                && userId == postUserId) {
+        if (IslndContract.UserEntry.MY_USER_ID != commentUserId
+                && IslndContract.UserEntry.MY_USER_ID == postUserId) {
             DataUtils.insertNewCommentNotification(
                     context,
                     commentUserId,

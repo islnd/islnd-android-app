@@ -6,6 +6,7 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.MGF1ParameterSpec;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
@@ -105,7 +107,7 @@ public class CryptoUtil {
         return null;
     }
 
-    public static Key decodePublicKey(String string) {
+    public static PublicKey decodePublicKey(String string) {
         byte[] encodedKey = decoder.decode(string);
         try {
             return keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
@@ -116,7 +118,7 @@ public class CryptoUtil {
         return null;
     }
 
-    public static Key decodeSymmetricKey(String string) {
+    public static SecretKey decodeSymmetricKey(String string) {
         byte[] encodedKey = decoder.decode(string);
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, SYMMETRIC_GENERATOR_ALGO);
     }
@@ -162,7 +164,7 @@ public class CryptoUtil {
         return null;
     }
 
-    public static byte[] decryptSymmetric(byte[] cipherText, Key key) {
+    public static byte[] decryptSymmetric(byte[] cipherText, SecretKey key) {
         byte[] IV = Arrays.copyOfRange(cipherText, 0, IV_SIZE);
         byte[] encryptedBytes = Arrays.copyOfRange(cipherText, IV_SIZE, cipherText.length);
 

@@ -47,7 +47,7 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                             postId);
                     intent.putExtra(
                             Post.POST_USER_ID_EXTRA,
-                            Util.getUserId(mContext));
+                            IslndContract.UserEntry.MY_USER_ID);
                     mContext.startActivity(intent);
                 });
                 break;

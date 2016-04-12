@@ -9,5 +9,9 @@ public abstract class AsymmetricEncryptedData<T extends ProtoSerializable> exten
         blob = ObjectEncrypter.encryptAsymmetric(object, publicKey);
     }
 
+    public AsymmetricEncryptedData(String blob) {
+        this.blob = blob;
+    }
+
     public abstract T decrypt(Key privateKey);
 }

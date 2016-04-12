@@ -48,10 +48,12 @@ public class FriendAddBackService extends IntentService {
             case IDENTITY_JOB: {
                 Identity myIdentity = MessageLayer.getMyIdentity(this);
                 Message identityMessage = MessageBuilder.buildIdentityMessage(
+                        this,
                         inbox,
                         myIdentity);
                 EncryptedMessage encryptedMessage = new EncryptedMessage(identityMessage, publicKey);
                 Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+                Log.v(TAG, "sending identity w alias " + myIdentity.getAlias());
                 break;
             }
             case PROFILE_JOB: {
@@ -76,6 +78,7 @@ public class FriendAddBackService extends IntentService {
                         profileResourceKey
                 );
                 Message message = MessageBuilder.buildProfileMessage(
+                        this,
                         inbox,
                         profileMessage);
                 EncryptedMessage encryptedMessage = new EncryptedMessage(message, publicKey);

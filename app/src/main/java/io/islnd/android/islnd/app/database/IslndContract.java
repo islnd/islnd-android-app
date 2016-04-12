@@ -22,8 +22,9 @@ public class IslndContract {
     public static final String PATH_IDENTITY = "identity";
     public static final String PATH_RECEIVED_EVENT = "received_event";
     public static final String PATH_OUTGOING_EVENT = "outgoing_event";
+    public static final String PATH_RECEIVED_MESSAGE = "received_message";
+    public static final String PATH_OUTGOING_MESSAGE = "outgoing_message";
     public static final String PATH_NOTIFICATION = "notification";
-    public static final String PATH_MAILBOX = "mailbox";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -83,8 +84,12 @@ public class IslndContract {
         public static final String COLUMN_PUBLIC_KEY = "public_key";
         public static final String COLUMN_MESSAGE_INBOX = "message_inbox";
         public static final String COLUMN_MESSAGE_OUTBOX = "message_outbox";
+        public static final String COLUMN_ACTIVE = "active";
 
         public static final int MY_USER_ID = 1; //--we are always the first user to go in the database
+
+        public static final int ACTIVE = 1;
+        public static final int NOT_ACTIVE = 0;
 
         public static int getUserIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));
@@ -313,21 +318,42 @@ public class IslndContract {
         public static final String COLUMN_BLOB = "blob";
     }
 
-    public static final class MailboxEntry implements BaseColumns {
+    public static final class ReceivedMessageEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MAILBOX).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECEIVED_MESSAGE).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RECEIVED_MESSAGE;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_EVENT;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RECEIVED_MESSAGE;
 
-        public static final String TABLE_NAME = "mailbox";
+        public static final String TABLE_NAME = "received_message";
 
         public static final String COLUMN_MAILBOX = "mailbox";
+        public static final String COLUMN_MESSAGE_ID = "message_id";
 
-        public static Uri buildMailboxUri(long id) {
+        public static Uri buildReceivedMessageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class OutgoingMessageEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_OUTGOING_MESSAGE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_MESSAGE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OUTGOING_MESSAGE;
+
+        public static final String TABLE_NAME = "outgoing_message";
+
+        public static final String COLUMN_MAILBOX = "mailbox";
+        public static final String COLUMN_BLOB = "blob";
+
+        public static Uri buildOutgoingMessageUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

@@ -60,7 +60,10 @@ public class Rest {
             Response<Void> response = service.postMessage(encryptedMessage, apiKey).execute();
 
             if (response.code() != HTTP_OK) {
-                Log.d(TAG, "post event returned code" + response.code());
+                Log.d(TAG, "post message returned code" + response.code());
+            }
+            else {
+                Log.v(TAG, "post message to mailbox " + encryptedMessage.getMailbox());
             }
         } catch (IOException e) {
             e.printStackTrace();

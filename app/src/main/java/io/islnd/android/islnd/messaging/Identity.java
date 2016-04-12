@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.Serializable;
 import java.security.Key;
+import java.security.PublicKey;
 
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
@@ -13,14 +14,14 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
     private final String alias;
     private final String messageInbox;
     private final Key groupKey;
-    private final Key publicKey;
+    private final PublicKey publicKey;
 
     public Identity(
             String displayName,
             String alias,
             String messageInbox,
             Key groupKey,
-            Key publicKey) {
+            PublicKey publicKey) {
         this.displayName = displayName;
         this.alias = alias;
         this.messageInbox = messageInbox;
@@ -36,7 +37,7 @@ public class Identity implements Serializable, ProtoSerializable<Identity> {
         return groupKey;
     }
 
-    public Key getPublicKey() {
+    public PublicKey getPublicKey() {
         return publicKey;
     }
 

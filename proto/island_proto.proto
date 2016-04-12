@@ -39,6 +39,7 @@ message ProfileResource {
 
 message Message {
   required string mailbox = 1;
-  required int32 type = 2;
-  required string blob = 3;
+  required int32 message_id = 2;
+  required int32 type = 3;
+  required string blob = 4;
 }

@@ -98,7 +98,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile_menu, menu);
 
-        if (Util.isUser(this, mProfileUserId)) {
+        if (mProfileUserId == IslndContract.UserEntry.MY_USER_ID) {
             MenuItem removeFriend = menu.findItem(R.id.remove_friend);
             removeFriend.setVisible(false);
         } else {

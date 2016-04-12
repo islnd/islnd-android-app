@@ -15,9 +15,12 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+
+import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.database.DataUtils;
@@ -25,10 +28,14 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
+import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
+import io.islnd.android.islnd.messaging.message.Message;
+import io.islnd.android.islnd.messaging.message.MessageProcessor;
 import io.islnd.android.islnd.messaging.server.EventQuery;
+import io.islnd.android.islnd.messaging.server.MessageQuery;
 
 public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -36,6 +43,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private Context mContext;
     private ContentResolver mContentResolver;
+    private Object incomingMessages;
 
     public EventSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -56,12 +64,76 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.v(TAG, "onPerformSync");
 
+        pushOutgoingMessages(provider);
         pushOutgoingEvents(provider);
+        getIncomingMessages();
         getIncomingEvents();
         
         mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
 
         Log.v(TAG, "completed on perform sync");
+    }
+
+    private void getIncomingMessages() {
+        MessageQuery messageQuery = new MessageQuery(getMailboxes());
+        Log.v(TAG, "message query " + messageQuery);
+        List<EncryptedMessage> encryptedMessages = Rest.postMessageQuery(
+                messageQuery,
+                Util.getApiKey(mContext));
+
+        if (encryptedMessages == null
+                || encryptedMessages.size() == 0) {
+            return;
+        }
+
+        Log.v(TAG, encryptedMessages.size() + " messages");
+        PriorityQueue<Message> messageQueue = new PriorityQueue<>();
+        for (EncryptedMessage encryptedMessage : encryptedMessages) {
+            Message message = encryptedMessage.decrypt(Util.getPrivateKey(mContext));
+            messageQueue.add(message);
+        }
+
+        while (!messageQueue.isEmpty()) {
+            MessageProcessor.process(mContext, messageQueue.poll());
+        }
+    }
+
+    private void pushOutgoingMessages(ContentProviderClient provider) {
+        String[] projections = new String[] {
+                IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX,
+                IslndContract.OutgoingMessageEntry.COLUMN_BLOB
+        };
+        try {
+            Cursor cursor = provider.query(
+                    IslndContract.OutgoingMessageEntry.CONTENT_URI,
+                    projections,
+                    null,
+                    null,
+                    null
+            );
+            Log.v(TAG, String.format("found %d outgoing messages", cursor.getCount()));
+            if (cursor.moveToFirst()) {
+                String apiKey = Util.getApiKey(mContext);
+
+                do {
+                    EncryptedMessage encryptedMessage = new EncryptedMessage(
+                            cursor.getString(0),
+                            cursor.getString(1)
+                    );
+                    Rest.postMessage(encryptedMessage, apiKey);
+                } while (cursor.moveToNext());
+
+                int records = mContentResolver.delete(
+                        IslndContract.OutgoingMessageEntry.CONTENT_URI,
+                        null,
+                        null
+                );
+                Log.v(TAG, String.format("posted and deleted %d messages", records));
+            }
+        } catch (RemoteException e) {
+            Log.d(TAG, "RemoteException: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void getIncomingEvents() {
@@ -142,20 +214,22 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         PriorityQueue<Event> events = new PriorityQueue<>();
         for (EncryptedEvent encryptedEvent : encryptedEvents) {
             String alias = encryptedEvent.getAlias();
+            Log.v(TAG, "event alias " + alias);
 
             //--TODO need to handle multiple users having same alias
             int userId = DataUtils.getUserIdFromAlias(mContext, alias);
 
             //--TODO keys need to be a keystore or in-memory cache service
-            Key groupKey = DataUtils.getGroupKey(mContext, userId);
-            Key publicKey = DataUtils.getPublicKey(mContext, userId);
+            SecretKey groupKey = DataUtils.getGroupKey(mContext, userId);
+            PublicKey publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
                 final Event event = encryptedEvent.decryptAndVerify(groupKey, publicKey);
                 if (event != null) {
                     events.add(event);
                 }
             } catch (InvalidSignatureException e) {
-                e.printStackTrace();
+                Log.d(TAG, "could not decrypt and verify event!");
+                Log.d(TAG, e.toString());
             }
         }
         return events;
@@ -166,15 +240,23 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 IslndContract.AliasEntry.COLUMN_ALIAS
         };
 
-        String[] args = new String[] { Integer.toString(Util.getUserId(mContext)) };
-        Cursor cursor = mContentResolver.query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
-                args,
-                null);
+        String[] args = new String[] { Integer.toString(IslndContract.UserEntry.MY_USER_ID) };
+        EventQuery eventQuery;
+        Cursor cursor = null;
+        try {
+            cursor = mContentResolver.query(
+                    IslndContract.AliasEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
+                    args,
+                    null);
 
-        EventQuery eventQuery = buildEventQuery(cursor);
+            eventQuery = buildEventQuery(cursor);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
         return Rest.postEventQuery(
                 eventQuery,
                 Util.getApiKey(getContext()));
@@ -189,10 +271,45 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
         do {
             final String alias = cursor.getString(cursor.getColumnIndex(IslndContract.AliasEntry.COLUMN_ALIAS));
-            Log.v(TAG, "query includes: " + alias);
+            Log.v(TAG, "event query includes: " + alias);
             aliases.add(alias);
         } while (cursor.moveToNext());
 
         return new EventQuery(aliases);
+    }
+
+    @NonNull
+    private List<String> getMailboxes() {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX
+        };
+        Cursor cursor = null;
+        try {
+            cursor = mContentResolver.query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_ACTIVE + " = ?",
+                    new String[] {Integer.toString(IslndContract.UserEntry.ACTIVE)},
+                    null);
+            List<String> mailboxes = new ArrayList<>();
+            if (!cursor.moveToFirst()) {
+                return mailboxes;
+            }
+
+            do {
+                final String mailbox = cursor.getString(0);
+                if (mailbox != null) {
+                    mailboxes.add(mailbox);
+                }
+            } while (cursor.moveToNext());
+
+            mailboxes.add(Util.getMyInbox(getContext()));
+            return mailboxes;
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
+import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.ServerTime;
@@ -19,12 +20,10 @@ public class EventListBuilder {
 
     private final Context mContext;
     private final List<Event> eventList;
-    private final int mUserId;
     private int eventId;
 
     public EventListBuilder(Context context) {
         mContext = context;
-        mUserId = Util.getUserId(mContext);
         this.eventList = new ArrayList<>();
         eventId = Util.getEventId(mContext);
     }
@@ -133,14 +132,8 @@ public class EventListBuilder {
         return this.eventList;
     }
 
-    public Event[] buildArray() {
-        changeAlias();
-        Util.setEventId(mContext, eventId);
-        return this.eventList.toArray(new Event[0]);
-    }
-
     private String getCurrentAlias() {
-        return DataUtils.getMostRecentAlias(mContext, mUserId);
+        return DataUtils.getMostRecentAlias(mContext, IslndContract.UserEntry.MY_USER_ID);
     }
 
     private static String getNewContentIdAndUpdate(Context context, String versionKey) {

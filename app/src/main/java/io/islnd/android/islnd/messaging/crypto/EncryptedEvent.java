@@ -1,6 +1,9 @@
 package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.Key;
+import java.security.PublicKey;
+
+import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.messaging.event.Event;
 
@@ -19,7 +22,7 @@ public class EncryptedEvent extends SymmetricEncryptedData {
     }
 
     @Override
-    public Event decryptAndVerify(Key groupKey, Key authorPublicKey) throws InvalidSignatureException {
+    public Event decryptAndVerify(SecretKey groupKey, PublicKey authorPublicKey) throws InvalidSignatureException {
         SignedObject signedObject = this.getSignedAndVerifiedObject(groupKey, authorPublicKey);
         return Event.fromProto(signedObject.getObject());
     }

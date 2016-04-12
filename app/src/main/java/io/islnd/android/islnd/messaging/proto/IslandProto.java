@@ -3199,11 +3199,15 @@ public final class IslandProto {
     boolean hasMailbox();
     String getMailbox();
     
-    // required int32 type = 2;
+    // required int32 message_id = 2;
+    boolean hasMessageId();
+    int getMessageId();
+    
+    // required int32 type = 3;
     boolean hasType();
     int getType();
     
-    // required string blob = 3;
+    // required string blob = 4;
     boolean hasBlob();
     String getBlob();
   }
@@ -3268,21 +3272,31 @@ public final class IslandProto {
       }
     }
     
-    // required int32 type = 2;
-    public static final int TYPE_FIELD_NUMBER = 2;
+    // required int32 message_id = 2;
+    public static final int MESSAGE_ID_FIELD_NUMBER = 2;
+    private int messageId_;
+    public boolean hasMessageId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getMessageId() {
+      return messageId_;
+    }
+    
+    // required int32 type = 3;
+    public static final int TYPE_FIELD_NUMBER = 3;
     private int type_;
     public boolean hasType() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public int getType() {
       return type_;
     }
     
-    // required string blob = 3;
-    public static final int BLOB_FIELD_NUMBER = 3;
+    // required string blob = 4;
+    public static final int BLOB_FIELD_NUMBER = 4;
     private java.lang.Object blob_;
     public boolean hasBlob() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     public String getBlob() {
       java.lang.Object ref = blob_;
@@ -3312,6 +3326,7 @@ public final class IslandProto {
     
     private void initFields() {
       mailbox_ = "";
+      messageId_ = 0;
       type_ = 0;
       blob_ = "";
     }
@@ -3321,6 +3336,10 @@ public final class IslandProto {
       if (isInitialized != -1) return isInitialized == 1;
       
       if (!hasMailbox()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasMessageId()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -3343,10 +3362,13 @@ public final class IslandProto {
         output.writeBytes(1, getMailboxBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, type_);
+        output.writeInt32(2, messageId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getBlobBytes());
+        output.writeInt32(3, type_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(4, getBlobBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3363,11 +3385,15 @@ public final class IslandProto {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, type_);
+          .computeInt32Size(2, messageId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getBlobBytes());
+          .computeInt32Size(3, type_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getBlobBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3495,10 +3521,12 @@ public final class IslandProto {
         super.clear();
         mailbox_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = 0;
+        messageId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        blob_ = "";
+        type_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
+        blob_ = "";
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       
@@ -3544,9 +3572,13 @@ public final class IslandProto {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.type_ = type_;
+        result.messageId_ = messageId_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
+        }
+        result.type_ = type_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
         }
         result.blob_ = blob_;
         result.bitField0_ = to_bitField0_;
@@ -3568,6 +3600,9 @@ public final class IslandProto {
         if (other.hasMailbox()) {
           setMailbox(other.getMailbox());
         }
+        if (other.hasMessageId()) {
+          setMessageId(other.getMessageId());
+        }
         if (other.hasType()) {
           setType(other.getType());
         }
@@ -3580,6 +3615,10 @@ public final class IslandProto {
       
       public final boolean isInitialized() {
         if (!hasMailbox()) {
+          
+          return false;
+        }
+        if (!hasMessageId()) {
           
           return false;
         }
@@ -3624,11 +3663,16 @@ public final class IslandProto {
             }
             case 16: {
               bitField0_ |= 0x00000002;
+              messageId_ = input.readInt32();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
               type_ = input.readInt32();
               break;
             }
-            case 26: {
-              bitField0_ |= 0x00000004;
+            case 34: {
+              bitField0_ |= 0x00000008;
               blob_ = input.readBytes();
               break;
             }
@@ -3674,31 +3718,52 @@ public final class IslandProto {
         onChanged();
       }
       
-      // required int32 type = 2;
+      // required int32 message_id = 2;
+      private int messageId_ ;
+      public boolean hasMessageId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getMessageId() {
+        return messageId_;
+      }
+      public Builder setMessageId(int value) {
+        bitField0_ |= 0x00000002;
+        messageId_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearMessageId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        messageId_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // required int32 type = 3;
       private int type_ ;
       public boolean hasType() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       public int getType() {
         return type_;
       }
       public Builder setType(int value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         type_ = value;
         onChanged();
         return this;
       }
       public Builder clearType() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         type_ = 0;
         onChanged();
         return this;
       }
       
-      // required string blob = 3;
+      // required string blob = 4;
       private java.lang.Object blob_ = "";
       public boolean hasBlob() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       public String getBlob() {
         java.lang.Object ref = blob_;
@@ -3714,19 +3779,19 @@ public final class IslandProto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  bitField0_ |= 0x00000008;
         blob_ = value;
         onChanged();
         return this;
       }
       public Builder clearBlob() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         blob_ = getDefaultInstance().getBlob();
         onChanged();
         return this;
       }
       void setBlob(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         blob_ = value;
         onChanged();
       }
@@ -3793,10 +3858,10 @@ public final class IslandProto {
       "\001(\t\022\031\n\021parent_content_id\030\t \001(\t\"&\n\016Profil",
       "eMessage\022\024\n\014resource_key\030\001 \002(\t\"P\n\017Profil" +
       "eResource\022\020\n\010about_me\030\001 \002(\t\022\025\n\rprofile_i" +
-      "mage\030\002 \002(\014\022\024\n\014header_image\030\003 \002(\014\"6\n\007Mess" +
-      "age\022\017\n\007mailbox\030\001 \002(\t\022\014\n\004type\030\002 \002(\005\022\014\n\004bl" +
-      "ob\030\003 \002(\tB(\n&io.islnd.android.islnd.messa" +
-      "ging.proto"
+      "mage\030\002 \002(\014\022\024\n\014header_image\030\003 \002(\014\"J\n\007Mess" +
+      "age\022\017\n\007mailbox\030\001 \002(\t\022\022\n\nmessage_id\030\002 \002(\005" +
+      "\022\014\n\004type\030\003 \002(\005\022\014\n\004blob\030\004 \002(\tB(\n&io.islnd" +
+      ".android.islnd.messaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3848,7 +3913,7 @@ public final class IslandProto {
           internal_static_proto_Message_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_Message_descriptor,
-              new java.lang.String[] { "Mailbox", "Type", "Blob", },
+              new java.lang.String[] { "Mailbox", "MessageId", "Type", "Blob", },
               io.islnd.android.islnd.messaging.proto.IslandProto.Message.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.Message.Builder.class);
           return null;

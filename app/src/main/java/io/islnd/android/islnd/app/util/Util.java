@@ -18,6 +18,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -104,10 +105,6 @@ public class Util {
         editor.apply();
     }
 
-    public static boolean isUser(Context context, int userId) {
-        return getUserId(context) == userId;
-    }
-
     public static void applyAppTheme(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String value = sharedPref.getString(AppearancePreferenceFragment.PREFERENCE_THEME_KEY, "1");
@@ -125,18 +122,13 @@ public class Util {
         }
     }
 
-    public static int getUserId(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getInt(context.getString(R.string.user_id), -1);
-    }
-
     public static Key getGroupKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodeSymmetricKey(
                 sharedPref.getString(context.getString(R.string.group_key), ""));
     }
 
-    public static Key getPublicKey(Context context) {
+    public static PublicKey getPublicKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePublicKey(
                 sharedPref.getString(context.getString(R.string.public_key), ""));
@@ -170,6 +162,18 @@ public class Util {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(context.getString(R.string.event_id), eventId);
+        editor.commit();
+    }
+
+    public static int getMessageId(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getInt(context.getString(R.string.message_id), 0);
+    }
+
+    public static void setMessageId(Context context, int eventId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(context.getString(R.string.message_id), eventId);
         editor.commit();
     }
 

@@ -71,7 +71,7 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
                 holder.profileImage,
                 Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
-        if (Util.isUser(mContext, comment.getUserId())) {
+        if (comment.getUserId() == IslndContract.UserEntry.MY_USER_ID) {
             holder.view.setOnLongClickListener((View v) -> {
                 final String DELETE_COMMENT = mContext.getString(R.string.delete_comment);
                 final String[] items = {DELETE_COMMENT};

@@ -32,8 +32,9 @@ public class IslndProvider extends ContentProvider {
     static final int RECEIVED_EVENT = 800;
     static final int RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID = 801;
     static final int OUTGOING_EVENT = 900;
-    static final int MAILBOX = 1000;
-    static final int NOTIFICATION = 1100;
+    static final int RECEIVED_MESSAGE = 1000;
+    static final int OUTGOING_MESSAGE = 1100;
+    static final int NOTIFICATION = 1200;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -92,7 +93,10 @@ public class IslndProvider extends ContentProvider {
         sProfileQueryBuilder.setTables(
                 IslndContract.ProfileEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID +
-                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID
+                        " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
+                        " INNER JOIN " + IslndContract.UserEntry.TABLE_NAME +
+                        " ON " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID +
+                        " = " + IslndContract.UserEntry.TABLE_NAME + "." + IslndContract.UserEntry._ID
         );
     }
 
@@ -215,8 +219,6 @@ public class IslndProvider extends ContentProvider {
 
     private Cursor getProfilesByUserId(Uri uri, String[] projection, String sortOrder) {
         int userId = IslndContract.ProfileEntry.getUserIdFromUri(uri);
-        Log.v(TAG, String.format("Get profile user id %d", userId));
-
         String[] selectionArgs = new String[] {Integer.toString(userId)};
         String selection = IslndContract.ProfileEntry.TABLE_NAME + "." +
                 IslndContract.ProfileEntry.COLUMN_USER_ID + " = ?";
@@ -316,11 +318,14 @@ public class IslndProvider extends ContentProvider {
                 IslndContract.PATH_RECEIVED_EVENT + "/*/#",
                 RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID);
 
+
         matcher.addURI(authority, IslndContract.PATH_OUTGOING_EVENT, OUTGOING_EVENT);
 
-        matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
+        matcher.addURI(authority, IslndContract.PATH_RECEIVED_MESSAGE, RECEIVED_MESSAGE);
 
-        matcher.addURI(authority, IslndContract.PATH_MAILBOX, MAILBOX);
+        matcher.addURI(authority, IslndContract.PATH_OUTGOING_MESSAGE, OUTGOING_MESSAGE);
+
+        matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
 
         return matcher;
     }
@@ -335,7 +340,6 @@ public class IslndProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         Cursor retCursor;
-        Log.v(TAG, "query " + uri);
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case POST: {
@@ -464,6 +468,17 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case RECEIVED_MESSAGE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.ReceivedMessageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
             case NOTIFICATION: {
                 retCursor = sNotificationQueryBuilder.query(
                         mOpenHelper.getReadableDatabase(),
@@ -475,9 +490,9 @@ public class IslndProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-            case MAILBOX: {
+            case OUTGOING_MESSAGE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        IslndContract.MailboxEntry.TABLE_NAME,
+                        IslndContract.OutgoingMessageEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -536,33 +551,25 @@ public class IslndProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
 
-        Log.v(TAG, "begin insert uri: " + uri);
-
         switch (match) {
             case POST: {
                 long _id = db.insertWithOnConflict(
                         IslndContract.PostEntry.TABLE_NAME,
                         null,
                         values,
-                        SQLiteDatabase.CONFLICT_IGNORE);
+                        SQLiteDatabase.CONFLICT_FAIL);
                 if ( _id > 0 )
                     returnUri = IslndContract.PostEntry.buildPostUri(_id);
                 else
                     return null;
                 break;
             }
-            case MAILBOX: {
-                long _id = db.insert(IslndContract.MailboxEntry.TABLE_NAME, null, values);
-                if ( _id > 0 ) {
-                    returnUri = IslndContract.MailboxEntry.buildMailboxUri(_id);
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
-
-                break;
-            }
             case USER: {
-                long _id = db.insert(IslndContract.UserEntry.TABLE_NAME, null, values);
+                long _id = db.insertWithOnConflict(
+                        IslndContract.UserEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_FAIL);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.UserEntry.buildUserUri(_id);
                 } else {
@@ -576,7 +583,7 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.AliasEntry.TABLE_NAME,
                         null,
                         values,
-                        SQLiteDatabase.CONFLICT_REPLACE);
+                        SQLiteDatabase.CONFLICT_FAIL);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.AliasEntry.buildAliasUri(_id);
                 } else {
@@ -604,7 +611,7 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.CommentEntry.TABLE_NAME,
                         null,
                         values,
-                        SQLiteDatabase.CONFLICT_IGNORE);
+                        SQLiteDatabase.CONFLICT_FAIL);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.CommentEntry.buildCommentUri(_id);
                     Log.v(TAG, "inserted comment");
@@ -635,7 +642,7 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.ReceivedEventEntry.TABLE_NAME,
                         null,
                         values,
-                        SQLiteDatabase.CONFLICT_IGNORE);
+                        SQLiteDatabase.CONFLICT_FAIL);
                 if ( _id > 0 )
                     returnUri = IslndContract.ReceivedEventEntry.buildEventUri(_id);
                 else
@@ -644,6 +651,31 @@ public class IslndProvider extends ContentProvider {
             }
             case RECEIVED_EVENT_WITH_ALIAS_AND_EVENT_ID: {
                 returnUri = insertEventWithAliasAndUri(db, uri);
+                break;
+            }
+            case OUTGOING_MESSAGE: {
+                long _id = db.insert(IslndContract.OutgoingMessageEntry.TABLE_NAME, null, values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.OutgoingMessageEntry.buildOutgoingMessageUri(_id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+
+                break;
+            }
+            case RECEIVED_MESSAGE: {
+                long _id = db.insertWithOnConflict(
+                        IslndContract.ReceivedMessageEntry.TABLE_NAME,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if ( _id > 0 )
+                    returnUri = IslndContract.ReceivedEventEntry.buildEventUri(_id);
+                else {
+                    Log.d(TAG, "message already added to content provider");
+                    return null;
+                }
+
                 break;
             }
             case NOTIFICATION: {
@@ -655,6 +687,7 @@ public class IslndProvider extends ContentProvider {
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
                 else
                     return null;
+
                 break;
             }
             default:
@@ -747,6 +780,25 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
             }
+            case OUTGOING_MESSAGE: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(IslndContract.OutgoingMessageEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
             default:
                 throw new UnsupportedOperationException("Bulk insert not supported for uri: " + uri);
         }
@@ -758,6 +810,8 @@ public class IslndProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
 
+        Log.v(TAG, "begin delete with uri " + uri);
+
         // this makes delete all rows return the number of rows deleted
         if (selection == null) {
             selection = "1";
@@ -767,6 +821,14 @@ public class IslndProvider extends ContentProvider {
             case POST: {
                 rowsDeleted = db.delete(
                         IslndContract.PostEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case POST_WITH_USER: {
+                int userId = IslndContract.PostEntry.getUserIdFromUri(uri);
+                rowsDeleted = db.delete(
+                        IslndContract.PostEntry.TABLE_NAME,
+                        sPostTableUserIdSelection,
+                        new String[] {Integer.toString(userId)});
                 break;
             }
             case COMMENT: {
@@ -809,9 +871,14 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.NotificationEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
-            case MAILBOX: {
+            case RECEIVED_MESSAGE: {
                 rowsDeleted = db.delete(
-                        IslndContract.MailboxEntry.TABLE_NAME, selection, selectionArgs);
+                        IslndContract.ReceivedMessageEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case OUTGOING_MESSAGE: {
+                rowsDeleted = db.delete(
+                        IslndContract.OutgoingMessageEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:
@@ -832,6 +899,8 @@ public class IslndProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsUpdated = 0;
 
+        Log.v(TAG, "begin update with uri " + uri);
+
         switch (match) {
             case PROFILE: {
                 db.update(
@@ -849,7 +918,6 @@ public class IslndProvider extends ContentProvider {
                         selection,
                         selectionArgs
                 );
-                Log.v(TAG, "update post updated " + rowsUpdated);
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 break;
             }
@@ -867,8 +935,19 @@ public class IslndProvider extends ContentProvider {
                         selection,
                         selectionArgs
                 );
-                Log.v(TAG, "update user updated " + rowsUpdated);
                 getContext().getContentResolver().notifyChange(IslndContract.UserEntry.CONTENT_URI, null);
+                break;
+            }
+            case USER_WITH_ID: {
+                int userId = IslndContract.UserEntry.getUserIdFromUri(uri);
+                rowsUpdated = db.update(
+                        IslndContract.UserEntry.TABLE_NAME,
+                        values,
+                        sUserTableUserIdSelection,
+                        new String[] {Integer.toString(userId)}
+                );
+                getContext().getContentResolver().notifyChange(IslndContract.UserEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
                 break;
             }
             case DISPLAY_NAME_WITH_USER_ID: {
