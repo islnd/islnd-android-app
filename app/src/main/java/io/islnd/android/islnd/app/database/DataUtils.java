@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.security.Key;
 
-import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;

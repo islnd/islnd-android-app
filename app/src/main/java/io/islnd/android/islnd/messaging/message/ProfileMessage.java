@@ -1,6 +1,5 @@
 package io.islnd.android.islnd.messaging.message;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import io.islnd.android.islnd.messaging.Decoder;

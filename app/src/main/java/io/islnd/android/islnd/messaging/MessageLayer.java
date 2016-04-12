@@ -13,7 +13,6 @@ import io.islnd.android.islnd.app.FindNewFriendService;
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.DataUtils;
-import io.islnd.android.islnd.app.database.NotificationType;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;

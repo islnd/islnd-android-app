@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
@@ -77,7 +77,7 @@ public class ViewFriendsFragment extends Fragment {
         super.onResume();
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(R.string.view_friends_fragment);
-        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        IntentFilter filter = new IntentFilter(IslndAction.EVENT_SYNC_COMPLETE);
         getContext().registerReceiver(mStopRefreshReceiver, filter);
     }
 

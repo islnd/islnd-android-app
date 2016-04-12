@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.Dialogs;
-import io.islnd.android.islnd.app.IslndIntent;
+import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SimpleDividerItemDecoration;
 import io.islnd.android.islnd.app.StopRefreshReceiver;
@@ -206,7 +206,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter(IslndIntent.EVENT_SYNC_COMPLETE);
+        IntentFilter filter = new IntentFilter(IslndAction.EVENT_SYNC_COMPLETE);
         this.registerReceiver(mStopRefreshReceiver, filter);
     }
 

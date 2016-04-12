@@ -26,4 +26,5 @@
     <color name="active_icon">#8a000000</color>
     <color name="inactive_icon">#42000000</color>
     <color name="black_tint">#61000000</color>
+    <color name="notification_primary">#3F51B5</color>
 </resources>
