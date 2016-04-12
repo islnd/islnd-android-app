@@ -32,6 +32,8 @@ import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.message.MessageProcessor;
+import io.islnd.android.islnd.messaging.message.MessageType;
+import io.islnd.android.islnd.messaging.message.ReceivedMessage;
 import io.islnd.android.islnd.messaging.server.EventQuery;
 import io.islnd.android.islnd.messaging.server.MessageQuery;
 
@@ -87,17 +89,30 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.v(TAG, encryptedMessages.size() + " messages");
         PriorityQueue<Message> messageQueue = new PriorityQueue<>();
         for (EncryptedMessage encryptedMessage : encryptedMessages) {
-            PublicKey authorPublicKey = DataUtils.getPublicKeyForUserOutbox(
-                    mContext,
-                    encryptedMessage.getMailbox());
-            Message message = null;
+            PublicKey authorPublicKey = null;
             try {
-                message = encryptedMessage.decryptAndVerify(Util.getPrivateKey(mContext), authorPublicKey);
-            } catch (InvalidSignatureException e) {
-                Log.d(TAG, "message signature invalid!");
-                Log.d(TAG, e.toString());
+                authorPublicKey = DataUtils.getPublicKeyForUserOutbox(
+                        mContext,
+                        encryptedMessage.getMailbox());
+            } catch (Exception e) {
+                //--This may fail if it is a new user
             }
-            messageQueue.add(message);
+
+            ReceivedMessage receivedMessage = encryptedMessage.decryptMessageAndCheckSignature(
+                    Util.getPrivateKey(mContext),
+                    authorPublicKey);
+
+            //--All messages must have a valid signature, except identity messages, because
+            //  those messages contain the user's public key. Since there is no previous knowledge
+            //  of the public key, there is nothing to validate
+            if (!receivedMessage.isSignatureValid()
+                    && receivedMessage.getMessage().getType() != MessageType.IDENTITY) {
+                Log.d(TAG, String.format("message type %d signature invalid!",
+                        receivedMessage.getMessage().getType()));
+                continue;
+            }
+
+            messageQueue.add(receivedMessage.getMessage());
         }
 
         while (!messageQueue.isEmpty()) {
@@ -246,14 +261,21 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         };
 
         String[] args = new String[] { Integer.toString(Util.getUserId(mContext)) };
-        Cursor cursor = mContentResolver.query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
-                args,
-                null);
-
-        EventQuery eventQuery = buildEventQuery(cursor);
+        Cursor cursor = null;
+        EventQuery eventQuery;
+        try {
+            cursor = mContentResolver.query(
+                    IslndContract.AliasEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.AliasEntry.COLUMN_USER_ID + " != ?",
+                    args,
+                    null);
+            eventQuery = buildEventQuery(cursor);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
         return Rest.postEventQuery(
                 eventQuery,
                 Util.getApiKey(getContext()));

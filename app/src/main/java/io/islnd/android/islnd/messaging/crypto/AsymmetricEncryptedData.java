@@ -15,6 +15,4 @@ public abstract class AsymmetricEncryptedData extends EncryptedData {
     public AsymmetricEncryptedData(String blob) {
         this.blob = blob;
     }
-
-    public abstract ProtoSerializable decryptAndVerify(Key privateKey, PublicKey authorPublicKey) throws InvalidSignatureException;
 }

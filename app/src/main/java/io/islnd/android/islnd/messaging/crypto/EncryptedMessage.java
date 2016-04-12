@@ -6,6 +6,7 @@ import java.security.PublicKey;
 
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.message.Message;
+import io.islnd.android.islnd.messaging.message.ReceivedMessage;
 
 public class EncryptedMessage extends AsymmetricEncryptedData {
 
@@ -26,16 +27,18 @@ public class EncryptedMessage extends AsymmetricEncryptedData {
         return mailbox;
     }
 
-    @Override
-    public Message decryptAndVerify(Key privateKey, PublicKey authorPublicKey) throws InvalidSignatureException {
+    public ReceivedMessage decryptMessageAndCheckSignature(Key privateKey, PublicKey authorPublicKey) {
         SignedObject signedObject = SignedObject.fromProto(
                 ObjectEncrypter.decryptAsymmetric(
                         this.blob,
                         privateKey));
-        if (!CryptoUtil.verifySignedObject(signedObject, authorPublicKey)) {
-            throw new InvalidSignatureException();
+
+        if (authorPublicKey == null) {
+            return new ReceivedMessage(Message.fromProto(signedObject.getObject()));
         }
 
-        return Message.fromProto(signedObject.getObject());
+        return new ReceivedMessage(
+                Message.fromProto(signedObject.getObject()),
+                CryptoUtil.verifySignedObject(signedObject, authorPublicKey));
     }
 }
