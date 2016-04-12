@@ -654,9 +654,8 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.NotificationEntry.TABLE_NAME,
                         null,
                         values);
-                if ( _id > 0 ) {
+                if ( _id > 0 )
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
-                }
                 else
                     return null;
                 break;

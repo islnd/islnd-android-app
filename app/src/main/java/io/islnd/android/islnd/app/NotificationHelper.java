@@ -36,26 +36,23 @@ public class NotificationHelper {
         context.getContentResolver().registerContentObserver(
                 IslndContract.NotificationEntry.CONTENT_URI,
                 true,
-                new NotificationObserver(new Handler())
+                new NotificationObserver(new Handler(), context)
         );
     }
 
-    public static void updateNotification(Context context) {
+    private static void updateNotification(Context context) {
         Log.v(TAG, "updateNotification");
-
-        // Handle notification cancel
-        PendingIntent deleteIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                new Intent(context, NotificationCancelListener.class),
-                0);
 
         // Build active notifications
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        List<SpannableStringBuilder> activeNotifications = getActiveNotifications(context);
+        List<SpannableStringBuilder> activeNotifications = getSpannableActiveNotificationsStrings(context);
+
         String bigContentTitle = "";
         int notificationCount = activeNotifications.size();
-        if (notificationCount == 1) {
+        if (notificationCount == 0) {
+            Log.d(TAG, "no active notifications, exiting updateNotification");
+            return;
+        } else if (notificationCount == 1) {
             bigContentTitle = context.getString(R.string.notification_big_content_title_single);
         } else {
             bigContentTitle = Integer.toString(notificationCount)
@@ -67,6 +64,13 @@ public class NotificationHelper {
         for (int i = 0; i < notificationCount; ++i) {
             inboxStyle.addLine(activeNotifications.get(i));
         }
+
+        // Handle notification cancel
+        PendingIntent deleteIntent = PendingIntent.getBroadcast(
+                context,
+                0,
+                new Intent(context, NotificationCancelListener.class),
+                0);
 
         // Open notifications fragment
         Intent resultIntent = new Intent(context, NavBaseActivity.class);
@@ -125,7 +129,7 @@ public class NotificationHelper {
         notificationManager.cancel(NOTIFICATION_ID);
     }
 
-    private static List<SpannableStringBuilder> getActiveNotifications(Context context) {
+    private static List<SpannableStringBuilder> getSpannableActiveNotificationsStrings(Context context) {
         List<SpannableStringBuilder> activeNotifications = new ArrayList<>();
 
         String[] projection = new String[] {
@@ -185,8 +189,13 @@ public class NotificationHelper {
 
     private static class NotificationObserver extends ContentObserver {
 
-        public NotificationObserver(Handler handler) {
+        private static final String TAG = NotificationObserver.class.getSimpleName();
+
+        private Context mContext;
+
+        public NotificationObserver(Handler handler, Context context) {
             super(handler);
+            mContext = context;
         }
 
         @Override
@@ -197,6 +206,7 @@ public class NotificationHelper {
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             Log.v(TAG, "onChange");
+            updateNotification(mContext);
         }
     }
 }
