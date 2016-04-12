@@ -36,6 +36,8 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import io.islnd.android.islnd.app.IslndAction;
+import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
@@ -79,9 +81,14 @@ public class NavBaseActivity extends AppCompatActivity
         
         ServerTime.synchronize(this, false);
 
+        Intent intent = getIntent();
+
         // Set fragment
         if (savedInstanceState != null) {
             mFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_STATE);
+        } else if (IslndAction.NOTIFICATION_CONTENT_CLICK.equals(intent.getAction())) {
+            NotificationHelper.cancelNotifications(this);
+            mFragment = new NotificationsFragment();
         } else {
             mFragment = new FeedFragment();
         }
@@ -111,11 +118,10 @@ public class NavBaseActivity extends AppCompatActivity
         mNavHeaderImage = (ImageView) header.findViewById(R.id.nav_header_image);
         mNavUserName = (TextView) header.findViewById(R.id.nav_user_name);
 
-        int myUserId = Util.getUserId(this);
         mNavProfileImage.setOnClickListener(
                 (View v) -> {
                     Intent profileIntent = new Intent(this, ProfileActivity.class);
-                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, myUserId);
+                    profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, IslndContract.UserEntry.MY_USER_ID);
                     startActivity(profileIntent);
                 });
     }
@@ -148,7 +154,7 @@ public class NavBaseActivity extends AppCompatActivity
                 break;
             case R.id.nav_profile:
                 Intent profileIntent = new Intent(this, ProfileActivity.class);
-                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, Util.getUserId(this));
+                profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, IslndContract.UserEntry.MY_USER_ID);
                 startActivity(profileIntent);
                 break;
             case R.id.nav_friends:

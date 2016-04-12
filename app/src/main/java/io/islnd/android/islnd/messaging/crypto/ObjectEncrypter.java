@@ -4,6 +4,8 @@ package io.islnd.android.islnd.messaging.crypto;
 import java.security.Key;
 import java.util.Arrays;
 
+import javax.crypto.SecretKey;
+
 import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
@@ -32,7 +34,7 @@ public class ObjectEncrypter {
         return combineChunksIntoString(encryptedChunks);
     }
 
-    public static byte[] decryptSymmetric(String string, Key key) {
+    public static byte[] decryptSymmetric(String string, SecretKey key) {
         byte[] encryptedBytes = decoder.decode(string);
         return CryptoUtil.decryptSymmetric(encryptedBytes, key);
     }

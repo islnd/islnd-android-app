@@ -35,7 +35,7 @@ public class CreateIdentityService extends IntentService {
         int userId = setAlias(context, displayName);
         setDefaultProfile(context, userId, displayName);
 
-        context.sendBroadcast(new Intent(IslndIntent.CREATE_ACCOUNT_COMPLETED));
+        context.sendBroadcast(new Intent(IslndAction.CREATE_ACCOUNT_COMPLETED));
         Log.v(TAG, "onHandleIntent completed");
     }
 
@@ -75,7 +75,6 @@ public class CreateIdentityService extends IntentService {
                 Util.getGroupKey(context),
                 Util.getPublicKey(context));
 
-        editor.putInt(context.getString(R.string.user_id), (int) userId);
         editor.putString(context.getString(R.string.message_inbox), messageInbox);
         editor.commit();
 

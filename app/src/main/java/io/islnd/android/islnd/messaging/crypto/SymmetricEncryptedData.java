@@ -4,6 +4,8 @@ import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.crypto.SecretKey;
+
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 
 public abstract class SymmetricEncryptedData extends EncryptedData {
@@ -18,9 +20,9 @@ public abstract class SymmetricEncryptedData extends EncryptedData {
         this.blob = blob;
     }
 
-    public abstract ProtoSerializable decryptAndVerify(Key groupKey, PublicKey authorPublicKey) throws InvalidSignatureException;
+    public abstract ProtoSerializable decryptAndVerify(SecretKey groupKey, PublicKey authorPublicKey) throws InvalidSignatureException;
 
-    protected String verifySignatureAndGetObject(Key groupKey, PublicKey authorPublicKey) throws InvalidSignatureException {
+    protected final String verifySignatureAndGetObject(SecretKey groupKey, PublicKey authorPublicKey) throws InvalidSignatureException {
         SignedObject signedObject = SignedObject.fromProto(ObjectEncrypter.decryptSymmetric(this.getBlob(), groupKey));
         if (!CryptoUtil.verifySignedObject(signedObject, authorPublicKey)) {
             throw new InvalidSignatureException();

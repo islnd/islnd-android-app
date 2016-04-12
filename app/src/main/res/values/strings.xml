@@ -62,7 +62,6 @@
     <string name="nav_sms_title">SMS Allow User</string>
     <string name="nav_settings_title">Settings</string>
     <string name="nav_add_friend">Add Friend</string>
-    <string name="user_id">user_id</string>
     <string name="event_id">event_id</string>
     <string name="title_activity_settings">Settings</string>
     <string name="light_theme">Light</string>
@@ -103,11 +102,13 @@
     <string name="delete_account_message">All data will be deleted from device. You will no longer have access to account.</string>
     <string name="delete_button">Delete</string>
     <string name="notifications">Notifications</string>
-    <string name="notification_comment_content">added a comment to your post.</string>
-    <string name="notification_new_friend_content">is now your friend.</string>
+    <string name="notification_comment_content">commented on your post</string>
+    <string name="notification_new_friend_content">is now your friend</string>
     <string name="post_does_not_exist">Post does not exist</string>
     <string name="message_inbox">message_inbox</string>
     <string name="message_id">message_id</string>
+    <string name="notification_big_content_title">new islnd notifications</string>
+    <string name="notification_big_content_title_single">1 new islnd notification</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>

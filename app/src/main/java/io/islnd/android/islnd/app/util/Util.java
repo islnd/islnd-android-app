@@ -19,6 +19,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.security.Key;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -105,10 +106,6 @@ public class Util {
         editor.apply();
     }
 
-    public static boolean isUser(Context context, int userId) {
-        return getUserId(context) == userId;
-    }
-
     public static void applyAppTheme(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String value = sharedPref.getString(AppearancePreferenceFragment.PREFERENCE_THEME_KEY, "1");
@@ -126,18 +123,13 @@ public class Util {
         }
     }
 
-    public static int getUserId(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getInt(context.getString(R.string.user_id), -1);
-    }
-
     public static Key getGroupKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodeSymmetricKey(
                 sharedPref.getString(context.getString(R.string.group_key), ""));
     }
 
-    public static Key getPublicKey(Context context) {
+    public static PublicKey getPublicKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePublicKey(
                 sharedPref.getString(context.getString(R.string.public_key), ""));

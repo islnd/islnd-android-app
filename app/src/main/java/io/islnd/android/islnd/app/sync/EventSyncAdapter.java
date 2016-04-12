@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import io.islnd.android.islnd.app.IslndIntent;
+import javax.crypto.SecretKey;
+
+import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
@@ -69,7 +71,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         getIncomingMessages();
         getIncomingEvents();
         
-        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
 
         Log.v(TAG, "completed on perform sync");
     }
@@ -164,7 +166,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             anyNewEventProcessed = false;
             List<EncryptedEvent> encryptedEvents = getEncryptedEvents();
             if (encryptedEvents == null) {
-                mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+                mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
                 Log.d(TAG, "event query returned null!");
                 return;
             }
@@ -227,7 +229,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onSyncCanceled() {
         super.onSyncCanceled();
 
-        mContext.sendBroadcast(new Intent(IslndIntent.EVENT_SYNC_COMPLETE));
+        mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
         Log.d(TAG, "sync cancelled");
     }
 
@@ -236,12 +238,13 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
         PriorityQueue<Event> events = new PriorityQueue<>();
         for (EncryptedEvent encryptedEvent : encryptedEvents) {
             String alias = encryptedEvent.getAlias();
+            Log.v(TAG, "event alias " + alias);
 
             //--TODO need to handle multiple users having same alias
             int userId = DataUtils.getUserIdFromAlias(mContext, alias);
 
             //--TODO keys need to be a keystore or in-memory cache service
-            Key groupKey = DataUtils.getGroupKey(mContext, userId);
+            SecretKey groupKey = DataUtils.getGroupKey(mContext, userId);
             PublicKey publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
                 final Event event = encryptedEvent.decryptAndVerify(groupKey, publicKey);
@@ -249,7 +252,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                     events.add(event);
                 }
             } catch (InvalidSignatureException e) {
-                e.printStackTrace();
+                Log.d(TAG, "could not decrypt and verify event!");
+                Log.d(TAG, e.toString());
             }
         }
         return events;
@@ -260,7 +264,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 IslndContract.AliasEntry.COLUMN_ALIAS
         };
 
-        String[] args = new String[] { Integer.toString(Util.getUserId(mContext)) };
+        String[] args = new String[] { Integer.toString(IslndContract.UserEntry.MY_USER_ID) };
         Cursor cursor = null;
         EventQuery eventQuery;
         try {
@@ -307,8 +311,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             cursor = mContentResolver.query(
                     IslndContract.UserEntry.CONTENT_URI,
                     projection,
-                    IslndContract.UserEntry.COLUMN_DELETED + " = ?",
-                    new String[] {Integer.toString(IslndContract.UserEntry.NOT_DELETED)},
+                    IslndContract.UserEntry.COLUMN_ACTIVE + " = ?",
+                    new String[] {Integer.toString(IslndContract.UserEntry.ACTIVE)},
                     null);
             List<String> mailboxes = new ArrayList<>();
             if (!cursor.moveToFirst()) {

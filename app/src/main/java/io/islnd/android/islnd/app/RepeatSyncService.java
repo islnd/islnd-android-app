@@ -1,48 +1,34 @@
 package io.islnd.android.islnd.app;
 
 import android.app.Service;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.Rest;
-import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
-import io.islnd.android.islnd.messaging.message.Message;
-import io.islnd.android.islnd.messaging.message.MessageProcessor;
-import io.islnd.android.islnd.messaging.server.MessageQuery;
 
-public class FindNewFriendService extends Service {
+public class RepeatSyncService extends Service {
 
-    private static final String TAG = FindNewFriendService.class.getSimpleName();
+    private static final String TAG = RepeatSyncService.class.getSimpleName();
 
     private Context mContext;
-    private ContentResolver mContentResolver;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand");
         mContext = this;
-        mContentResolver = getContentResolver();
 
-        checkMailbox();
+        repeatSync();
 
         return START_NOT_STICKY;
     }
 
-    private void checkMailbox() {
+    private void repeatSync() {
         new AsyncTask<Void, Void, Void>() {
 
             @Override
