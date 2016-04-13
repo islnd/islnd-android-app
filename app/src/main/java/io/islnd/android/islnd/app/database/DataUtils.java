@@ -9,7 +9,8 @@ import android.util.Log;
 
 import java.security.Key;
 import java.security.PublicKey;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.models.CommentKey;
@@ -615,6 +616,31 @@ public class DataUtils {
                 return CryptoUtil.decodePublicKey(cursor.getString(0));
             } else {
                 throw new IllegalArgumentException("database has no entry for inbox: " + inbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static PublicKey getPublicKeyForUserOutbox(Context context, String outbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " = ?",
+                    new String[] {outbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return CryptoUtil.decodePublicKey(cursor.getString(0));
+            } else {
+                throw new IllegalArgumentException("database has no entry for outbox: " + outbox);
             }
         } finally {
             if (cursor != null) {

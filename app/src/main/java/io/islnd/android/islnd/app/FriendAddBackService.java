@@ -51,7 +51,10 @@ public class FriendAddBackService extends IntentService {
                         this,
                         inbox,
                         myIdentity);
-                EncryptedMessage encryptedMessage = new EncryptedMessage(identityMessage, publicKey);
+                EncryptedMessage encryptedMessage = new EncryptedMessage(
+                        identityMessage,
+                        publicKey,
+                        Util.getPrivateKey(this));
                 Rest.postMessage(encryptedMessage, Util.getApiKey(this));
                 Log.v(TAG, "sending identity w alias " + myIdentity.getAlias());
                 break;
@@ -81,7 +84,10 @@ public class FriendAddBackService extends IntentService {
                         this,
                         inbox,
                         profileMessage);
-                EncryptedMessage encryptedMessage = new EncryptedMessage(message, publicKey);
+                EncryptedMessage encryptedMessage = new EncryptedMessage(
+                        message,
+                        publicKey,
+                        Util.getPrivateKey(this));
                 Rest.postMessage(encryptedMessage, Util.getApiKey(this));
 
                 break;

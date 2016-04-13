@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import java.security.Key;
+import java.security.PrivateKey;
 import java.util.List;
 
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -75,7 +76,7 @@ public class EventPublisher {
     public void publish() {
         final List<Event> events = this.eventListBuilder.build();
         ContentValues[] values = new ContentValues[events.size()];
-        Key privateKey = Util.getPrivateKey(mContext);
+        PrivateKey privateKey = Util.getPrivateKey(mContext);
         Key groupKey = Util.getGroupKey(mContext);
         for (int i = 0; i < events.size(); i++) {
             EventProcessor.process(mContext, events.get(i));

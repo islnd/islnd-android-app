@@ -1,16 +1,19 @@
 package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.message.Message;
+import io.islnd.android.islnd.messaging.message.ReceivedMessage;
 
 public class EncryptedMessage extends AsymmetricEncryptedData {
 
     private final String mailbox;
 
-    public EncryptedMessage(Message message, Key publicKey) {
-        super(message, publicKey);
+    public EncryptedMessage(Message message, Key recipientPublicKey, PrivateKey authorPrivateKey) {
+        super(message, recipientPublicKey, authorPrivateKey);
         this.mailbox = message.getMailbox();
     }
 
@@ -24,9 +27,18 @@ public class EncryptedMessage extends AsymmetricEncryptedData {
         return mailbox;
     }
 
-    @Override
-    public Message decrypt(Key privateKey) {
-        byte[] decryptedBytes = ObjectEncrypter.decryptAsymmetric(this.blob, privateKey);
-        return Message.fromProto(decryptedBytes);
+    public ReceivedMessage decryptMessageAndCheckSignature(Key privateKey, PublicKey authorPublicKey) {
+        SignedObject signedObject = SignedObject.fromProto(
+                ObjectEncrypter.decryptAsymmetric(
+                        this.blob,
+                        privateKey));
+
+        if (authorPublicKey == null) {
+            return new ReceivedMessage(Message.fromProto(signedObject.getObject()));
+        }
+
+        return new ReceivedMessage(
+                Message.fromProto(signedObject.getObject()),
+                CryptoUtil.verifySignedObject(signedObject, authorPublicKey));
     }
 }

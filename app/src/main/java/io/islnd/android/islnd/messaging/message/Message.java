@@ -2,6 +2,7 @@ package io.islnd.android.islnd.messaging.message;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
@@ -51,7 +52,8 @@ public class Message implements Comparable<Message>, ProtoSerializable {
                 .toByteArray();
     }
 
-    public static Message fromProto(byte[] bytes) {
+    public static Message fromProto(String encodedObject) {
+        byte[] bytes = new Decoder().decode(encodedObject);
         IslandProto.Message message = null;
         try {
             message = IslandProto.Message.parseFrom(bytes);

@@ -7,9 +7,11 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.security.Key;
+import java.security.PrivateKey;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
+import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 
@@ -43,7 +45,7 @@ public class MessagePublisher {
         Message deleteMeMessage = MessageBuilder.buildDeleteMeMessage(
                 context,
                 friendToRemoveMailbox);
-        return new EncryptedMessage(deleteMeMessage, friendToRemovePublicKey);
+        return new EncryptedMessage(deleteMeMessage, friendToRemovePublicKey, Util.getPrivateKey(context));
     }
 
     private static void createMessagesForRemainingFriends(Context context, int userId, String newAlias) {
@@ -60,6 +62,8 @@ public class MessagePublisher {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX
         };
+
+        PrivateKey myPrivateKey = Util.getPrivateKey(context);
 
         Cursor cursor = null;
         try {
@@ -86,7 +90,8 @@ public class MessagePublisher {
                                     cursor.getString(1),
                                     newAlias
                             ),
-                            CryptoUtil.decodePublicKey(cursor.getString(0))
+                            CryptoUtil.decodePublicKey(cursor.getString(0)),
+                            myPrivateKey
                     );
                     values[index].put(
                             IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX,
