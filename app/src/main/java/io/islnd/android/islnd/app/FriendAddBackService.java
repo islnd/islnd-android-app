@@ -60,8 +60,8 @@ public class FriendAddBackService extends IntentService {
                 Profile profile = DataUtils.getProfile(this, IslndContract.UserEntry.MY_USER_ID);
                 ProfileResource profileResource = new ProfileResource(
                         profile.getAboutMe(),
-                        ImageUtil.getByteArrayFromUri(this, profile.getProfileImageUri()),
-                        ImageUtil.getByteArrayFromUri(this, profile.getHeaderImageUri()));
+                        ImageUtil.getScaledImageByteArrayFromUri(this, profile.getProfileImageUri()),
+                        ImageUtil.getScaledImageByteArrayFromUri(this, profile.getHeaderImageUri()));
                 String profileResourceKey = CryptoUtil.createAlias();
                 EncryptedResource encryptedResource = new EncryptedResource(
                         profileResource,

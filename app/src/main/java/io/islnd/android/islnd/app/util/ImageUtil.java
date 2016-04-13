@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.graphics.BitmapCompat;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -30,7 +31,9 @@ public class ImageUtil {
 
     private static final String SLASH = "/";
 
-    private static final int COMPRESSION = 65;
+    private static final int COMPRESSION = 85;
+
+    private static final int SCALED_PIXEL_LIMIT = 1000;
 
     public static void saveBitmapToInternalStorage(Context context, Bitmap bitmap, String filePath) {
         File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
@@ -66,36 +69,6 @@ public class ImageUtil {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static Bitmap getBitmapFromInternalStorage(Context context, String filePath) {
-        File directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE);
-        File bitmapPath = new File(directory, filePath);
-        Bitmap bitmap = null;
-
-        try {
-            bitmap = BitmapFactory.decodeStream(new FileInputStream(bitmapPath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bitmap;
-    }
-
-    public static Uri saveBitmapToInternalFromUri(Context context, Uri uri) {
-        Bitmap bitmap = null;
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.v(TAG, "Failed to get bitmap from uri.");
-        }
-
-        Uri newUri = null;
-        if (bitmap != null) {
-            newUri = saveBitmapToInternalStorage(context, bitmap);
-        }
-        return newUri;
     }
 
     public static Bitmap getBitmapFromUri(Context context, Uri uri) {
@@ -179,15 +152,35 @@ public class ImageUtil {
         return Uri.fromFile(image);
     }
 
-    public static byte[] getByteArrayFromUri(Context context, Uri uri) {
-        Bitmap bitmap = getBitmapFromUri(context, uri);
-        return getByteArrayFromBitmap(bitmap);
+    public static byte[] getScaledImageByteArrayFromUri(Context context, Uri uri) {
+        Bitmap sampledBitmap = scaleBitmapDown(
+                getBitmapFromUri(context, uri),
+                SCALED_PIXEL_LIMIT);
+
+        byte[] bytes = getByteArrayFromBitmap(sampledBitmap);
+        Log.d(TAG, "scaled and compressed byte array size: " + bytes.length);
+        return bytes;
     }
 
     public static byte[] getByteArrayFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION, stream);
         return stream.toByteArray();
+    }
+
+    private static Bitmap scaleBitmapDown(Bitmap bitmap, int maxImagePixelDimen) {
+        float ratio = Math.min(
+                (float) maxImagePixelDimen / bitmap.getWidth(),
+                (float) maxImagePixelDimen / bitmap.getHeight());
+
+        if (ratio >= 1) {
+            return bitmap;
+        }
+
+        int width = Math.round(ratio * bitmap.getWidth());
+        int height = Math.round(ratio * bitmap.getHeight());
+
+        return Bitmap.createScaledBitmap(bitmap, width, height, true);
     }
 
     public static Bitmap getBitmapFromByteArray(byte[] image) {
