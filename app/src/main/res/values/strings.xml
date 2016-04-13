@@ -109,6 +109,8 @@
     <string name="message_id">message_id</string>
     <string name="notification_big_content_title">new islnd notifications</string>
     <string name="notification_big_content_title_single">1 new islnd notification</string>
+    <string name="notification_badge">notification_badge</string>
+    <string name="notification_badge_99_plus">99+</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>
