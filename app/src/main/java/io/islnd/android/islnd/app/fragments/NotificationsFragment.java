@@ -48,7 +48,7 @@ public class NotificationsFragment extends Fragment {
         mAdapter = new NotificationAdapter(mContext, null);
         final NotificationLoader notificationLoader = new NotificationLoader(
                 mContext,
-                IslndContract.NotificationEntry.CONTENT_URI,
+                IslndContract.NotificationWithUserDataEntry.CONTENT_URI,
                 mAdapter);
         getLoaderManager().initLoader(
                 LoaderId.NOTIFICATION_LOADER_ID,
