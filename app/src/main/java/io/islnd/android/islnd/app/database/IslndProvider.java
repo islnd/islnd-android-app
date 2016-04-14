@@ -35,6 +35,7 @@ public class IslndProvider extends ContentProvider {
     static final int RECEIVED_MESSAGE = 1000;
     static final int OUTGOING_MESSAGE = 1100;
     static final int NOTIFICATION = 1200;
+    static final int NOTIFICATION_WITH_USER_DATA = 1201;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -116,12 +117,12 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
-    private static final SQLiteQueryBuilder sNotificationQueryBuilder;
+    private static final SQLiteQueryBuilder sNotificationWithUserDataQueryBuilder;
 
     static {
-        sNotificationQueryBuilder = new SQLiteQueryBuilder();
+        sNotificationWithUserDataQueryBuilder = new SQLiteQueryBuilder();
 
-        sNotificationQueryBuilder.setTables(
+        sNotificationWithUserDataQueryBuilder.setTables(
                 IslndContract.NotificationEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
@@ -327,6 +328,8 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
 
+        matcher.addURI(authority, IslndContract.PATH_NOTIFICATION_WITH_USER_DATA, NOTIFICATION_WITH_USER_DATA);
+
         return matcher;
     }
 
@@ -480,7 +483,18 @@ public class IslndProvider extends ContentProvider {
                 break;
             }
             case NOTIFICATION: {
-                retCursor = sNotificationQueryBuilder.query(
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.NotificationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case NOTIFICATION_WITH_USER_DATA: {
+                retCursor = sNotificationWithUserDataQueryBuilder.query(
                         mOpenHelper.getReadableDatabase(),
                         projection,
                         selection,
@@ -540,6 +554,8 @@ public class IslndProvider extends ContentProvider {
                 return IslndContract.ReceivedEventEntry.CONTENT_ITEM_TYPE;
             case NOTIFICATION:
                 return IslndContract.NotificationEntry.CONTENT_ITEM_TYPE;
+            case NOTIFICATION_WITH_USER_DATA:
+                return IslndContract.NotificationWithUserDataEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -683,6 +699,7 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.NotificationEntry.TABLE_NAME,
                         null,
                         values);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationWithUserDataEntry.CONTENT_URI, null);
                 if ( _id > 0 )
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
                 else
@@ -925,7 +942,7 @@ public class IslndProvider extends ContentProvider {
                 updateProfileWithUserId(uri, values);
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
-                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationWithUserDataEntry.CONTENT_URI, null);
                 break;
             }
             case USER: {
@@ -963,7 +980,7 @@ public class IslndProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(IslndContract.PostEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.CommentEntry.CONTENT_URI, null);
                 getContext().getContentResolver().notifyChange(IslndContract.ProfileEntry.CONTENT_URI, null);
-                getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationWithUserDataEntry.CONTENT_URI, null);
                 break;
             }
             case ALIAS_WITH_USER_ID: {
@@ -987,6 +1004,7 @@ public class IslndProvider extends ContentProvider {
                 );
                 Log.v(TAG, "update notification updated " + rowsUpdated);
                 getContext().getContentResolver().notifyChange(IslndContract.NotificationEntry.CONTENT_URI, null);
+                getContext().getContentResolver().notifyChange(IslndContract.NotificationWithUserDataEntry.CONTENT_URI, null);
                 break;
             }
             default: {
