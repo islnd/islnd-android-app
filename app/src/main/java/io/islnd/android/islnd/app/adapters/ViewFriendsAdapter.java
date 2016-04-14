@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import io.islnd.android.islnd.app.Dialogs;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
-import io.islnd.android.islnd.app.activities.ViewPublicKeyActivity;
+import io.islnd.android.islnd.app.activities.ViewIdentityActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.User;
 import io.islnd.android.islnd.app.util.ImageUtil;
@@ -61,12 +61,12 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
         holder.overflow.setOnClickListener((View v) ->
         {
             final int REMOVE_FRIEND = 0;
-            final int DISPLAY_PUBLIC_KEY = 1;
+            final int VIEW_IDENTITY = 1;
 
             PopupMenu popup = new PopupMenu(mContext, holder.overflow);
 
             popup.getMenu().add(0, REMOVE_FRIEND, 0, mContext.getString(R.string.remove_friend));
-            popup.getMenu().add(0, DISPLAY_PUBLIC_KEY, 1, mContext.getString(R.string.display_public_key));
+            popup.getMenu().add(0, VIEW_IDENTITY, 1, mContext.getString(R.string.view_identity));
 
             popup.setOnMenuItemClickListener((MenuItem item) ->
             {
@@ -74,9 +74,9 @@ public class ViewFriendsAdapter extends CursorRecyclerViewAdapter<FriendGlanceVi
                     case REMOVE_FRIEND:
                         Dialogs.removeFriendDialog(mContext, user.getUserId(), user.getDisplayName());
                         break;
-                    case DISPLAY_PUBLIC_KEY:
-                        Intent viewPublicKeyIntent = new Intent(mContext, ViewPublicKeyActivity.class);
-                        viewPublicKeyIntent.putExtra(ViewPublicKeyActivity.USER_ID_EXTRA, user.getUserId());
+                    case VIEW_IDENTITY:
+                        Intent viewPublicKeyIntent = new Intent(mContext, ViewIdentityActivity.class);
+                        viewPublicKeyIntent.putExtra(ViewIdentityActivity.USER_ID_EXTRA, user.getUserId());
                         mContext.startActivity(viewPublicKeyIntent);
                         break;
                 }

@@ -176,11 +176,6 @@ public class NavBaseActivity extends AppCompatActivity
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case R.id.nav_view_public_key:
-                Intent viewPublicKeyIntent = new Intent(this, ViewPublicKeyActivity.class);
-                viewPublicKeyIntent.putExtra(ViewPublicKeyActivity.USER_ID_EXTRA, IslndContract.UserEntry.MY_USER_ID);
-                startActivity(viewPublicKeyIntent);
-                break;
         }
 
         if (isFragment) {

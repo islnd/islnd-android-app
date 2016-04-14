@@ -14,7 +14,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.LoaderId;
 
-public class ViewPublicKeyActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ViewIdentityActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String USER_ID_EXTRA = "USER_ID";
 
@@ -25,7 +25,7 @@ public class ViewPublicKeyActivity extends AppCompatActivity implements LoaderMa
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_view_public_key);
+        setContentView(R.layout.activity_view_identity);
         Intent intent = getIntent();
         mUserId = intent.getIntExtra(USER_ID_EXTRA, -1);
 
