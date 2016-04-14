@@ -10,4 +10,19 @@ public class UtilTests extends AndroidTestCase {
         assertEquals("a2:3b", Util.formatWithColons("a23b"));
         assertEquals("1:a2:3b", Util.formatWithColons("1a23b"));
     }
+
+    public void testPartition() throws Exception {
+        assertEquals("a", Util.partition("abcd", 4)[0]);
+        assertEquals("b", Util.partition("abcd", 4)[1]);
+        assertEquals("c", Util.partition("abcd", 4)[2]);
+        assertEquals("d", Util.partition("abcd", 4)[3]);
+
+        final String longString = "everydayeverynight";
+        assertEquals(
+                longString,
+                Util.partition(longString, 4)[0]
+                        + Util.partition(longString, 4)[1]
+                        + Util.partition(longString, 4)[2]
+                        + Util.partition(longString, 4)[3]);
+    }
 }
