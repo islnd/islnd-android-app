@@ -15,6 +15,7 @@ import android.widget.TextView;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.LoaderId;
+import io.islnd.android.islnd.app.util.Util;
 
 public class ViewIdentityActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -73,7 +74,13 @@ public class ViewIdentityActivity extends AppCompatActivity
             return;
         }
 
-        mPublicKeyTextView.setText(data.getString(1));
+        String[] partitions = Util.partition(data.getString(1), 4);
+        String identity = Util.formatWithColons(partitions[0]) + "\n"
+                + Util.formatWithColons(partitions[1]) + "\n"
+                + Util.formatWithColons(partitions[2]) + "\n"
+                + Util.formatWithColons(partitions[3]);
+
+        mPublicKeyTextView.setText(identity);
     }
 
     @Override
