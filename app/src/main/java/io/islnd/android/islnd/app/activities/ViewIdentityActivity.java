@@ -8,13 +8,16 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.LoaderId;
 
-public class ViewIdentityActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ViewIdentityActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String USER_ID_EXTRA = "USER_ID";
 
@@ -24,14 +27,27 @@ public class ViewIdentityActivity extends AppCompatActivity implements LoaderMan
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_view_identity);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent intent = getIntent();
         mUserId = intent.getIntExtra(USER_ID_EXTRA, -1);
 
         mPublicKeyTextView = (TextView) findViewById(R.id.public_key_digest);
 
         getSupportLoaderManager().initLoader(LoaderId.VIEW_PUBLIC_KEY_ACTIVITY_LOADER_ID, new Bundle(), this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
