@@ -15,26 +15,26 @@ public class IslndProviderTests extends AndroidTestCase {
         DatabaseTestHelpers.clearTables(mContext);
     }
 
-    public void testFirstUserHasExpectedId() {
+    public void testFirstUserHasExpectedId() throws Exception {
         long userId = DatabaseTestHelpers.insertFakeUser(mContext);
         assertEquals(userId, IslndContract.UserEntry.MY_USER_ID);
     }
 
-    public void testPostReturnsCorrectType() {
+    public void testPostReturnsCorrectType() throws Exception {
         String type = mContext.getContentResolver()
                 .getType(IslndContract.PostEntry.CONTENT_URI);
 
         assertEquals(IslndContract.PostEntry.CONTENT_TYPE, type);
     }
 
-    public void testUserReturnsCorrectType() {
+    public void testUserReturnsCorrectType() throws Exception {
         String type = mContext.getContentResolver()
                 .getType(IslndContract.UserEntry.CONTENT_URI);
 
         assertEquals(IslndContract.UserEntry.CONTENT_TYPE, type);
     }
 
-    public void testUserUniqueConstraint() {
+    public void testUserUniqueConstraint() throws Exception {
         final String key = "key";
         ContentValues originalValues = new ContentValues();
         final String originalInbox = "inbox1";
@@ -78,7 +78,7 @@ public class IslndProviderTests extends AndroidTestCase {
         assertEquals("inbox should not have changed!", originalInbox, cursor.getString(0));
     }
 
-    public void testDisplayNameMustBeForExistingUser() {
+    public void testDisplayNameMustBeForExistingUser() throws Exception {
         ContentValues values = new ContentValues();
         final int userId = 55;
         values.put(IslndContract.DisplayNameEntry.COLUMN_USER_ID, userId);
@@ -109,7 +109,7 @@ public class IslndProviderTests extends AndroidTestCase {
         assertEquals(0, cursor.getCount());
     }
 
-    public void testDisplayNameIsUpdatedOnMatchingInsert() {
+    public void testDisplayNameIsUpdatedOnMatchingInsert() throws Exception {
         long userId = DatabaseTestHelpers.insertFakeUser(mContext);
 
         String oldDisplayName = "old";

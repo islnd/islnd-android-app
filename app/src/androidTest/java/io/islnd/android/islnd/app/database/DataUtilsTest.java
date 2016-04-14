@@ -17,7 +17,7 @@ public class DataUtilsTest extends AndroidTestCase {
         DatabaseTestHelpers.clearTables(mContext);
     }
 
-    public void testUserIsUpdatedCorrectly() {
+    public void testUserIsUpdatedCorrectly() throws Exception {
         //--Arrange
         PublicKey publicKey = CryptoUtil.getKeyPair().getPublic();
         long userId = DatabaseTestHelpers.insertFakeUser(mContext, publicKey);

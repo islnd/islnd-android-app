@@ -7,6 +7,7 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -15,6 +16,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
@@ -213,10 +215,22 @@ public class CryptoUtil {
         return false;
     }
 
-    public static String getDigest(PublicKey publicKey) {
-        keyDigest.reset();
-        keyDigest.update(publicKey.getEncoded());
-        return encoder.encodeToString(keyDigest.digest());
+    public static String getDigest(Key key) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_GENERATOR_ALGO);
+            RSAPublicKeySpec keySpec = keyFactory.getKeySpec(key, RSAPublicKeySpec.class);
+
+            keyDigest.reset();
+            keyDigest.update(keySpec.getPublicExponent().toByteArray());
+            keyDigest.update(keySpec.getModulus().toByteArray());
+            return Hex.bytesToHex(keyDigest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+
+        throw new IllegalArgumentException();
     }
 }
 
