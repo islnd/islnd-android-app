@@ -269,8 +269,6 @@ public class IslndContract {
     }
 
     public static final class NotificationWithUserDataEntry implements BaseColumns {
-        private static final String TAG = NotificationEntry.class.getSimpleName();
-
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_NOTIFICATION_WITH_USER_DATA).build();
 
@@ -278,8 +276,6 @@ public class IslndContract {
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATION_WITH_USER_DATA;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATION_WITH_USER_DATA;
-
-        public static final String TABLE_NAME = "notification";
     }
 
     public static final class ReceivedEventEntry implements BaseColumns {

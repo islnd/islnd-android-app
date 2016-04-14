@@ -35,7 +35,7 @@ public class IslndProvider extends ContentProvider {
     static final int RECEIVED_MESSAGE = 1000;
     static final int OUTGOING_MESSAGE = 1100;
     static final int NOTIFICATION = 1200;
-    static final int NOTIFICATION_WITH_USER_DATA = 1201;
+    static final int NOTIFICATION_WITH_USER_DATA = 1300;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -699,11 +699,14 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.NotificationEntry.TABLE_NAME,
                         null,
                         values);
-                getContext().getContentResolver().notifyChange(IslndContract.NotificationWithUserDataEntry.CONTENT_URI, null);
-                if ( _id > 0 )
+                if ( _id > 0 ) {
+                    getContext().getContentResolver().notifyChange(
+                            IslndContract.NotificationWithUserDataEntry.CONTENT_URI,
+                            null);
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
-                else
+                } else {
                     return null;
+                }
 
                 break;
             }
