@@ -36,10 +36,12 @@ public class IslndProviderTests extends AndroidTestCase {
 
     public void testUserUniqueConstraint() throws Exception {
         final String key = "key";
+        final String digest = "digest";
         ContentValues originalValues = new ContentValues();
         final String originalInbox = "inbox1";
         originalValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, originalInbox);
         originalValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, key);
+        originalValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, digest);
         mContext.getContentResolver().insert(IslndContract.UserEntry.CONTENT_URI, originalValues);
 
         String[] projection = new String[] {IslndContract.UserEntry.COLUMN_MESSAGE_INBOX};
@@ -59,6 +61,7 @@ public class IslndProviderTests extends AndroidTestCase {
         final String newInbox = "inbox2";
         newValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, newInbox);
         newValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, key);
+        newValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, digest);
 
         try {
             mContext.getContentResolver().insert(IslndContract.UserEntry.CONTENT_URI, newValues);
