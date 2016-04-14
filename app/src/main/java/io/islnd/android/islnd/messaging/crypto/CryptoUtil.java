@@ -159,6 +159,10 @@ public class CryptoUtil {
     }
 
     public static byte[] decryptSymmetric(byte[] cipherText, SecretKey key) {
+        if (cipherText.length < IV_SIZE) {
+            return null;
+        }
+
         byte[] IV = Arrays.copyOfRange(cipherText, 0, IV_SIZE);
         byte[] encryptedBytes = Arrays.copyOfRange(cipherText, IV_SIZE, cipherText.length);
 

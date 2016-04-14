@@ -1,5 +1,7 @@
 package io.islnd.android.islnd.messaging.crypto;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -27,7 +29,7 @@ public class EncryptedMessage extends AsymmetricEncryptedData {
         return mailbox;
     }
 
-    public ReceivedMessage decryptMessageAndCheckSignature(Key privateKey, PublicKey authorPublicKey) {
+    public ReceivedMessage decryptMessageAndCheckSignature(Key privateKey, PublicKey authorPublicKey) throws InvalidProtocolBufferException {
         SignedObject signedObject = SignedObject.fromProto(
                 ObjectEncrypter.decryptAsymmetric(
                         this.blob,

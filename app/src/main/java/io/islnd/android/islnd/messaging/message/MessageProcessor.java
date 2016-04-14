@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.List;
@@ -20,6 +22,7 @@ import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.InvalidBlobException;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.ProfileResource;
 import io.islnd.android.islnd.messaging.Rest;
@@ -90,7 +93,7 @@ public class MessageProcessor {
             SecretKey groupKey = DataUtils.getGroupKey(context, userId);
             PublicKey publicKey = DataUtils.getPublicKey(context, userId);
             try {
-                ProfileResource profileResource = (ProfileResource) encryptedResources.get(0).decryptAndVerify(
+                ProfileResource profileResource = encryptedResources.get(0).decryptAndVerify(
                         groupKey,
                         publicKey
                 );
@@ -98,7 +101,14 @@ public class MessageProcessor {
                 saveProfile(context, message, profileResource);
                 updateMailbox(context);
             } catch (InvalidSignatureException e) {
-                e.printStackTrace();
+                Log.w(TAG, e.toString() + "could not decrypt and verify event!");
+                Log.w(TAG, e.toString());
+            } catch (InvalidBlobException e) {
+                Log.w(TAG, "blob was invalid!");
+                Log.w(TAG, e.toString());
+            } catch (InvalidProtocolBufferException e) {
+                Log.w(TAG, "protocol buffer was invalid!");
+                Log.w(TAG, e.toString());
             }
         }
     }
