@@ -100,7 +100,7 @@ public class EventListBuilder {
         this.eventList.add(new ChangeProfilePictureEvent(
                         getCurrentAlias(),
                         getNewEventId(),
-                        ImageUtil.getByteArrayFromUri(mContext, profileImageUri)));
+                        ImageUtil.getScaledImageByteArrayFromUri(mContext, profileImageUri)));
         return this;
     }
 
@@ -108,7 +108,7 @@ public class EventListBuilder {
         this.eventList.add(new ChangeHeaderPictureEvent(
                         getCurrentAlias(),
                         getNewEventId(),
-                        ImageUtil.getByteArrayFromUri(mContext, headerImageUri)));
+                        ImageUtil.getScaledImageByteArrayFromUri(mContext, headerImageUri)));
         return this;
     }
 
