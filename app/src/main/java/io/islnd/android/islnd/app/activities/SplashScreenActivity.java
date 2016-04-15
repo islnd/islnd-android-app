@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import io.islnd.android.islnd.app.BootReceiver;
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SyncAlarm;
@@ -42,8 +43,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         Util.applyAppTheme(this);
 
         Util.setUsesApiKey(mContext, true);
-
-        SyncAlarm.setAlarm(mContext, 1000 * 10); // one minute
 
         // Visual pause...
         Handler handler = new Handler();

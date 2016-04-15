@@ -114,6 +114,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             mProgressDialog.dismiss();
             Util.setHasCreatedAccount(mContext, true);
+            Util.enableIncrementalSyncs(mContext);
             finish();
             startActivity(new Intent(mContext, NavBaseActivity.class));
         }

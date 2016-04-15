@@ -3,9 +3,11 @@ package io.islnd.android.islnd.app;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +17,9 @@ import io.islnd.android.islnd.app.util.Util;
 public class SyncAlarm extends BroadcastReceiver {
 
     private static final String TAG = SyncAlarm.class.getSimpleName();
+
+    //public static final int SYNC_INTERVAL_MILLISECONDS = 1800000; // 30 minutes
+    public static final int SYNC_INTERVAL_MILLISECONDS = 10000; // 30 minutes
 
     private StopSystemNotificationsReceiver mNotificationsReceiver;
 
@@ -50,11 +55,29 @@ public class SyncAlarm extends BroadcastReceiver {
                 pendingIntent);
     }
 
-    private static void cancelAlarm(Context context) {
+    public static void cancelAlarm(Context context) {
         Log.v(TAG, "cancel sync alarm");
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(context, SyncAlarm.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         alarmManager.cancel(pendingIntent);
+    }
+
+    public static void enableReceiver(Context context) {
+        ComponentName receiver = new ComponentName(context, SyncAlarm.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    public static void disableReceiver(Context context) {
+        ComponentName receiver = new ComponentName(context, SyncAlarm.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
     }
 }

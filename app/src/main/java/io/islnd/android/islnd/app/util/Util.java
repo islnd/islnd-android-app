@@ -26,7 +26,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import io.islnd.android.islnd.app.BootReceiver;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.SyncAlarm;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.models.Comment;
 import io.islnd.android.islnd.app.models.CommentViewModel;
@@ -280,5 +282,17 @@ public class Util {
         return new Account(
                 context.getString(R.string.sync_account),
                 context.getString(R.string.sync_account_type));
+    }
+
+    public static void enableIncrementalSyncs(Context context) {
+        BootReceiver.enableReceiver(context);
+        SyncAlarm.enableReceiver(context);
+        SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_MILLISECONDS);
+    }
+
+    public static void disableIncrementalSyncs(Context context) {
+        BootReceiver.disableReceiver(context);
+        SyncAlarm.disableReceiver(context);
+        SyncAlarm.cancelAlarm(context);
     }
 }
