@@ -20,6 +20,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + IslndContract.UserEntry.TABLE_NAME + " (" +
                 IslndContract.UserEntry._ID + " INTEGER PRIMARY KEY, " +
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " TEXT NOT NULL, " +
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX + " TEXT NOT NULL, " +
                 IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " TEXT NULL, " +
                 IslndContract.UserEntry.COLUMN_ACTIVE + " INTEGER DEFAULT " + Integer.toString(IslndContract.UserEntry.ACTIVE) + " , " +

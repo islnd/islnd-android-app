@@ -9,8 +9,7 @@ import android.util.Log;
 
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.models.CommentKey;
@@ -46,6 +45,10 @@ public class DataUtils {
         ContentValues userValues = new ContentValues();
         final String encodedPublicKey = CryptoUtil.encodeKey(publicKey);
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, encodedPublicKey);
+        final String publicKeyDigest = CryptoUtil.getDigest(publicKey);
+        Log.v(TAG, "public key digest " + publicKeyDigest);
+        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST,
+                publicKeyDigest);
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, messageInbox);
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, messageOutbox);
 
@@ -308,13 +311,18 @@ public class DataUtils {
 
     public static void deleteAll(Context context) {
         final ContentResolver contentResolver = context.getContentResolver();
-        contentResolver.delete(IslndContract.UserEntry.CONTENT_URI, null, null);
-        contentResolver.delete(IslndContract.ProfileEntry.CONTENT_URI, null, null);
-        contentResolver.delete(IslndContract.PostEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.CommentEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.PostEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.ProfileEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.ReceivedEventEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.ReceivedMessageEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.NotificationEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.OutgoingEventEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.OutgoingMessageEntry.CONTENT_URI, null, null);
+
+        contentResolver.delete(IslndContract.UserEntry.CONTENT_URI, null, null);
     }
 
     public static void insertProfile(Context context, Profile profile, long userId) {

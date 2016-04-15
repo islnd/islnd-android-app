@@ -4,7 +4,6 @@ import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.message.ReceivedMessage;
 

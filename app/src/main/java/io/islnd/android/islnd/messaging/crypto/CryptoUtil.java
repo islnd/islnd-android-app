@@ -6,8 +6,9 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
@@ -15,6 +16,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
@@ -44,6 +46,7 @@ public class CryptoUtil {
     public static final int ASYMMETRIC_BLOCK_SIZE = 60;
 
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+    private static final String KEY_DIGEST_ALGORITHM = "SHA-1";
 
     // encryption instances
     private static KeyGenerator keyGenerator;
@@ -53,8 +56,10 @@ public class CryptoUtil {
     private static Cipher asymmetricCipherWithOAEP;
     private static SecureRandom secureRandom;
     private static Signature cryptoSignature;
+    private static MessageDigest keyDigest;
     private static Encoder encoder = new Encoder();
     private static Decoder decoder = new Decoder();
+
 
     static {
         try {
@@ -70,6 +75,8 @@ public class CryptoUtil {
             asymmetricCipherWithOAEP = Cipher.getInstance(ASYMMETRIC_ALGO_WITH_OAEP);
 
             cryptoSignature = Signature.getInstance(SIGNATURE_ALGORITHM);
+
+            keyDigest = MessageDigest.getInstance(KEY_DIGEST_ALGORITHM);
 
             secureRandom = new SecureRandom();
         } catch (GeneralSecurityException e) {
@@ -206,6 +213,24 @@ public class CryptoUtil {
         }
 
         return false;
+    }
+
+    public static String getDigest(Key key) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_GENERATOR_ALGO);
+            RSAPublicKeySpec keySpec = keyFactory.getKeySpec(key, RSAPublicKeySpec.class);
+
+            keyDigest.reset();
+            keyDigest.update(keySpec.getPublicExponent().toByteArray());
+            keyDigest.update(keySpec.getModulus().toByteArray());
+            return Hex.bytesToHex(keyDigest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+
+        throw new IllegalArgumentException();
     }
 }
 
