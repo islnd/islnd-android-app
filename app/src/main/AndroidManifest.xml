@@ -89,6 +89,9 @@
         <receiver
             android:name=".NotificationCancelListener"
             android:enabled="true"/>
+        <receiver
+            android:name=".SyncAlarm"
+            android:enabled="true"/>
 
         <provider
             android:name=".database.IslndProvider"
