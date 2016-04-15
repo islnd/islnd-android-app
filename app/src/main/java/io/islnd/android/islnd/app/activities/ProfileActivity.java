@@ -35,7 +35,7 @@ import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProfileActivity extends IslndActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
 

@@ -11,7 +11,7 @@ import android.widget.EditText;
 import io.islnd.android.islnd.app.EventPublisher;
 import io.islnd.android.islnd.app.R;
 
-public class NewPostActivity extends AppCompatActivity
+public class NewPostActivity extends IslndActivity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)

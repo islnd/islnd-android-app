@@ -14,7 +14,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 
-public class SplashScreenActivity extends AppCompatActivity {
+public class SplashScreenActivity extends IslndActivity {
 
     private static final String TAG = SplashScreenActivity.class.getSimpleName();
 

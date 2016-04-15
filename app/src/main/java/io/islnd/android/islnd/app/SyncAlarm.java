@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -49,7 +50,7 @@ public class SyncAlarm extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         alarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                0,
+                SystemClock.elapsedRealtime() + intervalInMillis,
                 intervalInMillis,
                 pendingIntent);
     }

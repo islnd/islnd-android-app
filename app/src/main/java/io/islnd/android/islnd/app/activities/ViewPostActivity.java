@@ -40,7 +40,7 @@ import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ViewPostActivity extends AppCompatActivity
+public class ViewPostActivity extends IslndActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ViewPostActivity.class.getSimpleName();
