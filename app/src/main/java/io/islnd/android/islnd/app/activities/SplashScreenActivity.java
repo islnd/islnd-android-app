@@ -43,8 +43,6 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         Util.setUsesApiKey(mContext, true);
 
-        NotificationHelper.initialize(mContext);
-
         SyncAlarm.setAlarm(mContext, 1000 * 10); // one minute
 
         // Visual pause...

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,9 +16,21 @@ public class SyncAlarm extends BroadcastReceiver {
 
     private static final String TAG = SyncAlarm.class.getSimpleName();
 
+    private StopSystemNotificationsReceiver mNotificationsReceiver;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "onReceive");
+
+        if (mNotificationsReceiver == null) {
+            mNotificationsReceiver = new StopSystemNotificationsReceiver();
+        }
+
+        IntentFilter intentFilter = new IntentFilter(IslndAction.EVENT_SYNC_COMPLETE);
+        context.getApplicationContext().registerReceiver(mNotificationsReceiver, intentFilter);
+
+        NotificationHelper.startListening(context);
+
         context.getContentResolver().requestSync(
                 Util.getSyncAccount(context),
                 IslndContract.CONTENT_AUTHORITY,
