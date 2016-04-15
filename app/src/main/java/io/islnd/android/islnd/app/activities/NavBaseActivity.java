@@ -403,6 +403,18 @@ public class NavBaseActivity extends AppCompatActivity
         return contactNumber;
     }
 
+    public void notificationBadgeClick() {
+        Log.v(TAG, "notificationBadgeClick");
+
+        NotificationHelper.cancelNotifications(getApplicationContext());
+
+        mFragment = new NotificationsFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, mFragment)
+                .addToBackStack("")
+                .commit();
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = new String[]{

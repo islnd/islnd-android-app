@@ -25,6 +25,7 @@ public class IslndContract {
     public static final String PATH_RECEIVED_MESSAGE = "received_message";
     public static final String PATH_OUTGOING_MESSAGE = "outgoing_message";
     public static final String PATH_NOTIFICATION = "notification";
+    public static final String PATH_NOTIFICATION_WITH_USER_DATA = "notification_with_user_data";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -266,6 +267,16 @@ public class IslndContract {
         public static Uri buildNotificationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+    }
+
+    public static final class NotificationWithUserDataEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_NOTIFICATION_WITH_USER_DATA).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATION_WITH_USER_DATA;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATION_WITH_USER_DATA;
     }
 
     public static final class ReceivedEventEntry implements BaseColumns {
