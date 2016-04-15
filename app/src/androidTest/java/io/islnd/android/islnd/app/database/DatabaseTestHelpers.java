@@ -13,6 +13,7 @@ public class DatabaseTestHelpers {
     public static long insertFakeUser(Context context) {
         ContentValues userValues = new ContentValues();
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, "key");
+        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, "digest");
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, "inbox");
         Uri result = context.getContentResolver().insert(
                 IslndContract.UserEntry.CONTENT_URI,
@@ -25,6 +26,7 @@ public class DatabaseTestHelpers {
     public static long insertFakeUser(Context context, PublicKey publicKey) {
         ContentValues userValues = new ContentValues();
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
+        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, CryptoUtil.getDigest(publicKey));
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, "inbox");
         Uri result = context.getContentResolver().insert(
                 IslndContract.UserEntry.CONTENT_URI,

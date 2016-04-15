@@ -125,6 +125,11 @@ public class ProfileActivity extends IslndActivity implements LoaderManager.Load
                         EDIT_PROFILE_REQUEST
                 );
                 break;
+            case R.id.view_identity:
+                Intent intent = new Intent(this, ViewIdentityActivity.class);
+                intent.putExtra(ViewIdentityActivity.USER_ID_EXTRA, mProfileUserId);
+                startActivity(intent);
+                break;
         }
 
         return super.onOptionsItemSelected(item);

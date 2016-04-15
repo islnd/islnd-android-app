@@ -295,4 +295,48 @@ public class Util {
         SyncAlarm.disableReceiver(context);
         SyncAlarm.cancelAlarm(context);
     }
+
+    public static String[] partition(String s, int partitions) {
+        String[] result = new String[partitions];
+
+        int start = 0;
+        int length = s.length() / partitions;
+        for (int i = 0; i < partitions; i++) {
+            if (i == partitions - 1) {
+                result[i] = s.substring(start);
+            } else {
+                result[i] = s.substring(start, start + length);
+                start += length;
+            }
+        }
+
+        return result;
+    }
+
+    public static String formatWithColons(String s) {
+        if (s.length() < 3) {
+            return s;
+        }
+
+        StringBuilder withColons = new StringBuilder(s.length() * 2);
+        final boolean isEven = s.length() % 2 == 0;
+
+        int startIndex = 0;
+        if (isEven) {
+            withColons.append(s.charAt(0));
+            withColons.append(s.charAt(1));
+            startIndex = 2;
+        } else {
+            withColons.append(s.charAt(0));
+            startIndex = 1;
+        }
+
+        for (int i = startIndex; i < s.length(); i+=2) {
+            withColons.append(":");
+            withColons.append(s.charAt(i));
+            withColons.append(s.charAt(i + 1));
+        }
+
+        return withColons.toString();
+    }
 }
