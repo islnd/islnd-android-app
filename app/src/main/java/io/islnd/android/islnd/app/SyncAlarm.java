@@ -36,6 +36,7 @@ public class SyncAlarm extends BroadcastReceiver {
 
         NotificationHelper.startListening(context);
 
+        Log.d(TAG, "requestSync");
         context.getContentResolver().requestSync(
                 Util.getSyncAccount(context),
                 IslndContract.CONTENT_AUTHORITY,

@@ -34,7 +34,8 @@ public class SplashScreenActivity extends IslndActivity {
                 syncAccount,
                 getString(R.string.content_authority),
                 true);
-        Log.v(TAG, "requesting sync...");
+
+        Log.d(TAG, "requestSync");
         resolver.requestSync(syncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
 
         Util.applyAppTheme(this);

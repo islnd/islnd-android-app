@@ -90,6 +90,7 @@ public class FeedFragment extends Fragment implements LoaderManager.LoaderCallba
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(
                 () -> {
+                    Log.d(TAG, "requestSync");
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,

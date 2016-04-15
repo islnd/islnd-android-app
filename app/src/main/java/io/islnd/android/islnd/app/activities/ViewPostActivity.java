@@ -79,6 +79,7 @@ public class ViewPostActivity extends IslndActivity
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(() ->
         {
+            Log.d(TAG, "requestSync");
             getApplicationContext().getContentResolver().requestSync(
                     Util.getSyncAccount(getApplicationContext()),
                     IslndContract.CONTENT_AUTHORITY,
