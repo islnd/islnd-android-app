@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import java.security.Key;
 import java.security.PublicKey;
 import java.util.List;
 

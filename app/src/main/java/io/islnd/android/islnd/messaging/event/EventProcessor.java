@@ -13,7 +13,6 @@ import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.util.ImageUtil;
-import io.islnd.android.islnd.app.util.Util;
 
 public class EventProcessor {
     private static final String TAG = EventProcessor.class.getSimpleName();

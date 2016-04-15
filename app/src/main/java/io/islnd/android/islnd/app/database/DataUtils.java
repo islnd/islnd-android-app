@@ -9,8 +9,7 @@ import android.util.Log;
 
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.models.CommentKey;

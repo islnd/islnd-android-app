@@ -2,7 +2,6 @@ package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.Key;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 

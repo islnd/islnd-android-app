@@ -10,10 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import io.islnd.android.islnd.app.BootReceiver;
-import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.SyncAlarm;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 

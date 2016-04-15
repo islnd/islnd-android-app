@@ -2,7 +2,6 @@ package io.islnd.android.islnd.messaging.crypto;
 
 import android.test.AndroidTestCase;
 
-import java.lang.Exception;
 import java.security.KeyPair;
 
 import io.islnd.android.islnd.messaging.Identity;
