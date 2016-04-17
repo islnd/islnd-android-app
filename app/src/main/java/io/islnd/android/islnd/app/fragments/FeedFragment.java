@@ -23,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import io.islnd.android.islnd.app.IslndAction;
@@ -91,6 +90,7 @@ public class FeedFragment extends Fragment implements LoaderManager.LoaderCallba
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(
                 () -> {
+                    Log.d(TAG, "requestSync");
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,

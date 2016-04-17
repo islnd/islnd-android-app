@@ -27,7 +27,7 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.util.ImageUtil;
 
-public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditProfileActivity extends IslndActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = EditProfileActivity.class.getSimpleName();
 

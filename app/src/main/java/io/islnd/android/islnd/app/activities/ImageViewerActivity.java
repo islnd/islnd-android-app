@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import io.islnd.android.islnd.app.R;
 
-public class ImageViewerActivity extends AppCompatActivity
+public class ImageViewerActivity extends IslndActivity
 {
     public static String IMAGE_VIEW_URI = "IMAGE_VIEW_URI";
 

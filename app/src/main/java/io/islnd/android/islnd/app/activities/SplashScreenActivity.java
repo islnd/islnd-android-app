@@ -10,12 +10,11 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
 
-public class SplashScreenActivity extends AppCompatActivity {
+public class SplashScreenActivity extends IslndActivity {
 
     private static final String TAG = SplashScreenActivity.class.getSimpleName();
 
@@ -35,14 +34,13 @@ public class SplashScreenActivity extends AppCompatActivity {
                 syncAccount,
                 getString(R.string.content_authority),
                 true);
-        Log.v(TAG, "requesting sync...");
+
+        Log.d(TAG, "requestSync");
         resolver.requestSync(syncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
 
         Util.applyAppTheme(this);
 
         Util.setUsesApiKey(mContext, true);
-
-        NotificationHelper.initialize(mContext);
 
         // Visual pause...
         Handler handler = new Handler();

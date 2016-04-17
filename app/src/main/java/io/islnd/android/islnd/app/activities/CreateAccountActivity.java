@@ -19,7 +19,7 @@ import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Rest;
 
-public class CreateAccountActivity extends AppCompatActivity {
+public class CreateAccountActivity extends IslndActivity {
 
     private static final String TAG = CreateAccountActivity.class.getSimpleName();
     private Context mContext;
@@ -114,6 +114,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             mProgressDialog.dismiss();
             Util.setHasCreatedAccount(mContext, true);
+            Util.enableIncrementalSyncs(mContext);
             finish();
             startActivity(new Intent(mContext, NavBaseActivity.class));
         }

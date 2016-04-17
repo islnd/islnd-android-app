@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,7 +36,7 @@ import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProfileActivity extends IslndActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
@@ -178,6 +179,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
 
         mRefreshLayout.setOnRefreshListener(
                 () -> {
+                    Log.d(TAG, "requestSync");
                     getApplicationContext().getContentResolver().requestSync(
                             Util.getSyncAccount(getApplicationContext()),
                             IslndContract.CONTENT_AUTHORITY,

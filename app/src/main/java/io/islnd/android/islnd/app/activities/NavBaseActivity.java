@@ -50,7 +50,7 @@ import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.ServerTime;
 
-public class NavBaseActivity extends AppCompatActivity
+public class NavBaseActivity extends IslndActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
