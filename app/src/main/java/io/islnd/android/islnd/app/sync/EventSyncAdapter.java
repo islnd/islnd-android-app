@@ -273,6 +273,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.w(TAG, e.toString());
             } catch (InvalidProtocolBufferException e) {
                 Log.w(TAG, e.toString());
+            } catch (IllegalArgumentException e) {
+                Log.w(TAG, e.toString());
             }
         }
         return events;

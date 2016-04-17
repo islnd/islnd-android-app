@@ -53,6 +53,8 @@ public class ObjectEncrypter {
                 throw new InvalidBlobException("bad padding");
             } catch (IllegalBlockSizeException e) {
                 throw new InvalidBlobException("illegal block size");
+            } catch (ArrayIndexOutOfBoundsException e) {
+                throw new InvalidBlobException("array index out of bounds");
             }
         }
 
