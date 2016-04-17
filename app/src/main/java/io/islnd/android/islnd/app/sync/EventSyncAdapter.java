@@ -13,6 +13,8 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.InvalidBlobException;
 import io.islnd.android.islnd.messaging.Rest;
 import io.islnd.android.islnd.messaging.crypto.EncryptedEvent;
 import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
@@ -99,9 +102,23 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 //--This may fail if it is a new user
             }
 
-            ReceivedMessage receivedMessage = encryptedMessage.decryptMessageAndCheckSignature(
-                    Util.getPrivateKey(mContext),
-                    authorPublicKey);
+            ReceivedMessage receivedMessage = null;
+            try {
+                receivedMessage = encryptedMessage.decryptMessageAndCheckSignature(
+                        Util.getPrivateKey(mContext),
+                        authorPublicKey);
+            } catch (InvalidProtocolBufferException e) {
+                Log.w(TAG, e.toString());
+            } catch (InvalidBlobException e) {
+                Log.w(TAG, e.toString());
+            } catch (IllegalArgumentException e) {
+                Log.w(TAG, e.toString());
+            }
+
+
+            if (receivedMessage == null) {
+                continue;
+            }
 
             //--All messages must have a valid signature, except identity messages, because
             //  those messages contain the user's public key. Since there is no previous knowledge
@@ -166,7 +183,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             List<EncryptedEvent> encryptedEvents = getEncryptedEvents();
             if (encryptedEvents == null) {
                 mContext.sendBroadcast(new Intent(IslndAction.EVENT_SYNC_COMPLETE));
-                Log.d(TAG, "event query returned null!");
+                Log.w(TAG, "event query returned null!");
                 return;
             }
 
@@ -242,7 +259,6 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             //--TODO need to handle multiple users having same alias
             int userId = DataUtils.getUserIdFromAlias(mContext, alias);
 
-            //--TODO keys need to be a keystore or in-memory cache service
             SecretKey groupKey = DataUtils.getGroupKey(mContext, userId);
             PublicKey publicKey = DataUtils.getPublicKey(mContext, userId);
             try {
@@ -251,8 +267,13 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                     events.add(event);
                 }
             } catch (InvalidSignatureException e) {
-                Log.d(TAG, "could not decrypt and verify event!");
-                Log.d(TAG, e.toString());
+                Log.w(TAG, e.toString());
+            } catch (InvalidBlobException e) {
+                Log.w(TAG, e.toString());
+            } catch (InvalidProtocolBufferException e) {
+                Log.w(TAG, e.toString());
+            } catch (IllegalArgumentException e) {
+                Log.w(TAG, e.toString());
             }
         }
         return events;

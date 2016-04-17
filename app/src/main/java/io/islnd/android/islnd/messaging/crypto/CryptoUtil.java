@@ -1,6 +1,7 @@
 package io.islnd.android.islnd.messaging.crypto;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -20,7 +21,9 @@ import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -136,12 +139,22 @@ public class CryptoUtil {
         return null;
     }
 
-    public static byte[] decryptAsymmetricWithOAEP(byte[] cipherText, Key key) {
+    public static byte[] decryptAsymmetricWithOAEP(byte[] cipherText, Key key) throws BadPaddingException, IllegalBlockSizeException {
         try {
             asymmetricCipherWithOAEP.init(Cipher.DECRYPT_MODE, key,
-                    new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT));
+                    new OAEPParameterSpec(
+                            "SHA-256",
+                            "MGF1",
+                            MGF1ParameterSpec.SHA1,
+                            PSource.PSpecified.DEFAULT));
             return asymmetricCipherWithOAEP.doFinal(cipherText);
-        } catch (GeneralSecurityException e) {
+        } catch (BadPaddingException e) {
+            throw e;
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            throw e;
+        } catch (InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
 
@@ -166,6 +179,10 @@ public class CryptoUtil {
     }
 
     public static byte[] decryptSymmetric(byte[] cipherText, SecretKey key) {
+        if (cipherText.length < IV_SIZE) {
+            return null;
+        }
+
         byte[] IV = Arrays.copyOfRange(cipherText, 0, IV_SIZE);
         byte[] encryptedBytes = Arrays.copyOfRange(cipherText, IV_SIZE, cipherText.length);
 

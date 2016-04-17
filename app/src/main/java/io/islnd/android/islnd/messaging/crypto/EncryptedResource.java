@@ -1,11 +1,14 @@
 package io.islnd.android.islnd.messaging.crypto;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
+import io.islnd.android.islnd.messaging.InvalidBlobException;
 import io.islnd.android.islnd.messaging.ProfileResource;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 
@@ -24,7 +27,7 @@ public class EncryptedResource extends SymmetricEncryptedData {
     }
 
     @Override
-    public ProfileResource decryptAndVerify(SecretKey groupKey, PublicKey authorPublicKey) throws InvalidSignatureException {
+    public ProfileResource decryptAndVerify(SecretKey groupKey, PublicKey authorPublicKey) throws InvalidSignatureException, InvalidBlobException, InvalidProtocolBufferException {
         return ProfileResource.fromProto(verifySignatureAndGetObject(groupKey, authorPublicKey));
     }
 }
