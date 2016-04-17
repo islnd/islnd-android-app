@@ -109,9 +109,13 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                         Util.getPrivateKey(mContext),
                         authorPublicKey);
             } catch (InvalidProtocolBufferException e) {
-                Log.w(TAG, "protocol buffer was invalid!");
+                Log.w(TAG, e.toString());
+            } catch (InvalidBlobException e) {
+                Log.w(TAG, e.toString());
+            } catch (IllegalArgumentException e) {
                 Log.w(TAG, e.toString());
             }
+
 
             if (receivedMessage == null) {
                 continue;

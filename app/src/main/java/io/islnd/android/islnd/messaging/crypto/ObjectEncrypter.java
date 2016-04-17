@@ -4,10 +4,13 @@ package io.islnd.android.islnd.messaging.crypto;
 import java.security.Key;
 import java.util.Arrays;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.messaging.Decoder;
 import io.islnd.android.islnd.messaging.Encoder;
+import io.islnd.android.islnd.messaging.InvalidBlobException;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
 
 public class ObjectEncrypter {
@@ -39,12 +42,18 @@ public class ObjectEncrypter {
         return CryptoUtil.decryptSymmetric(encryptedBytes, key);
     }
 
-    public static byte[] decryptAsymmetric(String string, Key key) {
+    public static byte[] decryptAsymmetric(String string, Key key) throws InvalidBlobException {
         byte[][] encryptedChunks = getChunksFromString(string);
 
         byte[][] chunks = new byte[encryptedChunks.length][];
         for (int i = 0; i < chunks.length; i++) {
-            chunks[i] = CryptoUtil.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
+            try {
+                chunks[i] = CryptoUtil.decryptAsymmetricWithOAEP(encryptedChunks[i], key);
+            } catch (BadPaddingException e) {
+                throw new InvalidBlobException("bad padding");
+            } catch (IllegalBlockSizeException e) {
+                throw new InvalidBlobException("illegal block size");
+            }
         }
 
         return combineChunksIntoObject(chunks);
