@@ -44,7 +44,6 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private Context mContext;
     private ContentResolver mContentResolver;
-    private Object incomingMessages;
 
     public EventSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -107,12 +106,13 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             //  those messages contain the user's public key. Since there is no previous knowledge
             //  of the public key, there is nothing to validate
             if (!receivedMessage.isSignatureValid()
-                    && receivedMessage.getMessage().getType() != MessageType.IDENTITY) {
+                    && receivedMessage.getMessage().getType() != MessageType.PUBLIC_IDENTITY) {
                 Log.d(TAG, String.format("message type %d signature invalid!",
                         receivedMessage.getMessage().getType()));
                 continue;
             }
 
+            Log.v(TAG, "adding message to queue type " + receivedMessage.getMessage().getType());
             messageQueue.add(receivedMessage.getMessage());
         }
 

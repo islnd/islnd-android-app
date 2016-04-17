@@ -16,23 +16,13 @@ import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
-import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.PublicIdentity;
+import io.islnd.android.islnd.messaging.SecretIdentity;
 import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class DataUtils {
     private static final String TAG = DataUtils.class.getSimpleName();
-
-    public static long insertUser(Context context, Identity identity, String messageOutbox) {
-        return insertUser(
-                context,
-                identity.getDisplayName(),
-                identity.getAlias(),
-                identity.getMessageInbox(),
-                messageOutbox,
-                identity.getGroupKey(),
-                identity.getPublicKey());
-    }
 
     public static long insertUser(
             Context context,
@@ -387,14 +377,19 @@ public class DataUtils {
         }
     }
 
-    public static long activateAndUpdateUser(Context context, Identity identity, String messageOutbox) {
+    public static long activateAndUpdateUser(
+            Context context,
+            int userId,
+            SecretIdentity secretIdentity,
+            String messageInbox,
+            String messageOutbox) {
         Cursor cursor = null;
         try {
-            final String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?";
-            final String[] selectionArgs = {CryptoUtil.encodeKey(identity.getPublicKey())};
+            final String selection = IslndContract.UserEntry._ID + " = ?";
+            final String[] selectionArgs = {Integer.toString(userId)};
             ContentValues values = new ContentValues();
             values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, messageOutbox);
-            values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, identity.getMessageInbox());
+            values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, messageInbox);
             values.put(IslndContract.UserEntry.COLUMN_ACTIVE, IslndContract.UserEntry.ACTIVE);
             int rowsUpdated = context.getContentResolver().update(
                     IslndContract.UserEntry.CONTENT_URI,
@@ -408,14 +403,14 @@ public class DataUtils {
             }
         }
 
-        int userId = getUserIdFromPublicKey(context, identity.getPublicKey());
         Log.v(TAG, "updating user id " + userId);
-        Log.v(TAG, "new alias " + identity.getAlias());
-        Log.v(TAG, "new group key " + CryptoUtil.encodeKey(identity.getGroupKey()));
+        Log.v(TAG, "new alias " + secretIdentity.getAlias());
+        Log.v(TAG, "new group key " + CryptoUtil.encodeKey(secretIdentity.getGroupKey()));
         try {
             ContentValues values = new ContentValues();
-            values.put(IslndContract.AliasEntry.COLUMN_ALIAS, identity.getAlias());
-            values.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(identity.getGroupKey()));
+            values.put(IslndContract.AliasEntry.COLUMN_ALIAS, secretIdentity.getAlias());
+            values.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(
+                    secretIdentity.getGroupKey()));
             context.getContentResolver().update(
                     IslndContract.AliasEntry.buildAliasWithUserId(userId),
                     values,
@@ -657,6 +652,34 @@ public class DataUtils {
         }
     }
 
+    public static PublicIdentity getPublicIdentityForUserOutbox(Context context, String outbox) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_MESSAGE_INBOX,
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX + " = ?",
+                    new String[] {outbox},
+                    null);
+            if (cursor.moveToFirst()) {
+                return new PublicIdentity(
+                        cursor.getString(0),
+                        CryptoUtil.decodePublicKey(cursor.getString(1)));
+            } else {
+                throw new IllegalArgumentException("database has no entry for outbox: " + outbox);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
     public static void updateAlias(Context context, int userId, String newAlias) {
         ContentValues values = new ContentValues();
         values.put(IslndContract.AliasEntry.COLUMN_ALIAS, newAlias);
@@ -684,5 +707,112 @@ public class DataUtils {
                 null,
                 null
         );
+    }
+
+    public static boolean isUserActive(Context mContext, long userId) {
+        String[] projection = {
+                IslndContract.UserEntry.COLUMN_ACTIVE,
+        };
+
+        Cursor cursor = mContext.getContentResolver().query(
+                IslndContract.UserEntry.CONTENT_URI,
+                projection,
+                IslndContract.UserEntry._ID + " = ?",
+                new String[] {Long.toString(userId)},
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            return cursor.getInt(0) == IslndContract.UserEntry.ACTIVE;
+        }
+
+        return false;
+    }
+
+    public static boolean userExists(Context mContext, PublicKey publicKey) {
+        Cursor cursor = mContext.getContentResolver().query(
+                IslndContract.UserEntry.CONTENT_URI,
+                new String[]{},
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?",
+                new String[] {CryptoUtil.encodeKey(publicKey)},
+                null
+        );
+
+        return cursor.moveToFirst();
+    }
+
+    public static boolean userExists(Context mContext, long userId) {
+        Cursor cursor = mContext.getContentResolver().query(
+                IslndContract.UserEntry.CONTENT_URI,
+                new String[]{},
+                IslndContract.UserEntry._ID + " = ?",
+                new String[] {Long.toString(userId)},
+                null
+        );
+
+        return cursor.moveToFirst();
+    }
+
+    public static void deactivateUser(Context mContext, long userId) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_ACTIVE, IslndContract.UserEntry.NOT_ACTIVE);
+        mContext.getContentResolver().update(
+                IslndContract.UserEntry.CONTENT_URI,
+                values,
+                IslndContract.UserEntry._ID + " = ?",
+                new String[] {Long.toString(userId)}
+        );
+    }
+
+    public static void addUser(Context context, PublicIdentity publicIdentity, String outbox) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicIdentity.getPublicKey()));
+        values.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, CryptoUtil.getDigest(publicIdentity.getPublicKey()));
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, publicIdentity.getMessageInbox());
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, outbox);
+        context.getContentResolver().insert(
+                IslndContract.UserEntry.CONTENT_URI,
+                values);
+    }
+
+    public static boolean addOrUpdateUser(Context context, PublicIdentity publicIdentity, String outbox) {
+        boolean newUser = !userExists(context, publicIdentity.getPublicKey());
+        if (newUser) {
+            addUser(context, publicIdentity, outbox);
+        } else {
+            updateUser(context, publicIdentity, outbox);
+        }
+
+        return newUser;
+    }
+
+    private static void updateUser(Context context, PublicIdentity publicIdentity, String outbox) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, publicIdentity.getMessageInbox());
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, outbox);
+        String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?";
+        String[] selectionArgs = new String[] { CryptoUtil.encodeKey(publicIdentity.getPublicKey()) };
+        context.getContentResolver().update(
+                IslndContract.UserEntry.CONTENT_URI,
+                values,
+                selection,
+                selectionArgs);
+    }
+
+    public static void addSecretIdentity(Context context, int userId, SecretIdentity secretIdentity) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.AliasEntry.COLUMN_USER_ID, userId);
+        values.put(IslndContract.AliasEntry.COLUMN_ALIAS, secretIdentity.getAlias());
+        values.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(secretIdentity.getGroupKey()));
+        context.getContentResolver().insert(
+                IslndContract.AliasEntry.CONTENT_URI,
+                values);
+
+        values.clear();
+        values.put(IslndContract.DisplayNameEntry.COLUMN_USER_ID, userId);
+        values.put(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME, secretIdentity.getDisplayName());
+        context.getContentResolver().insert(
+                IslndContract.DisplayNameEntry.CONTENT_URI,
+                values);
     }
 }

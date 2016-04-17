@@ -18,10 +18,11 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.messaging.PublicIdentity;
 import io.islnd.android.islnd.messaging.ProfileResource;
 import io.islnd.android.islnd.messaging.Rest;
+import io.islnd.android.islnd.messaging.SecretIdentity;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedResource;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
@@ -33,27 +34,39 @@ public class MessageProcessor {
 
     public static void process(Context context, Message message) {
         if (alreadyProcessed(context, message)) {
+            Log.d(TAG, "already processed message with type " + message.getType());
             return;
         }
 
         int type = message.getType();
         switch (type) {
-            case MessageType.IDENTITY: {
-                Log.v(TAG, "process identity");
+            case MessageType.PUBLIC_IDENTITY: {
+                Log.d(TAG, "process public identity");
 
-                Identity friendToAdd = Identity.fromProto(message.getBlob());
-                addNewFriend(context, friendToAdd);
+                PublicIdentity friendPublicIdentity = PublicIdentity.fromProto(message.getBlob());
+                DataUtils.addUser(context, friendPublicIdentity, message.getMailbox());
 
-                sendOurProfileToNewFriend(context, friendToAdd);
+                //--We need a new inbox to give to our next friend
+                Util.setMyInbox(context, CryptoUtil.createAlias());
+
+                //--TODO need to send our secret identity to new friend
+                sendOurSecretIdentityToUser(context, friendPublicIdentity);
+                sendOurProfileToUser(context, friendPublicIdentity);
+                break;
+            }
+            case MessageType.SECRET_IDENTITY: {
+                Log.d(TAG, "process secret identity");
+                SecretIdentity friendSecretIdentity = SecretIdentity.fromProto(message.getBlob());
+                addNewFriend(context, friendSecretIdentity, message.getMailbox());
                 break;
             }
             case MessageType.PROFILE: {
-                Log.v(TAG, "process profile");
+                Log.d(TAG, "process profile");
                 processProfileMessage(context, message);
                 break;
             }
             case MessageType.NEW_ALIAS: {
-                Log.v(TAG, "process new alias");
+                Log.d(TAG, "process new alias");
                 int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
                 DataUtils.updateAlias(context, userID, message.getBlob());
                 break;
@@ -89,7 +102,7 @@ public class MessageProcessor {
             SecretKey groupKey = DataUtils.getGroupKey(context, userId);
             PublicKey publicKey = DataUtils.getPublicKey(context, userId);
             try {
-                ProfileResource profileResource = (ProfileResource) encryptedResources.get(0).decryptAndVerify(
+                ProfileResource profileResource = encryptedResources.get(0).decryptAndVerify(
                         groupKey,
                         publicKey
                 );
@@ -145,30 +158,31 @@ public class MessageProcessor {
         return alreadyProcessed;
     }
 
-    private static void addNewFriend(Context context, Identity friendToAdd) {
-        Identity friendWithOurMailbox = new Identity(
-                friendToAdd.getDisplayName(),
-                friendToAdd.getAlias(),
-                friendToAdd.getMessageInbox(),
-                friendToAdd.getGroupKey(),
-                friendToAdd.getPublicKey()
-        );
+    private static void addNewFriend(Context context, SecretIdentity friendSecretIdentity, String friendOutbox) {
+        int userId = DataUtils.getUserIdForMessageOutbox(context, friendOutbox);
 
-        MessageLayer.addFriendToDatabaseAndCreateDefaultProfile(
+        MessageLayer.addSecretIdentityAndCreateDefaultProfile(
                 context,
-                friendWithOurMailbox,
-                Util.getMyInbox(context)
-        );
-
-        //--We need a new inbox to give to our next friend
-        Util.setMyInbox(context, CryptoUtil.createAlias());
+                userId,
+                friendSecretIdentity);
     }
 
-    private static void sendOurProfileToNewFriend(Context context, Identity friendToAdd) {
+    private static void sendOurSecretIdentityToUser(Context context, PublicIdentity publicIdentity) {
+        Intent sendSecretIdentity = new Intent(context, FriendAddBackService.class);
+        sendSecretIdentity.putExtra(
+                FriendAddBackService.MAILBOX_EXTRA,
+                publicIdentity.getMessageInbox());
+        sendSecretIdentity.putExtra(
+                FriendAddBackService.JOB_EXTRA,
+                FriendAddBackService.SECRET_IDENTITY_JOB);
+        context.startService(sendSecretIdentity);
+    }
+
+    private static void sendOurProfileToUser(Context context, PublicIdentity publicIdentity) {
         Intent sendProfileIntent = new Intent(context, FriendAddBackService.class);
         sendProfileIntent.putExtra(
                 FriendAddBackService.MAILBOX_EXTRA,
-                friendToAdd.getMessageInbox());
+                publicIdentity.getMessageInbox());
         sendProfileIntent.putExtra(
                 FriendAddBackService.JOB_EXTRA,
                 FriendAddBackService.PROFILE_JOB);

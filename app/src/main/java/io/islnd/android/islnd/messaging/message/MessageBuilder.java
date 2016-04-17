@@ -5,17 +5,26 @@ import android.util.Log;
 
 import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Encoder;
-import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.PublicIdentity;
+import io.islnd.android.islnd.messaging.SecretIdentity;
 
 public class MessageBuilder {
     private static final String TAG = MessageBuilder.class.getSimpleName();
 
-    public static Message buildIdentityMessage(Context context, String mailbox, Identity identity) {
+    public static Message buildPublicIdentityMessage(Context context, String mailbox, PublicIdentity publicIdentity) {
         return new Message(
                 mailbox,
                 getNewMessageIdAndUpdate(context),
-                MessageType.IDENTITY,
-                new Encoder().encodeToString(identity.toByteArray()));
+                MessageType.PUBLIC_IDENTITY,
+                new Encoder().encodeToString(publicIdentity.toByteArray()));
+    }
+
+    public static Message buildSecretIdentityMessage(Context context, String mailbox, SecretIdentity secretIdentity) {
+        return new Message(
+                mailbox,
+                getNewMessageIdAndUpdate(context),
+                MessageType.SECRET_IDENTITY,
+                new Encoder().encodeToString(secretIdentity.toByteArray()));
     }
 
     public static Message buildProfileMessage(Context context, String mailbox, ProfileMessage profileMessage) {

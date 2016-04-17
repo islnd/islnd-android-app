@@ -22,7 +22,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -198,7 +197,7 @@ public class NavBaseActivity extends IslndActivity
             } else {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(
+                boolean friendAdded = MessageLayer.addPublicIdentityFromQrCode(
                         getApplicationContext(),
                         contents);
                 String message = friendAdded
@@ -296,7 +295,7 @@ public class NavBaseActivity extends IslndActivity
 
     private void sendSms(String number) {
         String sms = getString(R.string.sms_prefix) +
-                MessageLayer.getMyIdentity(getApplicationContext());
+                MessageLayer.getMyPublicIdentity(getApplicationContext());
 
         try {
             SmsManager smsManager = SmsManager.getDefault();

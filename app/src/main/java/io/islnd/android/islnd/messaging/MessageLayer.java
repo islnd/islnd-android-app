@@ -22,11 +22,12 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
-    public static boolean addFriendFromEncodedIdentityString(Context context, String encodedString) {
-        Identity friendIdentity = Identity.fromProto(encodedString);
-        boolean newFriend = addFriendToDatabaseAndCreateDefaultProfile(
+    public static boolean addPublicIdentityFromQrCode(Context context, String encodedString) {
+        Log.d(TAG, "addPublicIdentityFromQrCode");
+        PublicIdentity friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        boolean newFriend = DataUtils.addOrUpdateUser(
                 context,
-                friendIdentity,
+                friendPublicIdentity,
                 Util.getMyInbox(context));  //--My current inbox will be where I check for new
                                             //  messages from this user
 
@@ -38,8 +39,9 @@ public class MessageLayer {
         context.startService(repeatSyncServiceIntent);
 
         //--Send our identity and profile to friend
-        final String friendInbox = friendIdentity.getMessageInbox();
-        startAddBackJob(context, friendInbox, FriendAddBackService.IDENTITY_JOB);
+        final String friendInbox = friendPublicIdentity.getMessageInbox();
+        startAddBackJob(context, friendInbox, FriendAddBackService.PUBLIC_IDENTITY_JOB);
+        startAddBackJob(context, friendInbox, FriendAddBackService.SECRET_IDENTITY_JOB);
         startAddBackJob(context, friendInbox, FriendAddBackService.PROFILE_JOB);
 
         return newFriend;
@@ -54,38 +56,38 @@ public class MessageLayer {
         context.startService(sendIdentityIntent);
     }
 
-    public static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity, String messageOutbox) {
-        if (DataUtils.activeUserHasPublicKey(context, identity.getPublicKey())) {
-            DataUtils.activateAndUpdateUser(context, identity, messageOutbox);
-            return false;
-        }
+    public static boolean addSecretIdentityAndCreateDefaultProfile(
+            Context context,
+            int userId,
+            SecretIdentity secretIdentity) {
+        DataUtils.addSecretIdentity(context, userId, secretIdentity);
+        Profile profile = Util.buildDefaultProfile(context, secretIdentity.getDisplayName());
+        DataUtils.insertProfile(context, profile, userId);
 
-        long userId;
-        if (DataUtils.inactiveUserHasPublicKey(context, identity.getPublicKey())) {
-            userId = DataUtils.activateAndUpdateUser(context, identity, messageOutbox);
-        } else {
-            userId = DataUtils.insertUser(context, identity, messageOutbox);
-            Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
-            DataUtils.insertProfile(context, profile, userId);
-        }
-
-        DataUtils.insertNewFriendNotification(context, (int) userId);
+        //--TODO how do we handle people already our friends?
+        DataUtils.insertNewFriendNotification(context, userId);
         return true;
     }
 
-    public static Identity getMyIdentity(Context context) {
+    public static PublicIdentity getMyPublicIdentity(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String displayName = DataUtils.getDisplayName(context, IslndContract.UserEntry.MY_USER_ID);
-        String alias = DataUtils.getMostRecentAlias(context, IslndContract.UserEntry.MY_USER_ID);
         String messageInbox = DataUtils.getMessageInbox(context, IslndContract.UserEntry.MY_USER_ID);
-        Log.v(TAG, String.format("alias is %s", alias));
-        Key groupKey = CryptoUtil.decodeSymmetricKey(
-                sharedPreferences.getString(context.getString(R.string.group_key), ""));
         PublicKey publicKey = CryptoUtil.decodePublicKey(
                 sharedPreferences.getString(context.getString(R.string.public_key), ""));
 
-        return new Identity(displayName, alias, messageInbox, groupKey, publicKey);
+        return new PublicIdentity(messageInbox, publicKey);
+    }
+
+    public static SecretIdentity getMySecretIdentity(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String alias = DataUtils.getMostRecentAlias(context, IslndContract.UserEntry.MY_USER_ID);
+        String displayName = DataUtils.getDisplayName(context, IslndContract.UserEntry.MY_USER_ID);
+        Key groupKey = CryptoUtil.decodeSymmetricKey(
+                sharedPreferences.getString(context.getString(R.string.group_key), ""));
+
+        return new SecretIdentity(displayName, alias, groupKey);
     }
 
     public static long getServerTimeOffsetMillis(Context context, int repetitions) throws IOException {

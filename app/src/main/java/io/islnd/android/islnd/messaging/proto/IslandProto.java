@@ -8,7 +8,492 @@ public final class IslandProto {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface IdentityOrBuilder
+  public interface PublicIdentityOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required string message_inbox = 1;
+    boolean hasMessageInbox();
+    String getMessageInbox();
+    
+    // required string public_key = 2;
+    boolean hasPublicKey();
+    String getPublicKey();
+  }
+  public static final class PublicIdentity extends
+      com.google.protobuf.GeneratedMessage
+      implements PublicIdentityOrBuilder {
+    // Use PublicIdentity.newBuilder() to construct.
+    private PublicIdentity(Builder builder) {
+      super(builder);
+    }
+    private PublicIdentity(boolean noInit) {}
+    
+    private static final PublicIdentity defaultInstance;
+    public static PublicIdentity getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public PublicIdentity getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PublicIdentity_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PublicIdentity_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required string message_inbox = 1;
+    public static final int MESSAGE_INBOX_FIELD_NUMBER = 1;
+    private java.lang.Object messageInbox_;
+    public boolean hasMessageInbox() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public String getMessageInbox() {
+      java.lang.Object ref = messageInbox_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          messageInbox_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getMessageInboxBytes() {
+      java.lang.Object ref = messageInbox_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        messageInbox_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required string public_key = 2;
+    public static final int PUBLIC_KEY_FIELD_NUMBER = 2;
+    private java.lang.Object publicKey_;
+    public boolean hasPublicKey() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getPublicKey() {
+      java.lang.Object ref = publicKey_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          publicKey_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getPublicKeyBytes() {
+      java.lang.Object ref = publicKey_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        publicKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    private void initFields() {
+      messageInbox_ = "";
+      publicKey_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasMessageInbox()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasPublicKey()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getMessageInboxBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getPublicKeyBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getMessageInboxBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getPublicKeyBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentityOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PublicIdentity_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_PublicIdentity_fieldAccessorTable;
+      }
+      
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        messageInbox_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        publicKey_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity.getDescriptor();
+      }
+      
+      public io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity.getDefaultInstance();
+      }
+      
+      public io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity result = new io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.messageInbox_ = messageInbox_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.publicKey_ = publicKey_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity.getDefaultInstance()) return this;
+        if (other.hasMessageInbox()) {
+          setMessageInbox(other.getMessageInbox());
+        }
+        if (other.hasPublicKey()) {
+          setPublicKey(other.getPublicKey());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasMessageInbox()) {
+          
+          return false;
+        }
+        if (!hasPublicKey()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              messageInbox_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              publicKey_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required string message_inbox = 1;
+      private java.lang.Object messageInbox_ = "";
+      public boolean hasMessageInbox() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public String getMessageInbox() {
+        java.lang.Object ref = messageInbox_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          messageInbox_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setMessageInbox(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        messageInbox_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearMessageInbox() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        messageInbox_ = getDefaultInstance().getMessageInbox();
+        onChanged();
+        return this;
+      }
+      void setMessageInbox(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000001;
+        messageInbox_ = value;
+        onChanged();
+      }
+      
+      // required string public_key = 2;
+      private java.lang.Object publicKey_ = "";
+      public boolean hasPublicKey() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getPublicKey() {
+        java.lang.Object ref = publicKey_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          publicKey_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setPublicKey(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        publicKey_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPublicKey() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        publicKey_ = getDefaultInstance().getPublicKey();
+        onChanged();
+        return this;
+      }
+      void setPublicKey(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        publicKey_ = value;
+        onChanged();
+      }
+      
+      // @@protoc_insertion_point(builder_scope:proto.PublicIdentity)
+    }
+    
+    static {
+      defaultInstance = new PublicIdentity(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:proto.PublicIdentity)
+  }
+  
+  public interface SecretIdentityOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
     // required string display_name = 1;
@@ -19,44 +504,36 @@ public final class IslandProto {
     boolean hasAlias();
     String getAlias();
     
-    // required string message_inbox = 3;
-    boolean hasMessageInbox();
-    String getMessageInbox();
-    
-    // required string group_key = 4;
+    // required string group_key = 3;
     boolean hasGroupKey();
     String getGroupKey();
-    
-    // required string public_key = 5;
-    boolean hasPublicKey();
-    String getPublicKey();
   }
-  public static final class Identity extends
+  public static final class SecretIdentity extends
       com.google.protobuf.GeneratedMessage
-      implements IdentityOrBuilder {
-    // Use Identity.newBuilder() to construct.
-    private Identity(Builder builder) {
+      implements SecretIdentityOrBuilder {
+    // Use SecretIdentity.newBuilder() to construct.
+    private SecretIdentity(Builder builder) {
       super(builder);
     }
-    private Identity(boolean noInit) {}
+    private SecretIdentity(boolean noInit) {}
     
-    private static final Identity defaultInstance;
-    public static Identity getDefaultInstance() {
+    private static final SecretIdentity defaultInstance;
+    public static SecretIdentity getDefaultInstance() {
       return defaultInstance;
     }
     
-    public Identity getDefaultInstanceForType() {
+    public SecretIdentity getDefaultInstanceForType() {
       return defaultInstance;
     }
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_descriptor;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SecretIdentity_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_fieldAccessorTable;
+      return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SecretIdentity_fieldAccessorTable;
     }
     
     private int bitField0_;
@@ -124,43 +601,11 @@ public final class IslandProto {
       }
     }
     
-    // required string message_inbox = 3;
-    public static final int MESSAGE_INBOX_FIELD_NUMBER = 3;
-    private java.lang.Object messageInbox_;
-    public boolean hasMessageInbox() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public String getMessageInbox() {
-      java.lang.Object ref = messageInbox_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          messageInbox_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getMessageInboxBytes() {
-      java.lang.Object ref = messageInbox_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        messageInbox_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
-    // required string group_key = 4;
-    public static final int GROUP_KEY_FIELD_NUMBER = 4;
+    // required string group_key = 3;
+    public static final int GROUP_KEY_FIELD_NUMBER = 3;
     private java.lang.Object groupKey_;
     public boolean hasGroupKey() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public String getGroupKey() {
       java.lang.Object ref = groupKey_;
@@ -188,44 +633,10 @@ public final class IslandProto {
       }
     }
     
-    // required string public_key = 5;
-    public static final int PUBLIC_KEY_FIELD_NUMBER = 5;
-    private java.lang.Object publicKey_;
-    public boolean hasPublicKey() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    public String getPublicKey() {
-      java.lang.Object ref = publicKey_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          publicKey_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getPublicKeyBytes() {
-      java.lang.Object ref = publicKey_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        publicKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
     private void initFields() {
       displayName_ = "";
       alias_ = "";
-      messageInbox_ = "";
       groupKey_ = "";
-      publicKey_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -240,15 +651,7 @@ public final class IslandProto {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasMessageInbox()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       if (!hasGroupKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasPublicKey()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -266,13 +669,7 @@ public final class IslandProto {
         output.writeBytes(2, getAliasBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getMessageInboxBytes());
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getGroupKeyBytes());
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(5, getPublicKeyBytes());
+        output.writeBytes(3, getGroupKeyBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -293,15 +690,7 @@ public final class IslandProto {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getMessageInboxBytes());
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getGroupKeyBytes());
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, getPublicKeyBytes());
+          .computeBytesSize(3, getGroupKeyBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -315,41 +704,41 @@ public final class IslandProto {
       return super.writeReplace();
     }
     
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(byte[] data)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseDelimitedFrom(java.io.InputStream input)
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -358,7 +747,7 @@ public final class IslandProto {
         return null;
       }
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseDelimitedFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -369,12 +758,12 @@ public final class IslandProto {
         return null;
       }
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static io.islnd.android.islnd.messaging.proto.IslandProto.Identity parseFrom(
+    public static io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -384,7 +773,7 @@ public final class IslandProto {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.Identity prototype) {
+    public static Builder newBuilder(io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -397,18 +786,18 @@ public final class IslandProto {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements io.islnd.android.islnd.messaging.proto.IslandProto.IdentityOrBuilder {
+       implements io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentityOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_descriptor;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SecretIdentity_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_Identity_fieldAccessorTable;
+        return io.islnd.android.islnd.messaging.proto.IslandProto.internal_static_proto_SecretIdentity_fieldAccessorTable;
       }
       
-      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.Identity.newBuilder()
+      // Construct using io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -431,12 +820,8 @@ public final class IslandProto {
         bitField0_ = (bitField0_ & ~0x00000001);
         alias_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        messageInbox_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
         groupKey_ = "";
-        bitField0_ = (bitField0_ & ~0x00000008);
-        publicKey_ = "";
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       
@@ -446,24 +831,24 @@ public final class IslandProto {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return io.islnd.android.islnd.messaging.proto.IslandProto.Identity.getDescriptor();
+        return io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity.getDescriptor();
       }
       
-      public io.islnd.android.islnd.messaging.proto.IslandProto.Identity getDefaultInstanceForType() {
-        return io.islnd.android.islnd.messaging.proto.IslandProto.Identity.getDefaultInstance();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity getDefaultInstanceForType() {
+        return io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity.getDefaultInstance();
       }
       
-      public io.islnd.android.islnd.messaging.proto.IslandProto.Identity build() {
-        io.islnd.android.islnd.messaging.proto.IslandProto.Identity result = buildPartial();
+      public io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity build() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private io.islnd.android.islnd.messaging.proto.IslandProto.Identity buildParsed()
+      private io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        io.islnd.android.islnd.messaging.proto.IslandProto.Identity result = buildPartial();
+        io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
@@ -471,8 +856,8 @@ public final class IslandProto {
         return result;
       }
       
-      public io.islnd.android.islnd.messaging.proto.IslandProto.Identity buildPartial() {
-        io.islnd.android.islnd.messaging.proto.IslandProto.Identity result = new io.islnd.android.islnd.messaging.proto.IslandProto.Identity(this);
+      public io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity buildPartial() {
+        io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity result = new io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -486,45 +871,31 @@ public final class IslandProto {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.messageInbox_ = messageInbox_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
         result.groupKey_ = groupKey_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.publicKey_ = publicKey_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.Identity) {
-          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.Identity)other);
+        if (other instanceof io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity) {
+          return mergeFrom((io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.Identity other) {
-        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.Identity.getDefaultInstance()) return this;
+      public Builder mergeFrom(io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity other) {
+        if (other == io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity.getDefaultInstance()) return this;
         if (other.hasDisplayName()) {
           setDisplayName(other.getDisplayName());
         }
         if (other.hasAlias()) {
           setAlias(other.getAlias());
         }
-        if (other.hasMessageInbox()) {
-          setMessageInbox(other.getMessageInbox());
-        }
         if (other.hasGroupKey()) {
           setGroupKey(other.getGroupKey());
-        }
-        if (other.hasPublicKey()) {
-          setPublicKey(other.getPublicKey());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -539,15 +910,7 @@ public final class IslandProto {
           
           return false;
         }
-        if (!hasMessageInbox()) {
-          
-          return false;
-        }
         if (!hasGroupKey()) {
-          
-          return false;
-        }
-        if (!hasPublicKey()) {
           
           return false;
         }
@@ -589,17 +952,7 @@ public final class IslandProto {
             }
             case 26: {
               bitField0_ |= 0x00000004;
-              messageInbox_ = input.readBytes();
-              break;
-            }
-            case 34: {
-              bitField0_ |= 0x00000008;
               groupKey_ = input.readBytes();
-              break;
-            }
-            case 42: {
-              bitField0_ |= 0x00000010;
-              publicKey_ = input.readBytes();
               break;
             }
           }
@@ -680,46 +1033,10 @@ public final class IslandProto {
         onChanged();
       }
       
-      // required string message_inbox = 3;
-      private java.lang.Object messageInbox_ = "";
-      public boolean hasMessageInbox() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      public String getMessageInbox() {
-        java.lang.Object ref = messageInbox_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          messageInbox_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
-      }
-      public Builder setMessageInbox(String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        messageInbox_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearMessageInbox() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        messageInbox_ = getDefaultInstance().getMessageInbox();
-        onChanged();
-        return this;
-      }
-      void setMessageInbox(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
-        messageInbox_ = value;
-        onChanged();
-      }
-      
-      // required string group_key = 4;
+      // required string group_key = 3;
       private java.lang.Object groupKey_ = "";
       public boolean hasGroupKey() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       public String getGroupKey() {
         java.lang.Object ref = groupKey_;
@@ -735,68 +1052,32 @@ public final class IslandProto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000004;
         groupKey_ = value;
         onChanged();
         return this;
       }
       public Builder clearGroupKey() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
         groupKey_ = getDefaultInstance().getGroupKey();
         onChanged();
         return this;
       }
       void setGroupKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         groupKey_ = value;
         onChanged();
       }
       
-      // required string public_key = 5;
-      private java.lang.Object publicKey_ = "";
-      public boolean hasPublicKey() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      public String getPublicKey() {
-        java.lang.Object ref = publicKey_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          publicKey_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
-      }
-      public Builder setPublicKey(String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000010;
-        publicKey_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearPublicKey() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        publicKey_ = getDefaultInstance().getPublicKey();
-        onChanged();
-        return this;
-      }
-      void setPublicKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000010;
-        publicKey_ = value;
-        onChanged();
-      }
-      
-      // @@protoc_insertion_point(builder_scope:proto.Identity)
+      // @@protoc_insertion_point(builder_scope:proto.SecretIdentity)
     }
     
     static {
-      defaultInstance = new Identity(true);
+      defaultInstance = new SecretIdentity(true);
       defaultInstance.initFields();
     }
     
-    // @@protoc_insertion_point(class_scope:proto.Identity)
+    // @@protoc_insertion_point(class_scope:proto.SecretIdentity)
   }
   
   public interface SignedObjectOrBuilder
@@ -3808,10 +4089,15 @@ public final class IslandProto {
   }
   
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_proto_Identity_descriptor;
+    internal_static_proto_PublicIdentity_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_proto_Identity_fieldAccessorTable;
+      internal_static_proto_PublicIdentity_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_SecretIdentity_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_proto_SecretIdentity_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_SignedObject_descriptor;
   private static
@@ -3846,38 +4132,47 @@ public final class IslandProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\030proto/island_proto.proto\022\005proto\"m\n\010Ide" +
-      "ntity\022\024\n\014display_name\030\001 \002(\t\022\r\n\005alias\030\002 \002" +
-      "(\t\022\025\n\rmessage_inbox\030\003 \002(\t\022\021\n\tgroup_key\030\004" +
-      " \002(\t\022\022\n\npublic_key\030\005 \002(\t\"1\n\014SignedObject" +
-      "\022\016\n\006object\030\001 \002(\t\022\021\n\tsignature\030\002 \002(\t\"\300\001\n\005" +
-      "Event\022\r\n\005alias\030\001 \002(\t\022\020\n\010event_id\030\002 \002(\005\022\022" +
-      "\n\nevent_type\030\003 \002(\005\022\022\n\ncontent_id\030\004 \001(\t\022\024" +
-      "\n\014text_content\030\005 \001(\t\022\024\n\014data_content\030\006 \001" +
-      "(\014\022\021\n\ttimestamp\030\007 \001(\003\022\024\n\014parent_alias\030\010 " +
-      "\001(\t\022\031\n\021parent_content_id\030\t \001(\t\"&\n\016Profil",
-      "eMessage\022\024\n\014resource_key\030\001 \002(\t\"P\n\017Profil" +
-      "eResource\022\020\n\010about_me\030\001 \002(\t\022\025\n\rprofile_i" +
-      "mage\030\002 \002(\014\022\024\n\014header_image\030\003 \002(\014\"J\n\007Mess" +
-      "age\022\017\n\007mailbox\030\001 \002(\t\022\022\n\nmessage_id\030\002 \002(\005" +
-      "\022\014\n\004type\030\003 \002(\005\022\014\n\004blob\030\004 \002(\tB(\n&io.islnd" +
-      ".android.islnd.messaging.proto"
+      "\n\030proto/island_proto.proto\022\005proto\";\n\016Pub" +
+      "licIdentity\022\025\n\rmessage_inbox\030\001 \002(\t\022\022\n\npu" +
+      "blic_key\030\002 \002(\t\"H\n\016SecretIdentity\022\024\n\014disp" +
+      "lay_name\030\001 \002(\t\022\r\n\005alias\030\002 \002(\t\022\021\n\tgroup_k" +
+      "ey\030\003 \002(\t\"1\n\014SignedObject\022\016\n\006object\030\001 \002(\t" +
+      "\022\021\n\tsignature\030\002 \002(\t\"\300\001\n\005Event\022\r\n\005alias\030\001" +
+      " \002(\t\022\020\n\010event_id\030\002 \002(\005\022\022\n\nevent_type\030\003 \002" +
+      "(\005\022\022\n\ncontent_id\030\004 \001(\t\022\024\n\014text_content\030\005" +
+      " \001(\t\022\024\n\014data_content\030\006 \001(\014\022\021\n\ttimestamp\030" +
+      "\007 \001(\003\022\024\n\014parent_alias\030\010 \001(\t\022\031\n\021parent_co",
+      "ntent_id\030\t \001(\t\"&\n\016ProfileMessage\022\024\n\014reso" +
+      "urce_key\030\001 \002(\t\"P\n\017ProfileResource\022\020\n\010abo" +
+      "ut_me\030\001 \002(\t\022\025\n\rprofile_image\030\002 \002(\014\022\024\n\014he" +
+      "ader_image\030\003 \002(\014\"J\n\007Message\022\017\n\007mailbox\030\001" +
+      " \002(\t\022\022\n\nmessage_id\030\002 \002(\005\022\014\n\004type\030\003 \002(\005\022\014" +
+      "\n\004blob\030\004 \002(\tB(\n&io.islnd.android.islnd.m" +
+      "essaging.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public com.google.protobuf.ExtensionRegistry assignDescriptors(
             com.google.protobuf.Descriptors.FileDescriptor root) {
           descriptor = root;
-          internal_static_proto_Identity_descriptor =
+          internal_static_proto_PublicIdentity_descriptor =
             getDescriptor().getMessageTypes().get(0);
-          internal_static_proto_Identity_fieldAccessorTable = new
+          internal_static_proto_PublicIdentity_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_proto_Identity_descriptor,
-              new java.lang.String[] { "DisplayName", "Alias", "MessageInbox", "GroupKey", "PublicKey", },
-              io.islnd.android.islnd.messaging.proto.IslandProto.Identity.class,
-              io.islnd.android.islnd.messaging.proto.IslandProto.Identity.Builder.class);
-          internal_static_proto_SignedObject_descriptor =
+              internal_static_proto_PublicIdentity_descriptor,
+              new java.lang.String[] { "MessageInbox", "PublicKey", },
+              io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.PublicIdentity.Builder.class);
+          internal_static_proto_SecretIdentity_descriptor =
             getDescriptor().getMessageTypes().get(1);
+          internal_static_proto_SecretIdentity_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_proto_SecretIdentity_descriptor,
+              new java.lang.String[] { "DisplayName", "Alias", "GroupKey", },
+              io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity.class,
+              io.islnd.android.islnd.messaging.proto.IslandProto.SecretIdentity.Builder.class);
+          internal_static_proto_SignedObject_descriptor =
+            getDescriptor().getMessageTypes().get(2);
           internal_static_proto_SignedObject_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_SignedObject_descriptor,
@@ -3885,7 +4180,7 @@ public final class IslandProto {
               io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.SignedObject.Builder.class);
           internal_static_proto_Event_descriptor =
-            getDescriptor().getMessageTypes().get(2);
+            getDescriptor().getMessageTypes().get(3);
           internal_static_proto_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_Event_descriptor,
@@ -3893,7 +4188,7 @@ public final class IslandProto {
               io.islnd.android.islnd.messaging.proto.IslandProto.Event.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.Event.Builder.class);
           internal_static_proto_ProfileMessage_descriptor =
-            getDescriptor().getMessageTypes().get(3);
+            getDescriptor().getMessageTypes().get(4);
           internal_static_proto_ProfileMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_ProfileMessage_descriptor,
@@ -3901,7 +4196,7 @@ public final class IslandProto {
               io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.ProfileMessage.Builder.class);
           internal_static_proto_ProfileResource_descriptor =
-            getDescriptor().getMessageTypes().get(4);
+            getDescriptor().getMessageTypes().get(5);
           internal_static_proto_ProfileResource_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_ProfileResource_descriptor,
@@ -3909,7 +4204,7 @@ public final class IslandProto {
               io.islnd.android.islnd.messaging.proto.IslandProto.ProfileResource.class,
               io.islnd.android.islnd.messaging.proto.IslandProto.ProfileResource.Builder.class);
           internal_static_proto_Message_descriptor =
-            getDescriptor().getMessageTypes().get(5);
+            getDescriptor().getMessageTypes().get(6);
           internal_static_proto_Message_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_proto_Message_descriptor,

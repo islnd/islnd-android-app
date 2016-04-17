@@ -16,9 +16,6 @@ import android.util.Log;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.messaging.MessageLayer;
 
-/**
- * Created by poo on 2/18/2016.
- */
 public class SmsReceiver extends BroadcastReceiver
 {
     private static String TAG = SmsReceiver.class.getSimpleName();
@@ -56,7 +53,7 @@ public class SmsReceiver extends BroadcastReceiver
         {
             Log.d(TAG, smsBody);
             // TODO: Don't notify if user is already friend.
-            boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(
+            boolean friendAdded = MessageLayer.addPublicIdentityFromQrCode(
                     context,
                     smsBody.replace(context.getString(R.string.sms_prefix), ""));
 
