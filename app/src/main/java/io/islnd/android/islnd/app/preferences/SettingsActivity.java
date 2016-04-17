@@ -3,12 +3,12 @@ package io.islnd.android.islnd.app.preferences;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.activities.IslndActivity;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends IslndActivity {
 
     private static final String TAG = SettingsActivity.class.getSimpleName();
 

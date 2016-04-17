@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.security.Key;
 import java.security.PrivateKey;
@@ -91,6 +92,7 @@ public class EventPublisher {
                 values
         );
 
+        Log.d(TAG, "requestSync");
         mContext.getContentResolver().requestSync(
                 Util.getSyncAccount(mContext),
                 IslndContract.CONTENT_AUTHORITY,

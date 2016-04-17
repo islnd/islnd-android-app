@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -60,6 +61,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".activities.ViewIdentityActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
             android:name=".activities.VerticalCaptureActivity"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
@@ -89,6 +94,16 @@
         <receiver
             android:name=".NotificationCancelListener"
             android:enabled="true"/>
+        <receiver
+            android:name=".SyncAlarm"
+            android:enabled="false"/>
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name=".database.IslndProvider"

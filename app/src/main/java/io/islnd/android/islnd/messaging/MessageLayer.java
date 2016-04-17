@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.PublicKey;
 
-import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.FriendAddBackService;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;

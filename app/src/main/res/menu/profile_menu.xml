@@ -9,6 +9,10 @@
         android:id="@+id/edit_profile"
         android:title="@string/edit_profile"
         android:icon="@drawable/ic_edit_white_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/view_identity"
+        android:title="@string/view_identity"
+        app:showAsAction="never"/>
 
 </menu>

@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import io.islnd.android.islnd.app.loader.NotificationLoader;
 import io.islnd.android.islnd.app.util.Util;
 
 public class NotificationsFragment extends Fragment {
+
+    private static final String TAG = NotificationsFragment.class.getSimpleName();
 
     private Context mContext;
     private ContentResolver mResolver;
@@ -48,7 +51,7 @@ public class NotificationsFragment extends Fragment {
         mAdapter = new NotificationAdapter(mContext, null);
         final NotificationLoader notificationLoader = new NotificationLoader(
                 mContext,
-                IslndContract.NotificationEntry.CONTENT_URI,
+                IslndContract.NotificationWithUserDataEntry.CONTENT_URI,
                 mAdapter);
         getLoaderManager().initLoader(
                 LoaderId.NOTIFICATION_LOADER_ID,
@@ -62,6 +65,7 @@ public class NotificationsFragment extends Fragment {
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(
                 () -> {
+                    Log.d(TAG, "requestSync");
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,

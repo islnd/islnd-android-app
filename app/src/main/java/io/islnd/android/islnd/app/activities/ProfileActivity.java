@@ -12,10 +12,10 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,7 +35,7 @@ import io.islnd.android.islnd.app.loader.PostLoader;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProfileActivity extends IslndActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
@@ -125,6 +125,11 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
                         EDIT_PROFILE_REQUEST
                 );
                 break;
+            case R.id.view_identity:
+                Intent intent = new Intent(this, ViewIdentityActivity.class);
+                intent.putExtra(ViewIdentityActivity.USER_ID_EXTRA, mProfileUserId);
+                startActivity(intent);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -173,6 +178,7 @@ public class ProfileActivity extends AppCompatActivity implements LoaderManager.
 
         mRefreshLayout.setOnRefreshListener(
                 () -> {
+                    Log.d(TAG, "requestSync");
                     getApplicationContext().getContentResolver().requestSync(
                             Util.getSyncAccount(getApplicationContext()),
                             IslndContract.CONTENT_AUTHORITY,

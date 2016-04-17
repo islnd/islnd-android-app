@@ -9,7 +9,6 @@ import java.security.PublicKey;
 import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.messaging.InvalidBlobException;
-import io.islnd.android.islnd.messaging.ProtoSerializable;
 import io.islnd.android.islnd.messaging.event.Event;
 
 public class EncryptedEvent extends SymmetricEncryptedData {

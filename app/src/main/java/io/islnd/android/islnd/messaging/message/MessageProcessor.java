@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.security.Key;
 import java.security.PublicKey;
 import java.util.List;
 

@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,9 @@ import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.util.Util;
 
 public class ViewFriendsFragment extends Fragment {
+
+    private static final String TAG = ViewFriendsFragment.class.getSimpleName();
+
     private RecyclerView mRecyclerView;
     private ViewFriendsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -62,6 +66,7 @@ public class ViewFriendsFragment extends Fragment {
         mRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(
                 () -> {
+                    Log.d(TAG, "requestSync");
                     mResolver.requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,

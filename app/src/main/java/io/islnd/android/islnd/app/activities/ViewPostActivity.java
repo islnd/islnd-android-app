@@ -11,7 +11,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -40,7 +39,7 @@ import io.islnd.android.islnd.app.models.Post;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
 
-public class ViewPostActivity extends AppCompatActivity
+public class ViewPostActivity extends IslndActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ViewPostActivity.class.getSimpleName();
@@ -79,6 +78,7 @@ public class ViewPostActivity extends AppCompatActivity
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         mRefreshLayout.setOnRefreshListener(() ->
         {
+            Log.d(TAG, "requestSync");
             getApplicationContext().getContentResolver().requestSync(
                     Util.getSyncAccount(getApplicationContext()),
                     IslndContract.CONTENT_AUTHORITY,

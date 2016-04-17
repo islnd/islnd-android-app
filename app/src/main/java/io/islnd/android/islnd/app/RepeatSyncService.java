@@ -36,6 +36,7 @@ public class RepeatSyncService extends Service {
                 int[] delay = {10000, 5000, 5000, 10000, 20000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
+                    Log.d(TAG, "requestSync");
                     mContext.getContentResolver().requestSync(
                             Util.getSyncAccount(mContext),
                             IslndContract.CONTENT_AUTHORITY,

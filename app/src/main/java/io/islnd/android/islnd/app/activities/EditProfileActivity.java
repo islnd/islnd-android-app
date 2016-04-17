@@ -11,7 +11,6 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +26,7 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.util.ImageUtil;
 
-public class EditProfileActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditProfileActivity extends IslndActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = EditProfileActivity.class.getSimpleName();
 

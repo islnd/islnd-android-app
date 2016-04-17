@@ -11,8 +11,6 @@ import javax.crypto.SecretKey;
 import io.islnd.android.islnd.messaging.InvalidBlobException;
 import io.islnd.android.islnd.messaging.ProfileResource;
 import io.islnd.android.islnd.messaging.ProtoSerializable;
-import io.islnd.android.islnd.messaging.event.Event;
-import io.islnd.android.islnd.messaging.server.ResourceQuery;
 
 public class EncryptedResource extends SymmetricEncryptedData {
 

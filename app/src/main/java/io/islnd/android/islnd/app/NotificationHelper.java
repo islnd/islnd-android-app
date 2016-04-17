@@ -34,7 +34,8 @@ public class NotificationHelper {
 
     private static NotificationObserver mNotificationObserver;
 
-    public static void initialize(Context context) {
+    public static void startListening(Context context) {
+        Log.v(TAG, "start listening");
         if (mNotificationObserver == null) {
             mNotificationObserver = new NotificationObserver(new Handler() , context);
         }
@@ -44,6 +45,15 @@ public class NotificationHelper {
                 true,
                 mNotificationObserver
         );
+    }
+
+    public static void stopListening(Context context) {
+        Log.v(TAG, "stop listening");
+        if (mNotificationObserver == null) {
+            return;
+        }
+
+        context.getContentResolver().unregisterContentObserver(mNotificationObserver);
     }
 
     private static void updateNotification(Context context) {
