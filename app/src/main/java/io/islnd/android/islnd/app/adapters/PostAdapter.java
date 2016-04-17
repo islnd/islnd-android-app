@@ -78,25 +78,27 @@ public class PostAdapter extends CursorRecyclerViewAdapter<GlancePostViewHolder>
             ((Activity)mContext).startActivityForResult(viewPostIntent, FeedFragment.DELETE_POST_RESULT);
         });
 
-        if(post.getUserId() == IslndContract.UserEntry.MY_USER_ID) {
-            holder.view.setOnLongClickListener((View v) -> {
-                final String DELETE_POST = mContext.getString(R.string.delete_post);
-                final String[] items = {DELETE_POST};
+        holder.view.setOnLongClickListener((View v) -> {
+            if (post.getUserId() != IslndContract.UserEntry.MY_USER_ID) {
+                return false;
+            }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
-                builder.setItems(items, (DialogInterface dialog, int item) -> {
-                    String itemStr = items[item];
-                    if (itemStr.equals(DELETE_POST)) {
-                        DialogFragment deletePostFragment =
-                                DeletePostDialog.buildWithArgs(post.getPostId());
-                        deletePostFragment.show(
-                                ((FragmentActivity) mContext).getSupportFragmentManager(),
-                                mContext.getString(R.string.fragment_delete_post));
-                    }
-                }).show();
+            final String DELETE_POST = mContext.getString(R.string.delete_post);
+            final String[] items = {DELETE_POST};
 
-                return true;
-            });
-        }
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
+            builder.setItems(items, (DialogInterface dialog, int item) -> {
+                String itemStr = items[item];
+                if (itemStr.equals(DELETE_POST)) {
+                    DialogFragment deletePostFragment =
+                            DeletePostDialog.buildWithArgs(post.getPostId());
+                    deletePostFragment.show(
+                            ((FragmentActivity) mContext).getSupportFragmentManager(),
+                            mContext.getString(R.string.fragment_delete_post));
+                }
+            }).show();
+
+            return true;
+        });
     }
 }
