@@ -161,8 +161,7 @@ public class ViewPostActivity extends IslndActivity
         postUserName.setText(mPost.getDisplayName());
         postTimestamp.setText(Util.smartTimestampFromUnixTime(mContext, mPost.getTimestamp()));
         postContent.setText(mPost.getContent());
-        //TODO: Need to use loader to have dynamic comment count
-        commentCount.setText("");
+        commentCount.setText(Util.numberOfCommentsString(mPost.getCommentCount()));
 
         // Go to profile on picture click
         mPostProfileImageView.setOnClickListener(
