@@ -16,6 +16,8 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -89,10 +91,30 @@ public class ViewPostActivity extends IslndActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.post_menu, menu);
+
+        if (mPostUserId != IslndContract.UserEntry.MY_USER_ID) {
+            MenuItem deletePost = menu.findItem(R.id.delete_post);
+            deletePost.setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.delete_post:
+                DeletePostDialog deletePostFragment =
+                        DeletePostDialog.buildWithArgs(mPost.getPostId());
+                deletePostFragment.show(
+                        getSupportFragmentManager(),
+                        mContext.getString(R.string.fragment_delete_post));
+                deletePostFragment.setFinishActivityIfSuccess(true);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -134,7 +156,6 @@ public class ViewPostActivity extends IslndActivity
         TextView postUserName = (TextView) findViewById(R.id.post_display_name);
         TextView postTimestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) findViewById(R.id.post_content);
-        RelativeLayout postOverflow = (RelativeLayout) findViewById(R.id.post_overflow_layout);
         TextView commentCount = (TextView) findViewById(R.id.post_comment_count);
 
         postUserName.setText(mPost.getDisplayName());
@@ -150,33 +171,6 @@ public class ViewPostActivity extends IslndActivity
                     profileIntent.putExtra(ProfileActivity.USER_ID_EXTRA, mPost.getUserId());
                     startActivity(profileIntent);
                 });
-
-
-        if (mPost.getUserId() == IslndContract.UserEntry.MY_USER_ID) {
-            postOverflow.setVisibility(View.VISIBLE);
-
-            postOverflow.setOnClickListener((View v) -> {
-                PopupMenu popup = new PopupMenu(this, postOverflow);
-                popup.getMenuInflater().inflate(R.menu.post_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener((MenuItem item) -> {
-                    switch (item.getItemId()) {
-                        case R.id.delete_post:
-                            DeletePostDialog deletePostFragment =
-                                    DeletePostDialog.buildWithArgs(mPost.getPostId());
-                            deletePostFragment.show(
-                                    getSupportFragmentManager(),
-                                    mContext.getString(R.string.fragment_delete_post));
-                            deletePostFragment.setFinishActivityIfSuccess(true);
-                    }
-
-                    return true;
-                });
-
-                popup.show();
-            });
-        } else {
-            postOverflow.setVisibility(View.GONE);
-        }
     }
 
     @Override

@@ -3,82 +3,52 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="@dimen/interact_post_padding"
     android:background="@color/background_core">
 
-    <LinearLayout
-        android:id="@+id/post_header_layout"
-        android:layout_width="match_parent"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/post_profile_image"
+        android:layout_width="@dimen/post_profile_image"
+        android:layout_height="@dimen/post_profile_image"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="@dimen/post_profile_image_margin"
+        android:layout_marginBottom="@dimen/post_profile_image_margin"/>
+
+    <TextView
+        android:id="@+id/post_display_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/interact_post_padding"
-        android:layout_marginLeft="@dimen/interact_post_padding"
-        android:orientation="horizontal">
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/post_profile_image"
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="@color/primary_text"/>
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/post_profile_image"
-            android:layout_width="@dimen/post_profile_image"
-            android:layout_height="@dimen/post_profile_image"
-            android:layout_marginRight="@dimen/post_profile_image_margin"
-            android:layout_marginBottom="@dimen/post_profile_image_margin"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/post_display_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Base.TextAppearance.AppCompat.Title"
-                android:textColor="@color/primary_text"/>
-
-            <TextView
-                android:id="@+id/post_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/post_display_name"
-                style="@style/Base.TextAppearance.AppCompat.Caption"
-                android:textColor="@color/secondary_text"/>
-        </LinearLayout>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/post_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_display_name"
+        android:layout_toRightOf="@+id/post_profile_image"
+        style="@style/Base.TextAppearance.AppCompat.Caption"
+        android:textColor="@color/secondary_text"/>
 
     <TextView
         android:id="@+id/post_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/post_header_layout"
-        android:layout_marginLeft="@dimen/interact_post_padding"
-        android:layout_marginRight="@dimen/interact_post_padding"
+        android:layout_below="@+id/post_profile_image"
         style="@style/Base.TextAppearance.AppCompat.Body1"
         android:textSize="20sp"
         android:textColor="@color/primary_text"/>
-
-    <RelativeLayout
-        android:id="@+id/post_overflow_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:padding="@dimen/interact_post_padding"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_more_vert_24dp"/>
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/post_comment_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/post_content"
-        android:layout_gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/post_content"
         android:layout_marginTop="@dimen/comment_icon_count_top_margin"
-        android:layout_marginLeft="@dimen/interact_post_padding"
-        android:layout_marginBottom="@dimen/interact_post_padding"
         android:textColor="@color/secondary_text"/>
 
 </RelativeLayout>
