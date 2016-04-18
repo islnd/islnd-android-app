@@ -3,6 +3,7 @@ package io.islnd.android.islnd.app;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -75,6 +76,10 @@ public class EventPublisher {
     }
 
     public void publish() {
+        new PublishTask().execute();
+    }
+
+    private void publishEvents() {
         final List<Event> events = this.eventListBuilder.build();
         ContentValues[] values = new ContentValues[events.size()];
         PrivateKey privateKey = Util.getPrivateKey(mContext);
@@ -97,5 +102,14 @@ public class EventPublisher {
                 Util.getSyncAccount(mContext),
                 IslndContract.CONTENT_AUTHORITY,
                 new Bundle());
+    }
+
+    private class PublishTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            publishEvents();
+            return null;
+        }
     }
 }
