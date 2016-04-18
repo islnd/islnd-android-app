@@ -37,8 +37,6 @@ public class SplashScreenActivity extends IslndActivity {
         Log.d(TAG, "requestSync");
         resolver.requestSync(syncAccount, IslndContract.CONTENT_AUTHORITY, new Bundle());
 
-        Util.applyAppTheme(this);
-
         Util.setUsesApiKey(mContext, true);
 
         // Visual pause...
