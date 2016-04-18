@@ -19,6 +19,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/new_post_edit_text_margin"
         android:inputType="textMultiLine|textCapSentences"
+        android:maxLength="@integer/post_maximum"
         android:background="@android:color/transparent"
         android:hint="@string/new_post_hint"
         android:gravity="top"
