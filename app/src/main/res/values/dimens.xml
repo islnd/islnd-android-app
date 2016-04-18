@@ -63,4 +63,5 @@
     <dimen name="badge_count_margin">8dp</dimen>
     <dimen name="glance_post_timestamp_margin">8dp</dimen>
     <dimen name="glance_post_comment_count_margin">16dp</dimen>
+    <dimen name="comment_timestamp_margin">16dp</dimen>
 </resources>
