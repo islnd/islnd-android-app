@@ -131,7 +131,7 @@ public class ViewPostActivity extends IslndActivity
                 mPostProfileImageView,
                 mPostProfileImageUri);
 
-        TextView postUserName = (TextView) findViewById(R.id.post_user_name);
+        TextView postUserName = (TextView) findViewById(R.id.post_display_name);
         TextView postTimestamp = (TextView) findViewById(R.id.post_timestamp);
         TextView postContent = (TextView) findViewById(R.id.post_content);
         RelativeLayout postOverflow = (RelativeLayout) findViewById(R.id.post_overflow_layout);
