@@ -179,8 +179,17 @@ public class CryptoUtil {
         return null;
     }
 
-    public static String createAlias() {
+    public static String getNewResourceKey() {
+        return getRandomString();
+    }
+
+    private static String getRandomString() {
+        //--64 bits of entropy
         return String.valueOf(secureRandom.nextLong());
+    }
+
+    public static String createAlias() {
+        return getRandomString();
     }
 
     public static SignedObject sign(ProtoSerializable object, PrivateKey privateKey) {

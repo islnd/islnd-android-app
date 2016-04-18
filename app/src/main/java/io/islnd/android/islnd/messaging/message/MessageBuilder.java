@@ -27,7 +27,8 @@ public class MessageBuilder {
                 new Encoder().encodeToString(secretIdentity.toByteArray()));
     }
 
-    public static Message buildProfileMessage(Context context, String mailbox, ProfileMessage profileMessage) {
+    public static Message buildProfileMessage(Context context, String mailbox, String profileResourceKey) {
+        ProfileMessage profileMessage = new ProfileMessage(profileResourceKey);
         return new Message(
                 mailbox,
                 getNewMessageIdAndUpdate(context),

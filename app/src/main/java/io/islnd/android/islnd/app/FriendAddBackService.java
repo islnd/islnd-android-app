@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.security.Key;
@@ -39,74 +40,27 @@ public class FriendAddBackService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.v(TAG, "onHandleIntent");
+        Log.d(TAG, "onHandleIntent");
 
         String inbox = intent.getStringExtra(MAILBOX_EXTRA);
-
         int job = intent.getIntExtra(JOB_EXTRA, -1);
-        Key publicKey = DataUtils.getPublicKeyForUserInbox(this, inbox);
+
+        Key recipientPublicKey = DataUtils.getPublicKeyForUserInbox(this, inbox);
         Log.v(TAG, "add back to mailbox " + inbox + " job " + job);
         switch (job) {
             case PUBLIC_IDENTITY_JOB: {
                 Log.d(TAG, "public identity job");
-                PublicIdentity myPublicIdentity = MessageLayer.getMyPublicIdentity(this);
-                Message identityMessage = MessageBuilder.buildPublicIdentityMessage(
-                        this,
-                        inbox,
-                        myPublicIdentity);
-                EncryptedMessage encryptedMessage = new EncryptedMessage(
-                        identityMessage,
-                        publicKey,
-                        Util.getPrivateKey(this));
-                Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+                sendPublicIdentityMessage(inbox, recipientPublicKey);
                 break;
             }
             case SECRET_IDENTITY_JOB: {
                 Log.d(TAG, "secret identity job");
-                SecretIdentity mySecretIdentity = MessageLayer.getMySecretIdentity(this);
-                Message identityMessage = MessageBuilder.buildSecretIdentityMessage(
-                        this,
-                        inbox,
-                        mySecretIdentity);
-                EncryptedMessage encryptedMessage = new EncryptedMessage(
-                        identityMessage,
-                        publicKey,
-                        Util.getPrivateKey(this));
-                Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+                sendSecretIdentityMessage(inbox, recipientPublicKey);
                 break;
             }
             case PROFILE_JOB: {
                 Log.d(TAG, "profile job");
-                Profile profile = DataUtils.getProfile(this, IslndContract.UserEntry.MY_USER_ID);
-                ProfileResource profileResource = new ProfileResource(
-                        profile.getAboutMe(),
-                        ImageUtil.getScaledImageByteArrayFromUri(this, profile.getProfileImageUri()),
-                        ImageUtil.getScaledImageByteArrayFromUri(this, profile.getHeaderImageUri()));
-                String profileResourceKey = CryptoUtil.createAlias();
-                EncryptedResource encryptedResource = new EncryptedResource(
-                        profileResource,
-                        Util.getPrivateKey(this),
-                        Util.getGroupKey(this),
-                        profileResourceKey
-                );
-                Rest.postResource(
-                        encryptedResource,
-                        Util.getApiKey(this)
-                );
-
-                ProfileMessage profileMessage = new ProfileMessage(
-                        profileResourceKey
-                );
-                Message message = MessageBuilder.buildProfileMessage(
-                        this,
-                        inbox,
-                        profileMessage);
-                EncryptedMessage encryptedMessage = new EncryptedMessage(
-                        message,
-                        publicKey,
-                        Util.getPrivateKey(this));
-                Rest.postMessage(encryptedMessage, Util.getApiKey(this));
-
+                sendProfileMessage(inbox, recipientPublicKey);
                 break;
             }
             default: {
@@ -115,5 +69,71 @@ public class FriendAddBackService extends IntentService {
         }
 
         Log.v(TAG, "onHandleIntent complete");
+    }
+
+    private void sendPublicIdentityMessage(String mailbox, Key recipientPublicKey) {
+        PublicIdentity myPublicIdentity = MessageLayer.getMyPublicIdentity(this);
+        Message identityMessage = MessageBuilder.buildPublicIdentityMessage(
+                this,
+                mailbox,
+                myPublicIdentity);
+        EncryptedMessage encryptedMessage = new EncryptedMessage(
+                identityMessage,
+                recipientPublicKey,
+                Util.getPrivateKey(this));
+        Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+    }
+
+    private void sendSecretIdentityMessage(String mailbox, Key recipientPublicKey) {
+        SecretIdentity mySecretIdentity = MessageLayer.getMySecretIdentity(this);
+        Message identityMessage = MessageBuilder.buildSecretIdentityMessage(
+                this,
+                mailbox,
+                mySecretIdentity);
+        EncryptedMessage encryptedMessage = new EncryptedMessage(
+                identityMessage,
+                recipientPublicKey,
+                Util.getPrivateKey(this));
+        Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+    }
+
+    private void sendProfileMessage(String mailbox, Key recipientPublicKey) {
+        //--TODO don't post profile resource if my profile has not changed
+        String profileResourceKey = postProfileResource();
+
+        postProfileMessage(mailbox, recipientPublicKey, profileResourceKey);
+    }
+
+    private void postProfileMessage(String mailbox, Key recipientPublicKey, String profileResourceKey) {
+        Message message = MessageBuilder.buildProfileMessage(
+                this,
+                mailbox,
+                profileResourceKey);
+        EncryptedMessage encryptedMessage = new EncryptedMessage(
+                message,
+                recipientPublicKey,
+                Util.getPrivateKey(this));
+        Rest.postMessage(encryptedMessage, Util.getApiKey(this));
+    }
+
+    private String postProfileResource() {
+        Profile myProfile = DataUtils.getProfile(this, IslndContract.UserEntry.MY_USER_ID);
+        ProfileResource profileResource = new ProfileResource(
+                myProfile.getAboutMe(),
+                ImageUtil.getScaledImageByteArrayFromUri(this, myProfile.getProfileImageUri()),
+                ImageUtil.getScaledImageByteArrayFromUri(this, myProfile.getHeaderImageUri()));
+        String profileResourceKey = CryptoUtil.getNewResourceKey();
+        EncryptedResource encryptedResource = new EncryptedResource(
+                profileResource,
+                Util.getPrivateKey(this),
+                Util.getGroupKey(this),
+                profileResourceKey
+        );
+        Rest.postResource(
+                encryptedResource,
+                Util.getApiKey(this)
+        );
+
+        return profileResourceKey;
     }
 }
