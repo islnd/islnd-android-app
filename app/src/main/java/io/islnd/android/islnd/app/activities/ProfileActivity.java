@@ -251,7 +251,14 @@ public class ProfileActivity extends IslndActivity implements LoaderManager.Load
         mDisplayName = data.getString(data.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
         mDisplayNameTextView.setText(mDisplayName);
 
-        mAboutMeTextView.setText(data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME)));
+        String aboutMe = data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_ABOUT_ME));
+
+        if ("".equals(aboutMe)) {
+            mAboutMeTextView.setVisibility(View.GONE);
+        } else {
+            mAboutMeTextView.setVisibility(View.VISIBLE);
+            mAboutMeTextView.setText(aboutMe);
+        }
 
         mProfileImageUriString = data.getString(data.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI));
         ImageUtil.setProfileImageSampled(
