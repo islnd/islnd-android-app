@@ -2,5 +2,5 @@
 <resources>
     <integer name="display_name_maximum">25</integer>
     <integer name="about_me_maximum">160</integer>
-    <integer name="post_maximum">1000</integer>
+    <integer name="post_maximum">5000</integer>
 </resources>
