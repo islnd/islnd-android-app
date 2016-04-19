@@ -249,5 +249,9 @@ public class CryptoUtil {
 
         throw new IllegalArgumentException();
     }
+
+    public static int generateSmsMessageId() {
+        return (int) (secureRandom.nextDouble() * 9999);
+    }
 }
 

@@ -41,7 +41,6 @@ import java.util.List;
 import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.NotificationsFragment;
@@ -49,12 +48,12 @@ import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
+import io.islnd.android.islnd.app.sms.MultipartMessage;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.PublicIdentity;
 import io.islnd.android.islnd.messaging.ServerTime;
-import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class NavBaseActivity extends IslndActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -303,13 +302,15 @@ public class NavBaseActivity extends IslndActivity
     private void sendSms(String number) {
         PublicIdentity myPublicIdentity = MessageLayer.createNewPublicIdentity(getApplicationContext());
         String encodedIdentity = new Encoder().encodeToString(myPublicIdentity.toByteArray());
-        String message = getString(R.string.sms_prefix) + encodedIdentity;
-        Log.v(TAG, "sending " + message);
 
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            ArrayList<String> messages = smsManager.divideMessage(message);
-            smsManager.sendMultipartTextMessage(number, null, messages, null, null);
+            List<String> messages = MultipartMessage.buildMessages(encodedIdentity);
+            for (String message : messages) {
+                Log.v(TAG, "sending " + message);
+                smsManager.sendTextMessage(number, null, message, null, null);
+            }
+
             Snackbar.make(mDrawerLayout, "SMS sent!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS sent!");
         } catch (Exception e) {

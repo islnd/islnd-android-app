@@ -27,6 +27,7 @@ public class IslndContract {
     public static final String PATH_NOTIFICATION = "notification";
     public static final String PATH_NOTIFICATION_WITH_USER_DATA = "notification_with_user_data";
     public static final String PATH_MESSAGE_TOKEN = "message_token";
+    public static final String PATH_SMS_MESSAGE = "sms_message";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -387,6 +388,29 @@ public class IslndContract {
         public static final String COLUMN_NONCE = "nonce";
 
         public static Uri buildMessageTokenUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class SmsMessageEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_SMS_MESSAGE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SMS_MESSAGE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SMS_MESSAGE;
+
+        public static final String TABLE_NAME = "sms_message";
+
+        public static final String COLUMN_ORIGINATING_ADDRESS = "originating_address";
+        public static final String COLUMN_MESSAGE_ID = "message_id";
+        public static final String COLUMN_MESSAGE_PART_ID = "message_part_id";
+        public static final String COLUMN_LAST_MESSAGE_PART_ID = "last_message_part_id";
+        public static final String COLUMN_BODY = "body";
+
+        public static Uri buildSmsMessageUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

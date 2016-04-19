@@ -132,6 +132,14 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.MessageTokenEntry.COLUMN_MAILBOX + " TEXT NOT NULL, " +
                 IslndContract.MessageTokenEntry.COLUMN_NONCE + " TEXT NOT NULL);";
 
+        final String SQL_CREATE_SMS_MESSAGE_TABLE = "CREATE TABLE " + IslndContract.SmsMessageEntry.TABLE_NAME + " (" +
+                IslndContract.SmsMessageEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.SmsMessageEntry.COLUMN_MESSAGE_ID + " STRING NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_LAST_MESSAGE_PART_ID + " INT NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_MESSAGE_PART_ID + " INT NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_BODY + " TEXT NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_ORIGINATING_ADDRESS + " TEXT NOT NULL);";
+
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_ALIAS_TABLE);
         db.execSQL(SQL_CREATE_DISPLAY_NAME_TABLE);
@@ -144,6 +152,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_RECEIVED_MESSAGE_TABLE);
         db.execSQL(SQL_CREATE_OUTGOING_MESSAGE_TABLE);
         db.execSQL(SQL_CREATE_MESSAGE_TOKEN_TABLE);
+        db.execSQL(SQL_CREATE_SMS_MESSAGE_TABLE);
     }
 
     @Override
@@ -158,6 +167,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedMessageEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingMessageEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.MessageTokenEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.SmsMessageEntry.TABLE_NAME);
 
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.PostEntry.TABLE_NAME);
 

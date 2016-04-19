@@ -25,6 +25,8 @@ public class MessageLayer {
 
     public static boolean addPublicIdentityFromSms(Context context, String encodedString) {
         Log.d(TAG, "addPublicIdentityFromSms");
+        Log.d(TAG, encodedString);
+
         PublicIdentity friendPublicIdentity = null;
         try {
             friendPublicIdentity = PublicIdentity.fromProto(encodedString);

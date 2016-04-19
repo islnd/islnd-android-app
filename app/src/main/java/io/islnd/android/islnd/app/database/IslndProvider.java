@@ -37,6 +37,7 @@ public class IslndProvider extends ContentProvider {
     static final int NOTIFICATION = 1200;
     static final int NOTIFICATION_WITH_USER_DATA = 1300;
     static final int MESSAGE_TOKEN = 1400;
+    static final int SMS_MESSAGE = 1500;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -333,6 +334,8 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_MESSAGE_TOKEN, MESSAGE_TOKEN);
 
+        matcher.addURI(authority, IslndContract.PATH_SMS_MESSAGE, SMS_MESSAGE);
+
         return matcher;
     }
 
@@ -521,6 +524,17 @@ public class IslndProvider extends ContentProvider {
             case MESSAGE_TOKEN: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         IslndContract.MessageTokenEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case SMS_MESSAGE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.SmsMessageEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -731,6 +745,19 @@ public class IslndProvider extends ContentProvider {
                         values);
                 if ( _id > 0 ) {
                     returnUri = IslndContract.MessageTokenEntry.buildMessageTokenUri(_id);
+                } else {
+                    return null;
+                }
+
+                break;
+            }
+            case SMS_MESSAGE: {
+                long _id = db.insert(
+                        IslndContract.SmsMessageEntry.TABLE_NAME,
+                        null,
+                        values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.SmsMessageEntry.buildSmsMessageUri(_id);
                 } else {
                     return null;
                 }
