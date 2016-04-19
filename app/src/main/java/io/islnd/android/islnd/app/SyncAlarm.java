@@ -19,7 +19,15 @@ public class SyncAlarm extends BroadcastReceiver {
 
     private static final String TAG = SyncAlarm.class.getSimpleName();
 
-    public static final int SYNC_INTERVAL_MILLISECONDS = 1800000; // 30 minutes
+    public static final int SYNC_INTERVAL_FIVE_MINUTES = 300000;
+    public static final int SYNC_INTERVAL_TEN_MINUTES = 600000;
+    public static final int SYNC_INTERVAL_FIFTEEN_MINUTES = 900000;
+    public static final int SYNC_INTERVAL_THIRTY_MINUTES = 1800000;
+    public static final int SYNC_INTERVAL_ONE_HOUR = 3600000;
+    public static final int SYNC_INTERVAL_TWO_HOURS = 7200000;
+    public static final int SYNC_INTERVAL_FOUR_HOURS = 14400000;
+    public static final int SYNC_INTERVAL_TWELVE_HOURS = 43200000;
+    public static final int SYNC_INTERVAL_TWENTY_FOUR_HOURS = 86400000;
 
     private StopSystemNotificationsReceiver mNotificationsReceiver;
 

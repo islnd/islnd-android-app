@@ -34,6 +34,7 @@ import io.islnd.android.islnd.app.models.Comment;
 import io.islnd.android.islnd.app.models.CommentViewModel;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.preferences.AppearancePreferenceFragment;
+import io.islnd.android.islnd.app.preferences.NotificationsPreferenceFragment;
 import io.islnd.android.islnd.app.preferences.ServerPreferenceFragment;
 import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
@@ -287,7 +288,7 @@ public class Util {
     public static void enableIncrementalSyncs(Context context) {
         BootReceiver.enableReceiver(context);
         SyncAlarm.enableReceiver(context);
-        SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_MILLISECONDS);
+        applySyncInterval(context);
     }
 
     public static void disableIncrementalSyncs(Context context) {
@@ -338,5 +339,46 @@ public class Util {
         }
 
         return withColons.toString();
+    }
+
+    public static void setSyncIntervalFromPreference(Context context, String arrayValue) {
+        switch (arrayValue) {
+            case "1":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_FIVE_MINUTES);
+                break;
+            case "2":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_TEN_MINUTES);
+                break;
+            case "3":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_FIFTEEN_MINUTES);
+                break;
+            case "4":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_THIRTY_MINUTES);
+                break;
+            case "5":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_ONE_HOUR);
+                break;
+            case "6":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_TWO_HOURS);
+                break;
+            case "7":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_FOUR_HOURS);
+                break;
+            case "8":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_TWELVE_HOURS);
+                break;
+            case "9":
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_TWENTY_FOUR_HOURS);
+                break;
+            default:
+                SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_THIRTY_MINUTES);
+        }
+    }
+
+    public static void applySyncInterval(Context context) {
+        String value = android.support.v7.preference.PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getString(NotificationsPreferenceFragment.PREF_SYNC_INTERVAL_KEY, "4");
+        setSyncIntervalFromPreference(context, value);
     }
 }

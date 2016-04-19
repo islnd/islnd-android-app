@@ -6,6 +6,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.fragments.NotificationsFragment;
 
 public class AppPreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener {
@@ -15,6 +16,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
     private static final String PREFERENCE_APPEARANCE_KEY = "pref_appearance_key";
     private static final String PREFERENCE_SERVER_KEY = "pref_server_key";
     private static final String PREFERENCE_ACCOUNT_KEY = "pref_account_key";
+    private static final String PREFERENCE_NOTIFICATIONS_KEY = "pref_notifications_key";
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -23,9 +25,11 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
         Preference appearancePreference = findPreference(PREFERENCE_APPEARANCE_KEY);
         Preference serverPreference = findPreference(PREFERENCE_SERVER_KEY);
         Preference accountPreference = findPreference(PREFERENCE_ACCOUNT_KEY);
+        Preference notificationsPreference = findPreference(PREFERENCE_NOTIFICATIONS_KEY);
         appearancePreference.setOnPreferenceClickListener(this);
         serverPreference.setOnPreferenceClickListener(this);
         accountPreference.setOnPreferenceClickListener(this);
+        notificationsPreference.setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -43,6 +47,10 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
                 break;
             case PREFERENCE_ACCOUNT_KEY:
                 settingsActivity.onPreferenceFragmentSelected(new AccountPreferenceFragment());
+                break;
+            case PREFERENCE_NOTIFICATIONS_KEY:
+                settingsActivity.onPreferenceFragmentSelected(new NotificationsPreferenceFragment());
+                break;
         }
         return true;
     }
