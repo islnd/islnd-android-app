@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                android:popupTheme="@style/AppTheme.PopupOverlay"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
                 android:fitsSystemWindows="true"/>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
