@@ -42,8 +42,8 @@ public class ShowQrFragment extends Fragment {
         Util.buildQrCode(qrImageView, encodedIdentity);
 
         //--Start find friend service because someone may snap our QR code
-        Intent findFriendServiceIntent = new Intent(mContext, RepeatSyncService.class);
-        mContext.startService(findFriendServiceIntent);
+        Intent repeatSyncServiceIntent = new Intent(mContext, RepeatSyncService.class);
+        mContext.startService(repeatSyncServiceIntent);
 
         Button getQrButton = (Button) v.findViewById(R.id.get_qr_button);
         getQrButton.setOnClickListener((View view) -> {

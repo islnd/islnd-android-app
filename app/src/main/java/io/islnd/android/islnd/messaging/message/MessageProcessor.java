@@ -42,7 +42,7 @@ public class MessageProcessor {
         switch (type) {
             case MessageType.PUBLIC_IDENTITY: {
                 Log.d(TAG, "process public identity");
-
+                
                 if (!DataUtils.validateMessage(context, message)) {
                     Log.w(TAG, "public identity message was not valid");
                     return;

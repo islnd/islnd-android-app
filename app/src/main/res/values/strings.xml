@@ -111,6 +111,7 @@
     <string name="view_identity">View Identity</string>
     <string name="notification_badge">notification_badge</string>
     <string name="notification_badge_99_plus">99+</string>
+    <string name="sms_add_self_message">We are already friends with ourselves :)</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>
@@ -123,6 +124,6 @@
     </string-array>
     <string-array name="nav_add_friend_actions">
         <item>QR Code</item>
-        <!--<item>SMS</item>-->
+        <item>SMS</item>
     </string-array>
 </resources>

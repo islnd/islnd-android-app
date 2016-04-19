@@ -764,6 +764,7 @@ public class DataUtils {
         Log.d(TAG, "updateUser");
         ContentValues values = new ContentValues();
         values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, inbox);
+        values.put(IslndContract.UserEntry.COLUMN_ACTIVE, IslndContract.UserEntry.ACTIVE);
         if (outbox != null) {
             values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, outbox);
         }

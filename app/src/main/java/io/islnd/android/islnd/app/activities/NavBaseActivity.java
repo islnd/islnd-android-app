@@ -35,9 +35,13 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.NotificationsFragment;
@@ -46,8 +50,11 @@ import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.util.ImageUtil;
+import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.messaging.PublicIdentity;
 import io.islnd.android.islnd.messaging.ServerTime;
+import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class NavBaseActivity extends IslndActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -294,12 +301,15 @@ public class NavBaseActivity extends IslndActivity
     }
 
     private void sendSms(String number) {
-        String sms = getString(R.string.sms_prefix) +
-                MessageLayer.createNewPublicIdentity(getApplicationContext());
+        PublicIdentity myPublicIdentity = MessageLayer.createNewPublicIdentity(getApplicationContext());
+        String encodedIdentity = new Encoder().encodeToString(myPublicIdentity.toByteArray());
+        String message = getString(R.string.sms_prefix) + encodedIdentity;
+        Log.v(TAG, "sending " + message);
 
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(number, null, sms, null, null);
+            ArrayList<String> messages = smsManager.divideMessage(message);
+            smsManager.sendMultipartTextMessage(number, null, messages, null, null);
             Snackbar.make(mDrawerLayout, "SMS sent!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS sent!");
         } catch (Exception e) {

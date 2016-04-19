@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.security.Key;
@@ -22,9 +23,33 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
+    public static boolean addPublicIdentityFromSms(Context context, String encodedString) {
+        Log.d(TAG, "addPublicIdentityFromSms");
+        PublicIdentity friendPublicIdentity = null;
+        try {
+            friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, e.toString());
+            return false;
+        }
+
+        if (DataUtils.getPublicKey(context, IslndContract.UserEntry.MY_USER_ID)
+                .equals(friendPublicIdentity.getPublicKey())) {
+            Toast.makeText(context, context.getText(R.string.sms_add_self_message), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "can't sms ourselves");
+            return false;
+        }
+
+        return addFriendAndStartAddBackJobs(context, friendPublicIdentity);
+    }
+
     public static boolean addPublicIdentityFromQrCode(Context context, String encodedString) {
         Log.d(TAG, "addPublicIdentityFromQrCode");
         PublicIdentity friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        return addFriendAndStartAddBackJobs(context, friendPublicIdentity);
+    }
+
+    private static boolean addFriendAndStartAddBackJobs(Context context, PublicIdentity friendPublicIdentity) {
         boolean newFriend = DataUtils.addOrUpdateUser(
                 context,
                 friendPublicIdentity.getPublicKey(),
