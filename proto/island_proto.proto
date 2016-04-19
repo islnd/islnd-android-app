@@ -5,6 +5,7 @@ option java_package = "io.islnd.android.islnd.messaging.proto";
 message PublicIdentity {
   required string message_inbox = 1;
   required string public_key = 2;
+  required string nonce = 3;
 }
 
 message SecretIdentity {
@@ -42,7 +43,8 @@ message ProfileResource {
 
 message Message {
   required string mailbox = 1;
-  required int32 message_id = 2;
-  required int32 type = 3;
-  required string blob = 4;
+  optional string nonce = 2;
+  required int32 message_id = 3;
+  required int32 type = 4;
+  required string blob = 5;
 }

@@ -60,9 +60,6 @@ public class CreateIdentityService extends IntentService {
     }
 
     private int setAlias(Context context, String displayName) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = settings.edit();
-
         String alias = CryptoUtil.createAlias();
         String messageInbox = CryptoUtil.createAlias();
 
@@ -74,9 +71,6 @@ public class CreateIdentityService extends IntentService {
                 null,
                 Util.getGroupKey(context),
                 Util.getPublicKey(context));
-
-        editor.putString(context.getString(R.string.message_inbox), messageInbox);
-        editor.commit();
 
         return (int)userId;
     }

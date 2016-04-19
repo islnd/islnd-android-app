@@ -36,6 +36,7 @@ public class IslndProvider extends ContentProvider {
     static final int OUTGOING_MESSAGE = 1100;
     static final int NOTIFICATION = 1200;
     static final int NOTIFICATION_WITH_USER_DATA = 1300;
+    static final int MESSAGE_TOKEN = 1400;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -330,6 +331,8 @@ public class IslndProvider extends ContentProvider {
 
         matcher.addURI(authority, IslndContract.PATH_NOTIFICATION_WITH_USER_DATA, NOTIFICATION_WITH_USER_DATA);
 
+        matcher.addURI(authority, IslndContract.PATH_MESSAGE_TOKEN, MESSAGE_TOKEN);
+
         return matcher;
     }
 
@@ -507,6 +510,17 @@ public class IslndProvider extends ContentProvider {
             case OUTGOING_MESSAGE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         IslndContract.OutgoingMessageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case MESSAGE_TOKEN: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.MessageTokenEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -704,6 +718,19 @@ public class IslndProvider extends ContentProvider {
                             IslndContract.NotificationWithUserDataEntry.CONTENT_URI,
                             null);
                     returnUri = IslndContract.NotificationEntry.buildNotificationUri(_id);
+                } else {
+                    return null;
+                }
+
+                break;
+            }
+            case MESSAGE_TOKEN: {
+                long _id = db.insert(
+                        IslndContract.MessageTokenEntry.TABLE_NAME,
+                        null,
+                        values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.MessageTokenEntry.buildMessageTokenUri(_id);
                 } else {
                     return null;
                 }

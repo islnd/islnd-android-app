@@ -183,6 +183,14 @@ public class CryptoUtil {
         return getRandomString();
     }
 
+    public static String getNewNonce() {
+        return getRandomString();
+    }
+
+    public static String getNewMailbox() {
+        return getRandomString();
+    }
+
     private static String getRandomString() {
         //--64 bits of entropy
         return String.valueOf(secureRandom.nextLong());

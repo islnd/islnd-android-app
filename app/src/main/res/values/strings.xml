@@ -105,7 +105,6 @@
     <string name="notification_comment_content">commented on your post</string>
     <string name="notification_new_friend_content">is now your friend</string>
     <string name="post_does_not_exist">Post does not exist</string>
-    <string name="message_inbox">message_inbox</string>
     <string name="message_id">message_id</string>
     <string name="notification_big_content_title">new islnd notifications</string>
     <string name="notification_big_content_title_single">1 new islnd notification</string>

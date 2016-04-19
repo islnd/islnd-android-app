@@ -11,9 +11,10 @@ import io.islnd.android.islnd.messaging.SecretIdentity;
 public class MessageBuilder {
     private static final String TAG = MessageBuilder.class.getSimpleName();
 
-    public static Message buildPublicIdentityMessage(Context context, String mailbox, PublicIdentity publicIdentity) {
+    public static Message buildPublicIdentityMessage(Context context, String mailbox, String nonce, PublicIdentity publicIdentity) {
         return new Message(
                 mailbox,
+                nonce,
                 getNewMessageIdAndUpdate(context),
                 MessageType.PUBLIC_IDENTITY,
                 new Encoder().encodeToString(publicIdentity.toByteArray()));

@@ -3,21 +3,23 @@ package io.islnd.android.islnd.messaging;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.Serializable;
-import java.security.Key;
 import java.security.PublicKey;
 
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.proto.IslandProto;
 
 public class PublicIdentity implements Serializable, ProtoSerializable<PublicIdentity> {
+
     private final String messageInbox;
     private final PublicKey publicKey;
+    private final String nonce;
 
     public PublicIdentity(
             String messageInbox,
-            PublicKey publicKey) {
+            PublicKey publicKey, String nonce) {
         this.messageInbox = messageInbox;
         this.publicKey = publicKey;
+        this.nonce = nonce;
     }
 
     public PublicKey getPublicKey() {
@@ -36,7 +38,8 @@ public class PublicIdentity implements Serializable, ProtoSerializable<PublicIde
 
         PublicIdentity otherPublicIdentity = (PublicIdentity)other;
         return this.publicKey.equals(otherPublicIdentity.publicKey)
-                && this.messageInbox.equals(otherPublicIdentity.messageInbox);
+                && this.messageInbox.equals(otherPublicIdentity.messageInbox)
+                && this.nonce.equals(otherPublicIdentity.nonce);
     }
 
     public static PublicIdentity fromProto(String blob) {
@@ -51,7 +54,8 @@ public class PublicIdentity implements Serializable, ProtoSerializable<PublicIde
 
         return new PublicIdentity(
                 identity.getMessageInbox(),
-                CryptoUtil.decodePublicKey(identity.getPublicKey()));
+                CryptoUtil.decodePublicKey(identity.getPublicKey()),
+                identity.getNonce());
     }
 
     @Override
@@ -59,7 +63,12 @@ public class PublicIdentity implements Serializable, ProtoSerializable<PublicIde
         return IslandProto.PublicIdentity.newBuilder()
                 .setPublicKey(CryptoUtil.encodeKey(this.getPublicKey()))
                 .setMessageInbox(this.getMessageInbox())
+                .setNonce(this.nonce)
                 .build()
                 .toByteArray();
+    }
+
+    public String getNonce() {
+        return nonce;
     }
 }

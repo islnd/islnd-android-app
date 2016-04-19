@@ -49,7 +49,7 @@ public class CryptoTests extends AndroidTestCase
     private static PublicIdentity bulidFakeIdentity() {
         return new PublicIdentity(
                 "inbox",
-                CryptoUtil.getKeyPair().getPublic()
-        );
+                CryptoUtil.getKeyPair().getPublic(),
+                "random");
     }
 }

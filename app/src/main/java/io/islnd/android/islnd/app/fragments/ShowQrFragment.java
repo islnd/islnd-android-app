@@ -36,7 +36,7 @@ public class ShowQrFragment extends Fragment {
         setHasOptionsMenu(true);
 
         ImageView qrImageView = (ImageView) v.findViewById(R.id.qr_image_view);
-        PublicIdentity myPublicIdentity = MessageLayer.getMyPublicIdentity(mContext);
+        PublicIdentity myPublicIdentity = MessageLayer.createNewPublicIdentity(mContext);
         String encodedIdentity = new Encoder().encodeToString(myPublicIdentity.toByteArray());
         Log.v(TAG, "encoded identity string has length " + encodedIdentity.length());
         Util.buildQrCode(qrImageView, encodedIdentity);

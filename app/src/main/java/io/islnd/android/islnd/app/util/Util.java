@@ -137,19 +137,6 @@ public class Util {
                 sharedPref.getString(context.getString(R.string.public_key), ""));
     }
 
-    public static String getMyInbox(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.message_inbox), "");
-    }
-
-    public static void setMyInbox(Context context, String inbox) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putString(context.getString(R.string.message_inbox), inbox);
-        editor.commit();
-    }
-
     public static PrivateKey getPrivateKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePrivateKey(

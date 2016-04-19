@@ -26,6 +26,7 @@ public class IslndContract {
     public static final String PATH_OUTGOING_MESSAGE = "outgoing_message";
     public static final String PATH_NOTIFICATION = "notification";
     public static final String PATH_NOTIFICATION_WITH_USER_DATA = "notification_with_user_data";
+    public static final String PATH_MESSAGE_TOKEN = "message_token";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -366,6 +367,26 @@ public class IslndContract {
         public static final String COLUMN_BLOB = "blob";
 
         public static Uri buildOutgoingMessageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class MessageTokenEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MESSAGE_TOKEN).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MESSAGE_TOKEN;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MESSAGE_TOKEN;
+
+        public static final String TABLE_NAME = "message_token";
+
+        public static final String COLUMN_MAILBOX = "mailbox";
+        public static final String COLUMN_NONCE = "nonce";
+
+        public static Uri buildMessageTokenUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

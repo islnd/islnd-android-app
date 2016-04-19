@@ -27,12 +27,10 @@ public class MessageLayer {
         PublicIdentity friendPublicIdentity = PublicIdentity.fromProto(encodedString);
         boolean newFriend = DataUtils.addOrUpdateUser(
                 context,
-                friendPublicIdentity,
-                Util.getMyInbox(context));  //--My current inbox will be where I check for new
-                                            //  messages from this user
+                friendPublicIdentity.getPublicKey(),
+                friendPublicIdentity.getMessageInbox());
 
-        //--We need a new inbox to give to our next friend
-        Util.setMyInbox(context, CryptoUtil.createAlias());
+        Log.v(TAG, "friend wants inbox " + friendPublicIdentity.getMessageInbox());
 
         //--Check for friend's profile
         Intent repeatSyncServiceIntent = new Intent(context, RepeatSyncService.class);
@@ -40,19 +38,19 @@ public class MessageLayer {
 
         //--Send our identity and profile to friend
         final String friendInbox = friendPublicIdentity.getMessageInbox();
-        startAddBackJob(context, friendInbox, FriendAddBackService.PUBLIC_IDENTITY_JOB);
-        startAddBackJob(context, friendInbox, FriendAddBackService.SECRET_IDENTITY_JOB);
-        startAddBackJob(context, friendInbox, FriendAddBackService.PROFILE_JOB);
+        final String randomValue = friendPublicIdentity.getNonce();
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.PUBLIC_IDENTITY_JOB);
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.SECRET_IDENTITY_JOB);
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.PROFILE_JOB);
 
         return newFriend;
     }
 
-    private static void startAddBackJob(Context context, String friendInbox, int identityJob) {
+    private static void startAddBackJob(Context context, String destinationMailbox, String nonce, int identityJob) {
         Intent sendIdentityIntent = new Intent(context, FriendAddBackService.class);
-        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, friendInbox);
-        sendIdentityIntent.putExtra(
-                FriendAddBackService.JOB_EXTRA,
-                identityJob);
+        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, destinationMailbox);
+        sendIdentityIntent.putExtra(FriendAddBackService.NONCE_EXTRA, nonce);
+        sendIdentityIntent.putExtra(FriendAddBackService.JOB_EXTRA, identityJob);
         context.startService(sendIdentityIntent);
     }
 
@@ -60,7 +58,7 @@ public class MessageLayer {
             Context context,
             int userId,
             SecretIdentity secretIdentity) {
-        DataUtils.addSecretIdentity(context, userId, secretIdentity);
+        DataUtils.addOrUpdateSecretIdentity(context, userId, secretIdentity);
         Profile profile = Util.buildDefaultProfile(context, secretIdentity.getDisplayName());
         DataUtils.insertProfile(context, profile, userId);
 
@@ -69,14 +67,18 @@ public class MessageLayer {
         return true;
     }
 
-    public static PublicIdentity getMyPublicIdentity(Context context) {
+    public static PublicIdentity createNewPublicIdentity(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String messageInbox = DataUtils.getMessageInbox(context, IslndContract.UserEntry.MY_USER_ID);
+        String messageInbox = MailboxHelper.getAndSetMyNewInbox(context);
+
         PublicKey publicKey = CryptoUtil.decodePublicKey(
                 sharedPreferences.getString(context.getString(R.string.public_key), ""));
+        final String nonce = CryptoUtil.getNewNonce();
 
-        return new PublicIdentity(messageInbox, publicKey);
+        DataUtils.addMessageToken(context, messageInbox, nonce);
+
+        return new PublicIdentity(messageInbox, publicKey, nonce);
     }
 
     public static SecretIdentity getMySecretIdentity(Context context) {

@@ -295,7 +295,7 @@ public class NavBaseActivity extends IslndActivity
 
     private void sendSms(String number) {
         String sms = getString(R.string.sms_prefix) +
-                MessageLayer.getMyPublicIdentity(getApplicationContext());
+                MessageLayer.createNewPublicIdentity(getApplicationContext());
 
         try {
             SmsManager smsManager = SmsManager.getDefault();
