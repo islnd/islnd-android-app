@@ -73,7 +73,7 @@
     <string name="pref_appearance_title">Appearance</string>
     <string name="pref_appearance_summary">Application theme</string>
     <string name="pref_server_title">Server</string>
-    <string name="pref_server_summary">Configure host settings</string>
+    <string name="pref_server_summary">API key</string>
     <string name="pref_account_title">Account</string>
     <string name="pref_account_summary">Delete account</string>
     <string name="pref_api_key_title">API Key</string>
@@ -112,6 +112,32 @@
     <string name="view_identity">View Identity</string>
     <string name="notification_badge">notification_badge</string>
     <string name="notification_badge_99_plus">99+</string>
+    <string name="pref_notification_title">Notifications</string>
+    <string name="pref_notification_summary">Sync interval</string>
+    <string name="pref_sync_interval_title">Sync interval</string>
+    <string name="pref_sync_interval_default_value">4</string>
+    <string-array name="pref_sync_interval_array">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>4 hours</item>
+        <item>12 hours</item>
+        <item>Daily</item>
+    </string-array>
+    <string-array name="pref_sync_interval_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>
