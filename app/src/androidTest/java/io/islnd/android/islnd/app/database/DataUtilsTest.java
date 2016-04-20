@@ -3,8 +3,6 @@ package io.islnd.android.islnd.app.database;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 
-import junit.framework.Assert;
-
 public class DataUtilsTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
