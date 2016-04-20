@@ -168,7 +168,14 @@ public class EventProcessor {
 
     private static void addComment(Context context, NewCommentEvent newCommentEvent) {
         int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
-        int postUserId = DataUtils.getUserIdFromPostAuthorAlias(context, newCommentEvent.getPostAuthorAlias());
+        int postUserId = 0;
+        try {
+            postUserId = DataUtils.getUserIdFromPostAuthorAlias(context, newCommentEvent.getPostAuthorAlias());
+        } catch (IllegalArgumentException e) {
+            Log.v(TAG, e.toString());
+            Log.v(TAG, "not friends with post author");
+            return;
+        }
 
         ContentValues values = new ContentValues();
         values.put(IslndContract.CommentEntry.COLUMN_POST_AUTHOR_ALIAS, newCommentEvent.getPostAuthorAlias());
