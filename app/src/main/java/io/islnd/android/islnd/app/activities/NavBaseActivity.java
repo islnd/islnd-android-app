@@ -247,7 +247,7 @@ public class NavBaseActivity extends IslndActivity
 
     private void addFriendActionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
-        builder.setTitle(R.string.add_friend_dialog)
+        builder.setTitle(R.string.dialog_title_add_friend_action)
                 .setItems(
                         R.array.nav_add_friend_actions,
                         (DialogInterface dialog, int which) -> {

@@ -46,8 +46,10 @@
                 android:orientation="vertical"
                 android:background="@color/background_core"
                 android:layout_marginTop="@dimen/profile_header_height"
-                android:paddingTop="@dimen/profile_info_padding"
-                android:paddingBottom="@dimen/profile_bottom_padding"
+                android:paddingTop="@dimen/profile_info_top_padding"
+                android:paddingBottom="@dimen/profile_info_padding"
+                android:paddingLeft="@dimen/profile_info_padding"
+                android:paddingRight="@dimen/profile_info_padding"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.2">
 
@@ -81,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                android:popupTheme="@style/AppTheme.PopupOverlay"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
                 android:fitsSystemWindows="true"/>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>

@@ -27,7 +27,8 @@ public class DeletePostDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dialog);
-        return builder.setMessage(getString(R.string.delete_post_dialog))
+        return builder.setTitle(getString(R.string.dialog_title_delete_post))
+                .setMessage(getString(R.string.dialog_delete_post))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                         {
                             String postId = getArguments().getString(POST_ID_BUNDLE_KEY);

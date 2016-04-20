@@ -1,42 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/comment_vertical_padding"
-                android:paddingBottom="@dimen/comment_vertical_padding"
-                android:paddingLeft="@dimen/comment_horizontal_padding"
-                android:paddingRight="@dimen/comment_horizontal_padding">
-
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/comment_vertical_padding"
+    android:paddingBottom="@dimen/comment_vertical_padding"
+    android:paddingLeft="@dimen/comment_horizontal_padding"
+    android:paddingRight="@dimen/comment_horizontal_padding">
+    
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/comment_profile_image"
         android:layout_width="@dimen/comment_profile_image"
         android:layout_height="@dimen/comment_profile_image"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:layout_marginRight="@dimen/comment_profile_image_margin"/>
 
-    <LinearLayout
-        android:id="@+id/comment_linear_layout"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/comment_display_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/comment_profile_image">
+        android:layout_toRightOf="@+id/comment_profile_image"
+        android:layout_toLeftOf="@+id/comment_timestamp"
+        style="@style/Base.TextAppearance.AppCompat.Body2"
+        android:textColor="@color/primary_text"/>
 
-        <TextView
-            android:id="@+id/comment_user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Base.TextAppearance.AppCompat.Body2"
-            android:textColor="@color/primary_text"/>
-
-        <TextView
-            android:id="@+id/comment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Base.TextAppearance.AppCompat.Body1"
-            android:textColor="@color/primary_text"/>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_display_name"
+        android:layout_toRightOf="@+id/comment_profile_image"
+        android:layout_toLeftOf="@+id/comment_timestamp"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
+        android:textColor="@color/primary_text"/>
 
     <TextView
         android:id="@+id/comment_timestamp"
@@ -44,6 +43,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/comment_timestamp_margin"
         style="@style/Base.TextAppearance.AppCompat.Caption"
         android:textColor="@color/secondary_text"/>
+
 </RelativeLayout>

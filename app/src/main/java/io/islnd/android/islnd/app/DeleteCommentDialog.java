@@ -23,7 +23,8 @@ public class DeleteCommentDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dialog);
-        return builder.setMessage(getString(R.string.delete_comment_dialog))
+        return builder.setTitle(getString(R.string.dialog_title_delete_comment))
+                .setMessage(getString(R.string.dialog_delete_comment))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                         {
                             String commentId = getArguments().getString(COMMENT_ID_BUNDLE_KEY);
