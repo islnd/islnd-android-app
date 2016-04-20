@@ -8,7 +8,10 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.security.Key;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -16,9 +19,13 @@ import io.islnd.android.islnd.app.models.CommentKey;
 import io.islnd.android.islnd.app.models.PostAliasKey;
 import io.islnd.android.islnd.app.models.PostKey;
 import io.islnd.android.islnd.app.models.Profile;
+import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.PublicKeyAndInbox;
 import io.islnd.android.islnd.messaging.ServerTime;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
+import io.islnd.android.islnd.messaging.message.Message;
+import io.islnd.android.islnd.messaging.message.MessageBuilder;
 
 public class DataUtils {
     private static final String TAG = DataUtils.class.getSimpleName();
@@ -669,6 +676,17 @@ public class DataUtils {
                 null);
     }
 
+    public static void updateGroupKey(Context context, int userId, String newGroupKeyEncoded) {
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, newGroupKeyEncoded);
+
+        context.getContentResolver().update(
+                IslndContract.AliasEntry.buildAliasWithUserId(userId),
+                values,
+                null,
+                null);
+    }
+
     public static void markUserAsDeletedAndDeletePosts(Context context, int userId) {
         ContentResolver contentResolver = context.getContentResolver();
         contentResolver.delete(
@@ -685,5 +703,45 @@ public class DataUtils {
                 null,
                 null
         );
+    }
+
+    public static List<PublicKeyAndInbox> getKeysForOtherUsers(Context context, int userIdToRemove) {
+        String[] projection = new String[] {
+                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
+                IslndContract.UserEntry.COLUMN_MESSAGE_INBOX
+        };
+
+        Cursor cursor = null;
+        try {
+            final String selection = IslndContract.UserEntry._ID + " != ? AND " +
+                    IslndContract.UserEntry._ID + " != ?";
+            cursor = context.getContentResolver().query(
+                    IslndContract.UserEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    new String[] {
+                            Integer.toString(IslndContract.UserEntry.MY_USER_ID),
+                            Integer.toString(userIdToRemove)
+                    },
+                    null);
+
+            List<PublicKeyAndInbox> publicKeyAndInboxList = new ArrayList<>();
+            if (!cursor.moveToFirst()) {
+                return publicKeyAndInboxList;
+            }
+
+            do {
+                publicKeyAndInboxList.add(new PublicKeyAndInbox(
+                        CryptoUtil.decodePublicKey(cursor.getString(0)),
+                        cursor.getString(1)
+                ));
+            } while (cursor.moveToNext());
+
+            return publicKeyAndInboxList;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

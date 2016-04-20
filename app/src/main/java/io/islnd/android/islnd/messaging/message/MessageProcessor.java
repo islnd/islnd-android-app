@@ -61,6 +61,12 @@ public class MessageProcessor {
                 DataUtils.updateAlias(context, userID, message.getBlob());
                 break;
             }
+            case MessageType.NEW_GROUP_KEY: {
+                Log.v(TAG, "process new group key");
+                int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
+                DataUtils.updateGroupKey(context, userID, message.getBlob());
+                break;
+            }
             case MessageType.DELETE_ME: {
                 Log.v(TAG, "process delete user");
                 int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());

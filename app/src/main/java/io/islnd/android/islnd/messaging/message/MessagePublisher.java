@@ -2,16 +2,20 @@ package io.islnd.android.islnd.messaging.message;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.security.Key;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.List;
+
+import javax.crypto.SecretKey;
 
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.PublicKeyAndInbox;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 
@@ -20,8 +24,11 @@ public class MessagePublisher {
 
     public static void removeFriend(Context context, int userId) {
         String newAlias = CryptoUtil.createAlias();
-        createMessagesForRemainingFriends(context, userId, newAlias);
+        SecretKey newGroupKey = CryptoUtil.getKey();
+        createMessagesForRemainingFriends(context, userId, newAlias, newGroupKey);
         DataUtils.updateAlias(context, IslndContract.UserEntry.MY_USER_ID, newAlias);
+        DataUtils.updateGroupKey(context, IslndContract.UserEntry.MY_USER_ID, CryptoUtil.encodeKey(newGroupKey));
+        Util.setGroupKey(context, newGroupKey);
 
         createMessageForFriendToRemove(context, userId);
     }
@@ -48,8 +55,8 @@ public class MessagePublisher {
         return new EncryptedMessage(deleteMeMessage, friendToRemovePublicKey, Util.getPrivateKey(context));
     }
 
-    private static void createMessagesForRemainingFriends(Context context, int userId, String newAlias) {
-        ContentValues[] values = createContentValuesForRemainingFriends(context, userId, newAlias);
+    private static void createMessagesForRemainingFriends(Context context, int userIdToRemove, String newAlias, SecretKey newGroupKey) {
+        ContentValues[] values = createContentValuesForRemainingFriends(context, userIdToRemove, newAlias, newGroupKey);
         int recordsInserted = context.getContentResolver().bulkInsert(
                 IslndContract.OutgoingMessageEntry.CONTENT_URI,
                 values
@@ -57,57 +64,71 @@ public class MessagePublisher {
         Log.v(TAG, String.format("wrote %d messages", recordsInserted));
     }
 
-    private static ContentValues[] createContentValuesForRemainingFriends(Context context, int userId, String newAlias) {
-        String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
-                IslndContract.UserEntry.COLUMN_MESSAGE_INBOX
-        };
+    private static ContentValues[] createContentValuesForRemainingFriends(
+            Context context,
+            int userIdToRemove,
+            String newAlias,
+            SecretKey newGroupKey) {
+
+        List<PublicKeyAndInbox> publicKeyAndInboxList = DataUtils.getKeysForOtherUsers(context, userIdToRemove);
+        ContentValues[] values = new ContentValues[publicKeyAndInboxList.size() * 2];
+        initializeArray(values);
 
         PrivateKey myPrivateKey = Util.getPrivateKey(context);
+        final String newGroupKeyEncoded = CryptoUtil.encodeKey(newGroupKey);
 
-        Cursor cursor = null;
-        try {
-            final String selection = IslndContract.UserEntry._ID + " != ? AND " +
-                    IslndContract.UserEntry._ID + " != ?";
-            cursor = context.getContentResolver().query(
-                    IslndContract.UserEntry.CONTENT_URI,
-                    projection,
-                    selection,
-                    new String[] {
-                            Integer.toString(IslndContract.UserEntry.MY_USER_ID),
-                            Integer.toString(userId)
-                    },
-                    null);
+        int index = 0;
+        for (PublicKeyAndInbox publicKeyAndInbox : publicKeyAndInboxList) {
+            final Message newAliasMessage = MessageBuilder.buildNewAliasMessage(
+                    context,
+                    publicKeyAndInbox.getInbox(),
+                    newAlias
+            );
+            encryptMessageAndSetToContentValue(
+                    newAliasMessage,
+                    myPrivateKey,
+                    publicKeyAndInbox.getPublicKey(),
+                    values[index++],
+                    publicKeyAndInbox.getInbox());
 
-            ContentValues[] values = new ContentValues[cursor.getCount()];
-            int index = 0;
-            if (cursor.moveToFirst()) {
-                do {
-                    values[index] = new ContentValues();
-                    EncryptedMessage encryptedMessage = new EncryptedMessage(
-                            MessageBuilder.buildNewAliasMessage(
-                                    context,
-                                    cursor.getString(1),
-                                    newAlias
-                            ),
-                            CryptoUtil.decodePublicKey(cursor.getString(0)),
-                            myPrivateKey
-                    );
-                    values[index].put(
-                            IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX,
-                            cursor.getString(1));
-                    values[index].put(
-                            IslndContract.OutgoingMessageEntry.COLUMN_BLOB,
-                            encryptedMessage.getBlob());
-                    index++;
-                } while (cursor.moveToNext());
-            }
-
-            return values;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            final Message newGroupKeyMessage = MessageBuilder.buildNewGroupKeyMessage(
+                    context,
+                    publicKeyAndInbox.getInbox(),
+                    newGroupKeyEncoded
+            );
+            encryptMessageAndSetToContentValue(
+                    newGroupKeyMessage,
+                    myPrivateKey,
+                    publicKeyAndInbox.getPublicKey(),
+                    values[index++],
+                    publicKeyAndInbox.getInbox());
         }
+
+        return values;
+    }
+
+    private static void initializeArray(ContentValues[] values) {
+        for (int i = 0; i < values.length; i++) {
+            values[i] = new ContentValues();
+        }
+    }
+
+    private static void encryptMessageAndSetToContentValue(
+            Message message,
+            PrivateKey myPrivateKey,
+            PublicKey publicKey,
+            ContentValues value,
+            String recipientInbox) {
+        EncryptedMessage encryptedAliasMessage = new EncryptedMessage(
+                message,
+                publicKey,
+                myPrivateKey
+        );
+        value.put(
+                IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX,
+                recipientInbox);
+        value.put(
+                IslndContract.OutgoingMessageEntry.COLUMN_BLOB,
+                encryptedAliasMessage.getBlob());
     }
 }
