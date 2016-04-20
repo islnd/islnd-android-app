@@ -80,7 +80,8 @@ public class EventProcessor {
                 null,
                 null);
 
-        Log.v(TAG, "new alias is " + event.getNewAlias());
+        Log.v(TAG, String.format("user %d changed alias from %s to %s",
+                userId, event.getAlias(), event.getNewAlias()));
     }
 
     private static void changeHeaderPicture(Context context, ChangeHeaderPictureEvent event) {
@@ -155,7 +156,8 @@ public class EventProcessor {
                 IslndContract.PostEntry.CONTENT_URI,
                 values);
 
-        Log.v(TAG, "add post " + newPostEvent.getAlias() + " " + newPostEvent.getPostId());
+        Log.v(TAG, String.format("adding post id %s for alias %s ",
+                newPostEvent.getPostId(), newPostEvent.getAlias()));
     }
 
     private static void deletePost(Context context, DeletePostEvent deletePostEvent) {

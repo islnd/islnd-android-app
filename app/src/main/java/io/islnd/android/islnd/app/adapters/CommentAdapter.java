@@ -71,25 +71,27 @@ public class CommentAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewH
                 holder.profileImage,
                 Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI))));
 
-        if (comment.getUserId() == IslndContract.UserEntry.MY_USER_ID) {
-            holder.view.setOnLongClickListener((View v) -> {
-                final String DELETE_COMMENT = mContext.getString(R.string.delete_comment);
-                final String[] items = {DELETE_COMMENT};
+        holder.view.setOnLongClickListener((View v) -> {
+            if (comment.getUserId() != IslndContract.UserEntry.MY_USER_ID) {
+                return false;
+            }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
-                builder.setItems(items, (DialogInterface dialog, int item) -> {
-                    String itemStr = items[item];
-                    if (itemStr.equals(DELETE_COMMENT)) {
-                        DialogFragment deleteCommentFragment =
-                                DeleteCommentDialog.buildWithArgs(comment.getCommentId());
-                        deleteCommentFragment.show(
-                                ((FragmentActivity) mContext).getSupportFragmentManager(),
-                                mContext.getString(R.string.fragment_delete_comment));
-                    }
-                }).show();
+            final String DELETE_COMMENT = mContext.getString(R.string.delete_comment);
+            final String[] items = {DELETE_COMMENT};
 
-                return true;
-            });
-        }
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme_Dialog);
+            builder.setItems(items, (DialogInterface dialog, int item) -> {
+                String itemStr = items[item];
+                if (itemStr.equals(DELETE_COMMENT)) {
+                    DialogFragment deleteCommentFragment =
+                            DeleteCommentDialog.buildWithArgs(comment.getCommentId());
+                    deleteCommentFragment.show(
+                            ((FragmentActivity) mContext).getSupportFragmentManager(),
+                            mContext.getString(R.string.fragment_delete_comment));
+                }
+            }).show();
+
+            return true;
+        });
     }
 }

@@ -326,6 +326,7 @@ public class DataUtils {
         contentResolver.delete(IslndContract.ProfileEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.DisplayNameEntry.CONTENT_URI, null, null);
+
         contentResolver.delete(IslndContract.ReceivedEventEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.ReceivedMessageEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.OutgoingEventEntry.CONTENT_URI, null, null);

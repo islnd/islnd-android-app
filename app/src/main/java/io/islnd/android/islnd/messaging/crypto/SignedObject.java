@@ -31,13 +31,10 @@ public class SignedObject implements ProtoSerializable<SignedObject> {
                 .toByteArray();
     }
 
-    public static SignedObject fromProto(byte[] bytes) {
+    public static SignedObject fromProto(byte[] bytes) throws InvalidProtocolBufferException {
         IslandProto.SignedObject signedObject = null;
-        try {
-            signedObject = IslandProto.SignedObject.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
+        signedObject = IslandProto.SignedObject.parseFrom(bytes);
+
         return new SignedObject(signedObject.getObject(), signedObject.getSignature());
     }
 }
