@@ -307,20 +307,20 @@ public class DataUtils {
                 args);
     }
 
-    public static void deleteComment(ContentResolver contentResolver, CommentKey commentKey) {
+    public static int deleteComment(ContentResolver contentResolver, CommentKey commentKey) {
         String selection = IslndContract.CommentEntry.COLUMN_COMMENT_USER_ID + " = ? AND " +
                 IslndContract.CommentEntry.COLUMN_COMMENT_ID + " = ?";
         String[] args = new String[] {
                 Integer.toString(commentKey.getCommentAuthorId()),
                 commentKey.getCommentId()};
-        contentResolver.delete(
+        return contentResolver.delete(
                 IslndContract.CommentEntry.CONTENT_URI,
                 selection,
                 args);
     }
 
-    public static void deleteComment(Context context, CommentKey commentKey) {
-        deleteComment(context.getContentResolver(), commentKey);
+    public static int deleteComment(Context context, CommentKey commentKey) {
+        return deleteComment(context.getContentResolver(), commentKey);
     }
 
     public static void deleteAll(Context context) {

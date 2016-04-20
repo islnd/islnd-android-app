@@ -224,14 +224,18 @@ public class EventProcessor {
 
     private static void deleteComment(Context context, DeleteCommentEvent deleteCommentEvent) {
         int commentUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
+
+        CommentKey commentToDelete = new CommentKey(commentUserId, deleteCommentEvent.getCommentId());
+        int deletedCount = DataUtils.deleteComment(context, commentToDelete);
+        if (deletedCount == 0) {
+            Log.d(TAG, "exit from delete comment");
+            return;
+        }
+
         PostAliasKey postAliasKey = DataUtils.getParentPostFromComment(
                 context,
                 commentUserId,
                 deleteCommentEvent.getCommentId());
-
-        CommentKey commentToDelete = new CommentKey(commentUserId, deleteCommentEvent.getCommentId());
-        DataUtils.deleteComment(context, commentToDelete);
-
         int commentCount = DataUtils.getCommentCount(
                 context,
                 postAliasKey.getPostAuthorAlias(),
