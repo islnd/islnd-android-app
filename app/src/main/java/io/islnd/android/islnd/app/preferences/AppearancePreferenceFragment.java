@@ -85,7 +85,8 @@ public class AppearancePreferenceFragment extends PreferenceFragmentCompat
 
     private void showRestartActivityDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
-        builder.setMessage(getString(R.string.restart_settings_message))
+        builder.setTitle(getString(R.string.dialog_title_restart_settings))
+                .setMessage(getString(R.string.dialog_restart_settings))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) -> {
                     Util.restartActivity((AppCompatActivity) getContext());
                 })

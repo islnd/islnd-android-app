@@ -1,6 +1,5 @@
 package io.islnd.android.islnd.app.activities;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +10,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -200,7 +200,8 @@ public class EditProfileActivity extends IslndActivity implements LoaderManager.
 
     private void showDiscardChangesDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
-        builder.setMessage(getString(R.string.discard_profile_changes_dialog))
+        builder.setTitle(getString(R.string.dialog_title_discard_profile_changes))
+                .setMessage(getString(R.string.dialog_discard_profile_changes))
                 .setPositiveButton(R.string.discard, (DialogInterface dialog, int id) ->
                 {
                     finish();

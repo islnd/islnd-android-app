@@ -18,7 +18,10 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat">
+        <item name="android:colorBackground">@color/background_mat</item>
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
 
     <style name="AppTheme.TransparentToolbar">
         <item name="titleTextColor">@android:color/white</item>
