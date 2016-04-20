@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import io.islnd.android.islnd.app.util.Util;
+
 public class BootReceiver extends BroadcastReceiver {
 
     private static final String TAG = BootReceiver.class.getSimpleName();
@@ -15,7 +17,7 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "onReceive");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            SyncAlarm.setAlarm(context, SyncAlarm.SYNC_INTERVAL_MILLISECONDS);
+            Util.applySyncInterval(context);
         }
     }
 

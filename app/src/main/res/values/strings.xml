@@ -72,7 +72,7 @@
     <string name="pref_appearance_title">Appearance</string>
     <string name="pref_appearance_summary">Application theme</string>
     <string name="pref_server_title">Server</string>
-    <string name="pref_server_summary">Configure host settings</string>
+    <string name="pref_server_summary">API key</string>
     <string name="pref_account_title">Account</string>
     <string name="pref_account_summary">Delete account</string>
     <string name="pref_api_key_title">API Key</string>
@@ -112,11 +112,51 @@
     <string name="view_identity">View Identity</string>
     <string name="notification_badge">notification_badge</string>
     <string name="notification_badge_99_plus">99+</string>
+    <string name="pref_notification_title">Notifications</string>
+    <string name="pref_notification_summary">Sync interval</string>
+    <string name="pref_sync_interval_title">Sync interval</string>
+    <string name="pref_sync_interval_default_value">4</string>
+    <string name="five_minutes">5 minutes</string>
+    <string name="ten_minutes">10 minutes</string>
+    <string name="fifteen_minutes">15 minutes</string>
+    <string name="thirty_minutes">30 minutes</string>
+    <string name="one_hour">1 hour</string>
+    <string name="two_hours">2 hours</string>
+    <string name="four_hours">4 hours</string>
+    <string name="twelve_hours">12 hours</string>
+    <string name="daily">Daily</string>
+    <string name="pref_enable_notifications_title">Enable notifications</string>
+    <string name="preferences_category_notifications">Notifications</string>
+    <string name="preferences_category_appearance">Appearance</string>
+    <string name="preferences_category_server">Server</string>
+    <string name="preferences_category_account">Account</string>
     <string name="dialog_title_delete_comment">Delete comment</string>
     <string name="dialog_title_delete_post">Delete post</string>
     <string name="dialog_title_discard_profile_changes">Discard changes</string>
     <string name="dialog_title_remove_friend">Remove friend</string>
     <string name="dialog_remove_friend">Remove %s as a friend?</string>
+    <string-array name="pref_sync_interval_array">
+        <item>@string/five_minutes</item>
+        <item>@string/ten_minutes</item>
+        <item>@string/fifteen_minutes</item>
+        <item>@string/thirty_minutes</item>
+        <item>@string/one_hour</item>
+        <item>@string/two_hours</item>
+        <item>@string/four_hours</item>
+        <item>@string/twelve_hours</item>
+        <item>@string/daily</item>
+    </string-array>
+    <string-array name="pref_sync_interval_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>
