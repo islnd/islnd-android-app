@@ -13,7 +13,7 @@ public class Dialogs {
     public static void removeFriendDialog(Context context, int userId, String displayName) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
         builder.setTitle(context.getString(R.string.dialog_title_remove_friend))
-                .setMessage("Remove " + displayName + " as a friend?")
+                .setMessage(String.format(context.getString(R.string.dialog_remove_friend), displayName))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                 {
                     MessagePublisher.removeFriend(context, userId);

@@ -116,6 +116,7 @@
     <string name="dialog_title_delete_post">Delete post</string>
     <string name="dialog_title_discard_profile_changes">Discard changes</string>
     <string name="dialog_title_remove_friend">Remove friend</string>
+    <string name="dialog_remove_friend">Remove %s as a friend?</string>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>
