@@ -1,14 +1,6 @@
 package io.islnd.android.islnd.app.database;
 
-import android.database.Cursor;
 import android.test.AndroidTestCase;
-import android.util.Log;
-
-import java.security.Key;
-import java.security.PublicKey;
-
-import io.islnd.android.islnd.messaging.SecretIdentity;
-import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class DataUtilsTest extends AndroidTestCase {
     @Override

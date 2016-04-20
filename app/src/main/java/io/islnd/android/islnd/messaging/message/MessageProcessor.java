@@ -20,8 +20,6 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
-import io.islnd.android.islnd.messaging.MailboxHelper;
-import io.islnd.android.islnd.messaging.Identity;
 import io.islnd.android.islnd.messaging.InvalidBlobException;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.PublicIdentity;

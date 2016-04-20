@@ -3,7 +3,6 @@ package io.islnd.android.islnd.app.database;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 
 import java.security.PublicKey;
