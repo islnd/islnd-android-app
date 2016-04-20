@@ -377,7 +377,7 @@ public class Util {
 
     public static void applySyncInterval(Context context) {
         if (!getNotificationsEnabled(context)) {
-            Log.d(TAG, "apply sync cancelled: notifications not enabled");
+            Log.d(TAG, "applySyncInterval: notifications disabled");
             return;
         }
 

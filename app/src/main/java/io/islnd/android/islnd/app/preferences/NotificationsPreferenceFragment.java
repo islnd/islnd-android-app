@@ -1,16 +1,12 @@
 package io.islnd.android.islnd.app.preferences;
 
 import android.os.Bundle;
-import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.preference.SwitchPreferenceCompat;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
-import io.islnd.android.islnd.app.SyncAlarm;
-import io.islnd.android.islnd.app.util.Util;
 
 public class NotificationsPreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener {
