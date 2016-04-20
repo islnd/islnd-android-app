@@ -8,15 +8,15 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 
-import io.islnd.android.islnd.messaging.Identity;
+import io.islnd.android.islnd.messaging.PublicIdentity;
 
 public class CryptoTests extends AndroidTestCase
 {
     public void testObjectSigningWorks() throws Exception
     {
-        Identity identity = bulidFakeIdentity();
+        PublicIdentity publicIdentity = bulidFakeIdentity();
         KeyPair keyPair = CryptoUtil.getKeyPair();
-        SignedObject signedObject = CryptoUtil.sign(identity, keyPair.getPrivate());
+        SignedObject signedObject = CryptoUtil.sign(publicIdentity, keyPair.getPrivate());
         assertEquals(true, CryptoUtil.verifySignedObject(signedObject, keyPair.getPublic()));
     }
 
@@ -46,13 +46,10 @@ public class CryptoTests extends AndroidTestCase
         assertFalse("fingerprints should not match", CryptoUtil.getDigest(publicKey1).equals(CryptoUtil.getDigest(publicKey2)));
     }
 
-    private static Identity bulidFakeIdentity() {
-        return new Identity(
-                "display",
-                "alias",
+    private static PublicIdentity bulidFakeIdentity() {
+        return new PublicIdentity(
                 "inbox",
-                CryptoUtil.getKey(),
-                CryptoUtil.getKeyPair().getPublic()
-        );
+                CryptoUtil.getKeyPair().getPublic(),
+                "random");
     }
 }

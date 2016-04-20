@@ -92,7 +92,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_NOTIFICATION_TABLE = "CREATE TABLE " + IslndContract.NotificationEntry.TABLE_NAME + " (" +
                 IslndContract.NotificationEntry._ID + " INTEGER PRIMARY KEY," +
-                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER NOT NULL," +
+                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER," +
                 IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " INTEGER NOT NULL," +
                 IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT, " +
                 IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
@@ -127,6 +127,25 @@ public class IslndDbHelper extends SQLiteOpenHelper {
                 IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX + " TEXT NOT NULL, " +
                 IslndContract.OutgoingMessageEntry.COLUMN_BLOB + " TEXT NOT NULL);";
 
+        final String SQL_CREATE_MESSAGE_TOKEN_TABLE = "CREATE TABLE " + IslndContract.MessageTokenEntry.TABLE_NAME + " (" +
+                IslndContract.MessageTokenEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.MessageTokenEntry.COLUMN_MAILBOX + " TEXT NOT NULL, " +
+                IslndContract.MessageTokenEntry.COLUMN_NONCE + " TEXT NOT NULL);";
+
+        final String SQL_CREATE_SMS_MESSAGE_TABLE = "CREATE TABLE " + IslndContract.SmsMessageEntry.TABLE_NAME + " (" +
+                IslndContract.SmsMessageEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.SmsMessageEntry.COLUMN_MESSAGE_ID + " STRING NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_LAST_MESSAGE_PART_ID + " INT NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_MESSAGE_PART_ID + " INT NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_BODY + " TEXT NOT NULL, " +
+                IslndContract.SmsMessageEntry.COLUMN_ORIGINATING_ADDRESS + " TEXT NOT NULL);";
+
+        final String SQL_CREATE_INVITE_TABLE = "CREATE TABLE " + IslndContract.InviteEntry.TABLE_NAME + " (" +
+                IslndContract.InviteEntry._ID + " INTEGER PRIMARY KEY," +
+                IslndContract.InviteEntry.COLUMN_DISPLAY_NAME + " STRING NOT NULL, " +
+                IslndContract.InviteEntry.COLUMN_PHONE_NUMBER + " STRING NOT NULL, " +
+                IslndContract.InviteEntry.COLUMN_INVITE + " STRING NOT NULL);";
+
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_ALIAS_TABLE);
         db.execSQL(SQL_CREATE_DISPLAY_NAME_TABLE);
@@ -138,21 +157,29 @@ public class IslndDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_OUTGOING_EVENT_TABLE);
         db.execSQL(SQL_CREATE_RECEIVED_MESSAGE_TABLE);
         db.execSQL(SQL_CREATE_OUTGOING_MESSAGE_TABLE);
+        db.execSQL(SQL_CREATE_MESSAGE_TOKEN_TABLE);
+        db.execSQL(SQL_CREATE_SMS_MESSAGE_TABLE);
+        db.execSQL(SQL_CREATE_INVITE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.UserEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.NotificationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.AliasEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.DisplayNameEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.PostEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.CommentEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ProfileEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.NotificationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedEventEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingEventEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.ReceivedMessageEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + IslndContract.OutgoingMessageEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.MessageTokenEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.SmsMessageEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.InviteEntry.TABLE_NAME);
+
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.PostEntry.TABLE_NAME);
+
+        db.execSQL("DROP TABLE IF EXISTS " + IslndContract.UserEntry.TABLE_NAME);
         onCreate(db);
     }
 

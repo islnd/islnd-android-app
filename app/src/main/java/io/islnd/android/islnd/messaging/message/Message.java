@@ -9,12 +9,22 @@ import io.islnd.android.islnd.messaging.proto.IslandProto;
 public class Message implements Comparable<Message>, ProtoSerializable {
 
     private final String mailbox;
+    private final String nonce;
     private final int messageId;
     private final int type;
     private final String blob;
 
+    public Message(String mailbox, String nonce, int messageId, int type, String blob) {
+        this.mailbox = mailbox;
+        this.nonce = nonce;
+        this.messageId = messageId;
+        this.type = type;
+        this.blob = blob;
+    }
+
     public Message(String mailbox, int messageId, int type, String blob) {
         this.mailbox = mailbox;
+        this.nonce = null;
         this.messageId = messageId;
         this.type = type;
         this.blob = blob;
@@ -36,6 +46,10 @@ public class Message implements Comparable<Message>, ProtoSerializable {
         return messageId;
     }
 
+    public String getNonce() {
+        return nonce;
+    }
+
     @Override
     public int compareTo(Message another) {
         return type - another.type;
@@ -43,12 +57,17 @@ public class Message implements Comparable<Message>, ProtoSerializable {
 
     @Override
     public byte[] toByteArray() {
-        return IslandProto.Message.newBuilder()
+        IslandProto.Message.Builder builder = IslandProto.Message.newBuilder()
                 .setMailbox(this.mailbox)
                 .setMessageId(this.messageId)
                 .setType(this.type)
-                .setBlob(this.blob)
-                .build()
+                .setBlob(this.blob);
+
+        if (this.nonce != null) {
+            builder.setNonce(this.nonce);
+        }
+
+        return builder.build()
                 .toByteArray();
     }
 
@@ -61,12 +80,22 @@ public class Message implements Comparable<Message>, ProtoSerializable {
             e.printStackTrace();
         }
 
-        return new Message(
-                message.getMailbox(),
-                message.getMessageId(),
-                message.getType(),
-                message.getBlob()
-        );
+        if (message.hasNonce()) {
+            return new Message(
+                    message.getMailbox(),
+                    message.getNonce(),
+                    message.getMessageId(),
+                    message.getType(),
+                    message.getBlob()
+            );
+        } else {
+            return new Message(
+                    message.getMailbox(),
+                    message.getMessageId(),
+                    message.getType(),
+                    message.getBlob()
+            );
+        }
     }
 
     @Override

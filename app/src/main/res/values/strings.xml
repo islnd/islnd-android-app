@@ -39,7 +39,7 @@
     <string name="show_qr_code">Show this to your friend</string>
     <string name="dialog_title_add_friend_action">Pick Add Friend Action</string>
     <string name="title_activity_show_qr">ShowQRActivity</string>
-    <string name="sms_prefix">ISLAND-#-#-</string>
+    <string name="sms_allow_dialog_title">Allow user with SMS</string>
     <string name="dialog_title_sms_add_friend">Add friend with SMS</string>
     <string name="sms_disclaimer">Disclaimer: Standard text messaging rates may apply</string>
     <string name="send">send</string>
@@ -105,13 +105,13 @@
     <string name="notification_comment_content">commented on your post</string>
     <string name="notification_new_friend_content">is now your friend</string>
     <string name="post_does_not_exist">Post does not exist</string>
-    <string name="message_inbox">message_inbox</string>
     <string name="message_id">message_id</string>
     <string name="notification_big_content_title">new islnd notifications</string>
     <string name="notification_big_content_title_single">1 new islnd notification</string>
     <string name="view_identity">View Identity</string>
     <string name="notification_badge">notification_badge</string>
     <string name="notification_badge_99_plus">99+</string>
+    <string name="sms_add_self_message">Are you texting yourself?</string>
     <string name="pref_notification_title">Notifications</string>
     <string name="pref_notification_summary">Sync interval</string>
     <string name="pref_sync_interval_title">Sync interval</string>
@@ -169,6 +169,18 @@
     </string-array>
     <string-array name="nav_add_friend_actions">
         <item>QR Code</item>
-        <!--<item>SMS</item>-->
+        <item>SMS</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="invites">Invites</string>
+    <string name="nav_invites">Invites</string>
+    <string name="accept_invite">Accept invite</string>
+    <string name="accept_invite_dialog">Accept invite?</string>
+    <string name="fragment_accept_invite">fragment_accept_invite</string>
+    <string name="notification_new_invite">You received a friend invite</string>
+    <string name="has_requested_sms_invite_permission">has_requested_sms_invite_permission</string>
+    <string name="dialog_title_sms_invite_permission">SMS friend invite</string>
+    <string name="dialog_sms_invite_permission">A friend may add you with a text message (SMS). To allow or disallow this click OK.</string>
 </resources>

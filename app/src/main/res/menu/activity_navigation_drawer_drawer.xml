@@ -21,6 +21,10 @@
             android:title="@string/nav_add_friend"
             android:icon="@drawable/ic_person_add_24dp"/>
         <item
+            android:id="@+id/nav_invites"
+            android:title="@string/nav_invites"
+            android:icon="@drawable/ic_person_add_24dp"/>
+        <item
             android:id="@+id/nav_notifications"
             android:title="@string/notifications"
             android:icon="@drawable/ic_notifications_24dp"/>

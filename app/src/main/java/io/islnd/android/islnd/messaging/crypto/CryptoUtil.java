@@ -196,8 +196,25 @@ public class CryptoUtil {
         return null;
     }
 
-    public static String createAlias() {
+    public static String getNewResourceKey() {
+        return getRandomString();
+    }
+
+    public static String getNewNonce() {
+        return getRandomString();
+    }
+
+    public static String getNewMailbox() {
+        return getRandomString();
+    }
+
+    private static String getRandomString() {
+        //--64 bits of entropy
         return String.valueOf(secureRandom.nextLong());
+    }
+
+    public static String createAlias() {
+        return getRandomString();
     }
 
     public static SignedObject sign(ProtoSerializable object, PrivateKey privateKey) {
@@ -248,6 +265,10 @@ public class CryptoUtil {
         }
 
         throw new IllegalArgumentException();
+    }
+
+    public static int generateSmsMessageId() {
+        return (int) (secureRandom.nextDouble() * 9999);
     }
 }
 

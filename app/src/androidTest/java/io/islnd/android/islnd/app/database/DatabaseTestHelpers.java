@@ -67,6 +67,7 @@ public class DatabaseTestHelpers {
         contentResolver.delete(IslndContract.AliasEntry.CONTENT_URI, null, null);
 
         contentResolver.delete(IslndContract.NotificationEntry.CONTENT_URI, null, null);
+        contentResolver.delete(IslndContract.InviteEntry.CONTENT_URI, null, null);
 
         contentResolver.delete(IslndContract.ReceivedEventEntry.CONTENT_URI, null, null);
         contentResolver.delete(IslndContract.OutgoingEventEntry.CONTENT_URI, null, null);

@@ -47,7 +47,6 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private Context mContext;
     private ContentResolver mContentResolver;
-    private Object incomingMessages;
 
     public EventSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -99,6 +98,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                         mContext,
                         encryptedMessage.getMailbox());
             } catch (Exception e) {
+                Log.v(TAG, "public key not found");
                 //--This may fail if it is a new user
             }
 
@@ -124,7 +124,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             //  those messages contain the user's public key. Since there is no previous knowledge
             //  of the public key, there is nothing to validate
             if (!receivedMessage.isSignatureValid()
-                    && receivedMessage.getMessage().getType() != MessageType.IDENTITY) {
+                    && receivedMessage.getMessage().getType() != MessageType.PUBLIC_IDENTITY) {
                 Log.d(TAG, String.format("message type %d signature invalid!",
                         receivedMessage.getMessage().getType()));
                 continue;
@@ -323,36 +323,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @NonNull
     private List<String> getMailboxes() {
-        String[] projection = new String[] {
-                IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX
-        };
-        Cursor cursor = null;
-        try {
-            cursor = mContentResolver.query(
-                    IslndContract.UserEntry.CONTENT_URI,
-                    projection,
-                    IslndContract.UserEntry.COLUMN_ACTIVE + " = ?",
-                    new String[] {Integer.toString(IslndContract.UserEntry.ACTIVE)},
-                    null);
-            List<String> mailboxes = new ArrayList<>();
-            if (!cursor.moveToFirst()) {
-                return mailboxes;
-            }
-
-            do {
-                final String mailbox = cursor.getString(0);
-                if (mailbox != null) {
-                    mailboxes.add(mailbox);
-                }
-            } while (cursor.moveToNext());
-
-            mailboxes.add(Util.getMyInbox(getContext()));
-            return mailboxes;
-
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        List<String> mailboxes = DataUtils.getActiveUserOutboxes(getContext());
+        mailboxes.addAll(DataUtils.getMessageTokenMailboxes(getContext()));
+        return mailboxes;
     }
 }

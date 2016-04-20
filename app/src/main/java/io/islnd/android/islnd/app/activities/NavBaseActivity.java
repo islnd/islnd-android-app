@@ -2,11 +2,13 @@ package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.NavigationView;
@@ -35,18 +37,26 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.fragments.InvitesFragment;
 import io.islnd.android.islnd.app.fragments.NotificationsFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
 import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
+import io.islnd.android.islnd.app.sms.MultipartMessage;
 import io.islnd.android.islnd.app.util.ImageUtil;
+import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.MessageLayer;
+import io.islnd.android.islnd.messaging.PublicIdentity;
 import io.islnd.android.islnd.messaging.ServerTime;
 
 public class NavBaseActivity extends IslndActivity
@@ -59,6 +69,7 @@ public class NavBaseActivity extends IslndActivity
 
     private static final int REQUEST_SMS = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_SMS_AND_CONTACT = 2;
 
     private static final int CONTACT_RESULT = 0;
 
@@ -76,6 +87,11 @@ public class NavBaseActivity extends IslndActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+
+        if (Build.VERSION.SDK_INT >= 23
+                && !Util.getHasRequestSmsInvitePermission(getApplicationContext())) {
+            showSmsInvitePermissionDialog();
+        }
         
         ServerTime.synchronize(this, false);
 
@@ -172,6 +188,13 @@ public class NavBaseActivity extends IslndActivity
             case R.id.nav_add_friend:
                 addFriendActionDialog();
                 break;
+            case R.id.nav_invites:
+                if (currentFragment instanceof InvitesFragment) {
+                    break;
+                }
+                mFragment = new InvitesFragment();
+                isFragment = true;
+                break;
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
@@ -197,7 +220,7 @@ public class NavBaseActivity extends IslndActivity
             } else {
                 String contents = result.getContents();
                 Log.d(TAG, "Contents: " + contents);
-                boolean friendAdded = MessageLayer.addFriendFromEncodedIdentityString(
+                boolean friendAdded = MessageLayer.addPublicIdentityFromQrCode(
                         getApplicationContext(),
                         contents);
                 String message = friendAdded
@@ -294,12 +317,17 @@ public class NavBaseActivity extends IslndActivity
     }
 
     private void sendSms(String number) {
-        String sms = getString(R.string.sms_prefix) +
-                MessageLayer.getMyIdentity(getApplicationContext());
+        PublicIdentity myPublicIdentity = MessageLayer.createNewPublicIdentity(getApplicationContext());
+        String encodedIdentity = new Encoder().encodeToString(myPublicIdentity.toByteArray());
 
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(number, null, sms, null, null);
+            List<String> messages = MultipartMessage.buildMessages(encodedIdentity);
+            for (String message : messages) {
+                Log.v(TAG, "sending " + message);
+                smsManager.sendTextMessage(number, null, message, null, null);
+            }
+
             Snackbar.make(mDrawerLayout, "SMS sent!", Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "SMS sent!");
         } catch (Exception e) {
@@ -412,6 +440,21 @@ public class NavBaseActivity extends IslndActivity
                 .replace(R.id.content_frame, mFragment)
                 .addToBackStack("")
                 .commit();
+    }
+
+    private void showSmsInvitePermissionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
+        builder.setTitle(getString(R.string.dialog_title_sms_invite_permission))
+                .setMessage(getString(R.string.dialog_sms_invite_permission))
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
+                {
+                    ActivityCompat.requestPermissions(
+                            this,
+                            new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_CONTACTS},
+                            REQUEST_SMS_AND_CONTACT);
+                    Util.setHasRequestSmsInvitePermission(getApplicationContext(), true);
+                })
+                .show();
     }
 
     @Override

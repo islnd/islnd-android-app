@@ -36,6 +36,10 @@ public class IslndProvider extends ContentProvider {
     static final int OUTGOING_MESSAGE = 1100;
     static final int NOTIFICATION = 1200;
     static final int NOTIFICATION_WITH_USER_DATA = 1300;
+    static final int MESSAGE_TOKEN = 1400;
+    static final int SMS_MESSAGE = 1500;
+    static final int INVITE = 1600;
+    static final int INVITE_WITH_ID = 1601;
 
     private static final String sPostTableUserIdSelection =
             IslndContract.PostEntry.TABLE_NAME +
@@ -123,10 +127,11 @@ public class IslndProvider extends ContentProvider {
         sNotificationWithUserDataQueryBuilder = new SQLiteQueryBuilder();
 
         sNotificationWithUserDataQueryBuilder.setTables(
-                IslndContract.NotificationEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                IslndContract.NotificationEntry.TABLE_NAME +
+                        " LEFT JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
-                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " LEFT JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
                         " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
                         " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
         );
@@ -235,6 +240,22 @@ public class IslndProvider extends ContentProvider {
         );
     }
 
+    private Cursor getInviteById(Uri uri, String[] projection) {
+        int inviteId = IslndContract.InviteEntry.getIdFromUri(uri);
+        String selection = IslndContract.InviteEntry._ID + " = ?";
+        String[] selectionArgs = {Long.toString(inviteId)};
+
+        return mOpenHelper.getReadableDatabase().query(
+                IslndContract.InviteEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+    }
+
     private Cursor getCommentsByPostAuthorAliasAndPostId(Uri uri, String[] projection, String sortOrder) {
         String postAuthorAlias = IslndContract.CommentEntry.getUserAliasFromUri(uri);
         String postId = IslndContract.CommentEntry.getPostIdFromUri(uri);
@@ -329,6 +350,13 @@ public class IslndProvider extends ContentProvider {
         matcher.addURI(authority, IslndContract.PATH_NOTIFICATION, NOTIFICATION);
 
         matcher.addURI(authority, IslndContract.PATH_NOTIFICATION_WITH_USER_DATA, NOTIFICATION_WITH_USER_DATA);
+
+        matcher.addURI(authority, IslndContract.PATH_MESSAGE_TOKEN, MESSAGE_TOKEN);
+
+        matcher.addURI(authority, IslndContract.PATH_SMS_MESSAGE, SMS_MESSAGE);
+
+        matcher.addURI(authority, IslndContract.PATH_INVITE, INVITE);
+        matcher.addURI(authority, IslndContract.PATH_INVITE + "/#", INVITE_WITH_ID);
 
         return matcher;
     }
@@ -513,6 +541,43 @@ public class IslndProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
+                break;
+            }
+            case MESSAGE_TOKEN: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.MessageTokenEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case SMS_MESSAGE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.SmsMessageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case INVITE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        IslndContract.InviteEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            case INVITE_WITH_ID: {
+                retCursor = getInviteById(uri, projection);
                 break;
             }
 
@@ -710,6 +775,45 @@ public class IslndProvider extends ContentProvider {
 
                 break;
             }
+            case MESSAGE_TOKEN: {
+                long _id = db.insert(
+                        IslndContract.MessageTokenEntry.TABLE_NAME,
+                        null,
+                        values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.MessageTokenEntry.buildMessageTokenUri(_id);
+                } else {
+                    return null;
+                }
+
+                break;
+            }
+            case SMS_MESSAGE: {
+                long _id = db.insert(
+                        IslndContract.SmsMessageEntry.TABLE_NAME,
+                        null,
+                        values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.SmsMessageEntry.buildSmsMessageUri(_id);
+                } else {
+                    return null;
+                }
+
+                break;
+            }
+            case INVITE: {
+                long _id = db.insert(
+                        IslndContract.InviteEntry.TABLE_NAME,
+                        null,
+                        values);
+                if ( _id > 0 ) {
+                    returnUri = IslndContract.InviteEntry.buildInviteUri(_id);
+                } else {
+                    return null;
+                }
+
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -899,6 +1003,11 @@ public class IslndProvider extends ContentProvider {
             case OUTGOING_MESSAGE: {
                 rowsDeleted = db.delete(
                         IslndContract.OutgoingMessageEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case INVITE: {
+                rowsDeleted = db.delete(
+                        IslndContract.InviteEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:

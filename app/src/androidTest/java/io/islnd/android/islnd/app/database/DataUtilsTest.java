@@ -1,14 +1,7 @@
 package io.islnd.android.islnd.app.database;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
-
-import java.security.Key;
-import java.security.PublicKey;
-
-import io.islnd.android.islnd.messaging.Identity;
-import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 
 public class DataUtilsTest extends AndroidTestCase {
     @Override
@@ -17,110 +10,87 @@ public class DataUtilsTest extends AndroidTestCase {
         DatabaseTestHelpers.clearTables(mContext);
     }
 
-    public void testUserIsUpdatedCorrectly() throws Exception {
-        //--Arrange
-        PublicKey publicKey = CryptoUtil.getKeyPair().getPublic();
-        long userId = DatabaseTestHelpers.insertFakeUser(mContext, publicKey);
-        ContentValues values = new ContentValues();
-        values.put(IslndContract.UserEntry.COLUMN_ACTIVE, IslndContract.UserEntry.NOT_ACTIVE);
-        mContext.getContentResolver().update(
-                IslndContract.UserEntry.CONTENT_URI,
-                values,
-                IslndContract.UserEntry._ID + " = ?",
-                new String[] {Long.toString(userId)}
-        );
+    public void testDeactivateUser() throws Exception {
+        long userId = DatabaseTestHelpers.insertFakeUser(mContext);
+        assertTrue("user does not exist", DataUtils.userExists(mContext, userId));
+        assertTrue("user was not activate", DataUtils.isUserActive(mContext, userId));
+        DataUtils.deactivateUser(mContext, userId);
+        assertTrue("user does not exist", DataUtils.userExists(mContext, userId));
+        assertFalse("user was not deactivated", DataUtils.isUserActive(mContext, userId));
+    }
 
-        String[] projection = {
-                IslndContract.UserEntry.COLUMN_ACTIVE,
-        };
+    public void testNotificationWithUserId() throws Exception {
+        long userId = DatabaseTestHelpers.insertFakeUser(mContext);
+        DataUtils.insertNewFriendNotification(mContext, (int) userId);
         Cursor cursor = mContext.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
-                projection,
-                IslndContract.UserEntry._ID + " = ?",
-                new String[] {Long.toString(userId)},
-                null
-        );
+                IslndContract.NotificationEntry.CONTENT_URI,
+                new String[] {IslndContract.NotificationEntry._ID },
+                null,
+                null,
+                null);
+        assertEquals(1, cursor.getCount());
+    }
 
-        //--Verify deactivate worked
-        assertTrue("user not found", cursor.moveToFirst());
-        assertEquals("user is active but should have been de-activated", IslndContract.UserEntry.NOT_ACTIVE, cursor.getInt(0));
-        cursor.close();
+    public void testNotificationWithoutUserId() throws Exception {
+        DataUtils.insertNewInviteNotification(mContext, 0);
+        Cursor cursor = mContext.getContentResolver().query(
+                IslndContract.NotificationEntry.CONTENT_URI,
+                new String[] {IslndContract.NotificationEntry._ID },
+                null,
+                null,
+                null);
+        assertEquals(1, cursor.getCount());
+    }
 
-        String oldDisplayName = "rob";
-        DatabaseTestHelpers.setDisplayName(mContext, userId, oldDisplayName);
+    public void testCanQueryDisplayNameWhenNoUserMatches() throws Exception {
+        DataUtils.insertNewInviteNotification(mContext, 0);
 
-        Key newGroupKey = CryptoUtil.getKey();
-        String newDisplayName = "joey";
-        String newAlias = "newAlias";
-        String newInbox = "newInbox";
-        Identity identity = new Identity(
-                newDisplayName,
-                newAlias,
-                newInbox,
-                newGroupKey,
-                publicKey
-        );
-
-        String newOutbox = "newOutbox";
-
-        DataUtils.activateAndUpdateUser(mContext, identity, newOutbox);
-
-        //--Confirm user table is correct
-        projection = new String[]{
-                IslndContract.UserEntry.COLUMN_ACTIVE,
-                IslndContract.UserEntry.COLUMN_MESSAGE_INBOX,
-                IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX,
-                IslndContract.UserEntry.COLUMN_PUBLIC_KEY
+        String[] projection = new String[]{
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry._ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_POST_ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_TIMESTAMP,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
         };
 
-        cursor = mContext.getContentResolver().query(
-                IslndContract.UserEntry.CONTENT_URI,
-                projection,
-                IslndContract.UserEntry._ID + " = ?",
-                new String[] {Long.toString(userId)},
-                null
-        );
-
-        assertTrue("user not found", cursor.moveToFirst());
-        assertEquals("user not active", IslndContract.UserEntry.ACTIVE, cursor.getInt(0));
-        assertEquals("wrong inbox", newInbox, cursor.getString(1));
-        assertEquals("wrong outbox", newOutbox, cursor.getString(2));
-        assertEquals("wrong public key", CryptoUtil.encodeKey(publicKey), cursor.getString(3));
-
-        cursor.close();
-
-        //--Confirm alias table is correct
-        projection = new String[]{
-                IslndContract.AliasEntry.COLUMN_ALIAS,
-                IslndContract.AliasEntry.COLUMN_GROUP_KEY,
-        };
-
-        cursor = mContext.getContentResolver().query(
-                IslndContract.AliasEntry.CONTENT_URI,
-                projection,
-                IslndContract.AliasEntry.COLUMN_USER_ID + " = ?",
-                new String[] {Long.toString(userId)},
-                null
-        );
-
-        assertTrue("user not found", cursor.moveToFirst());
-        assertEquals("alias incorrect", newAlias, cursor.getString(0));
-        assertEquals("group key incorrect", CryptoUtil.encodeKey(newGroupKey), cursor.getString(1));
-        cursor.close();
-
-        //--confirm only one record in alias table
-        projection = new String[]{
-                IslndContract.AliasEntry._ID,
-        };
-
-        cursor = mContext.getContentResolver().query(
-                IslndContract.AliasEntry.CONTENT_URI,
+        Cursor cursor = mContext.getContentResolver().query(
+                IslndContract.NotificationWithUserDataEntry.CONTENT_URI,
                 projection,
                 null,
                 null,
-                null
-        );
+                null);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToFirst();
+        assertNull(cursor.getString(0));
+    }
 
-        assertEquals("should be one record", 1, cursor.getCount());
+    public void testNotificationLeftJoinWorks() throws Exception {
+        String displayName = "joe";
+        long userId = DatabaseTestHelpers.insertFakeUser(mContext);
+        DatabaseTestHelpers.setDisplayName(mContext, userId, displayName);
+        DataUtils.insertNewFriendNotification(mContext, (int) userId);
+
+        String[] projection = new String[]{
+                IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry._ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_POST_ID,
+                IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_TIMESTAMP,
+                IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI
+        };
+
+        Cursor cursor = mContext.getContentResolver().query(
+                IslndContract.NotificationWithUserDataEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+
+        assertEquals(1, cursor.getCount());
+        cursor.moveToFirst();
+        assertEquals(displayName, cursor.getString(0));
     }
 }

@@ -2,6 +2,8 @@ package io.islnd.android.islnd.messaging.message;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -31,6 +33,10 @@ public class MessagePublisher {
         Util.setGroupKey(context, newGroupKey);
 
         createMessageForFriendToRemove(context, userId);
+        context.getContentResolver().requestSync(
+                Util.getSyncAccount(context),
+                IslndContract.CONTENT_AUTHORITY,
+                new Bundle());
     }
 
     private static void createMessageForFriendToRemove(Context context, int userId) {

@@ -149,19 +149,6 @@ public class Util {
                 sharedPref.getString(context.getString(R.string.public_key), ""));
     }
 
-    public static String getMyInbox(Context context) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString(context.getString(R.string.message_inbox), "");
-    }
-
-    public static void setMyInbox(Context context, String inbox) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putString(context.getString(R.string.message_inbox), inbox);
-        editor.commit();
-    }
-
     public static PrivateKey getPrivateKey(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return CryptoUtil.decodePrivateKey(
@@ -350,6 +337,19 @@ public class Util {
         }
 
         return withColons.toString();
+    }
+
+    public static boolean getHasRequestSmsInvitePermission(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.has_requested_sms_invite_permission), false);
+    }
+
+    public static void setHasRequestSmsInvitePermission(Context context, boolean hasRequestedPermission) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean(context.getString(R.string.has_requested_sms_invite_permission), hasRequestedPermission);
+        editor.apply();
     }
 
     public static void setSyncIntervalFromPreference(Context context, String arrayValue) {

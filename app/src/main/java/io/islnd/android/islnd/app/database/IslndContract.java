@@ -26,6 +26,9 @@ public class IslndContract {
     public static final String PATH_OUTGOING_MESSAGE = "outgoing_message";
     public static final String PATH_NOTIFICATION = "notification";
     public static final String PATH_NOTIFICATION_WITH_USER_DATA = "notification_with_user_data";
+    public static final String PATH_MESSAGE_TOKEN = "message_token";
+    public static final String PATH_SMS_MESSAGE = "sms_message";
+    public static final String PATH_INVITE = "invite";
 
     public static final class PostEntry implements BaseColumns {
 
@@ -367,6 +370,74 @@ public class IslndContract {
 
         public static Uri buildOutgoingMessageUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class MessageTokenEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MESSAGE_TOKEN).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MESSAGE_TOKEN;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MESSAGE_TOKEN;
+
+        public static final String TABLE_NAME = "message_token";
+
+        public static final String COLUMN_MAILBOX = "mailbox";
+        public static final String COLUMN_NONCE = "nonce";
+
+        public static Uri buildMessageTokenUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class SmsMessageEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_SMS_MESSAGE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SMS_MESSAGE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SMS_MESSAGE;
+
+        public static final String TABLE_NAME = "sms_message";
+
+        public static final String COLUMN_ORIGINATING_ADDRESS = "originating_address";
+        public static final String COLUMN_MESSAGE_ID = "message_id";
+        public static final String COLUMN_MESSAGE_PART_ID = "message_part_id";
+        public static final String COLUMN_LAST_MESSAGE_PART_ID = "last_message_part_id";
+        public static final String COLUMN_BODY = "body";
+
+        public static Uri buildSmsMessageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class InviteEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_INVITE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INVITE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INVITE;
+
+        public static final String TABLE_NAME = "invite";
+
+        public static final String COLUMN_PHONE_NUMBER = "originating_address";
+        public static final String COLUMN_DISPLAY_NAME = "display_name";
+        public static final String COLUMN_INVITE = "invite";
+
+        public static Uri buildInviteUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static int getIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 }

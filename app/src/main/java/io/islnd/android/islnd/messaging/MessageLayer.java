@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.IOException;
 import java.security.Key;
@@ -22,70 +25,110 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class MessageLayer {
     private static final String TAG = MessageLayer.class.getSimpleName();
 
-    public static boolean addFriendFromEncodedIdentityString(Context context, String encodedString) {
-        Identity friendIdentity = Identity.fromProto(encodedString);
-        boolean newFriend = addFriendToDatabaseAndCreateDefaultProfile(
-                context,
-                friendIdentity,
-                Util.getMyInbox(context));  //--My current inbox will be where I check for new
-                                            //  messages from this user
+    public static boolean addPublicIdentityFromSms(Context context, String encodedString) {
+        Log.d(TAG, "addPublicIdentityFromSms");
+        Log.v(TAG, "encodedString: " + encodedString);
 
-        //--We need a new inbox to give to our next friend
-        Util.setMyInbox(context, CryptoUtil.createAlias());
+        PublicIdentity friendPublicIdentity = null;
+        try {
+            friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, e.toString());
+            return false;
+        } catch (InvalidProtocolBufferException e) {
+            Log.w(TAG, e.toString());
+            return false;
+        }
+
+        if (DataUtils.getPublicKey(context, IslndContract.UserEntry.MY_USER_ID)
+                .equals(friendPublicIdentity.getPublicKey())) {
+            Toast.makeText(context, context.getText(R.string.sms_add_self_message), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "can't sms ourselves");
+            return false;
+        }
+
+        return addFriendAndStartAddBackJobs(context, friendPublicIdentity);
+    }
+
+    public static boolean addPublicIdentityFromQrCode(Context context, String encodedString) {
+        Log.d(TAG, "addPublicIdentityFromQrCode");
+        PublicIdentity friendPublicIdentity = null;
+        try {
+            friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        } catch (InvalidProtocolBufferException e) {
+            Log.w(TAG, e.toString());
+            return false;
+        }
+
+        return addFriendAndStartAddBackJobs(context, friendPublicIdentity);
+    }
+
+    private static boolean addFriendAndStartAddBackJobs(Context context, PublicIdentity friendPublicIdentity) {
+        boolean newFriend = DataUtils.addOrUpdateUser(
+                context,
+                friendPublicIdentity.getPublicKey(),
+                friendPublicIdentity.getMessageInbox());
+
+        Log.v(TAG, "friend wants inbox " + friendPublicIdentity.getMessageInbox());
 
         //--Check for friend's profile
         Intent repeatSyncServiceIntent = new Intent(context, RepeatSyncService.class);
         context.startService(repeatSyncServiceIntent);
 
         //--Send our identity and profile to friend
-        final String friendInbox = friendIdentity.getMessageInbox();
-        startAddBackJob(context, friendInbox, FriendAddBackService.IDENTITY_JOB);
-        startAddBackJob(context, friendInbox, FriendAddBackService.PROFILE_JOB);
+        final String friendInbox = friendPublicIdentity.getMessageInbox();
+        final String randomValue = friendPublicIdentity.getNonce();
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.PUBLIC_IDENTITY_JOB);
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.SECRET_IDENTITY_JOB);
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.PROFILE_JOB);
 
         return newFriend;
     }
 
-    private static void startAddBackJob(Context context, String friendInbox, int identityJob) {
+    private static void startAddBackJob(Context context, String destinationMailbox, String nonce, int identityJob) {
         Intent sendIdentityIntent = new Intent(context, FriendAddBackService.class);
-        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, friendInbox);
-        sendIdentityIntent.putExtra(
-                FriendAddBackService.JOB_EXTRA,
-                identityJob);
+        sendIdentityIntent.putExtra(FriendAddBackService.MAILBOX_EXTRA, destinationMailbox);
+        sendIdentityIntent.putExtra(FriendAddBackService.NONCE_EXTRA, nonce);
+        sendIdentityIntent.putExtra(FriendAddBackService.JOB_EXTRA, identityJob);
         context.startService(sendIdentityIntent);
     }
 
-    public static boolean addFriendToDatabaseAndCreateDefaultProfile(Context context, Identity identity, String messageOutbox) {
-        if (DataUtils.activeUserHasPublicKey(context, identity.getPublicKey())) {
-            DataUtils.activateAndUpdateUser(context, identity, messageOutbox);
-            return false;
-        }
+    public static boolean addSecretIdentityAndCreateDefaultProfile(
+            Context context,
+            int userId,
+            SecretIdentity secretIdentity) {
+        DataUtils.addOrUpdateSecretIdentity(context, userId, secretIdentity);
+        Profile profile = Util.buildDefaultProfile(context, secretIdentity.getDisplayName());
+        DataUtils.insertProfile(context, profile, userId);
 
-        long userId;
-        if (DataUtils.inactiveUserHasPublicKey(context, identity.getPublicKey())) {
-            userId = DataUtils.activateAndUpdateUser(context, identity, messageOutbox);
-        } else {
-            userId = DataUtils.insertUser(context, identity, messageOutbox);
-            Profile profile = Util.buildDefaultProfile(context, identity.getDisplayName());
-            DataUtils.insertProfile(context, profile, userId);
-        }
-
-        DataUtils.insertNewFriendNotification(context, (int) userId);
+        //--TODO how do we handle people already our friends?
+        DataUtils.insertNewFriendNotification(context, userId);
         return true;
     }
 
-    public static Identity getMyIdentity(Context context) {
+    public static PublicIdentity createNewPublicIdentity(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String displayName = DataUtils.getDisplayName(context, IslndContract.UserEntry.MY_USER_ID);
-        String alias = DataUtils.getMostRecentAlias(context, IslndContract.UserEntry.MY_USER_ID);
-        String messageInbox = DataUtils.getMessageInbox(context, IslndContract.UserEntry.MY_USER_ID);
-        Log.v(TAG, String.format("alias is %s", alias));
-        Key groupKey = CryptoUtil.decodeSymmetricKey(
-                sharedPreferences.getString(context.getString(R.string.group_key), ""));
+        String messageInbox = MailboxHelper.getAndSetMyNewInbox(context);
+
         PublicKey publicKey = CryptoUtil.decodePublicKey(
                 sharedPreferences.getString(context.getString(R.string.public_key), ""));
+        final String nonce = CryptoUtil.getNewNonce();
 
-        return new Identity(displayName, alias, messageInbox, groupKey, publicKey);
+        DataUtils.addMessageToken(context, messageInbox, nonce);
+
+        return new PublicIdentity(messageInbox, publicKey, nonce);
+    }
+
+    public static SecretIdentity getMySecretIdentity(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String alias = DataUtils.getMostRecentAlias(context, IslndContract.UserEntry.MY_USER_ID);
+        String displayName = DataUtils.getDisplayName(context, IslndContract.UserEntry.MY_USER_ID);
+        Key groupKey = CryptoUtil.decodeSymmetricKey(
+                sharedPreferences.getString(context.getString(R.string.group_key), ""));
+
+        return new SecretIdentity(displayName, alias, groupKey);
     }
 
     public static long getServerTimeOffsetMillis(Context context, int repetitions) throws IOException {
