@@ -326,4 +326,17 @@ public class Util {
 
         return withColons.toString();
     }
+
+    public static boolean getHasRequestSmsInvitePermission(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.has_requested_sms_invite_permission), false);
+    }
+
+    public static void setHasRequestSmsInvitePermission(Context context, boolean hasRequestedPermission) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean(context.getString(R.string.has_requested_sms_invite_permission), hasRequestedPermission);
+        editor.apply();
+    }
 }

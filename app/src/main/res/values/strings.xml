@@ -133,4 +133,7 @@
     <string name="accept_invite">Accept invite</string>
     <string name="accept_invite_dialog">Accept invite?</string>
     <string name="fragment_accept_invite">fragment_accept_invite</string>
+    <string name="has_requested_sms_invite_permission">has_requested_sms_invite_permission</string>
+    <string name="dialog_title_sms_invite_permission">SMS friend invite</string>
+    <string name="dialog_sms_invite_permission">A friend may add you with a text message (SMS). To allow or disallow this click OK.</string>
 </resources>

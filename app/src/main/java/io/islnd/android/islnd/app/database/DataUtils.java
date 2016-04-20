@@ -1,11 +1,14 @@
 package io.islnd.android.islnd.app.database;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.security.Key;
@@ -991,6 +994,11 @@ public class DataUtils {
     }
 
     public static String getPhoneContactDisplayName(Context context, String originatingAddress) {
+        if(ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return "";
+        }
+
         String[] projection = new String[] {
                 ContactsContract.PhoneLookup.DISPLAY_NAME
         };
