@@ -1,6 +1,7 @@
 package io.islnd.android.islnd.app;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -9,6 +10,7 @@ import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.sms.MultipartMessage;
 import io.islnd.android.islnd.app.util.Util;
@@ -56,9 +58,22 @@ public class SmsReceiver extends BroadcastReceiver
 
         MultipartMessage.save(context, smsMessage);
         if (MultipartMessage.isComplete(context, smsMessage)) {
-            MessageLayer.addPublicIdentityFromSms(
-                    context,
-                    MultipartMessage.getComplete(context, smsMessage));
+            addMessageToAcceptQueue(context, smsMessage);
         }
+    }
+
+    private void addMessageToAcceptQueue(Context context, SmsMessage smsMessage) {
+        final String completeMessage = MultipartMessage.getComplete(context, smsMessage);
+        final String originatingAddress = smsMessage.getOriginatingAddress();
+        final String displayName = DataUtils.getPhoneContactDisplayName(context, originatingAddress);
+        Log.v(TAG, "display name " + displayName);
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.InviteEntry.COLUMN_DISPLAY_NAME, displayName);
+        values.put(IslndContract.InviteEntry.COLUMN_PHONE_NUMBER,
+                originatingAddress);
+        values.put(IslndContract.InviteEntry.COLUMN_INVITE, completeMessage);
+        context.getContentResolver().insert(
+                IslndContract.InviteEntry.CONTENT_URI,
+                values);
     }
 }

@@ -42,15 +42,10 @@ public class PublicIdentity implements Serializable, ProtoSerializable<PublicIde
                 && this.nonce.equals(otherPublicIdentity.nonce);
     }
 
-    public static PublicIdentity fromProto(String blob) {
+    public static PublicIdentity fromProto(String blob) throws InvalidProtocolBufferException {
         IslandProto.PublicIdentity identity = null;
         byte[] bytes = new Decoder().decode(blob);
-        try {
-            identity = IslandProto.PublicIdentity.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
-            // TODO: Might want to handle for things like sms
-            e.printStackTrace();
-        }
+        identity = IslandProto.PublicIdentity.parseFrom(bytes);
 
         return new PublicIdentity(
                 identity.getMessageInbox(),

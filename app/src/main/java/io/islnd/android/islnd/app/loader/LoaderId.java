@@ -11,4 +11,5 @@ public class LoaderId {
     public static final int NOTIFICATION_LOADER_ID = 7;
     public static final int VIEW_PUBLIC_KEY_ACTIVITY_LOADER_ID = 8;
     public static final int FEED_NOTIFICATION_COUNT_LOADER_ID = 9;
+    public static final int INVITE_LOADER_ID = 10;
 }

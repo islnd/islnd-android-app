@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.io.IOException;
 import java.security.Key;
 import java.security.PublicKey;
@@ -25,12 +27,15 @@ public class MessageLayer {
 
     public static boolean addPublicIdentityFromSms(Context context, String encodedString) {
         Log.d(TAG, "addPublicIdentityFromSms");
-        Log.d(TAG, encodedString);
+        Log.v(TAG, "encodedString: " + encodedString);
 
         PublicIdentity friendPublicIdentity = null;
         try {
             friendPublicIdentity = PublicIdentity.fromProto(encodedString);
         } catch (IllegalArgumentException e) {
+            Log.w(TAG, e.toString());
+            return false;
+        } catch (InvalidProtocolBufferException e) {
             Log.w(TAG, e.toString());
             return false;
         }
@@ -47,7 +52,14 @@ public class MessageLayer {
 
     public static boolean addPublicIdentityFromQrCode(Context context, String encodedString) {
         Log.d(TAG, "addPublicIdentityFromQrCode");
-        PublicIdentity friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        PublicIdentity friendPublicIdentity = null;
+        try {
+            friendPublicIdentity = PublicIdentity.fromProto(encodedString);
+        } catch (InvalidProtocolBufferException e) {
+            Log.w(TAG, e.toString());
+            return false;
+        }
+
         return addFriendAndStartAddBackJobs(context, friendPublicIdentity);
     }
 

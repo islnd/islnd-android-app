@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.security.Key;
@@ -945,6 +946,67 @@ public class DataUtils {
 
             return mailboxes;
 
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static String getInvite(Context context, long inviteId) {
+        String[] projection = new String[] {
+                IslndContract.InviteEntry.COLUMN_INVITE
+        };
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    IslndContract.InviteEntry.buildInviteUri(inviteId),
+                    projection,
+                    null,
+                    null,
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            } else {
+                throw new IllegalArgumentException("no invite for id " + inviteId);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static void deleteInvite(Context context, long inviteId) {
+        String selection = IslndContract.InviteEntry._ID + " = ?";
+        String[] selectionArgs = new String[] {
+                Long.toString(inviteId)
+        };
+        context.getContentResolver().delete(
+                IslndContract.InviteEntry.CONTENT_URI,
+                selection,
+                selectionArgs
+        );
+    }
+
+    public static String getPhoneContactDisplayName(Context context, String originatingAddress) {
+        String[] projection = new String[] {
+                ContactsContract.PhoneLookup.DISPLAY_NAME
+        };
+
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, originatingAddress),
+                    projection,
+                    null,
+                    null,
+                    null);
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            } else {
+                return "";
+            }
         } finally {
             if (cursor != null) {
                 cursor.close();

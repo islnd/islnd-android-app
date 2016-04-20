@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.security.PublicKey;
 import java.util.List;
 
@@ -48,7 +50,15 @@ public class MessageProcessor {
                     return;
                 }
 
-                PublicIdentity friendPublicIdentity = PublicIdentity.fromProto(message.getBlob());
+                PublicIdentity friendPublicIdentity = null;
+                try {
+                    friendPublicIdentity = PublicIdentity.fromProto(message.getBlob());
+                } catch (InvalidProtocolBufferException e) {
+                    Log.w(TAG, e.toString());
+                    e.printStackTrace();
+                    break;
+                }
+
                 DataUtils.addOrUpdateUser(
                         context,
                         friendPublicIdentity.getPublicKey(),

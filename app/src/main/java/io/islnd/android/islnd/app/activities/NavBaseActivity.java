@@ -2,6 +2,7 @@ package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -43,6 +44,7 @@ import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
+import io.islnd.android.islnd.app.fragments.InvitesFragment;
 import io.islnd.android.islnd.app.fragments.NotificationsFragment;
 import io.islnd.android.islnd.app.fragments.ShowQrFragment;
 import io.islnd.android.islnd.app.fragments.ViewFriendsFragment;
@@ -177,6 +179,13 @@ public class NavBaseActivity extends IslndActivity
                 break;
             case R.id.nav_add_friend:
                 addFriendActionDialog();
+                break;
+            case R.id.nav_invites:
+                if (currentFragment instanceof InvitesFragment) {
+                    break;
+                }
+                mFragment = new InvitesFragment();
+                isFragment = true;
                 break;
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
