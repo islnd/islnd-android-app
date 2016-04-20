@@ -109,6 +109,7 @@ public class Util {
     }
 
     public static void applyAppTheme(Context context) {
+        Log.d(TAG, "applying app theme...");
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String value = sharedPref.getString(AppearancePreferenceFragment.PREFERENCE_THEME_KEY, "1");
 
