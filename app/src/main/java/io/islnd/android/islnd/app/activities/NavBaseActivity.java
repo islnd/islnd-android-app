@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.NavigationView;
@@ -52,6 +53,7 @@ import io.islnd.android.islnd.app.loader.LoaderId;
 import io.islnd.android.islnd.app.preferences.SettingsActivity;
 import io.islnd.android.islnd.app.sms.MultipartMessage;
 import io.islnd.android.islnd.app.util.ImageUtil;
+import io.islnd.android.islnd.app.util.Util;
 import io.islnd.android.islnd.messaging.Encoder;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.PublicIdentity;
@@ -67,6 +69,7 @@ public class NavBaseActivity extends IslndActivity
 
     private static final int REQUEST_SMS = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_SMS_AND_CONTACT = 2;
 
     private static final int CONTACT_RESULT = 0;
 
@@ -84,6 +87,11 @@ public class NavBaseActivity extends IslndActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
         onCreateDrawer();
+
+        if (Build.VERSION.SDK_INT >= 23
+                && !Util.getHasRequestSmsInvitePermission(getApplicationContext())) {
+            showSmsInvitePermissionDialog();
+        }
         
         ServerTime.synchronize(this, false);
 
@@ -432,6 +440,21 @@ public class NavBaseActivity extends IslndActivity
                 .replace(R.id.content_frame, mFragment)
                 .addToBackStack("")
                 .commit();
+    }
+
+    private void showSmsInvitePermissionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog);
+        builder.setTitle(getString(R.string.dialog_title_sms_invite_permission))
+                .setMessage(getString(R.string.dialog_sms_invite_permission))
+                .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
+                {
+                    ActivityCompat.requestPermissions(
+                            this,
+                            new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_CONTACTS},
+                            REQUEST_SMS_AND_CONTACT);
+                    Util.setHasRequestSmsInvitePermission(getApplicationContext(), true);
+                })
+                .show();
     }
 
     @Override
