@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
 
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.fragments.NotificationsFragment;
@@ -30,6 +32,14 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat
         serverPreference.setOnPreferenceClickListener(this);
         accountPreference.setOnPreferenceClickListener(this);
         notificationsPreference.setOnPreferenceClickListener(this);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setDivider(null);
+        setDividerHeight(0);
     }
 
     @Override

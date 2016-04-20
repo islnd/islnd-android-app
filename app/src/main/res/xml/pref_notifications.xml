@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
-        android:key="pref_enable_notifications_key"
-        android:title="@string/pref_enable_notifications_title"
-        android:defaultValue="true"/>
+    <PreferenceCategory android:title="@string/preferences_category_notifications">
 
-    <ListPreference
-        android:key="pref_sync_interval_key"
-        android:title="@string/pref_sync_interval_title"
-        android:dialogTitle="@string/pref_sync_interval_title"
-        android:entries="@array/pref_sync_interval_array"
-        android:entryValues="@array/pref_sync_interval_values"
-        android:defaultValue="@string/pref_sync_interval_default_value"
-        android:dependency="pref_enable_notifications_key"/>
+        <SwitchPreference
+            android:key="pref_enable_notifications_key"
+            android:title="@string/pref_enable_notifications_title"
+            android:defaultValue="true"/>
+
+        <ListPreference
+            android:key="pref_sync_interval_key"
+            android:title="@string/pref_sync_interval_title"
+            android:dialogTitle="@string/pref_sync_interval_title"
+            android:entries="@array/pref_sync_interval_array"
+            android:entryValues="@array/pref_sync_interval_values"
+            android:defaultValue="@string/pref_sync_interval_default_value"
+            android:dependency="pref_enable_notifications_key"/>
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
