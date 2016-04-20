@@ -192,13 +192,19 @@ public class NotificationHelper {
             case NotificationType.NEW_FRIEND:
                 contentInfo = displayName + " " + context.getString(R.string.notification_new_friend_content);
                 break;
+            case NotificationType.NEW_INVITE:
+                contentInfo = context.getString(R.string.notification_new_invite);
+                break;
             default:
                 throw new UnsupportedOperationException();
         }
 
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder(contentInfo);
         StyleSpan styleSpan = new StyleSpan(android.graphics.Typeface.BOLD);
-        stringBuilder.setSpan(styleSpan, 0, displayName.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        final int displayNameLength = displayName == null
+            ? 0
+            : displayName.length();
+        stringBuilder.setSpan(styleSpan, 0, displayNameLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         return stringBuilder;
     }

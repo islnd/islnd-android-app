@@ -474,7 +474,7 @@ public class DataUtils {
     }
 
     private static void insertNotification(Context context,
-                                          int userId,
+                                          Integer userId,
                                           int notificationType,
                                           String postId,
                                           long timestamp) {
@@ -487,6 +487,15 @@ public class DataUtils {
                 IslndContract.NotificationEntry.CONTENT_URI,
                 values);
         Log.v(TAG, "notification added");
+    }
+
+    public static void insertNewInviteNotification(Context context, int notificationId) {
+        insertNotification(
+                context,
+                null,
+                NotificationType.NEW_INVITE,
+                null,
+                ServerTime.getCurrentTimeMillis(context));
     }
 
     public static void insertNewFriendNotification(Context context, int userId) {

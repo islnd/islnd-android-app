@@ -133,4 +133,5 @@
     <string name="accept_invite">Accept invite</string>
     <string name="accept_invite_dialog">Accept invite?</string>
     <string name="fragment_accept_invite">fragment_accept_invite</string>
+    <string name="notification_new_invite">You received a friend invite</string>
 </resources>

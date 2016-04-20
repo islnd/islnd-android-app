@@ -127,10 +127,11 @@ public class IslndProvider extends ContentProvider {
         sNotificationWithUserDataQueryBuilder = new SQLiteQueryBuilder();
 
         sNotificationWithUserDataQueryBuilder.setTables(
-                IslndContract.NotificationEntry.TABLE_NAME + " INNER JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
+                IslndContract.NotificationEntry.TABLE_NAME +
+                        " LEFT JOIN " + IslndContract.DisplayNameEntry.TABLE_NAME +
                         " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
                         " = " + IslndContract.DisplayNameEntry.TABLE_NAME + "." + IslndContract.DisplayNameEntry.COLUMN_USER_ID +
-                        " INNER JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
+                        " LEFT JOIN " + IslndContract.ProfileEntry.TABLE_NAME +
                         " ON " + IslndContract.NotificationEntry.TABLE_NAME + "." + IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID +
                         " = " + IslndContract.ProfileEntry.TABLE_NAME + "." + IslndContract.ProfileEntry.COLUMN_USER_ID
         );
@@ -240,7 +241,7 @@ public class IslndProvider extends ContentProvider {
     }
 
     private Cursor getInviteById(Uri uri, String[] projection) {
-        Long inviteId = IslndContract.InviteEntry.getIdFromUri(uri);
+        int inviteId = IslndContract.InviteEntry.getIdFromUri(uri);
         String selection = IslndContract.InviteEntry._ID + " = ?";
         String[] selectionArgs = {Long.toString(inviteId)};
 

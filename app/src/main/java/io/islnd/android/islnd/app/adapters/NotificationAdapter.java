@@ -30,7 +30,6 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
     @Override
     public void onBindViewHolder(NotificationViewHolder holder, Cursor cursor) {
         String displayName = cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
-        int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID));
         int notificationType = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE));
 
         switch (notificationType) {
@@ -54,12 +53,17 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
             }
             case NotificationType.NEW_FRIEND: {
                 holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_18dp);
+                int userId = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID));
 
                 holder.view.setOnClickListener((View v) -> {
                     Intent intent = new Intent(mContext, ProfileActivity.class);
                     intent.putExtra(ProfileActivity.USER_ID_EXTRA, userId);
                     mContext.startActivity(intent);
                 });
+                break;
+            }
+            case NotificationType.NEW_INVITE: {
+                holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_18dp);
                 break;
             }
         }
@@ -75,11 +79,13 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                 cursor.getLong(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_TIMESTAMP)))
         );
 
-        ImageUtil.setPostProfileImageSampled(
-                mContext,
-                holder.profileImage,
-                Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI)))
-        );
+        if (notificationType != NotificationType.NEW_INVITE) {
+            ImageUtil.setPostProfileImageSampled(
+                    mContext,
+                    holder.profileImage,
+                    Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI)))
+            );
+        }
     }
 
     @Override

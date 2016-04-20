@@ -436,8 +436,8 @@ public class IslndContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Long getIdFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(1));
+        public static int getIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 }

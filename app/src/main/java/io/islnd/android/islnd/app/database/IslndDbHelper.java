@@ -92,7 +92,7 @@ public class IslndDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_NOTIFICATION_TABLE = "CREATE TABLE " + IslndContract.NotificationEntry.TABLE_NAME + " (" +
                 IslndContract.NotificationEntry._ID + " INTEGER PRIMARY KEY," +
-                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER NOT NULL," +
+                IslndContract.NotificationEntry.COLUMN_NOTIFICATION_USER_ID + " INTEGER," +
                 IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE + " INTEGER NOT NULL," +
                 IslndContract.NotificationEntry.COLUMN_POST_ID + " TEXT, " +
                 IslndContract.NotificationEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL, " +
