@@ -45,6 +45,14 @@ public class MessageBuilder {
                 newAlias);
     }
 
+    public static Message buildNewGroupKeyMessage(Context context, String mailbox, String encodedKey) {
+        return new Message(
+                mailbox,
+                getNewMessageIdAndUpdate(context),
+                MessageType.NEW_GROUP_KEY,
+                encodedKey);
+    }
+
     public static Message buildDeleteMeMessage(Context context, String mailbox) {
         return new Message(
                 mailbox,

@@ -5,5 +5,6 @@ public class MessageType {
     public static final int SECRET_IDENTITY = 1;
     public static final int PROFILE = 2;
     public static final int NEW_ALIAS = 3;
-    public static final int DELETE_ME = 4;
+    public static final int NEW_GROUP_KEY = 4;
+    public static final int DELETE_ME = 5;
 }

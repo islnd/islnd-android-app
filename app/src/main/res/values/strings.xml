@@ -26,21 +26,21 @@
     <string name="allow_user">Allow User</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="delete_post">Delete post</string>
-    <string name="delete_post_dialog">Delete post?</string>
+    <string name="dialog_delete_post">Do you want to delete your post?</string>
     <string name="delete_comment">Delete comment</string>
-    <string name="delete_comment_dialog">Delete comment?</string>
+    <string name="dialog_delete_comment">Do you want to delete your comment?</string>
     <string name="post_id_key">post_id</string>
     <string name="private_key">PRIVATE_KEY</string>
     <string name="public_key">PUBLIC_KEY</string>
     <string name="group_key">group_key</string>
     <string name="server_time_offset">server_time_offset</string>
     <string name="view_friend_status">Not Allowed</string>
-    <string name="allow_user_dialog">Allow user?</string>
     <string name="get_qr_code">Get Friend\'s QR Code</string>
-    <string name="qr_dialog_title">Show this to your friend</string>
-    <string name="add_friend_dialog">Pick Add Friend Action</string>
+    <string name="show_qr_code">Show this to your friend</string>
+    <string name="dialog_title_add_friend_action">Pick Add Friend Action</string>
     <string name="title_activity_show_qr">ShowQRActivity</string>
     <string name="sms_allow_dialog_title">Allow user with SMS</string>
+    <string name="dialog_title_sms_add_friend">Add friend with SMS</string>
     <string name="sms_disclaimer">Disclaimer: Standard text messaging rates may apply</string>
     <string name="send">send</string>
     <string name="phone_number">Phone Number</string>
@@ -72,16 +72,17 @@
     <string name="pref_appearance_title">Appearance</string>
     <string name="pref_appearance_summary">Application theme</string>
     <string name="pref_server_title">Server</string>
-    <string name="pref_server_summary">Configure host settings</string>
+    <string name="pref_server_summary">API key</string>
     <string name="pref_account_title">Account</string>
     <string name="pref_account_summary">Delete account</string>
     <string name="pref_api_key_title">API Key</string>
     <string name="pref_api_key_summary">Used with password protected server</string>
     <string name="pref_delete_account_title">Delete Account</string>
     <string name="pref_delete_account_summary">Removes all data and settings from device</string>
-    <string name="restart_settings_message">Settings must restart to apply change. Restart now?</string>
+    <string name="dialog_title_restart_settings">Restart settings</string>
+    <string name="dialog_restart_settings">Settings must restart to apply change. Restart now?</string>
     <string name="view_friends_fragment">Friends</string>
-    <string name="discard_profile_changes_dialog">Discard changes?</string>
+    <string name="dialog_discard_profile_changes">Do you want to discard profile changes?</string>
     <string name="discard">Discard</string>
     <string name="display_name">Display Name</string>
     <string name="has_created_account">has_created_account</string>
@@ -97,8 +98,8 @@
     <string name="creating_identity_message">Creating identity…</string>
     <string name="added_new_friend_message">Added new friend!</string>
     <string name="already_friends_message">We are already friends!</string>
-    <string name="delete_account_title">WARNING</string>
-    <string name="delete_account_message">All data will be deleted from device. You will no longer have access to account.</string>
+    <string name="dialog_title_delete_account">WARNING</string>
+    <string name="dialog_delete_account">All data will be deleted from device. You will no longer have access to account.</string>
     <string name="delete_button">Delete</string>
     <string name="notifications">Notifications</string>
     <string name="notification_comment_content">commented on your post</string>
@@ -111,6 +112,51 @@
     <string name="notification_badge">notification_badge</string>
     <string name="notification_badge_99_plus">99+</string>
     <string name="sms_add_self_message">Are you texting yourself?</string>
+    <string name="pref_notification_title">Notifications</string>
+    <string name="pref_notification_summary">Sync interval</string>
+    <string name="pref_sync_interval_title">Sync interval</string>
+    <string name="pref_sync_interval_default_value">4</string>
+    <string name="five_minutes">5 minutes</string>
+    <string name="ten_minutes">10 minutes</string>
+    <string name="fifteen_minutes">15 minutes</string>
+    <string name="thirty_minutes">30 minutes</string>
+    <string name="one_hour">1 hour</string>
+    <string name="two_hours">2 hours</string>
+    <string name="four_hours">4 hours</string>
+    <string name="twelve_hours">12 hours</string>
+    <string name="daily">Daily</string>
+    <string name="pref_enable_notifications_title">Enable notifications</string>
+    <string name="preferences_category_notifications">Notifications</string>
+    <string name="preferences_category_appearance">Appearance</string>
+    <string name="preferences_category_server">Server</string>
+    <string name="preferences_category_account">Account</string>
+    <string name="dialog_title_delete_comment">Delete comment</string>
+    <string name="dialog_title_delete_post">Delete post</string>
+    <string name="dialog_title_discard_profile_changes">Discard changes</string>
+    <string name="dialog_title_remove_friend">Remove friend</string>
+    <string name="dialog_remove_friend">Remove %s as a friend?</string>
+    <string-array name="pref_sync_interval_array">
+        <item>@string/five_minutes</item>
+        <item>@string/ten_minutes</item>
+        <item>@string/fifteen_minutes</item>
+        <item>@string/thirty_minutes</item>
+        <item>@string/one_hour</item>
+        <item>@string/two_hours</item>
+        <item>@string/four_hours</item>
+        <item>@string/twelve_hours</item>
+        <item>@string/daily</item>
+    </string-array>
+    <string-array name="pref_sync_interval_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
     <string-array name="pref_theme_array">
         <item>@string/light_theme</item>
         <item>@string/dark_theme</item>

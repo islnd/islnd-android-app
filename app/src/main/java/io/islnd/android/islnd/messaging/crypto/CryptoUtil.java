@@ -87,7 +87,7 @@ public class CryptoUtil {
         }
     }
 
-    public static Key getKey() {
+    public static SecretKey getKey() {
         return keyGenerator.generateKey();
     }
 

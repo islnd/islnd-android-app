@@ -41,8 +41,8 @@ public class AccountPreferenceFragment extends PreferenceFragmentCompat
 
     private void showDeleteAccountDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
-        builder.setTitle(getString(R.string.delete_account_title))
-                .setMessage(getString(R.string.delete_account_message))
+        builder.setTitle(getString(R.string.dialog_title_delete_account))
+                .setMessage(getString(R.string.dialog_delete_account))
                 .setPositiveButton(getString(R.string.delete_button), (DialogInterface dialog, int id) -> {
                     Util.deleteDataAndPreferences(getContext());
                     Util.restartApp((AppCompatActivity) getContext());

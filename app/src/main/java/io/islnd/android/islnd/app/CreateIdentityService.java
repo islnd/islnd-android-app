@@ -31,7 +31,7 @@ public class CreateIdentityService extends IntentService {
         String displayName = intent.getStringExtra(DISPLAY_NAME_EXTRA);
         Context context = getApplicationContext();
         setKeyPairAndPostPublicKey(context);
-        setGroupKey(context);
+        Util.setGroupKey(context, CryptoUtil.getKey());
         int userId = setAlias(context, displayName);
         setDefaultProfile(context, userId, displayName);
 
@@ -48,14 +48,6 @@ public class CreateIdentityService extends IntentService {
         String publicKey = CryptoUtil.encodeKey(keyPair.getPublic());
         editor.putString(context.getString(R.string.private_key), privateKey);
         editor.putString(context.getString(R.string.public_key), publicKey);
-        editor.commit();
-    }
-
-    private static void setGroupKey(Context context) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = settings.edit();
-        String groupKey = CryptoUtil.encodeKey(CryptoUtil.getKey());
-        editor.putString(context.getString(R.string.group_key), groupKey);
         editor.commit();
     }
 
