@@ -376,9 +376,21 @@ public class Util {
     }
 
     public static void applySyncInterval(Context context) {
+        if (!getNotificationsEnabled(context)) {
+            Log.d(TAG, "apply sync cancelled: notifications not enabled");
+            return;
+        }
+
         String value = android.support.v7.preference.PreferenceManager
                 .getDefaultSharedPreferences(context)
-                .getString(NotificationsPreferenceFragment.PREF_SYNC_INTERVAL_KEY, "4");
+                .getString(
+                        NotificationsPreferenceFragment.PREF_SYNC_INTERVAL_KEY,
+                        context.getString(R.string.pref_sync_interval_default_value));
         setSyncIntervalFromPreference(context, value);
+    }
+
+    public static boolean getNotificationsEnabled(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(NotificationsPreferenceFragment.PREF_ENABLE_NOTIFICATIONS_KEY, true);
     }
 }

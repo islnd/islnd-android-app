@@ -1,9 +1,11 @@
 package io.islnd.android.islnd.app.preferences;
 
 import android.os.Bundle;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.preference.SwitchPreferenceCompat;
 import android.util.Log;
 
 import io.islnd.android.islnd.app.R;
@@ -16,6 +18,7 @@ public class NotificationsPreferenceFragment extends PreferenceFragmentCompat
     private static final String TAG = NotificationsPreferenceFragment.class.getSimpleName();
 
     public static final String PREF_SYNC_INTERVAL_KEY = "pref_sync_interval_key";
+    public static final String PREF_ENABLE_NOTIFICATIONS_KEY = "pref_enable_notifications_key";
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -26,29 +29,27 @@ public class NotificationsPreferenceFragment extends PreferenceFragmentCompat
 
         String syncIntervalArrayValue = PreferenceManager
                 .getDefaultSharedPreferences(getContext())
-                .getString(PREF_SYNC_INTERVAL_KEY, "4");
+                .getString(PREF_SYNC_INTERVAL_KEY, getString(R.string.pref_sync_interval_default_value));
         setSyncIntervalSummary(syncIntervalArrayValue);
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object o) {
-        String oldValue = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getString(PREF_SYNC_INTERVAL_KEY, "4");
         String value = o.toString();
         String key = preference.getKey();
         Log.d(TAG, "pref key: " + key);
-        Log.d(TAG, "pref old value: " + oldValue);
-        Log.d(TAG, "pref new value: " + value);
-
-        if (oldValue.equals(value)) {
-            return false;
-        }
+        Log.d(TAG, "pref value: " + value);
 
         switch (key) {
             case PREF_SYNC_INTERVAL_KEY:
-                Util.setSyncIntervalFromPreference(getContext(), value);
-                SyncAlarm.cancelAlarm(getContext());
+                String oldValue = PreferenceManager
+                        .getDefaultSharedPreferences(getContext())
+                        .getString(PREF_SYNC_INTERVAL_KEY, getString(R.string.pref_sync_interval_default_value));
+
+                if (oldValue.equals(value)) {
+                    return false;
+                }
+
                 setSyncIntervalSummary(value);
                 break;
         }

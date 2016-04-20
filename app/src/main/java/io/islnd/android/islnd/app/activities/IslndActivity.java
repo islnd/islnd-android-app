@@ -10,7 +10,9 @@ public class IslndActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        SyncAlarm.cancelAlarm(getApplicationContext());
+        if (Util.getNotificationsEnabled(getApplicationContext())) {
+            SyncAlarm.cancelAlarm(getApplicationContext());
+        }
     }
 
     @Override
