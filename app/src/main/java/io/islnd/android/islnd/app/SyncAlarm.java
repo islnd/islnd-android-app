@@ -19,15 +19,18 @@ public class SyncAlarm extends BroadcastReceiver {
 
     private static final String TAG = SyncAlarm.class.getSimpleName();
 
-    public static final int SYNC_INTERVAL_FIVE_MINUTES = 300000;
-    public static final int SYNC_INTERVAL_TEN_MINUTES = 600000;
-    public static final int SYNC_INTERVAL_FIFTEEN_MINUTES = 900000;
-    public static final int SYNC_INTERVAL_THIRTY_MINUTES = 1800000;
-    public static final int SYNC_INTERVAL_ONE_HOUR = 3600000;
-    public static final int SYNC_INTERVAL_TWO_HOURS = 7200000;
-    public static final int SYNC_INTERVAL_FOUR_HOURS = 14400000;
-    public static final int SYNC_INTERVAL_TWELVE_HOURS = 43200000;
-    public static final int SYNC_INTERVAL_TWENTY_FOUR_HOURS = 86400000;
+    private static final int MILLISECONDS_IN_MINUTE = 60000;
+    private static final int MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTE;
+
+    public static final int SYNC_INTERVAL_FIVE_MINUTES = 5 * MILLISECONDS_IN_MINUTE;
+    public static final int SYNC_INTERVAL_TEN_MINUTES = 10 * MILLISECONDS_IN_MINUTE;
+    public static final int SYNC_INTERVAL_FIFTEEN_MINUTES = 15 * MILLISECONDS_IN_MINUTE;
+    public static final int SYNC_INTERVAL_THIRTY_MINUTES = 30 * MILLISECONDS_IN_MINUTE;
+    public static final int SYNC_INTERVAL_ONE_HOUR = MILLISECONDS_IN_HOUR;
+    public static final int SYNC_INTERVAL_TWO_HOURS = 2 * MILLISECONDS_IN_HOUR;
+    public static final int SYNC_INTERVAL_FOUR_HOURS = 4 * MILLISECONDS_IN_HOUR;
+    public static final int SYNC_INTERVAL_TWELVE_HOURS = 12 * MILLISECONDS_IN_HOUR;
+    public static final int SYNC_INTERVAL_TWENTY_FOUR_HOURS = 24 * MILLISECONDS_IN_HOUR;
 
     private StopSystemNotificationsReceiver mNotificationsReceiver;
 
