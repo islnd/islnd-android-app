@@ -109,6 +109,7 @@ public class ImageUtil {
     }
 
     public static Bitmap getBitmapFromAssets(Context context, String filePath) {
+        Log.d(TAG, "getting bitmap from asset: " + filePath);
         AssetManager assetManager = context.getAssets();
 
         InputStream inputStream;
