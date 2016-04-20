@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import javax.crypto.SecretKey;
+
 import io.islnd.android.islnd.app.BootReceiver;
 import io.islnd.android.islnd.app.R;
 import io.islnd.android.islnd.app.SyncAlarm;
@@ -124,6 +126,15 @@ public class Util {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
                 break;
         }
+    }
+
+    public static void setGroupKey(Context context, SecretKey groupKey) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+
+        String encodedGroupKey = CryptoUtil.encodeKey(groupKey);
+        editor.putString(context.getString(R.string.group_key), encodedGroupKey);
+        editor.commit();
     }
 
     public static Key getGroupKey(Context context) {

@@ -33,9 +33,10 @@ public class RepeatSyncService extends Service {
 
             @Override
             protected Void doInBackground(Void... params) {
-                int[] delay = {10000, 5000, 5000, 10000, 20000, 20000, 20000};
+                int[] delay = {10000, 10000, 20000, 20000, 20000};
 
                 for (int i = 0; i < delay.length; i++) {
+                    Log.v(TAG, (delay.length - i) + " repeat syncs remaining");
                     Log.d(TAG, "requestSync");
                     mContext.getContentResolver().requestSync(
                             Util.getSyncAccount(mContext),
