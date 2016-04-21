@@ -8,7 +8,8 @@ import android.widget.TextView;
 import io.islnd.android.islnd.app.R;
 
 public class NotificationViewHolder extends RecyclerView.ViewHolder  {
-    public ImageView profileImage;
+    public ImageView profileImageCircle;
+    public ImageView profileImageSquare;
     public TextView notificationContent;
     public ImageView notificationTypeIcon;
     public TextView timestamp;
@@ -16,7 +17,8 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder  {
 
     public NotificationViewHolder(View itemView) {
         super(itemView);
-        profileImage = (ImageView) itemView.findViewById(R.id.profile_image);
+        profileImageCircle = (ImageView) itemView.findViewById(R.id.profile_image_circle);
+        profileImageSquare = (ImageView) itemView.findViewById(R.id.profile_image_square);
         notificationContent = (TextView) itemView.findViewById(R.id.notification_content);
         notificationTypeIcon = (ImageView) itemView.findViewById(R.id.notification_type_icon);
         timestamp = (TextView) itemView.findViewById(R.id.timestamp);

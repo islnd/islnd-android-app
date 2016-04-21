@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,12 +42,30 @@ public class InviteAdapter extends CursorRecyclerViewAdapter<InviteViewHolder> {
         String displayName = cursor.getString(cursor.getColumnIndex(IslndContract.InviteEntry.COLUMN_DISPLAY_NAME));
         String phoneNumber = cursor.getString(cursor.getColumnIndex(IslndContract.InviteEntry.COLUMN_PHONE_NUMBER));
         long inviteId = cursor.getLong(cursor.getColumnIndex(IslndContract.InviteEntry._ID));
-        holder.displayName.setText(displayName);
-        holder.phoneNumber.setText(phoneNumber);
 
+        String inviteMessage = "";
+        String inviteMessagePrefix = "";
+        int boldLength = 0;
+        if ("".equals(displayName)) {
+            inviteMessagePrefix = phoneNumber;
+            inviteMessage = inviteMessagePrefix + " " + mContext.getString(R.string.invite_message);
+            boldLength = phoneNumber.length();
+        } else {
+            inviteMessagePrefix = displayName + " (" + phoneNumber + ")";
+            inviteMessage = inviteMessagePrefix + " "  + mContext.getString(R.string.invite_message);
+            boldLength = displayName.length() + phoneNumber.length() + 3;
+        }
+
+        SpannableStringBuilder inviteMessageStringBuilder = new SpannableStringBuilder(inviteMessage);
+        StyleSpan styleSpan = new StyleSpan(android.graphics.Typeface.BOLD);
+        inviteMessageStringBuilder.setSpan(styleSpan, 0, boldLength, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+        holder.inviteMessage.setText(inviteMessageStringBuilder);
+
+        final String sourceName = inviteMessagePrefix;
         holder.view.setOnClickListener((View v) -> {
             DialogFragment acceptInviteDialog =
-                    AcceptInviteDialog.buildWithArgs(inviteId);
+                    AcceptInviteDialog.buildWithArgs(inviteId, sourceName);
             acceptInviteDialog.show(
                     ((FragmentActivity) mContext).getSupportFragmentManager(),
                     mContext.getString(R.string.fragment_accept_invite));

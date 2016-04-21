@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/invite_vertical_padding"
@@ -8,22 +9,20 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin">
 
-    <TextView
-        android:id="@+id/invite_display_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/invite_content_margin"
-        android:layout_marginRight="@dimen/invite_content_margin"
-        style="@style/Base.TextAppearance.AppCompat.Medium"
-        android:textColor="@color/primary_text"/>
+    <ImageView
+        android:id="@+id/invite_icon"
+        android:layout_width="@dimen/invite_icon"
+        android:layout_height="@dimen/invite_icon"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="@dimen/invite_icon_margin"
+        app:srcCompat="@drawable/ic_contact_mail_48dp"/>
 
     <TextView
-        android:id="@+id/invite_phone_number"
+        android:id="@+id/invite_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/invite_content_margin"
-        android:layout_toRightOf="@id/invite_display_name"
-        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:layout_toRightOf="@id/invite_icon"
+        style="@style/Base.TextAppearance.AppCompat.Subhead"
         android:textColor="@color/primary_text"/>
 
 </RelativeLayout>

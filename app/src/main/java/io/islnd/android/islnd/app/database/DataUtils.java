@@ -1054,6 +1054,7 @@ public class DataUtils {
     }
 
     public static void deleteInvite(Context context, long inviteId) {
+        Log.d(TAG, "deleting invite: " + inviteId);
         String selection = IslndContract.InviteEntry._ID + " = ?";
         String[] selectionArgs = new String[] {
                 Long.toString(inviteId)

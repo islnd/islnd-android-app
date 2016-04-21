@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -63,7 +64,13 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                 break;
             }
             case NotificationType.NEW_INVITE: {
-                holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_18dp);
+                holder.profileImageSquare.setImageResource(R.drawable.ic_contact_mail_48dp);
+                holder.notificationTypeIcon.setVisibility(View.GONE);
+                holder.view.setOnClickListener((View v) -> {
+                    Intent intent = new Intent(mContext, NavBaseActivity.class);
+                    intent.setAction(NavBaseActivity.INVITE_FRAGMENT_ACTION);
+                    mContext.startActivity(intent);
+                });
                 break;
             }
         }
@@ -82,7 +89,7 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
         if (notificationType != NotificationType.NEW_INVITE) {
             ImageUtil.setPostProfileImageSampled(
                     mContext,
-                    holder.profileImage,
+                    holder.profileImageCircle,
                     Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI)))
             );
         }
