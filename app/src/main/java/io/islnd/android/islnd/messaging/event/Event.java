@@ -49,11 +49,7 @@ public abstract class Event implements
 
     @Override
     public int compareTo(Event another) {
-        if (this.alias.equals(another.alias)) {
-            return this.eventId - another.eventId;
-        }
-
-        return this.alias.compareTo(another.alias);
+        return this.eventId - another.eventId;
     }
 
     public static Event fromProto(String string) {
