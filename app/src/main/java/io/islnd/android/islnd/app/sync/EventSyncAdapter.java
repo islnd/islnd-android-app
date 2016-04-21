@@ -79,6 +79,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void getIncomingMessages() {
+        Log.d(TAG, "getIncomingMessages");
         MessageQuery messageQuery = new MessageQuery(getMailboxes());
         Log.v(TAG, "message query " + messageQuery);
         List<EncryptedMessage> encryptedMessages = Rest.postMessageQuery(
@@ -140,6 +141,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void pushOutgoingMessages(ContentProviderClient provider) {
+        Log.d(TAG, "pushOutgoingMessages");
         String[] projections = new String[] {
                 IslndContract.OutgoingMessageEntry.COLUMN_MAILBOX,
                 IslndContract.OutgoingMessageEntry.COLUMN_BLOB
@@ -178,9 +180,11 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void getIncomingEvents() {
+        Log.d(TAG, "getIncomingEvents");
         PriorityQueue<Event> comments = new PriorityQueue<>();
         boolean anyNewEventProcessed;
         do {
+            Log.d(TAG, "get events loop");
             anyNewEventProcessed = false;
             List<EncryptedEvent> encryptedEvents = getEncryptedEvents();
             if (encryptedEvents == null) {
@@ -194,6 +198,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
             //--Process events in order
             while (!events.isEmpty()) {
+                Log.d(TAG, "process loop");
                 final Event event = events.poll();
                 switch (event.getType()) {
                     case EventType.NEW_COMMENT: {
@@ -222,6 +227,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void pushOutgoingEvents(ContentProviderClient provider) {
+        Log.d(TAG, "pushOutgoingEvents");
         String[] projections = new String[] {
                 IslndContract.OutgoingEventEntry.COLUMN_ALIAS,
                 IslndContract.OutgoingEventEntry.COLUMN_BLOB
