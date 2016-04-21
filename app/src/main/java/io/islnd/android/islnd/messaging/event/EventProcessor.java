@@ -236,10 +236,16 @@ public class EventProcessor {
             commentUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
         }
 
-        PostAliasKey postAliasKey = DataUtils.getParentPostFromComment(
-                context,
-                commentUserId,
-                deleteCommentEvent.getCommentId());
+        PostAliasKey postAliasKey = null;
+        try {
+            postAliasKey = DataUtils.getParentPostFromComment(
+                    context,
+                    commentUserId,
+                    deleteCommentEvent.getCommentId());
+        } catch (IllegalArgumentException e) {
+            Log.v(TAG, "ignoring delete comment because we don't have the post");
+            return;
+        }
 
         CommentKey commentToDelete = new CommentKey(commentUserId, deleteCommentEvent.getCommentId());
         int deletedCount = DataUtils.deleteComment(context, commentToDelete);
