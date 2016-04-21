@@ -167,7 +167,13 @@ public class EventProcessor {
     }
 
     private static void addComment(Context context, NewCommentEvent newCommentEvent) {
-        int commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
+        //--If the userId was set previously, that takes precendence over the alias
+        //--This is a hack to defer comment processing when receiving events
+        int commentUserId = newCommentEvent.getUserId();
+        if (commentUserId == 0) {
+            commentUserId = DataUtils.getUserIdFromAlias(context, newCommentEvent.getAlias());
+        }
+
         int postUserId = 0;
         try {
             postUserId = DataUtils.getUserIdFromPostAuthorAlias(context, newCommentEvent.getPostAuthorAlias());
@@ -223,7 +229,17 @@ public class EventProcessor {
     }
 
     private static void deleteComment(Context context, DeleteCommentEvent deleteCommentEvent) {
-        int commentUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
+        //--If the userId was set previously, that takes precendence over the alias
+        //--This is a hack to defer comment processing when receiving events
+        int commentUserId = deleteCommentEvent.getUserId();
+        if (commentUserId == 0) {
+            commentUserId = DataUtils.getUserIdFromAlias(context, deleteCommentEvent.getAlias());
+        }
+
+        PostAliasKey postAliasKey = DataUtils.getParentPostFromComment(
+                context,
+                commentUserId,
+                deleteCommentEvent.getCommentId());
 
         CommentKey commentToDelete = new CommentKey(commentUserId, deleteCommentEvent.getCommentId());
         int deletedCount = DataUtils.deleteComment(context, commentToDelete);
@@ -232,10 +248,6 @@ public class EventProcessor {
             return;
         }
 
-        PostAliasKey postAliasKey = DataUtils.getParentPostFromComment(
-                context,
-                commentUserId,
-                deleteCommentEvent.getCommentId());
         int commentCount = DataUtils.getCommentCount(
                 context,
                 postAliasKey.getPostAuthorAlias(),

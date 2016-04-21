@@ -21,6 +21,9 @@ public abstract class Event implements
     protected final int eventId;
     protected final int eventType;
 
+    //--This is a hack to defer comment processing
+    private int userId;
+
     protected Event(String alias, int eventId, int eventType) {
         this.alias = alias;
         this.eventId = eventId;
@@ -129,5 +132,13 @@ public abstract class Event implements
         }
 
         return null;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return this.userId;
     }
 }
