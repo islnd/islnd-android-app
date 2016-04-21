@@ -45,14 +45,6 @@ public class ShowQrFragment extends Fragment {
         Intent repeatSyncServiceIntent = new Intent(mContext, RepeatSyncService.class);
         mContext.startService(repeatSyncServiceIntent);
 
-        Button getQrButton = (Button) v.findViewById(R.id.get_qr_button);
-        getQrButton.setOnClickListener((View view) -> {
-                    IntentIntegrator integrator = new IntentIntegrator(getActivity());
-                    integrator.setCaptureActivity(VerticalCaptureActivity.class);
-                    integrator.setOrientationLocked(false);
-                    integrator.initiateScan();
-        });
-
         return v;
     }
 

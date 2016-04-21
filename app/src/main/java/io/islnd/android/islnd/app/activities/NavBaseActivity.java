@@ -2,7 +2,6 @@ package io.islnd.android.islnd.app.activities;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,7 +36,6 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.islnd.android.islnd.app.IslndAction;
@@ -249,7 +247,7 @@ public class NavBaseActivity extends IslndActivity
                 // Permission granted
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    smsAllowDialog();
+                    smsInviteFriendDialog();
                 }
                 break;
             case REQUEST_CONTACT:
@@ -275,26 +273,28 @@ public class NavBaseActivity extends IslndActivity
                         R.array.nav_add_friend_actions,
                         (DialogInterface dialog, int which) -> {
                             switch (which) {
-                                case 0: // QR
-                                    qrCodeActionDialog();
+                                case 0: // Display QR
+                                    mFragment = new ShowQrFragment();
+                                    getSupportFragmentManager().beginTransaction()
+                                            .replace(R.id.content_frame, mFragment)
+                                            .addToBackStack("")
+                                            .commit();
                                     break;
-                                case 1: // SMS
-                                    smsAllowDialog();
+                                case 1: // Scan SMS
+                                    IntentIntegrator integrator = new IntentIntegrator(this);
+                                    integrator.setCaptureActivity(VerticalCaptureActivity.class);
+                                    integrator.setOrientationLocked(false);
+                                    integrator.initiateScan();
+                                    break;
+                                case 2: // SMS
+                                    smsInviteFriendDialog();
                                     break;
                             }
                         })
                 .show();
     }
 
-    private void qrCodeActionDialog() {
-        mFragment = new ShowQrFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, mFragment)
-                .addToBackStack("")
-                .commit();
-    }
-
-    private void smsAllowDialog() {
+    private void smsInviteFriendDialog() {
         // Check permission if we have to.
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
