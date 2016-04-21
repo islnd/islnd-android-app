@@ -176,7 +176,50 @@ public class DataUtils {
         }
     }
 
+    public static void updateUserOutbox(Context context, int userId, String newOutbox) {
+        Log.d(TAG, "updateUserOutbox by userId");
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, newOutbox);
+
+        String selection = IslndContract.UserEntry._ID + " = ?";
+        String[] selectionArgs = new String[]{ Integer.toString(userId) };
+
+        int rowsUpdated = context.getContentResolver().update(
+                IslndContract.UserEntry.CONTENT_URI,
+                values,
+                selection,
+                selectionArgs
+        );
+
+        if (rowsUpdated == 0) {
+            Log.w(TAG, "no outbox updated");
+        }
+    }
+
+    public static void updateUserInbox(Context context, String newInbox, Key publicKey) {
+        Log.d(TAG, "updateUserInbox by publicKey");
+        ContentValues values = new ContentValues();
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, newInbox);
+
+        String selection = IslndContract.UserEntry.COLUMN_PUBLIC_KEY + " = ?";
+        String[] selectionArgs = new String[]{
+                CryptoUtil.encodeKey(publicKey)
+        };
+
+        int rowsUpdated = context.getContentResolver().update(
+                IslndContract.UserEntry.CONTENT_URI,
+                values,
+                selection,
+                selectionArgs
+        );
+
+        if (rowsUpdated == 0) {
+            Log.w(TAG, "no inbox updated");
+        }
+    }
+
     public static void updateUserOutbox(Context context, String outbox, Key publicKey) {
+        Log.d(TAG, "updateUserOutbox by publicKey");
         ContentValues values = new ContentValues();
         values.put(IslndContract.UserEntry.COLUMN_MESSAGE_OUTBOX, outbox);
 
@@ -185,12 +228,16 @@ public class DataUtils {
                 CryptoUtil.encodeKey(publicKey)
         };
 
-        context.getContentResolver().update(
+        int rowsUpdated = context.getContentResolver().update(
                 IslndContract.UserEntry.CONTENT_URI,
                 values,
                 selection,
                 selectionArgs
         );
+
+        if (rowsUpdated == 0) {
+            Log.w(TAG, "no outbox updated");
+        }
     }
 
     public static int getUserIdForMessageOutbox(Context context, String mailbox) {
@@ -573,9 +620,10 @@ public class DataUtils {
         }
     }
 
-    public static void updateMyUserMailbox(Context context, String newMailbox) {
+    public static void updateMyInbox(Context context, String newInbox) {
+        Log.d(TAG, "updateMyInbox");
         ContentValues values = new ContentValues();
-        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, newMailbox);
+        values.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, newInbox);
 
         String selection = IslndContract.UserEntry._ID + " = ?";
         String[] selectionArgs = new String[]{
@@ -644,11 +692,14 @@ public class DataUtils {
         ContentValues values = new ContentValues();
         values.put(IslndContract.AliasEntry.COLUMN_ALIAS, newAlias);
 
-        context.getContentResolver().update(
+        int rowsUpdated = context.getContentResolver().update(
                 IslndContract.AliasEntry.buildAliasWithUserId(userId),
                 values,
                 null,
                 null);
+        if (rowsUpdated == 0) {
+            Log.w(TAG, "no alias updated");
+        }
     }
 
     public static void updateGroupKey(Context context, int userId, String newGroupKeyEncoded) {
@@ -1082,5 +1133,16 @@ public class DataUtils {
                 cursor.close();
             }
         }
+    }
+
+    public static void removeMessageToken(Context context, String mailbox) {
+        Log.d(TAG, "removeMessageToken");
+        String where = IslndContract.MessageTokenEntry.COLUMN_MAILBOX + " = ?";
+        String[] selectionArgs = new String[] { mailbox};
+        context.getContentResolver().delete(
+                IslndContract.MessageTokenEntry.CONTENT_URI,
+                where,
+                selectionArgs
+        );
     }
 }
