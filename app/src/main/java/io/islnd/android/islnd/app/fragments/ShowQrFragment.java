@@ -41,10 +41,6 @@ public class ShowQrFragment extends Fragment {
         Log.v(TAG, "encoded identity string has length " + encodedIdentity.length());
         Util.buildQrCode(qrImageView, encodedIdentity);
 
-        //--Start find friend service because someone may snap our QR code
-        Intent repeatSyncServiceIntent = new Intent(mContext, RepeatSyncService.class);
-        mContext.startService(repeatSyncServiceIntent);
-
         return v;
     }
 

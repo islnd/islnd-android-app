@@ -41,6 +41,7 @@ import java.util.List;
 import io.islnd.android.islnd.app.IslndAction;
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.RepeatSyncService;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.fragments.FeedFragment;
 import io.islnd.android.islnd.app.fragments.InvitesFragment;
@@ -274,6 +275,7 @@ public class NavBaseActivity extends IslndActivity
                         (DialogInterface dialog, int which) -> {
                             switch (which) {
                                 case 0: // Display QR
+                                    startService(new Intent(this, RepeatSyncService.class));
                                     mFragment = new ShowQrFragment();
                                     getSupportFragmentManager().beginTransaction()
                                             .replace(R.id.content_frame, mFragment)
@@ -281,6 +283,7 @@ public class NavBaseActivity extends IslndActivity
                                             .commit();
                                     break;
                                 case 1: // Scan SMS
+                                    startService(new Intent(this, RepeatSyncService.class));
                                     IntentIntegrator integrator = new IntentIntegrator(this);
                                     integrator.setCaptureActivity(VerticalCaptureActivity.class);
                                     integrator.setOrientationLocked(false);
