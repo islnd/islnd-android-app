@@ -2,7 +2,6 @@ package io.islnd.android.islnd.messaging.message;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -77,7 +76,7 @@ public class MessagePublisher {
             String newAlias,
             SecretKey newGroupKey) {
 
-        List<PublicKeyAndInbox> publicKeyAndInboxList = DataUtils.getKeysForOtherUsers(context, userIdToRemove);
+        List<PublicKeyAndInbox> publicKeyAndInboxList = DataUtils.getPublicKeyAndInboxForActiveUsersWithoutMeAndUserToRemove(context, userIdToRemove);
         ContentValues[] values = new ContentValues[publicKeyAndInboxList.size() * 3];
         initializeArray(values);
 

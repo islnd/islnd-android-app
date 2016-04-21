@@ -1095,7 +1095,7 @@ public class DataUtils {
         }
     }
 
-    public static List<PublicKeyAndInbox> getKeysForOtherUsers(Context context, int userIdToRemove) {
+    public static List<PublicKeyAndInbox> getPublicKeyAndInboxForActiveUsersWithoutMeAndUserToRemove(Context context, int userIdToRemove) {
         String[] projection = new String[] {
                 IslndContract.UserEntry.COLUMN_PUBLIC_KEY,
                 IslndContract.UserEntry.COLUMN_MESSAGE_INBOX
@@ -1104,15 +1104,18 @@ public class DataUtils {
         Cursor cursor = null;
         try {
             final String selection = IslndContract.UserEntry._ID + " != ? AND " +
-                    IslndContract.UserEntry._ID + " != ?";
+                    IslndContract.UserEntry._ID + " != ? AND " +
+                    IslndContract.UserEntry.COLUMN_ACTIVE + " = ? ";
+            final String[] selectionArgs = {
+                    Integer.toString(IslndContract.UserEntry.MY_USER_ID),
+                    Integer.toString(userIdToRemove),
+                    Integer.toString(IslndContract.UserEntry.ACTIVE)
+            };
             cursor = context.getContentResolver().query(
                     IslndContract.UserEntry.CONTENT_URI,
                     projection,
                     selection,
-                    new String[] {
-                            Integer.toString(IslndContract.UserEntry.MY_USER_ID),
-                            Integer.toString(userIdToRemove)
-                    },
+                    selectionArgs,
                     null);
 
             List<PublicKeyAndInbox> publicKeyAndInboxList = new ArrayList<>();

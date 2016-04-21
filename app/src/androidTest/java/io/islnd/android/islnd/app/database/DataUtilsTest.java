@@ -3,6 +3,10 @@ package io.islnd.android.islnd.app.database;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 
+import java.util.List;
+
+import io.islnd.android.islnd.messaging.PublicKeyAndInbox;
+
 public class DataUtilsTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
@@ -92,5 +96,18 @@ public class DataUtilsTest extends AndroidTestCase {
         assertEquals(1, cursor.getCount());
         cursor.moveToFirst();
         assertEquals(displayName, cursor.getString(0));
+    }
+
+    public void testGetsExpectedUsers() {
+        long myUserId = DatabaseTestHelpers.insertFakeUser(mContext);
+        assertEquals(IslndContract.UserEntry.MY_USER_ID, myUserId);
+        long user1 = DatabaseTestHelpers.insertFakeUser(mContext);
+        long user2 = DatabaseTestHelpers.insertFakeUser(mContext);
+        List<PublicKeyAndInbox> result = DataUtils.getPublicKeyAndInboxForActiveUsersWithoutMeAndUserToRemove(mContext, (int) user1);
+        assertEquals(1, result.size());
+
+        DataUtils.deactivateUser(mContext, user2);
+        result = DataUtils.getPublicKeyAndInboxForActiveUsersWithoutMeAndUserToRemove(mContext, (int) user1);
+        assertEquals(0, result.size());
     }
 }

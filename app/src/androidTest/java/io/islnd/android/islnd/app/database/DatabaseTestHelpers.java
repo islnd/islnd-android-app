@@ -12,7 +12,8 @@ import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 public class DatabaseTestHelpers {
     public static long insertFakeUser(Context context) {
         ContentValues userValues = new ContentValues();
-        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, "key");
+        final PublicKey publicKey = CryptoUtil.getKeyPair().getPublic();
+        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
         userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, "digest");
         userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, "inbox");
         Uri result = context.getContentResolver().insert(
@@ -21,29 +22,6 @@ public class DatabaseTestHelpers {
         );
 
         return IslndContract.UserEntry.getUserIdFromUri(result);
-    }
-
-    public static long insertFakeUser(Context context, PublicKey publicKey) {
-        ContentValues userValues = new ContentValues();
-        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY, CryptoUtil.encodeKey(publicKey));
-        userValues.put(IslndContract.UserEntry.COLUMN_PUBLIC_KEY_DIGEST, CryptoUtil.getDigest(publicKey));
-        userValues.put(IslndContract.UserEntry.COLUMN_MESSAGE_INBOX, "inbox");
-        Uri result = context.getContentResolver().insert(
-                IslndContract.UserEntry.CONTENT_URI,
-                userValues
-        );
-
-        final int userIdFromUri = IslndContract.UserEntry.getUserIdFromUri(result);
-        ContentValues aliasValues = new ContentValues();
-        aliasValues.put(IslndContract.AliasEntry.COLUMN_ALIAS, "fakeAlias");
-        aliasValues.put(IslndContract.AliasEntry.COLUMN_GROUP_KEY, CryptoUtil.encodeKey(CryptoUtil.getKey()));
-        aliasValues.put(IslndContract.AliasEntry.COLUMN_USER_ID, userIdFromUri);
-        context.getContentResolver().insert(
-                IslndContract.AliasEntry.CONTENT_URI,
-                aliasValues
-        );
-
-        return userIdFromUri;
     }
 
     public static void setDisplayName(Context context, long userId, String newDisplayName) {
