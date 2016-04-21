@@ -8,14 +8,12 @@ import io.islnd.android.islnd.app.R;
 
 public class InviteViewHolder extends RecyclerView.ViewHolder  {
 
-    public TextView displayName;
-    public TextView phoneNumber;
+    public TextView inviteMessage;
     public View view;
 
     public InviteViewHolder(View itemView) {
         super(itemView);
-        displayName = (TextView) itemView.findViewById(R.id.invite_display_name);
-        phoneNumber = (TextView) itemView.findViewById(R.id.invite_phone_number);
+        inviteMessage = (TextView) itemView.findViewById(R.id.invite_message);
         view = itemView;
     }
 }

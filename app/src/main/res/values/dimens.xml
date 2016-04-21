@@ -67,4 +67,6 @@
     <dimen name="glance_post_comment_count_margin">16dp</dimen>
     <dimen name="comment_timestamp_margin">16dp</dimen>
     <dimen name="profile_info_padding">16dp</dimen>
+    <dimen name="invite_icon">64dp</dimen>
+    <dimen name="invite_icon_margin">8dp</dimen>
 </resources>

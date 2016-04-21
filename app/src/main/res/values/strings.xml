@@ -181,4 +181,5 @@
     <string name="dialog_title_sms_invite_permission">SMS friend invite</string>
     <string name="dialog_sms_invite_permission">A friend may add you with a text message (SMS). To allow or disallow this click OK.</string>
     <string name="qr_one_friend">Use a new QR code for each friend</string>
+    <string name="invite_message">wants to be your friend.</string>
 </resources>
