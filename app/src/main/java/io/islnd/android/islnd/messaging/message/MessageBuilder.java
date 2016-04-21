@@ -38,6 +38,7 @@ public class MessageBuilder {
     }
 
     public static Message buildNewAliasMessage(Context context, String mailbox, String newAlias) {
+        Log.v(TAG, String.format("message to %s new alias %s", mailbox, newAlias));
         return new Message(
                 mailbox,
                 getNewMessageIdAndUpdate(context),
@@ -46,6 +47,7 @@ public class MessageBuilder {
     }
 
     public static Message buildNewGroupKeyMessage(Context context, String mailbox, String encodedKey) {
+        Log.v(TAG, String.format("message to %s new group key", mailbox));
         return new Message(
                 mailbox,
                 getNewMessageIdAndUpdate(context),
@@ -54,6 +56,7 @@ public class MessageBuilder {
     }
 
     public static Message buildNewMailboxMessage(Context context, String mailbox, String newMailbox) {
+        Log.v(TAG, String.format("message to %s change mailbox to %s", mailbox, newMailbox));
         return new Message(
                 mailbox,
                 getNewMessageIdAndUpdate(context),
@@ -62,6 +65,7 @@ public class MessageBuilder {
     }
 
     public static Message buildDeleteMeMessage(Context context, String mailbox) {
+        Log.v(TAG, String.format("message to %s delete me", mailbox));
         return new Message(
                 mailbox,
                 getNewMessageIdAndUpdate(context),
