@@ -34,6 +34,7 @@ import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
 import io.islnd.android.islnd.messaging.crypto.InvalidSignatureException;
 import io.islnd.android.islnd.messaging.event.Event;
 import io.islnd.android.islnd.messaging.event.EventProcessor;
+import io.islnd.android.islnd.messaging.event.EventType;
 import io.islnd.android.islnd.messaging.message.Message;
 import io.islnd.android.islnd.messaging.message.MessageProcessor;
 import io.islnd.android.islnd.messaging.message.MessageType;
@@ -177,6 +178,7 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void getIncomingEvents() {
+        PriorityQueue<Event> comments = new PriorityQueue<>();
         boolean anyNewEventProcessed;
         do {
             anyNewEventProcessed = false;
@@ -192,12 +194,31 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
             //--Process events in order
             while (!events.isEmpty()) {
-                boolean newEventProcessed = EventProcessor.process(mContext, events.poll());
-                if (newEventProcessed) {
-                    anyNewEventProcessed = true;
+                final Event event = events.poll();
+                switch (event.getType()) {
+                    case EventType.NEW_COMMENT: {
+                        //--Fall through
+                    }
+                    case EventType.DELETE_COMMENT: {
+                        event.setUserId(DataUtils.getUserIdFromAlias(mContext, event.getAlias()));
+                        comments.add(event);
+                        break;
+                    }
+                    default: {
+                        boolean newEventProcessed = EventProcessor.process(mContext, event);
+                        if (newEventProcessed) {
+                            anyNewEventProcessed = true;
+                        }
+                        break;
+                    }
                 }
             }
         } while (anyNewEventProcessed);
+
+        //--Process all comments and delete comments
+        while (!comments.isEmpty()) {
+            EventProcessor.process(mContext, comments.poll());
+        }
     }
 
     private void pushOutgoingEvents(ContentProviderClient provider) {
