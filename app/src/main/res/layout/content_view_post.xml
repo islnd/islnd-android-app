@@ -60,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:inputType="textMultiLine|textCapSentences"
+            android:maxLength="@integer/comment_maximum"
             android:hint="@string/add_comment"
             android:textColor="@color/primary_text"
             android:textColorHint="@color/hint_text"/>
