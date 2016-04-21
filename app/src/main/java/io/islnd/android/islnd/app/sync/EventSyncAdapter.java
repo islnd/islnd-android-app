@@ -181,7 +181,8 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void getIncomingEvents() {
         Log.d(TAG, "getIncomingEvents");
-        PriorityQueue<Event> comments = new PriorityQueue<>();
+        PriorityQueue<Event> newComments = new PriorityQueue<>();
+        PriorityQueue<Event> deleteComments = new PriorityQueue<>();
         boolean anyNewEventProcessed;
         do {
             Log.d(TAG, "get events loop");
@@ -202,11 +203,13 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
                 final Event event = events.poll();
                 switch (event.getType()) {
                     case EventType.NEW_COMMENT: {
-                        //--Fall through
+                        event.setUserId(DataUtils.getUserIdFromAlias(mContext, event.getAlias()));
+                        newComments.add(event);
+                        break;
                     }
                     case EventType.DELETE_COMMENT: {
                         event.setUserId(DataUtils.getUserIdFromAlias(mContext, event.getAlias()));
-                        comments.add(event);
+                        deleteComments.add(event);
                         break;
                     }
                     default: {
@@ -220,9 +223,13 @@ public class EventSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         } while (anyNewEventProcessed);
 
-        //--Process all comments and delete comments
-        while (!comments.isEmpty()) {
-            EventProcessor.process(mContext, comments.poll());
+        //--Process new comments and then delete comments
+        while (!newComments.isEmpty()) {
+            EventProcessor.process(mContext, newComments.poll());
+        }
+
+        while (!deleteComments.isEmpty()) {
+            EventProcessor.process(mContext, deleteComments.poll());
         }
     }
 
