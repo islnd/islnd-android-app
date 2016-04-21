@@ -44,12 +44,15 @@ public class InviteAdapter extends CursorRecyclerViewAdapter<InviteViewHolder> {
         long inviteId = cursor.getLong(cursor.getColumnIndex(IslndContract.InviteEntry._ID));
 
         String inviteMessage = "";
+        String inviteMessagePrefix = "";
         int boldLength = 0;
         if ("".equals(displayName)) {
-            inviteMessage = phoneNumber + " " + mContext.getString(R.string.invite_message);
+            inviteMessagePrefix = phoneNumber;
+            inviteMessage = inviteMessagePrefix + " " + mContext.getString(R.string.invite_message);
             boldLength = phoneNumber.length();
         } else {
-            inviteMessage = displayName + " (" + phoneNumber + ") "  + mContext.getString(R.string.invite_message);
+            inviteMessagePrefix = displayName + " (" + phoneNumber + ")";
+            inviteMessage = inviteMessagePrefix + " "  + mContext.getString(R.string.invite_message);
             boldLength = displayName.length() + phoneNumber.length() + 3;
         }
 
@@ -59,9 +62,10 @@ public class InviteAdapter extends CursorRecyclerViewAdapter<InviteViewHolder> {
 
         holder.inviteMessage.setText(inviteMessageStringBuilder);
 
+        final String sourceName = inviteMessagePrefix;
         holder.view.setOnClickListener((View v) -> {
             DialogFragment acceptInviteDialog =
-                    AcceptInviteDialog.buildWithArgs(inviteId);
+                    AcceptInviteDialog.buildWithArgs(inviteId, sourceName);
             acceptInviteDialog.show(
                     ((FragmentActivity) mContext).getSupportFragmentManager(),
                     mContext.getString(R.string.fragment_accept_invite));

@@ -16,11 +16,13 @@ public class AcceptInviteDialog extends DialogFragment {
     private static final String TAG = AcceptInviteDialog.class.getSimpleName();
 
     public static final String INVITE_ID_BUNDLE_KEY = "INVITE_PARAM";
+    public static final String INVITE_SOURCE_NAME_BUNDLE_KEY = "INVITE_SOURCE_NAME";
 
-    public static AcceptInviteDialog buildWithArgs(long inviteId) {
+    public static AcceptInviteDialog buildWithArgs(long inviteId, String sourceName) {
         AcceptInviteDialog acceptInviteDialog = new AcceptInviteDialog();
         Bundle args = new Bundle();
         args.putLong(AcceptInviteDialog.INVITE_ID_BUNDLE_KEY, inviteId);
+        args.putString(AcceptInviteDialog.INVITE_SOURCE_NAME_BUNDLE_KEY, sourceName);
         acceptInviteDialog.setArguments(args);
         return acceptInviteDialog;
     }
@@ -29,13 +31,21 @@ public class AcceptInviteDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dialog);
-        return builder.setMessage(getString(R.string.accept_invite_dialog))
+        return builder.setTitle(R.string.dialog_title_invite_friend)
+                .setMessage(String.format(
+                        getString(R.string.accept_invite_dialog),
+                        getArguments().getString(INVITE_SOURCE_NAME_BUNDLE_KEY)))
                 .setPositiveButton(android.R.string.ok, (DialogInterface dialog, int id) ->
                         {
                             long inviteId = getArguments().getLong(INVITE_ID_BUNDLE_KEY);
                             acceptAndDeleteInvite(inviteId);
                         })
-                .setNegativeButton(android.R.string.cancel, null)
+                .setNegativeButton(R.string.dialog_button_dismiss, (DialogInterface dialog, int id) ->
+                        {
+                            DataUtils.deleteInvite(
+                                    getContext(),
+                                    getArguments().getLong(INVITE_ID_BUNDLE_KEY));
+                        })
                 .create();
     }
 
