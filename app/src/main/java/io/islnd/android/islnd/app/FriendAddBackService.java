@@ -11,6 +11,7 @@ import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.models.Profile;
 import io.islnd.android.islnd.app.util.ImageUtil;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.MailboxHelper;
 import io.islnd.android.islnd.messaging.PublicIdentity;
 import io.islnd.android.islnd.messaging.MessageLayer;
 import io.islnd.android.islnd.messaging.ProfileResource;
@@ -33,6 +34,7 @@ public class FriendAddBackService extends IntentService {
     public static final int PUBLIC_IDENTITY_JOB = 0;
     public static final int SECRET_IDENTITY_JOB = 1;
     public static final int PROFILE_JOB = 2;
+    public static final int NEW_MAILBOX_JOB = 3;
 
     public FriendAddBackService() {
         super(TAG);
@@ -61,7 +63,12 @@ public class FriendAddBackService extends IntentService {
             }
             case PROFILE_JOB: {
                 Log.d(TAG, "profile job");
-                sendProfileMessage(inbox, nonce, recipientPublicKey);
+                sendProfileMessage(inbox, recipientPublicKey);
+                break;
+            }
+            case NEW_MAILBOX_JOB: {
+                Log.d(TAG, "new mailbox job");
+                sendNewMailboxMessage(inbox, recipientPublicKey);
                 break;
             }
             default: {
@@ -70,6 +77,19 @@ public class FriendAddBackService extends IntentService {
         }
 
         Log.v(TAG, "onHandleIntent complete");
+    }
+
+    private void sendNewMailboxMessage(String mailbox, Key recipientPublicKey) {
+        String newMailbox = MailboxHelper.getAndSetNewInboxForUser(this, recipientPublicKey);
+        Message message = MessageBuilder.buildNewMailboxMessage(
+                this,
+                mailbox,
+                newMailbox);
+        EncryptedMessage encryptedMessage = new EncryptedMessage(
+                message,
+                recipientPublicKey,
+                Util.getPrivateKey(this));
+        Rest.postMessage(encryptedMessage, Util.getApiKey(this));
     }
 
     private void sendPublicIdentityMessage(String mailbox, String nonce, Key recipientPublicKey) {
@@ -103,7 +123,7 @@ public class FriendAddBackService extends IntentService {
         Rest.postMessage(encryptedMessage, Util.getApiKey(this));
     }
 
-    private void sendProfileMessage(String mailbox, String nonce, Key recipientPublicKey) {
+    private void sendProfileMessage(String mailbox, Key recipientPublicKey) {
         //--TODO don't post profile resource if my profile has not changed
         String profileResourceKey = postProfileResource();
 

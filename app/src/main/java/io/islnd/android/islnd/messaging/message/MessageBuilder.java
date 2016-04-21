@@ -53,6 +53,14 @@ public class MessageBuilder {
                 encodedKey);
     }
 
+    public static Message buildNewMailboxMessage(Context context, String mailbox, String newMailbox) {
+        return new Message(
+                mailbox,
+                getNewMessageIdAndUpdate(context),
+                MessageType.NEW_MAILBOX,
+                newMailbox);
+    }
+
     public static Message buildDeleteMeMessage(Context context, String mailbox) {
         return new Message(
                 mailbox,

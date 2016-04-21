@@ -65,8 +65,9 @@ public class MessageProcessor {
                         friendPublicIdentity.getMessageInbox(),
                         message.getMailbox());
 
-                sendOurSecretIdentityToUser(context, friendPublicIdentity);
-                sendOurProfileToUser(context, friendPublicIdentity);
+                startAddBackJob(context, friendPublicIdentity, FriendAddBackService.SECRET_IDENTITY_JOB);
+                startAddBackJob(context, friendPublicIdentity, FriendAddBackService.PROFILE_JOB);
+                startAddBackJob(context, friendPublicIdentity, FriendAddBackService.NEW_MAILBOX_JOB);
                 break;
             }
             case MessageType.SECRET_IDENTITY: {
@@ -91,6 +92,15 @@ public class MessageProcessor {
                 Log.v(TAG, "process new group key");
                 int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
                 DataUtils.updateGroupKey(context, userID, message.getBlob());
+                break;
+            }
+            case MessageType.NEW_MAILBOX: {
+                Log.d(TAG, "process new mailbox");
+                int userID = DataUtils.getUserIdForMessageOutbox(context, message.getMailbox());
+                Log.v(TAG, String.format("user %d from %s to %s",
+                        userID, message.getMailbox(), message.getBlob()));
+                DataUtils.removeMessageToken(context, message.getMailbox());
+                DataUtils.updateUserOutbox(context, userID, message.getBlob());
                 break;
             }
             case MessageType.DELETE_ME: {
@@ -195,25 +205,14 @@ public class MessageProcessor {
                 friendSecretIdentity);
     }
 
-    private static void sendOurSecretIdentityToUser(Context context, PublicIdentity publicIdentity) {
-        Intent sendSecretIdentity = new Intent(context, FriendAddBackService.class);
-        sendSecretIdentity.putExtra(
-                FriendAddBackService.MAILBOX_EXTRA,
-                publicIdentity.getMessageInbox());
-        sendSecretIdentity.putExtra(
-                FriendAddBackService.JOB_EXTRA,
-                FriendAddBackService.SECRET_IDENTITY_JOB);
-        context.startService(sendSecretIdentity);
-    }
-
-    private static void sendOurProfileToUser(Context context, PublicIdentity publicIdentity) {
+    private static void startAddBackJob(Context context, PublicIdentity publicIdentity, int profileJob) {
         Intent sendProfileIntent = new Intent(context, FriendAddBackService.class);
         sendProfileIntent.putExtra(
                 FriendAddBackService.MAILBOX_EXTRA,
                 publicIdentity.getMessageInbox());
         sendProfileIntent.putExtra(
                 FriendAddBackService.JOB_EXTRA,
-                FriendAddBackService.PROFILE_JOB);
+                profileJob);
         context.startService(sendProfileIntent);
     }
 

@@ -17,6 +17,7 @@ import javax.crypto.SecretKey;
 import io.islnd.android.islnd.app.database.DataUtils;
 import io.islnd.android.islnd.app.database.IslndContract;
 import io.islnd.android.islnd.app.util.Util;
+import io.islnd.android.islnd.messaging.MailboxHelper;
 import io.islnd.android.islnd.messaging.PublicKeyAndInbox;
 import io.islnd.android.islnd.messaging.crypto.CryptoUtil;
 import io.islnd.android.islnd.messaging.crypto.EncryptedMessage;
@@ -77,7 +78,7 @@ public class MessagePublisher {
             SecretKey newGroupKey) {
 
         List<PublicKeyAndInbox> publicKeyAndInboxList = DataUtils.getKeysForOtherUsers(context, userIdToRemove);
-        ContentValues[] values = new ContentValues[publicKeyAndInboxList.size() * 2];
+        ContentValues[] values = new ContentValues[publicKeyAndInboxList.size() * 3];
         initializeArray(values);
 
         PrivateKey myPrivateKey = Util.getPrivateKey(context);
@@ -104,6 +105,19 @@ public class MessagePublisher {
             );
             encryptMessageAndSetToContentValue(
                     newGroupKeyMessage,
+                    myPrivateKey,
+                    publicKeyAndInbox.getPublicKey(),
+                    values[index++],
+                    publicKeyAndInbox.getInbox());
+
+            String newMailbox = MailboxHelper.getAndSetNewInboxForUser(context, publicKeyAndInbox.getPublicKey());
+            final Message newMailboxMessage = MessageBuilder.buildNewMailboxMessage(
+                    context,
+                    publicKeyAndInbox.getInbox(),
+                    newMailbox
+            );
+            encryptMessageAndSetToContentValue(
+                    newMailboxMessage,
                     myPrivateKey,
                     publicKeyAndInbox.getPublicKey(),
                     values[index++],

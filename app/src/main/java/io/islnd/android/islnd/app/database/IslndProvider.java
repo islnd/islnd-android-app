@@ -1010,6 +1010,11 @@ public class IslndProvider extends ContentProvider {
                         IslndContract.InviteEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case MESSAGE_TOKEN: {
+                rowsDeleted = db.delete(
+                        IslndContract.MessageTokenEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

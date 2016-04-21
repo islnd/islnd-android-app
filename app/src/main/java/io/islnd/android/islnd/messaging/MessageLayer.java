@@ -81,6 +81,7 @@ public class MessageLayer {
         startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.PUBLIC_IDENTITY_JOB);
         startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.SECRET_IDENTITY_JOB);
         startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.PROFILE_JOB);
+        startAddBackJob(context, friendInbox, randomValue, FriendAddBackService.NEW_MAILBOX_JOB);
 
         return newFriend;
     }
