@@ -63,7 +63,8 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
                 break;
             }
             case NotificationType.NEW_INVITE: {
-                holder.notificationTypeIcon.setImageResource(R.drawable.ic_person_add_18dp);
+                holder.profileImageSquare.setImageResource(R.drawable.ic_contact_mail_48dp);
+                holder.notificationTypeIcon.setVisibility(View.GONE);
                 break;
             }
         }
@@ -82,7 +83,7 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
         if (notificationType != NotificationType.NEW_INVITE) {
             ImageUtil.setPostProfileImageSampled(
                     mContext,
-                    holder.profileImage,
+                    holder.profileImageCircle,
                     Uri.parse(cursor.getString(cursor.getColumnIndex(IslndContract.ProfileEntry.COLUMN_PROFILE_IMAGE_URI)))
             );
         }

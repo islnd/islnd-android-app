@@ -8,18 +8,30 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
+    <FrameLayout
+        android:id="@+id/notification_profile_image_layout"
         android:layout_width="@dimen/notification_profile_image"
         android:layout_height="@dimen/notification_profile_image"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="@dimen/notification_profile_image_margin"/>
+        android:layout_marginRight="@dimen/notification_profile_image_margin">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image_circle"
+            android:layout_width="@dimen/notification_profile_image"
+            android:layout_height="@dimen/notification_profile_image"/>
+
+        <ImageView
+            android:id="@+id/profile_image_square"
+            android:layout_width="@dimen/notification_profile_image"
+            android:layout_height="@dimen/notification_profile_image" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/notification_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/profile_image"
+        android:layout_toRightOf="@id/notification_profile_image_layout"
         android:layout_marginBottom="@dimen/notification_content_margin"
         style="@style/Base.TextAppearance.AppCompat.Subhead"
         android:textColor="@color/primary_text"/>
