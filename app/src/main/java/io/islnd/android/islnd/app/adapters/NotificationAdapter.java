@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import io.islnd.android.islnd.app.NotificationHelper;
 import io.islnd.android.islnd.app.R;
+import io.islnd.android.islnd.app.activities.NavBaseActivity;
 import io.islnd.android.islnd.app.activities.ProfileActivity;
 import io.islnd.android.islnd.app.activities.ViewPostActivity;
 import io.islnd.android.islnd.app.database.IslndContract;
@@ -65,6 +66,11 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
             case NotificationType.NEW_INVITE: {
                 holder.profileImageSquare.setImageResource(R.drawable.ic_contact_mail_48dp);
                 holder.notificationTypeIcon.setVisibility(View.GONE);
+                holder.view.setOnClickListener((View v) -> {
+                    Intent intent = new Intent(mContext, NavBaseActivity.class);
+                    intent.setAction(NavBaseActivity.INVITE_FRAGMENT_ACTION);
+                    mContext.startActivity(intent);
+                });
                 break;
             }
         }

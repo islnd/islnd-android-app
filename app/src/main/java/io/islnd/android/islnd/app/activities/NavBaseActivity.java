@@ -66,6 +66,8 @@ public class NavBaseActivity extends IslndActivity
 
     private static final String FRAGMENT_STATE = "FRAGMENT_STATE";
 
+    public static final String INVITE_FRAGMENT_ACTION = "INVITE_FRAGMENT_ACTION";
+
     private static final int REQUEST_SMS = 0;
     private static final int REQUEST_CONTACT = 1;
     private static final int REQUEST_SMS_AND_CONTACT = 2;
@@ -102,6 +104,8 @@ public class NavBaseActivity extends IslndActivity
         } else if (IslndAction.NOTIFICATION_CONTENT_CLICK.equals(intent.getAction())) {
             NotificationHelper.cancelNotifications(this);
             mFragment = new NotificationsFragment();
+        } else if (INVITE_FRAGMENT_ACTION.equals(intent.getAction())) {
+            mFragment = new InvitesFragment();
         } else {
             mFragment = new FeedFragment();
         }
