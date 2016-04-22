@@ -101,7 +101,7 @@ public class NotificationHelper {
 
         // Build and notify
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_notification_logo)
                 .setContentTitle(bigContentTitle)
                 .setContentText(activeNotifications.get(0))
                 .setDeleteIntent(deleteIntent)
