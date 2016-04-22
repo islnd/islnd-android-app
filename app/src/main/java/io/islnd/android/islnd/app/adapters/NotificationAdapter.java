@@ -33,6 +33,9 @@ public class NotificationAdapter extends CursorRecyclerViewAdapter<NotificationV
         String displayName = cursor.getString(cursor.getColumnIndex(IslndContract.DisplayNameEntry.COLUMN_DISPLAY_NAME));
         int notificationType = cursor.getInt(cursor.getColumnIndex(IslndContract.NotificationEntry.COLUMN_NOTIFICATION_TYPE));
 
+        holder.profileImageCircle.setImageResource(android.R.color.transparent);
+        holder.profileImageSquare.setImageResource(android.R.color.transparent);
+
         switch (notificationType) {
             case NotificationType.COMMENT: {
                 holder.notificationTypeIcon.setImageResource(R.drawable.ic_comment_18dp);
